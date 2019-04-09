@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function create(fn) {
   let listeners = []
   let state = {
