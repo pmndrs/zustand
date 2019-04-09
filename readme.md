@@ -24,7 +24,7 @@ const useStore = create(set => ({
 ```jsx
 function Counter() {
   // Will only re-render the component when "count" changes
-  const count = useState(state => state.count)
+  const count = useStore(state => state.count)
   return <h1>{count}</h1>
 }
 
