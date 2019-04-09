@@ -1,0 +1,13 @@
+node_modules/
+coverage/
+dist/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.vscode
+.docz/
+package-lock.json
+coverage/
+.idea
