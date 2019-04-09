@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="400" src="bear.png" />
+</p>
+
     npm install zustand
 
 React state is in a bit of a mess. Hundreds of solutions out there, the established options don't exactly go along well with hooks, context does not scale enough. There are dozens of solutions that claim you can replace, say, Redux with hooks and context, but most can't select state, which IMO doesn't qualify as a state-manager. The ones that do scale _and_ offer hooks with good ergonomics often come with other problems, like being unable to breach reconcilers (react-three-fiber, react-konva, etc).
