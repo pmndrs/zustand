@@ -31,7 +31,7 @@ function Controlls() {
   return (
     <>
       <button onClick={inc}>up</button>
-      <button onClick={down}>down</button>
+      <button onClick={dec}>down</button>
     </>
   )
 }
