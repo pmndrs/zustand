@@ -5,6 +5,8 @@ React state is in a bit of a mess. Hundreds of solutions out there, the establis
 #### Create a store (or multiple, up to you...)
 
 ```jsx
+import create from 'msga'
+
 // Name your store anything you like, but remember, it's a hook!
 const useStore = create(set => ({
   // Everything in here is your state
