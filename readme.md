@@ -1,8 +1,8 @@
     npm install msga
 
-React state is in a bit of a mess. Hundreds of solutions out there, the established options don't exactly go along well with hooks, context didn't deliver. There are dozens of solutions that claim you can replace, say, Redux with hooks and context, but most of them can't select state, so everything renders on every change, which IMO doesn't qualify as a state-manager. The ones that do scale *and* offer hooks with good ergonomics often come with other problems, like being unable to breach reconcilers (react-three-fiber, react-konva, etc).
+React state is in a bit of a mess. Hundreds of solutions out there, the established options don't exactly go along well with hooks, context underdelivers. There are dozens of solutions that claim you can replace, say, Redux with hooks and context, but most can't select state, which IMO doesn't qualify as a state-manager. The ones that do scale _and_ offer hooks with good ergonomics often come with other problems, like being unable to breach reconcilers (react-three-fiber, react-konva, etc).
 
-Msga is a small (~400something bytes) barebones store. Nothing much to it, but it has a comfy api and solves some of these problems.
+Msga is a small barebones store. Nothing much to it, but it has a comfy api and solves some of these problems.
 
 #### Create a store (or multiple, up to you...)
 
@@ -10,7 +10,7 @@ Msga is a small (~400something bytes) barebones store. Nothing much to it, but i
 import create from 'msga'
 
 // Name your store anything you like, but remember, it's a hook!
-const useStore = create(set => ({
+const [useStore] = create(set => ({
   // Everything in here is your state
   count: 1,
   // You don't have to nest your actions, but makes it easier to fetch them later on
@@ -81,7 +81,7 @@ const book = useBookStore(state => state.books[title], [title])
 Just call `set` when you're ready, it doesn't care if your actions are async or not.
 
 ```jsx
-const useStore = create(set => ({
+const [useStore] = create(set => ({
   result: '',
   fetch: async url => {
     const response = await fetch(url)
@@ -96,7 +96,7 @@ const useStore = create(set => ({
 The `set` function already allows functional update `set(state => result)` but should there be cases where you need to access outside of it you have an optional `get`, too.
 
 ```jsx
-const useStore = create((set, get) => ({
+const [useStore] = create((set, get) => ({
   text: "hello",
   action: () => {
     const text = get().text
@@ -110,7 +110,7 @@ const useStore = create((set, get) => ({
 ```jsx
 import produce from "immer"
 
-const useStore = create(set => ({
+const [useStore] = create(set => ({
   nested: {
     structure: {
       constains: {
@@ -122,4 +122,19 @@ const useStore = create(set => ({
     draft.nested.structure.contains.a.value = undefined // not anymore ...
   }))
 })
+```
+
+## Reading/writing state and reacting to changes outside of components
+
+You can use it without React out of the box.
+
+```jsx
+const [, api] = create(...)
+
+// Listening to changes
+api.subscribe(state => console.log("i log whenever state changes", state))
+// Getting fresh state
+const state = api.getState()
+// Destroying the store
+api.destroy()
 ```
