@@ -1,13 +1,13 @@
-    npm install msga
+    npm install zustand
 
 React state is in a bit of a mess. Hundreds of solutions out there, the established options don't exactly go along well with hooks, context does not scale enough. There are dozens of solutions that claim you can replace, say, Redux with hooks and context, but most can't select state, which IMO doesn't qualify as a state-manager. The ones that do scale _and_ offer hooks with good ergonomics often come with other problems, like being unable to breach reconcilers (react-three-fiber, react-konva, etc).
 
-Msga is a small barebones store. Nothing much to it, but it has a comfy api and solves some of these problems.
+zustand is a small barebones store. Nothing much to it, but it has a comfy api and solves some of these problems.
 
 #### Create a store (or multiple, up to you...)
 
 ```jsx
-import create from 'msga'
+import create from 'zustand'
 
 // Name your store anything you like, but remember, it's a hook!
 const [useStore] = create(set => ({
@@ -54,7 +54,7 @@ const data = useStore()
 
 ## Selecting multiple state slices
 
-It's just like mapStateToProps in Redux. Msga will run a small shallow equal over the object you return. Of course, it won't cause re-renders if these properties aren't changed in the state model.
+It's just like mapStateToProps in Redux. zustand will run a small shallow equal over the object you return. Of course, it won't cause re-renders if these properties aren't changed in the state model.
 
 ```jsx
 const { name, age } = useStore(state => ({ name: state.name, age: state.age }))
