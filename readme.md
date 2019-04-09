@@ -124,9 +124,9 @@ const [useStore] = create(set => ({
 })
 ```
 
-## Reading/writing state and reacting to changes outside of components
+## Reading/writing state and reacting to changes outside of components
 
-You can use it without React out of the box.
+You can use it with or without React out of the box.
 
 ```jsx
 const [, api] = create(...)
