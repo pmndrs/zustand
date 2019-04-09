@@ -60,9 +60,16 @@ It's just like mapStateToProps in Redux. Msga will run a small shallow equal ove
 const { name, age } = useStore(state => ({ name: state.name, age: state.age }))
 ```
 
+Or, if you prefer, atomic selects do the same ...
+
+```jsx
+const name = useStore(state => state.name)
+const age = useStore(state => state.age)
+```
+
 ## Fetching from multiple stores
 
-You can create as many stores as you like, but you can also use data from one call in another.
+Since you can create as many stores as you like, forwarding a result into another selector is straight forward.
 
 ```jsx
 const currentUser = useCredentialsStore(state => state.currentUser)
@@ -71,7 +78,7 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors (this is completely optional)
 
-You can change the selector always! But since you essentially pass a new function every render it will subscribe and unsubscribe to the store every time. It's that big of a deal, unless you're dealing with hundreds of connected components. But you can still memoize your selector with an optional second argument that's similar to Reacts useCallback. Give it the dependencies you are interested in and it will let your selector in peace.
+You can change the selector always! But since you essentially pass a new function every render it will subscribe and unsubscribe to the store every time. It's not that much of a big deal, unless you're dealing with hundreds of connected components. But you can still memoize your selector with an optional second argument that's similar to Reacts useCallback. Give it the dependencies you are interested in and it will let your selector in peace.
 
 ```jsx
 const book = useBookStore(state => state.books[title], [title])
