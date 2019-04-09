@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="400" src="bear.png" />
+  <img width="500" src="bear.png" />
 </p>
 
     npm install zustand
