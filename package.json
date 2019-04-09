@@ -1,7 +1,7 @@
 {
-  "name": "msga",
+  "name": "zustand",
   "version": "0.0.1",
-  "description": "",
+  "description": "⛑ Comfy state management in React",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "sideEffects": false,
@@ -32,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/drcmda/msga.git"
+    "url": "git+https://github.com/drcmda/zustand.git"
   },
   "keywords": [
     "react",
@@ -45,9 +45,9 @@
   "author": "Paul Henschel",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/drcmda/msga/issues"
+    "url": "https://github.com/drcmda/zustand/issues"
   },
-  "homepage": "https://github.com/drcmda/msga#readme",
+  "homepage": "https://github.com/drcmda/zustand#readme",
   "dependencies": {
     "@babel/runtime": "^7.4.3"
   },
