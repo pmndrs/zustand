@@ -15,13 +15,13 @@ export default function create(fn) {
   return [
     // useStore
     (selector, dependencies) => {
-      const selected = selector(state.current)
+      let selected = selector ? selector(state.current) : state.current
       // Using functional initial b/c selected itself could be a function
       const [slice, set] = React.useState(() => selected)
       React.useEffect(() => {
         const ping = () => {
           // Get fresh selected state
-          let selected = selector(state.current)
+          let selected = selector ? selector(state.current) : state.current
           // If state is not equal from the get go and not an atomic then shallow equal it
           if (slice !== selected && typeof selected === 'object' && !Array.isArray(selected)) {
             selected = Object.entries(selected).reduce(
