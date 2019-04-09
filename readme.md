@@ -101,7 +101,7 @@ const [useStore] = create((set, get) => ({
   text: "hello",
   action: () => {
     const text = get().text
-    ///...
+    ...
   }
 })
 ```
