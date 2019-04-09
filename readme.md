@@ -2,6 +2,8 @@
 
 React state is in a bit of a mess. Hundreds of solutions out there, the established options don't exactly go along well with hooks, context didn't deliver. There are dozens of solutions that claim you can replace, say, Redux with hooks and context, but most of them can't select state, so everything renders on every change, which IMO doesn't qualify as a state-manager. The ones that do scale *and* offer hooks with good ergonomics often come with other problems, like being unable to breach reconcilers (react-three-fiber, react-konva, etc).
 
+Msga is a small (~400something bytes) barebones store. Nothing much to it, but it has a comfy api and solves some of these problems.
+
 #### Create a store (or multiple, up to you...)
 
 ```jsx
