@@ -28,7 +28,7 @@ function Counter() {
   return <h1>{count}</h1>
 }
 
-function Controlls() {
+function Controls() {
   const { inc, dec } = useState(state => state.actions)
   return (
     <>
