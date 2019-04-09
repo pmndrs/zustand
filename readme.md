@@ -31,6 +31,7 @@ function Counter() {
 }
 
 function Controls() {
+  // "actions" isn't special, we just named it like that to fetch updaters easier 
   const { inc, dec } = useStore(state => state.actions)
   return (
     <>
@@ -53,7 +54,7 @@ const data = useStore()
 
 ## Selecting multiple state slices
 
-It's just like mapStateToProps in Redux. msga will run a small shallow euqal test over the object you return.
+It's just like mapStateToProps in Redux. Msga will run a small shallow equal over the object you return. Of course, it won't cause re-renders if these properties aren't changed in the state model.
 
 ```jsx
 const { name, age } = useStore(state => ({ name: state.name, age: state.age }))
@@ -70,7 +71,7 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors (this is completely optional)
 
-You can change the selector always. But additionally you can memoize it with an optional second argument that's similar to Reacts useMemo. You could do it without, but it will subscribe and unsubscribe to the store on every render pass. Not that big of a deal, unless you're dealing with thousands of connected components.
+You can change the selector always! But since you essentially pass a new function every render it will subscribe and unsubscribe to the store every time. It's that big of a deal, unless you're dealing with hundreds of connected components. But you can still memoize your selector with an optional second argument that's similar to Reacts useCallback. Give it the dependencies you are interested in and it will let your selector in peace.
 
 ```jsx
 const book = useBookStore(state => state.books[title], [title])
@@ -100,7 +101,7 @@ const [useStore] = create((set, get) => ({
   text: "hello",
   action: () => {
     const text = get().text
-    ///...
+    ...
   }
 })
 ```
