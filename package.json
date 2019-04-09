@@ -69,5 +69,9 @@
     "rollup-plugin-node-resolve": "^4.2.1",
     "rollup-plugin-size-snapshot": "^0.8.0",
     "typescript": "^3.4.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.8",
+    "react-dom": ">=16.8"
   }
 }
