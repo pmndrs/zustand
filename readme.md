@@ -1,8 +1,6 @@
     npm install zustand
 
-React state is in a bit of a mess. Hundreds of solutions out there, the established options don't exactly go along well with hooks, context does not scale enough. There are dozens of solutions that claim you can replace, say, Redux with hooks and context, but most can't select state, which IMO doesn't qualify as a state-manager. The ones that do scale _and_ offer hooks with good ergonomics often come with other problems, like being unable to breach reconcilers (react-three-fiber, react-konva, etc).
-
-zustand is a small barebones store. Nothing much to it, but it has a comfy api and solves some of these problems.
+Small, fast and scaleable barebones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like, breaches reconciler boundaries (React context cannot pass into react-three-fiber, react-konva, etc).
 
 #### Create a store (or multiple, up to you...)
 
