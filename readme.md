@@ -29,7 +29,7 @@ function Counter() {
 }
 
 function Controls() {
-  const { inc, dec } = useState(state => state.actions)
+  const { inc, dec } = useStore(state => state.actions)
   return (
     <>
       <button onClick={inc}>up</button>
