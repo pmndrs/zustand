@@ -1,7 +1,7 @@
 {
   "name": "msga",
   "version": "0.0.1",
-  "description": "👍 Making React-state great again",
+  "description": "",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "sideEffects": false,
