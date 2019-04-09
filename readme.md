@@ -110,7 +110,7 @@ const useStore = create((set, get) => ({
 ```jsx
 import produce from "immer"
 
-const useStore = create((set, get) => ({
+const useStore = create(set => ({
   nested: {
     structure: {
       constains: {
