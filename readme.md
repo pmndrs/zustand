@@ -117,6 +117,8 @@ const [useStore] = create((set, get) => ({
 
 ## Sick of reducers and changing nested state? Use Immer!
 
+[immer](https://github.com/mweststrate/immer) is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
+
 ```jsx
 import produce from "immer"
 
