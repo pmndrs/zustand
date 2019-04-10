@@ -133,7 +133,8 @@ const [useStore] = create(set => ({
 
 const set = useStore(state => state.set)
 set(draft => {
-  draft.nested.structure.contains.a.value = undefined
+  draft.nested.structure.contains.a.value = false
+  draft.nested.structure.contains.anotherValue = true
 })
 ```
 
