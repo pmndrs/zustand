@@ -1,6 +1,6 @@
 {
   "name": "zustand",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "⛑ Comfy state management in React",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
