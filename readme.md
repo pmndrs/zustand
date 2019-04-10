@@ -139,12 +139,16 @@ const [useStore] = create(set => ({
 You can use it with or without React out of the box.
 
 ```jsx
-const [, api] = create(...)
+const [, api] = create(set => ({ n: 0, setN: n => set({ n }) }))
 
-// Listening to changes
-api.subscribe(state => console.log("i log whenever state changes", state))
 // Getting fresh state
-const state = api.getState()
+const n = api.getState().n
+// Listening to changes
+const unsub = api.subscribe(state => console.log(state.n))
+// Updating state, will trigger listeners
+api.getState().setN(1)
+// Unsubscribing handler
+unsub()
 // Destroying the store
 api.destroy()
 ```
