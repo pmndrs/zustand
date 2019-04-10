@@ -117,7 +117,7 @@ const [useStore] = create((set, get) => ({
 
 ## Sick of reducers and changing nested state? Use Immer!
 
-Having to construct nested structes bearhanded is one of the worst aspects of reducing state. Try [immer](https://github.com/mweststrate/immer)! It is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
+Having to build nested structures bearhanded is one of the more tiresome aspects of reducing state. Have you tried [immer](https://github.com/mweststrate/immer)? It is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
 
 ```jsx
 import produce from "immer"
