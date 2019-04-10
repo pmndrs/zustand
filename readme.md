@@ -121,6 +121,7 @@ const [useStore] = create((set, get) => ({
 import produce from "immer"
 
 const [useStore] = create(set => ({
+  set: fn => set(produce(fn)),
   nested: {
     structure: {
       constains: {
@@ -128,9 +129,11 @@ const [useStore] = create(set => ({
       }
     }
   },
-  action: () => set(produce(draft => {
-    draft.nested.structure.contains.a.value = undefined // not anymore ...
-  }))
+})
+
+const set = useStore(state => state.set)
+set(draft => {
+  draft.nested.structure.contains.a.value = undefined
 })
 ```
 
