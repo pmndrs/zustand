@@ -1,7 +1,7 @@
 {
   "name": "zustand",
   "version": "0.0.3",
-  "description": "⛑ Comfy state management in React",
+  "description": "🐻 Bear necessities for state management in React",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "sideEffects": false,
@@ -22,7 +22,7 @@
     "singleQuote": true,
     "jsxBracketSameLine": true,
     "tabWidth": 2,
-    "printWidth": 120
+    "printWidth": 80
   },
   "lint-staged": {
     "*.{js,}": [
@@ -48,9 +48,6 @@
     "url": "https://github.com/drcmda/zustand/issues"
   },
   "homepage": "https://github.com/drcmda/zustand#readme",
-  "dependencies": {
-    "@babel/runtime": "^7.4.3"
-  },
   "devDependencies": {
     "@babel/core": "7.3.4",
     "@babel/plugin-transform-modules-commonjs": "7.2.0",
@@ -71,7 +68,6 @@
     "typescript": "^3.4.2"
   },
   "peerDependencies": {
-    "react": ">=16.8",
-    "react-dom": ">=16.8"
+    "react": ">=16.8"
   }
 }

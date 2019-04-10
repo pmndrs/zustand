@@ -10,13 +10,11 @@ const getBabelOptions = ({ useESModules }, targets) => ({
   babelrc: false,
   extensions,
   exclude: '**/node_modules/**',
-  runtimeHelpers: true,
   presets: [
     ['@babel/preset-env', { loose: true, modules: false, targets }],
     '@babel/preset-react',
     '@babel/preset-typescript',
   ],
-  plugins: [['@babel/transform-runtime', { regenerator: false, useESModules }]],
 })
 
 function createConfig(entry, out) {
@@ -26,7 +24,9 @@ function createConfig(entry, out) {
       output: { file: `dist/${out}.js`, format: 'esm' },
       external,
       plugins: [
-        babel(getBabelOptions({ useESModules: true }, '>1%, not dead, not ie 11, not op_mini all')),
+        babel(
+          getBabelOptions({ useESModules: true }, 'last 2 chrome versions')
+        ),
         sizeSnapshot(),
         resolve({ extensions }),
       ],
@@ -35,7 +35,11 @@ function createConfig(entry, out) {
       input: entry,
       output: { file: `dist/${out}.cjs.js`, format: 'cjs' },
       external,
-      plugins: [babel(getBabelOptions({ useESModules: false })), sizeSnapshot(), resolve({ extensions })],
+      plugins: [
+        babel(getBabelOptions({ useESModules: false })),
+        sizeSnapshot(),
+        resolve({ extensions }),
+      ],
     },
   ]
 }

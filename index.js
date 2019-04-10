@@ -1,15 +1,13 @@
 import React from 'react'
 
 export default function create(fn) {
-  let listeners = []
   let state = {
+    listeners: [],
     current: fn(
       merge => {
-        if (typeof merge === 'function') {
-          merge = merge(state.current)
-        }
-        state.current = { ...state.current, ...merge }
-        listeners.forEach(listener => listener(state.current))
+        if (typeof merge === 'function') merge = merge(state.current)
+        state.current = Object.assign({}, state.current, merge)
+        state.listeners.forEach(listener => listener(state.current))
       },
       () => state.current
     ),
@@ -17,7 +15,7 @@ export default function create(fn) {
   return [
     // useStore
     (selector, dependencies) => {
-      let selected = selector ? selector(state.current) : { ...state.current }
+      let selected = selector ? selector(state.current) : state.current
       // Using functional initial b/c selected itself could be a function
       const [slice, set] = React.useState(() => selected)
       const sliceRef = React.useRef()
@@ -25,36 +23,37 @@ export default function create(fn) {
       React.useEffect(() => {
         const ping = () => {
           // Get fresh selected state
-          let selected = selector ? selector(state.current) : { ...state.current }
+          let selected = selector ? selector(state.current) : state.current
           // If state is not equal from the get go and not an atomic then shallow equal it
-          if (sliceRef.current !== selected && typeof selected === 'object' && !Array.isArray(selected)) {
+          if (
+            sliceRef.current !== selected &&
+            typeof selected === 'object' &&
+            !Array.isArray(selected)
+          ) {
             selected = Object.entries(selected).reduce(
-              (acc, [key, value]) => (sliceRef.current[key] !== value ? { ...acc, [key]: value } : acc),
+              (acc, [key, value]) =>
+                sliceRef.current[key] !== value
+                  ? Object.assign({}, acc, { [key]: value })
+                  : acc,
               sliceRef.current
             )
           }
-          // Using functional initial b/c selected itself could be a function
-          if (sliceRef.current !== selected) {
-            // Refresh local slice
-            set(() => selected)
-          }
+          // Refresh local slice, functional initial b/c selected itself could be a function
+          if (sliceRef.current !== selected) set(() => selected)
         }
-        listeners.push(ping)
-        return () => (listeners = listeners.filter(i => i !== ping))
+        state.listeners.push(ping)
+        return () => (state.listeners = state.listeners.filter(i => i !== ping))
       }, dependencies || [selector])
       // Returning the selected state slice
       return selected
     },
     {
       subscribe: fn => {
-        listeners.push(fn)
-        return () => (listeners = listeners.filter(i => i !== fn))
+        state.listeners.push(fn)
+        return () => (state.listeners = state.listeners.filter(i => i !== fn))
       },
       getState: () => state.current,
-      destroy: () => {
-        listeners = []
-        state.current = {}
-      },
+      destroy: () => ((state.listeners = []), (state.current = {})),
     },
   ]
 }
