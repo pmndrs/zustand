@@ -80,7 +80,7 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors (this is completely optional)
 
-You can change the selector always! But since you essentially pass a new function every render it will subscribe and unsubscribe to the store every time. It's not that much of a big deal, unless you're dealing with hundreds of connected components. But you can still memoize your selector with an optional second argument that's similar to Reacts useCallback. Give it the dependencies you are interested in and it will let your selector in peace.
+You can change the selector always! But since you essentially pass a new function every render it will subscribe and unsubscribe to the store every time. Most of the time it will bearly make a difference, but when you're dealing with dozens of connected components it is a good habit to memoize your selectors with an optional second argument that's similar to Reacts useCallback. Give it the dependencies you are interested in and it will let your selector in peace, which is faster and saves memory.
 
 ```jsx
 const book = useBookStore(state => state.books[title], [title])
@@ -117,7 +117,7 @@ const [useStore] = create((set, get) => ({
 
 ## Sick of reducers and changing nested state? Use Immer!
 
-[immer](https://github.com/mweststrate/immer) is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
+Having to construct nested structes bearhanded is one of the worst aspects of reducing state. Try [immer](https://github.com/mweststrate/immer)! It is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
 
 ```jsx
 import produce from "immer"
