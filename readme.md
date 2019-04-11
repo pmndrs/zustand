@@ -158,3 +158,19 @@ unsub()
 // Destroying the store
 api.destroy()
 ```
+
+## Middleware
+
+```jsx
+const logger = fn => {
+  return (set, get) => fn(args => {
+    console.log("  applying", args)
+    set(args)
+    console.log("  new state", get())
+  }, get)
+}
+
+const [useStore] = create(logger((set, get) => {
+  return { text: "hello", setText: text => set({ text }) }
+}))
+```
