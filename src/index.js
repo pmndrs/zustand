@@ -25,11 +25,7 @@ export default function create(fn) {
           // Get fresh selected state
           let selected = selector ? selector(state.current) : state.current
           // If state is not equal from the get go and not an atomic then shallow equal it
-          if (
-            sliceRef.current !== selected &&
-            typeof selected === 'object' &&
-            !Array.isArray(selected)
-          ) {
+          if (sliceRef.current !== selected && selected === Object(selected)) {
             selected = Object.entries(selected).reduce(
               (acc, [key, value]) =>
                 sliceRef.current[key] !== value
