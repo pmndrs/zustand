@@ -4,7 +4,7 @@
 
     npm install zustand
 
-Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like, breaches reconciler boundaries. You can check out a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
+Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like, breaches reconciler boundaries and is cross-platform to boot. Make your paws dirty with a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
 #### Create a store (or multiple, up to you...)
 
@@ -117,7 +117,7 @@ const [useStore] = create((set, get) => ({
 
 ## Sick of reducers and changing nested state? Use Immer!
 
-Having to construct nested structes bearhanded is one of the worst aspects of reducing state. Try [immer](https://github.com/mweststrate/immer)! It is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
+Having to build nested structures bearhanded is one of the more tiresome aspects of reducing state. Have you tried [immer](https://github.com/mweststrate/immer)? It is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
 
 ```jsx
 import produce from "immer"
@@ -157,4 +157,20 @@ api.getState().setN(1)
 unsub()
 // Destroying the store
 api.destroy()
+```
+
+## Middleware
+
+```jsx
+const logger = fn => {
+  return (set, get) => fn(args => {
+    console.log("  applying", args)
+    set(args)
+    console.log("  new state", get())
+  }, get)
+}
+
+const [useStore] = create(logger((set, get) => {
+  return { text: "hello", setText: text => set({ text }) }
+}))
 ```
