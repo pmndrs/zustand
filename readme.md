@@ -25,6 +25,8 @@ const [useStore] = create(set => ({
 
 #### Bind components
 
+Look Ma, no providers!
+
 ```jsx
 function Counter() {
   // Will only re-render the component when "count" changes
