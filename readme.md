@@ -4,9 +4,11 @@
 
     npm install zustand
 
-Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like, breaches reconciler boundaries and is cross-platform to boot. Make your paws dirty with a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
+Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like, not context based (no reliance on providers, breaches reconciler boundaries), and is cross-platform to boot. Make your paws dirty with a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
 #### Create a store (or multiple, up to you...)
+
+You could be in global or component scope, manage your store anywhere you want!
 
 ```jsx
 import create from 'zustand'
