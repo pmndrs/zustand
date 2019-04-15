@@ -165,7 +165,7 @@ const [useStore] = create((set, get) => ({
   dispatch: args => set(state => reducer(state, args)),
 })
 
-const dispatch useStore(state => state.dispatch)
+const dispatch = useStore(state => state.dispatch)
 dispatch({ type: types.increase })
 ```
 
