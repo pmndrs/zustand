@@ -144,6 +144,31 @@ set(draft => {
 })
 ```
 
+## Can't live without redux-like reducers and action types?
+
+```jsx
+const types {
+  increase: "INCREASE",
+  decrease: "DECREASE"
+}
+
+const reducer = (state, { type, ...payload }) => {
+  switch (type) {
+    case types.increase: return { ...state, count: state.count + 1 }
+    case types.decrease: return { ...state, count: state.count - 1 } 
+  }
+  return state
+}
+
+const [useStore] = create((set, get) => ({
+  count: 0,
+  dispatch: args => set(state => reducer(state, args)),
+})
+
+const dispatch useStore(state => state.dispatch)
+dispatch({ type: types.increase })
+```
+
 ## Reading/writing state and reacting to changes outside of components
 
 You can use it with or without React out of the box.
