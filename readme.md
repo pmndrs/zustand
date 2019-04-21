@@ -48,7 +48,7 @@ function Controls() {
 }
 ```
 
-# Receipes
+# Recipes
 
 ## Fetching everything
 
