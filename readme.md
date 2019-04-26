@@ -37,7 +37,7 @@ function Counter() {
 }
 
 function Controls() {
-  // "actions" isn't special, we just named it like that to fetch updaters easier 
+  // "actions" isn't special, we just named it like that to fetch updaters easier
   const { inc, dec } = useStore(state => state.actions)
   return (
     <>
@@ -82,14 +82,6 @@ const currentUser = useCredentialsStore(state => state.currentUser)
 const person = usePersonStore(state => state.persons[currentUser])
 ```
 
-## Memoizing selectors (this is completely optional)
-
-You can change the selector always! But since you essentially pass a new function every render it will subscribe and unsubscribe to the store every time. Most of the time it will bearly make a difference, but when you're dealing with dozens of connected components it is a good habit to memoize your selectors with an optional second argument that's similar to Reacts useCallback. Give it the dependencies you are interested in and it will let your selector in peace, which is faster and saves memory.
-
-```jsx
-const book = useBookStore(state => state.books[title], [title])
-```
-
 ## Async actions
 
 Just call `set` when you're ready, it doesn't care if your actions are async or not.
@@ -116,7 +108,7 @@ const [useStore] = create((set, get) => ({
     const text = get().text
     ...
   }
-})
+}))
 ```
 
 ## Sick of reducers and changing nested state? Use Immer!
@@ -135,7 +127,7 @@ const [useStore] = create(set => ({
       }
     }
   },
-})
+}))
 
 const set = useStore(state => state.set)
 set(draft => {
@@ -147,7 +139,7 @@ set(draft => {
 ## Can't live without redux-like reducers and action types?
 
 ```jsx
-const types {
+const types = {
   increase: "INCREASE",
   decrease: "DECREASE"
 }
@@ -155,15 +147,15 @@ const types {
 const reducer = (state, { type, ...payload }) => {
   switch (type) {
     case types.increase: return { ...state, count: state.count + 1 }
-    case types.decrease: return { ...state, count: state.count - 1 } 
+    case types.decrease: return { ...state, count: state.count - 1 }
   }
   return state
 }
 
-const [useStore] = create((set, get) => ({
+const [useStore] = create(set => ({
   count: 0,
   dispatch: args => set(state => reducer(state, args)),
-})
+}))
 
 const dispatch = useStore(state => state.dispatch)
 dispatch({ type: types.increase })
@@ -174,14 +166,14 @@ dispatch({ type: types.increase })
 You can use it with or without React out of the box.
 
 ```jsx
-const [, api] = create(set => ({ n: 0, setN: n => set({ n }) }))
+const [, api] = create({ n: 0 })
 
 // Getting fresh state
 const n = api.getState().n
 // Listening to changes
 const unsub = api.subscribe(state => console.log(state.n))
 // Updating state, will trigger listeners
-api.getState().setN(1)
+api.setState({ n: 1 })
 // Unsubscribing handler
 unsub()
 // Destroying the store
@@ -191,15 +183,14 @@ api.destroy()
 ## Middleware
 
 ```jsx
-const logger = fn => {
-  return (set, get) => fn(args => {
-    console.log("  applying", args)
-    set(args)
-    console.log("  new state", get())
-  }, get)
-}
+const logger = fn => (set, get) => fn(args => {
+  console.log("  applying", args)
+  set(args)
+  console.log("  new state", get())
+}, get)
 
-const [useStore] = create(logger((set, get) => {
-  return { text: "hello", setText: text => set({ text }) }
-}))
+const [useStore] = create(logger(set => ({
+  text: "hello",
+  setText: text => set({ text })
+})))
 ```
