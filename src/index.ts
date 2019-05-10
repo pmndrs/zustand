@@ -40,9 +40,10 @@ export default function create<
   function useStore<U>(selector?: StateSelector<State, U>) {
     // Gets entire state if no selector was passed in
     const selectState = typeof selector === 'function' ? selector : getState
-    // Using functional initial b/c selected itself could be a function
-    const [stateSlice, setStateSlice] = React.useState(() => selectState(state))
-    // Prevent useEffect from needing to run when values change by storing them in a ref object
+    // Not storing state in react hooks, just using to enable forcing an update
+    const [, forceUpdate] = React.useState({})
+    const stateSlice = selectState(state)
+    // Prevent subscribing/unsubscribing to the store when values change by storing them in a ref object
     const refs = React.useRef({ stateSlice, selectState }).current
 
     // Update refs when needed and only after view has been updated
@@ -56,9 +57,11 @@ export default function create<
       return subscribe(() => {
         // Get fresh selected state
         const selected = refs.selectState(state)
-        if (!shallowEqual(refs.stateSlice, selected))
-          // Refresh local slice, functional initial b/c selected itself could be a function
-          setStateSlice(() => selected)
+        if (!shallowEqual(refs.stateSlice, selected)) {
+          // Refresh local slice
+          refs.stateSlice = selected
+          forceUpdate({})
+        }
       })
     }, [])
 
