@@ -160,3 +160,24 @@ it('can update the selector even when the store does not change', async () => {
   rerender(<Component selector={s => s.two} />)
   await waitForElement(() => getByText('two'))
 })
+
+it('can pass optional dependencies to restrict selector calls', async () => {
+  const [useStore] = create(() => ({}))
+  let selectorCallCount = 0
+
+  function Component({ deps }) {
+    useStore(() => {
+      selectorCallCount++
+    }, deps)
+    return <div>{selectorCallCount}</div>
+  }
+
+  const { rerender } = render(<Component deps={[true]} />)
+  expect(selectorCallCount).toBe(1)
+
+  rerender(<Component deps={[true]} />)
+  expect(selectorCallCount).toBe(1)
+
+  rerender(<Component deps={[false]} />)
+  expect(selectorCallCount).toBe(2)
+})

@@ -36,14 +36,23 @@ export default function create<
   }
 
   function useStore(): State
-  function useStore<U>(selector: StateSelector<State, U>): U
-  function useStore<U>(selector?: StateSelector<State, U>) {
+  function useStore<U>(
+    selector: StateSelector<State, U>,
+    deps?: readonly any[]
+  ): U
+  function useStore<U>(
+    selector?: StateSelector<State, U>,
+    deps?: readonly any[]
+  ) {
     // Gets entire state if no selector was passed in
-    const selectState = typeof selector === 'function' ? selector : getState
+    const selectState = React.useCallback(
+      typeof selector === 'function' ? selector : getState,
+      deps as readonly any[]
+    )
     // Nothing stored in useState, just using to enable forcing an update
     const [, forceUpdate] = React.useState({})
-    // Always get latest slice because selector can change
-    const stateSlice = selectState(state)
+    // Always get latest slice unless dependencies are passed in
+    const stateSlice = React.useMemo(() => selectState(state), deps)
     // Prevent subscribing/unsubscribing to the store when values change by storing them in a ref object
     const refs = React.useRef({ stateSlice, selectState }).current
 
