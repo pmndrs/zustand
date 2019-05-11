@@ -65,6 +65,9 @@ export default function create<
     // Update refs only after view has been updated
     useEffect(() => void (selectStateRef.current = selectState), [selectState])
     useEffect(() => void (stateSliceRef.current = stateSlice), [stateSlice])
+    useEffect(() => void (dependenciesRef.current = dependencies), [
+      dependencies,
+    ])
 
     // Subscribe/unsubscribe to the store only on mount/unmount
     useEffect(() => {
