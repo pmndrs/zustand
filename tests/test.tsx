@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
 import {
   cleanup,
   fireEvent,
@@ -24,32 +25,22 @@ it('creates a store hook and api object', () => {
   `)
 })
 
-it('updates the store', () => {
-  expect.assertions(2)
-
+it('updates the store', async () => {
   const [useStore] = create(set => ({
     count: 1,
     inc: () => set(state => ({ count: state.count + 1 })),
     dec: () => set(state => ({ count: state.count - 1 })),
   }))
-  let renderCount = 0
 
   function Counter() {
-    renderCount++
     const { count, dec } = useStore()
-
-    useEffect(dec, [])
-
-    if (renderCount === 1) {
-      expect(count).toBe(1)
-    } else {
-      expect(count).toBe(0)
-    }
-
-    return <div>{count}</div>
+    React.useEffect(dec, [])
+    return <div>count: {count}</div>
   }
 
-  render(<Counter />)
+  const { getByText } = render(<Counter />)
+
+  await waitForElement(() => getByText('count: 0'))
 })
 
 it('can subscribe to part of the store', async () => {
@@ -142,4 +133,59 @@ it('can destroy the store', () => {
   // should this throw?
   setState({ value: 2 })
   expect(getState().value).toEqual(2)
+})
+
+it('can update the selector even when the store does not change', async () => {
+  const [useStore] = create(() => ({
+    one: 'one',
+    two: 'two',
+  }))
+
+  function Component({ selector }) {
+    return <div>{useStore(selector)}</div>
+  }
+
+  const { getByText, rerender } = render(<Component selector={s => s.one} />)
+  await waitForElement(() => getByText('one'))
+
+  rerender(<Component selector={s => s.two} />)
+  await waitForElement(() => getByText('two'))
+})
+
+it('can pass optional dependencies to restrict selector calls', () => {
+  const [useStore] = create(() => ({}))
+  let selectorCallCount = 0
+
+  function Component({ deps }) {
+    useStore(() => {
+      selectorCallCount++
+    }, deps)
+    return <div>{selectorCallCount}</div>
+  }
+
+  const { rerender } = render(<Component deps={[true]} />)
+  expect(selectorCallCount).toBe(1)
+
+  rerender(<Component deps={[true]} />)
+  expect(selectorCallCount).toBe(1)
+
+  rerender(<Component deps={[false]} />)
+  expect(selectorCallCount).toBe(2)
+})
+
+it('can update state without updating dependencies', async () => {
+  const [useStore, { setState }] = create(() => ({ value: 0 }))
+
+  function Component() {
+    const { value } = useStore(state => state, [])
+    return <div>value: {value}</div>
+  }
+
+  const { getByText } = render(<Component />)
+  await waitForElement(() => getByText('value: 0'))
+
+  act(() => {
+    setState({ value: 1 })
+  })
+  await waitForElement(() => getByText('value: 1'))
 })
