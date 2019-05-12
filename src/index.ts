@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react'
+import { useCallback, useLayoutEffect, useReducer, useRef } from 'react'
 import shallowEqual from './shallowEqual'
 
 type StateListener<T> = (state: T) => void
@@ -47,30 +47,28 @@ export default function create<
     dependencies?: ReadonlyArray<any>
   ) {
     // State selector gets entire state if no selector was passed in
-    const selectState = typeof selector === 'function' ? selector : getState
+    const stateSelector = typeof selector === 'function' ? selector : getState
+    const selectState = useCallback(
+      stateSelector,
+      dependencies as ReadonlyArray<any>
+    )
     const selectStateRef = useRef(selectState)
-    const dependenciesRef = useRef(dependencies)
     let [stateSlice, dispatch] = useReducer(reducer, state, selectState)
 
-    // Call new selector if no dependencies were passed in and selector has changed or dependencies were passed in and have changed
-    if (
-      (!dependencies && selectState !== selectStateRef.current) ||
-      !shallowEqual(dependencies, dependenciesRef.current)
-    )
-      stateSlice = selectState(state)
+    // Call new selector if it has changed
+    if (selectState !== selectStateRef.current) stateSlice = selectState(state)
 
     // Store in ref to enable updating without rerunning subscribe/unsubscribe
     const stateSliceRef = useRef(stateSlice)
 
     // Update refs only after view has been updated
-    useEffect(() => {
+    useLayoutEffect(() => {
       selectStateRef.current = selectState
       stateSliceRef.current = stateSlice
-      dependenciesRef.current = dependencies
-    }, [selectState, stateSlice, dependencies])
+    }, [selectState, stateSlice])
 
     // Subscribe/unsubscribe to the store only on mount/unmount
-    useEffect(() => {
+    useLayoutEffect(() => {
       return subscribe(() => {
         // Use the last selector passed to useStore to get current state slice
         const selectedSlice = selectStateRef.current(state)
