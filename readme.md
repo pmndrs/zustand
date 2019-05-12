@@ -194,3 +194,38 @@ const [useStore] = create(logger(set => ({
   setText: text => set({ text })
 })))
 ```
+
+## Memoizing selectors, performance concerns, etc. (this is just additional info)
+
+Zustand tries to be as performant as possible while still being flexible but there are limitations. This is an attempt to breakdown how Zustand works to enable better estimations of the computational cost.
+
+A component is always subscribed to the part of the store that the latest selector returned:
+```js
+const foo = useStore(state => state.foo) // subscribed only to state.foo
+```
+
+The selector is called first to return the selected state and again on ANY modification to the store, even updates made to a different part of the store:
+```js
+const [useStore, { setState }] = create(() => ({ foo: 'foo', bar: 'bar' }))
+function ComponentFoo() {
+  return useStore(state => state.foo)
+}
+function ComponentBar() {
+  return useStore(state => state.bar)
+}
+setState({ bar: 'new bar' }) // All selectors are called but only ComponentBar renders again
+```
+
+Zustand calls selectors to compare the selected state (the return value of the selector) with the previous selected state. An update is dispatched to the component if the new selected state is different. The comparison is done with a shallow equality check. The component will then render again with the new selected state. Zustand has to check if the selector is new during the re render because it can be changed at any time. If the selector is new, it's called and the return value is used instead of the selected state that was dispatched.
+
+It's best to use selectors that are not computationally expensive as they are called on every update to the store. You can also skip the additional call to the selector by extracting the selector and passing it in as a static reference:
+```js
+const fooSelector = state => state.foo
+const foo = useStore(fooSelector) // fooSelector only called on initialization and store updates
+```
+
+You can also pass an optional dependencies array to let Zustand know when the selector updates:
+```js
+// selector only called on initialization, store updates, and props.key updates
+const part = useStore(state => state[props.key], [props.key])
+```
