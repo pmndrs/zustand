@@ -55,7 +55,7 @@ function Controls() {
 You can, but remember that it will cause the component to update on every state change!
 
 ```jsx
-const data = useStore()
+const state = useStore()
 ```
 
 ## Selecting multiple state slices
@@ -63,14 +63,14 @@ const data = useStore()
 It's just like mapStateToProps in Redux. zustand will run a small shallow equal over the object you return. Of course, it won't cause re-renders if these properties aren't changed in the state model.
 
 ```jsx
-const { name, age } = useStore(state => ({ name: state.name, age: state.age }))
+const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
 ```
 
 Or, if you prefer, atomic selects do the same ...
 
 ```jsx
-const name = useStore(state => state.name)
-const age = useStore(state => state.age)
+const foo = useStore(state => state.foo)
+const bar = useStore(state => state.bar)
 ```
 
 ## Fetching from multiple stores
@@ -102,7 +102,7 @@ const foo = useStore(fooSelector)
 Or an optional dependencies array to let Zustand know when the selector updates:
 
 ```js
-const part = useStore(state => state.foo[props.id], [props.id])
+const foo = useStore(state => state.foo[props.id], [props.id])
 ```
 
 From there on your selector will only run when either state changes, or the selector itself.
