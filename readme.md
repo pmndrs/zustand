@@ -84,15 +84,15 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors, optimizing performance
 
-Flux stores usually call the selector on every render-pass. Normally this isn't much of a problem, but when your selectors are computationally expensive you may want to optimize it.
+Flux stores usually call the selector on every render-pass. Most of the time this isn't much of a problem, but when your selectors are computationally expensive, or when you know the component renders a lot (for instance react-motion calling it 60 times per second for animation purposes) you may want to optimize it.
 
 ```js
 const foo = useStore(state => state.foo[props.id])
 ```
 
-In this case the selector `state => state.foo[props.id]` will run on every state change, as well as every time the component renders.
+In this case the selector `state => state.foo[props.id]` will run on every state change, as well as every time the component renders. This isn't expensive at all, but let's optimize it for arguments sake.
 
-To optimize this you can either pass a static reference:
+You can either pass a static reference:
 
 ```js
 const fooSelector = useCallback(state => state.foo[props.id], [props.id])
