@@ -59,7 +59,7 @@ export default function create<TState extends State>(
   function useStore<U>(
     selector?: StateSelector<TState, U>,
     dependencies?: ReadonlyArray<any>
-  ) {
+  ): TState | U {
     // State selector gets entire state if no selector was passed in
     const stateSelector = typeof selector === 'function' ? selector : getState
     const selectState = useCallback(
