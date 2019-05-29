@@ -9,7 +9,10 @@ export type State = Record<string, any>
 export type SetState<T> = (partialState: PartialState<T>) => void
 export type GetState<T> = () => T
 
-export type UseStore<T> = <U = T>(selector?: StateSelector<T, U>) => U
+export type UseStore<T> = {
+  (): T
+  <U>(selector: StateSelector<T, U>, dependencies?: ReadonlyArray<any>): U
+}
 
 export interface StoreApi<T> {
   getState: GetState<T>
