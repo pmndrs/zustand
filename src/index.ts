@@ -95,7 +95,10 @@ export default function create<TState extends State>(
     return stateSlice
   }
 
-  let state = createState(setState as TSetState, getState as TGetState)
+  let state = createState(
+    setState as SetState<State>,
+    getState as GetState<State>
+  )
   const api = { destroy, getState, setState, subscribe }
 
   return [useStore, api] as [typeof useStore, typeof api]
