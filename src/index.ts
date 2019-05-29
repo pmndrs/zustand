@@ -101,5 +101,5 @@ export default function create<TState extends State>(
   )
   const api = { destroy, getState, setState, subscribe }
 
-  return [useStore, api] as [typeof useStore, typeof api]
+  return [useStore, api]
 }
