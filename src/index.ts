@@ -23,12 +23,8 @@ export interface StoreApi<T> {
 
 const reducer = <T>(state: any, newState: T) => newState
 
-export default function create<
-  TState extends State,
-  TSetState extends SetState<TState> = SetState<TState>,
-  TGetState extends GetState<TState> = GetState<TState>
->(
-  createState: (set: TSetState, get: TGetState) => TState
+export default function create<TState extends State>(
+  createState: (set: SetState<State>, get: GetState<State>) => TState
 ): [UseStore<TState>, StoreApi<TState>] {
   const listeners: Set<StateListener<TState>> = new Set()
 
