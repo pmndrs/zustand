@@ -1,20 +1,34 @@
 import { useCallback, useLayoutEffect, useReducer, useRef } from 'react'
 import shallowEqual from './shallowEqual'
 
-type StateListener<T> = (state: T) => void
-type StateSelector<T, U> = (state: T) => U
-type PartialState<T> = Partial<T> | ((state: T) => Partial<T>)
+export type StateListener<T> = (state: T) => void
+export type StateSelector<T, U> = (state: T) => U
+export type PartialState<T> = Partial<T> | ((state: T) => Partial<T>)
+
+export type State = Record<string, any>
+export type SetState<T> = (partialState: PartialState<T>) => void
+export type GetState<T> = () => T
+
+export type UseStore<T> = {
+  (): T
+  <U>(selector: StateSelector<T, U>, dependencies?: ReadonlyArray<any>): U
+}
+
+export interface StoreApi<T> {
+  getState: GetState<T>
+  setState: SetState<T>
+  subscribe: (listener: StateListener<T>) => () => void
+  destroy: () => void
+}
 
 const reducer = <T>(state: any, newState: T) => newState
 
-export default function create<
-  State extends Record<string, any>,
-  SetState extends (partialState: PartialState<Record<string, any>>) => void,
-  GetState extends () => Record<string, any>
->(createState: (set: SetState, get: GetState) => State) {
-  const listeners: Set<StateListener<State>> = new Set()
+export default function create<TState extends State>(
+  createState: (set: SetState<State>, get: GetState<State>) => TState
+): [UseStore<TState>, StoreApi<TState>] {
+  const listeners: Set<StateListener<TState>> = new Set()
 
-  const setState = (partialState: PartialState<State>) => {
+  const setState = (partialState: PartialState<TState>) => {
     state = Object.assign(
       {},
       state,
@@ -25,7 +39,7 @@ export default function create<
 
   const getState = () => state
 
-  const subscribe = (listener: StateListener<State>) => {
+  const subscribe = (listener: StateListener<TState>) => {
     listeners.add(listener)
     return () => {
       listeners.delete(listener)
@@ -34,18 +48,18 @@ export default function create<
 
   const destroy = () => {
     listeners.clear()
-    state = {} as State
+    state = {} as TState
   }
 
-  function useStore(): State
+  function useStore(): TState
   function useStore<U>(
-    selector: StateSelector<State, U>,
+    selector: StateSelector<TState, U>,
     dependencies?: ReadonlyArray<any>
   ): U
   function useStore<U>(
-    selector?: StateSelector<State, U>,
+    selector?: StateSelector<TState, U>,
     dependencies?: ReadonlyArray<any>
-  ) {
+  ): TState | U {
     // State selector gets entire state if no selector was passed in
     const stateSelector = typeof selector === 'function' ? selector : getState
     const selectState = useCallback(
@@ -81,8 +95,11 @@ export default function create<
     return stateSlice
   }
 
-  let state = createState(setState as SetState, getState as GetState)
+  let state = createState(
+    setState as SetState<State>,
+    getState as GetState<State>
+  )
   const api = { destroy, getState, setState, subscribe }
 
-  return [useStore, api] as [typeof useStore, typeof api]
+  return [useStore, api]
 }
