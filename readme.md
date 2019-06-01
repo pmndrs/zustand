@@ -171,10 +171,10 @@ const types = {
   decrease: "DECREASE"
 }
 
-const reducer = (state, { type, ...payload }) => {
+const reducer = (state, { type, by = 1 }) => {
   switch (type) {
-    case types.increase: return { count: state.count + 1 }
-    case types.decrease: return { count: state.count - 1 }
+    case types.increase: return { count: state.count + by }
+    case types.decrease: return { count: state.count - by }
   }
 }
 
@@ -184,7 +184,7 @@ const [useStore] = create(set => ({
 }))
 
 const dispatch = useStore(state => state.dispatch)
-dispatch({ type: types.increase })
+dispatch({ type: types.increase, by: 2 })
 ```
 
 ## Reading/writing state and reacting to changes outside of components
