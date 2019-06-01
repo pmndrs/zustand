@@ -21,7 +21,7 @@ const [useStore] = create(set => ({
   count: 1,
   // You don't have to nest your actions, but makes it easier to fetch them later on
   actions: {
-    inc: () => set(state => ({ count: state.count + 1 })), // same semantics as setState
+    inc: () => set(state => ({ count: state.count + 1 })), // same semantics as setState, it *merges* state
     dec: () => set(state => ({ count: state.count - 1 })),
   },
 }))
@@ -173,10 +173,9 @@ const types = {
 
 const reducer = (state, { type, ...payload }) => {
   switch (type) {
-    case types.increase: return { ...state, count: state.count + 1 }
-    case types.decrease: return { ...state, count: state.count - 1 }
+    case types.increase: return { count: state.count + 1 }
+    case types.decrease: return { count: state.count - 1 }
   }
-  return state
 }
 
 const [useStore] = create(set => ({
