@@ -15,12 +15,12 @@ You could be in global or component scope, manage your store anywhere you want!
 ```jsx
 import create from 'zustand'
 
-// Name your store anything you like, but remember, it's a hook!
+// You store is a hook! Name it as you like
 const [useStore] = create(set => ({
   // Everything in here is your state
   count: 1,
-  // You don't have to nest your actions, but makes it easier to fetch them later on
   actions: {
+    // You don't have to nest your actions, but makes it easier to fetch them later on
     inc: () => set(state => ({ count: state.count + 1 })), // same semantics as setState
     dec: () => set(state => ({ count: state.count - 1 })), // ... it *merges* state
   },
@@ -39,12 +39,12 @@ function Counter() {
 }
 
 function Controls() {
-  // "actions" isn't special, we just named it like that to fetch updaters easier
-  const { inc, dec } = useStore(state => state.actions)
+  // "actions" isn't special, in this case it makes fetching updaters easier
+  const actions = useStore(state => state.actions)
   return (
     <>
-      <button onClick={inc}>up</button>
-      <button onClick={dec}>down</button>
+      <button onClick={actions.inc}>up</button>
+      <button onClick={actions.dec}>down</button>
     </>
   )
 }
