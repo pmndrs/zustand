@@ -196,14 +196,16 @@ You can use it with or without React out of the box.
 const [, api] = create({ n: 0 })
 
 // Getting fresh state
-const n = api.getState().n
+const num = api.getState().n
 // Listening to changes
 const unsub = api.subscribe(state => console.log(state.n))
+// And with a selector
+const unsub2 = api.subscribe(state => state.n, n => console.log(n))
 // Updating state, will trigger listeners
 api.setState({ n: 1 })
-// Unsubscribing handler
+// Unsubscribing listener
 unsub()
-// Destroying the store
+// Destroying the store (removing all listeners)
 api.destroy()
 ```
 
