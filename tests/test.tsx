@@ -5,7 +5,7 @@ import {
   fireEvent,
   render,
   waitForElement,
-} from 'react-testing-library'
+} from '@testing-library/react'
 import create, {
   GetState,
   PartialState,

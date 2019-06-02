@@ -71,9 +71,6 @@
     "collectCoverageFrom": [
       "src/**/*.{js,ts,tsx}",
       "tests/**/*.{js,ts,tsx}"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/setupTests.js"
     ]
   },
   "devDependencies": {
@@ -82,24 +79,22 @@
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/plugin-transform-typescript": "^7.4.0",
     "@babel/preset-env": "^7.4.3",
+    "@testing-library/react": "^8.0.1",
     "@types/jest": "^24.0.11",
     "@types/react": "^16.8.13",
-    "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.12.1",
-    "husky": "^1.3.1",
-    "jest": "^24.7.1",
+    "husky": "^2.3.0",
+    "jest": "^24.8.0",
     "lint-staged": "^8.1.5",
     "prettier": "^1.17.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-testing-library": "^6.1.2",
     "rimraf": "^2.6.3",
-    "rollup": "^1.10.0",
+    "rollup": "^1.13.1",
     "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-node-resolve": "^4.2.3",
-    "rollup-plugin-size-snapshot": "^0.8.0",
-    "rollup-plugin-typescript2": "^0.20.1",
-    "typescript": "^3.4.3"
+    "rollup-plugin-node-resolve": "^5.0.1",
+    "rollup-plugin-size-snapshot": "^0.9.0",
+    "rollup-plugin-typescript2": "^0.21.1",
+    "typescript": "^3.5.1"
   },
   "peerDependencies": {
     "react": ">=16.8"
