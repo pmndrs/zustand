@@ -114,28 +114,59 @@ it('can set the store', () => {
 })
 
 it('can subscribe to the store', () => {
-  expect.assertions(3)
+  const initialState = { value: 1, other: 'a' }
+  const [, { setState, getState, subscribe }] = create(() => initialState)
 
-  const [, { setState, subscribe }] = create(() => ({ value: 1 }))
+  // Should not be called if new state identity is the same
+  let unsub = subscribe(() => {
+    throw new Error('subscriber called when new state identity is the same')
+  })
+  setState(initialState)
+  unsub()
 
-  const unsub1 = subscribe(newState => {
-    expect(newState.value).toBe(2)
-    unsub1()
+  // Should be called even if shallow equal when no selector used
+  unsub = subscribe(newState => {
+    expect(newState.value).toBe(1)
   })
-  const unsub2 = subscribe(newState => {
+  setState({ ...getState() })
+  unsub()
+
+  // Should be called when state changes
+  unsub = subscribe(newState => {
     expect(newState.value).toBe(2)
-    unsub2()
   })
-  const unsub3 = subscribe(
+  setState({ value: 2 })
+  unsub()
+
+  // Should not be called with selector if shallow equal
+  unsub = subscribe(
     state => state.value,
-    newValue => {
-      expect(newValue).toBe(2)
-      unsub3()
+    () => {
+      throw new Error('subscriber called when shallow equal and selector used')
     }
   )
+  setState({ ...getState() })
+  unsub()
 
-  setState({ value: 1 })
-  setState({ value: 2 })
+  // Should not be called with selector if non-selected part changes
+  unsub = subscribe(
+    state => state.value,
+    () => {
+      throw new Error('subscriber called when non-selected part changed')
+    }
+  )
+  setState({ other: 'b' })
+  unsub()
+
+  // Should be called with selector if selected part changes
+  unsub = subscribe(
+    state => state.value,
+    newValue => {
+      expect(newValue).toBe(3)
+    }
+  )
+  setState({ value: 3 })
+  unsub()
 })
 
 it('can destroy the store', () => {

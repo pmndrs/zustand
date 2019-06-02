@@ -35,14 +35,7 @@ export default function create<TState extends State>(
   const setState: SetState<TState> = partial => {
     const partialState =
       typeof partial === 'function' ? partial(state) : partial
-    // Shallow equality check only on the values in partialState
-    // This is (hopefully) a performance optimization
-    if (
-      partialState !== state &&
-      Object.entries(partialState).some(
-        ([key, value]) => !Object.is(state[key], value)
-      )
-    ) {
+    if (partialState !== state) {
       state = Object.assign({}, state, partialState)
       listeners.forEach(listener => listener(state))
     }
