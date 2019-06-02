@@ -6,7 +6,17 @@ import {
   render,
   waitForElement,
 } from 'react-testing-library'
-import create from '../src/index'
+import create, {
+  GetState,
+  PartialState,
+  SetState,
+  State,
+  StateListener,
+  StateSelector,
+  StoreApi,
+  Subscribe,
+  UseStore,
+} from '../src/index'
 
 afterEach(cleanup)
 
@@ -104,20 +114,59 @@ it('can set the store', () => {
 })
 
 it('can subscribe to the store', () => {
-  expect.assertions(2)
+  const initialState = { value: 1, other: 'a' }
+  const [, { setState, getState, subscribe }] = create(() => initialState)
 
-  const [, { setState, subscribe }] = create(() => ({ value: 1 }))
-
-  const unsub1 = subscribe(newState => {
-    expect(newState.value).toBe(2)
-    unsub1()
+  // Should not be called if new state identity is the same
+  let unsub = subscribe(() => {
+    throw new Error('subscriber called when new state identity is the same')
   })
-  const unsub2 = subscribe(newState => {
-    expect(newState.value).toBe(2)
-    unsub2()
-  })
+  setState(initialState)
+  unsub()
 
+  // Should be called even if shallow equal when no selector used
+  unsub = subscribe(newState => {
+    expect(newState.value).toBe(1)
+  })
+  setState({ ...getState() })
+  unsub()
+
+  // Should be called when state changes
+  unsub = subscribe(newState => {
+    expect(newState.value).toBe(2)
+  })
   setState({ value: 2 })
+  unsub()
+
+  // Should not be called with selector if shallow equal
+  unsub = subscribe(
+    state => state.value,
+    () => {
+      throw new Error('subscriber called when shallow equal and selector used')
+    }
+  )
+  setState({ ...getState() })
+  unsub()
+
+  // Should not be called with selector if non-selected part changes
+  unsub = subscribe(
+    state => state.value,
+    () => {
+      throw new Error('subscriber called when non-selected part changed')
+    }
+  )
+  setState({ other: 'b' })
+  unsub()
+
+  // Should be called with selector if selected part changes
+  unsub = subscribe(
+    state => state.value,
+    newValue => {
+      expect(newValue).toBe(3)
+    }
+  )
+  setState({ value: 3 })
+  unsub()
 })
 
 it('can destroy the store', () => {
@@ -164,13 +213,13 @@ it('can pass optional dependencies to restrict selector calls', () => {
   }
 
   const { rerender } = render(<Component deps={[true]} />)
-  expect(selectorCallCount).toBe(1)
+  expect(selectorCallCount).toBe(2)
 
   rerender(<Component deps={[true]} />)
-  expect(selectorCallCount).toBe(1)
+  expect(selectorCallCount).toBe(2)
 
   rerender(<Component deps={[false]} />)
-  expect(selectorCallCount).toBe(2)
+  expect(selectorCallCount).toBe(3)
 })
 
 it('can update state without updating dependencies', async () => {
@@ -188,4 +237,59 @@ it('can update state without updating dependencies', async () => {
     setState({ value: 1 })
   })
   await waitForElement(() => getByText('value: 1'))
+})
+
+it('can use exposed types', () => {
+  interface ExampleState extends State {
+    num: number
+    numGet: () => number
+    numGetState: () => number
+    numSet: (v: number) => void
+    numSetState: (v: number) => void
+  }
+
+  const listener: StateListener<ExampleState> = state => {
+    const value = state.num * state.numGet() * state.numGetState()
+    state.numSet(value)
+    state.numSetState(value)
+  }
+  const selector: StateSelector<ExampleState, number> = state => state.num
+  const partial: PartialState<ExampleState> = { num: 2, numGet: () => 2 }
+  const partialFn: PartialState<ExampleState> = state => ({ num: 2, ...state })
+
+  const [useStore, storeApi] = create(
+    (set: SetState<ExampleState>, get: GetState<ExampleState>) => ({
+      num: 1,
+      numGet: () => get().num,
+      numGetState: () => storeApi.getState().num,
+      numSet: (v: number) => set({ num: v }),
+      numSetState: (v: number) => storeApi.setState({ num: v }),
+    })
+  )
+
+  function checkAllTypes(
+    getState: GetState<ExampleState>,
+    partialState: PartialState<ExampleState>,
+    setState: SetState<ExampleState>,
+    state: State,
+    stateListener: StateListener<ExampleState>,
+    stateSelector: StateSelector<ExampleState, number>,
+    storeApi: StoreApi<ExampleState>,
+    subscribe: Subscribe<ExampleState>,
+    useStore: UseStore<ExampleState>
+  ) {
+    expect(true).toBeTruthy()
+  }
+
+  checkAllTypes(
+    storeApi.getState,
+    Math.random() > 0.5 ? partial : partialFn,
+    storeApi.setState,
+    storeApi.getState(),
+    listener,
+    selector,
+    storeApi,
+    storeApi.subscribe,
+    useStore
+  )
 })
