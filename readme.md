@@ -126,7 +126,7 @@ const [useStore] = create(set => ({
 
 ## Read from state in actions
 
-The `set` function already allows functional update `set(state => result)` but should there be cases where you need to access outside of it you have an optional `get`, too.
+`set` already allows function-updates (`set(state => result)`), but you still have access to state outside of it though `get`.
 
 ```jsx
 const [useStore] = create((set, get) => ({
