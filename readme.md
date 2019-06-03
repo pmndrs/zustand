@@ -199,9 +199,10 @@ The api signature of subscribe([selector,] callback):unsub allows you to easily 
 const [useStore, api] = create(set => ({ [0]: [-10, 0], [1]: [10, 5], ... }))
 
 function Component({ id }) {
+  // Fetch initial state
   const xy = useRef(api.getState()[id])
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(state => state[id], state => (xy.current = state)), [id])
+  useEffect(() => api.subscribe(state => state[id], coords => (xy.current = coords)), [id])
 ```
 
 ## Middleware
