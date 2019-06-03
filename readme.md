@@ -62,7 +62,7 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-Just like with Reduxes mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes.
+Just like with Reduxes mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
 
 ```jsx
 const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
