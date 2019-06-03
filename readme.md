@@ -27,10 +27,9 @@ import create from 'zustand'
 
 // You store is a hook! Name it anything you like
 const [useStore] = create(set => ({
-  // Everything in here is your state
+  // Everything in here is your state, actions are not special, you don't need to nest them
   count: 1,
   actions: {
-    // You don't have to nest your actions, but makes it easier to fetch them later on
     inc: () => set(state => ({ count: state.count + 1 })), // same semantics as setState
     dec: () => set(state => ({ count: state.count - 1 })), // ... it *merges* state
   },
@@ -49,7 +48,7 @@ function Counter() {
 }
 
 function Controls() {
-  // "actions" isn't special, in this case it makes fetching updaters easier
+  // We've put our actions under "state.actions", makes fetching them easier
   const actions = useStore(state => state.actions)
   return (
     <>
