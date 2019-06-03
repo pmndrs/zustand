@@ -86,13 +86,13 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors, optimizing performance
 
-When your selectors are computationally expensive, or when you know the component renders a lot, you may want to memoize it. Say you select a piece of state ...
+Say you select a piece of state ...
 
 ```js
 const foo = useStore(state => state.foo[props.id])
 ```
 
-Your selector (`state => state.foo[props.id]`) will run on every state change, as well as every time the component renders. This isn't that expensive, but let's optimize it for arguments sake.
+Your selector (`state => state.foo[props.id]`) will run on every state change, as well as every time the component renders. It isn't that expensive in this case, but let's optimize it for arguments sake.
 
 You can either pass a static reference:
 
@@ -107,7 +107,7 @@ Or an optional dependencies array to let zustand know when the selector needs to
 const foo = useStore(state => state.foo[props.id], [props.id])
 ```
 
-From now on your selector will only run when either the state changes, or the selector itself.
+From now on your selector is memoized and will only run when either the state changes, or the selector itself.
 
 ## Async actions
 
