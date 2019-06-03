@@ -174,18 +174,19 @@ dispatch({ type: types.increase, by: 2 })
 You can use it with or without React out of the box.
 
 ```jsx
-const [, api] = create({ n: 0 })
+const [, api] = create({ a: 1, b: 2, c: 3 })
 
 // Getting fresh state
 const num = api.getState().n
-// Listening to changes
-const unsub = api.subscribe(state => console.log(state.n))
-// And with a selector
-const unsub2 = api.subscribe(state => state.n, n => console.log(n))
+// Listening to all changes, fires on every dispatch
+const unsub1 = api.subscribe(state => console.log("state changed", state))
+// Listening to selected changes
+const unsub2 = api.subscribe(state => state.a, a => console.log("a changed", a))
 // Updating state, will trigger listeners
-api.setState({ n: 1 })
-// Unsubscribing listener
-unsub()
+api.setState({ a: 1 })
+// Unsubscribe listeners
+unsub1()
+unsub2()
 // Destroying the store (removing all listeners)
 api.destroy()
 ```
