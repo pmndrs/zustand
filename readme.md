@@ -196,12 +196,12 @@ api.destroy()
 The api signature of subscribe([selector,] callback):unsub allows you to easily bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. Best combine it with useEffect. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference when you are allowed to mutate the view directly.
 
 ```jsx
-const [useStore, api] = create(set => ({ ... }))
+const [useStore, api] = create(set => ({ [0]: [-10, 0], [1]: [10, 5], ... }))
 
 function Component({ id }) {
-  const coords = useRef([0, 0])
+  const xy = useRef(api.getState()[id])
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(state => state.coords[id], xy => (coords.current = xy)), [id])
+  useEffect(() => api.subscribe(state => state[id], state => (xy.current = state)), [id])
 ```
 
 ## Middleware
