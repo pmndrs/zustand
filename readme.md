@@ -36,7 +36,7 @@ const [useStore] = create(set => ({
 }))
 ```
 
-#### Bind components, done ...
+#### Then bind components with the resulting hook, that's it!
 
 Look Ma, no providers!
 
