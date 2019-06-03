@@ -62,13 +62,13 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-It's just like mapStateToProps in Redux. zustand will run a small shallow equal over the object you return. Of course, it won't cause re-renders if these properties aren't changed in the state model.
+Just like with Reduxes mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes.
 
 ```jsx
 const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
 ```
 
-Or, if you prefer, atomic selects do the same ...
+Atomic selects do the same ...
 
 ```jsx
 const foo = useStore(state => state.foo)
@@ -77,7 +77,7 @@ const bar = useStore(state => state.bar)
 
 ## Fetching from multiple stores
 
-Since you can create as many stores as you like, forwarding a result into another selector is straight forward.
+Since you can create as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
 
 ```jsx
 const currentUser = useCredentialsStore(state => state.currentUser)
@@ -86,13 +86,13 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors, optimizing performance
 
-Flux stores usually call the selector on every render-pass. Most of the time this isn't much of a problem, but when your selectors are computationally expensive, or when you know the component renders a lot (for instance react-motion calling it 60 times per second for animation purposes) you may want to optimize it.
+When your selectors are computationally expensive, or when you know the component renders a lot, you may want to memoize it. Say you select a piece of state ...
 
 ```js
 const foo = useStore(state => state.foo[props.id])
 ```
 
-In this case the selector `state => state.foo[props.id]` will run on every state change, as well as every time the component renders. This isn't expensive at all, but let's optimize it for arguments sake.
+Your selector (`state => state.foo[props.id]`) will run on every state change, as well as every time the component renders. This isn't that expensive, but let's optimize it for arguments sake.
 
 You can either pass a static reference:
 
@@ -101,13 +101,13 @@ const fooSelector = useCallback(state => state.foo[props.id], [props.id])
 const foo = useStore(fooSelector)
 ```
 
-Or an optional dependencies array to let Zustand know when the selector updates:
+Or an optional dependencies array to let zustand know when the selector needs to update:
 
 ```js
 const foo = useStore(state => state.foo[props.id], [props.id])
 ```
 
-From there on your selector will only run when either state changes, or the selector itself.
+From now on your selector will only run when either the state changes, or the selector itself.
 
 ## Async actions
 
@@ -166,10 +166,7 @@ set(draft => {
 ## Can't live without redux-like reducers and action types?
 
 ```jsx
-const types = {
-  increase: "INCREASE",
-  decrease: "DECREASE"
-}
+const types = { increase: "INCREASE", decrease: "DECREASE" }
 
 const reducer = (state, { type, by = 1 }) => {
   switch (type) {
