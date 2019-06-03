@@ -115,13 +115,10 @@ Just call `set` when you're ready, it doesn't care if your actions are async or 
 
 ```jsx
 const [useStore] = create(set => ({
-  result: '',
+  json: {},
   fetch: async url => {
     const response = await fetch(url)
-    const json = await response.json()
-    set({ result: json })
-  },
-}))
+    set({ json: await response.json() })
 ```
 
 ## Read from state in actions
@@ -133,9 +130,6 @@ const [useStore] = create((set, get) => ({
   text: "hello",
   action: () => {
     const text = get().text
-    ...
-  }
-}))
 ```
 
 ## Sick of reducers and changing nested state? Use Immer!
