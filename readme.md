@@ -126,7 +126,7 @@ const [useStore] = create(set => ({
 
 ## Read from state in actions
 
-`set` allows fn-updates (`set(state => result)`), but you still have access to state outside of it through `get`.
+`set` allows fn-updates `set(state => result)`, but you still have access to state outside of it through `get`.
 
 ```jsx
 const [useStore] = create((set, get) => ({
