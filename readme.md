@@ -216,9 +216,9 @@ The subscribe method can also select state, similar to the useStore hook. This a
 const [useStore, api] = create(set => ({ ... }))
 
 function Component({ id }) {
-  const xyz = useRef([0, 0, 0])
+  const coords = useRef([0, 0])
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(state => state.coords[id], xyz => (coords.xyz = xyz)), [id])
+  useEffect(() => api.subscribe(state => state.coords[id], xy => (coords.current = xy)), [id])
 ```
 
 ## Middleware
