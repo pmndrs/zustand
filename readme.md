@@ -126,7 +126,7 @@ const [useStore] = create(set => ({
 
 ## Read from state in actions
 
-`set` already allows function-updates (`set(state => result)`), but you still have access to state outside of it though `get`.
+`set` allows fn-updates (`set(state => result)`), but you still have access to state outside of it through `get`.
 
 ```jsx
 const [useStore] = create((set, get) => ({
@@ -140,27 +140,18 @@ const [useStore] = create((set, get) => ({
 
 ## Sick of reducers and changing nested state? Use Immer!
 
-Having to build nested structures bearhanded is one of the more tiresome aspects of reducing state. Have you tried [immer](https://github.com/mweststrate/immer)? It is a tiny package that allows you to work with immutable state in a more convenient way. You can easily extend your store with it.
+Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
 ```jsx
 import produce from "immer"
 
 const [useStore] = create(set => ({
   set: fn => set(produce(fn)),
-  nested: {
-    structure: {
-      constains: {
-        a: "value"
-      }
-    }
-  },
+  nested: { structure: { constains: { a: "value" } } },
 }))
 
 const set = useStore(state => state.set)
-set(draft => {
-  draft.nested.structure.contains.a.value = false
-  draft.nested.structure.contains.anotherValue = true
-})
+set(state => void state.nested.structure.contains = null)
 ```
 
 ## Can't live without redux-like reducers and action types?
@@ -207,7 +198,7 @@ api.destroy()
 
 ## Transient updates (for often occuring state-changes)
 
-The subscribe method can also select state, similar to the useStore hook. This allows you to bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference in some edge cases where you are allowed to mutate the view directly.
+The subscribe method can also select state. This allows you to bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference when you are allowed to mutate the view directly.
 
 ```jsx
 const [useStore, api] = create(set => ({ ... }))
@@ -219,6 +210,8 @@ function Component({ id }) {
 ```
 
 ## Middleware
+
+You can functionally compose your store any way you like.
 
 ```jsx
 const logger = fn => (set, get) => fn(args => {
