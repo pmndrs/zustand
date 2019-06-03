@@ -210,7 +210,7 @@ api.destroy()
 
 ## Transient updates (for often occuring state-changes)
 
-The subscribe method can also select state, similar to the useStore hook. This allows you to bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. This can make a **drastic** performance difference in some edge cases where you are allowed to mutate the view directly.
+The subscribe method can also select state, similar to the useStore hook. This allows you to bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference in some edge cases where you are allowed to mutate the view directly.
 
 ```jsx
 const [useStore, api] = create(set => ({ ... }))
