@@ -18,7 +18,7 @@ Small, fast and scaleable bearbones state-management solution. Has a comfy api b
 
 ### How to use it
 
-#### How Create a store (or multiple, up to you...)
+#### First create a store (or multiple, up to you...)
 
 You could be in global or component scope, manage your store anywhere you want!
 
@@ -37,7 +37,7 @@ const [useStore] = create(set => ({
 }))
 ```
 
-#### Bind components
+#### Bind components, done ...
 
 Look Ma, no providers!
 
