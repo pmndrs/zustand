@@ -28,7 +28,7 @@ export interface StoreApi<T> {
 const reducer = <T>(state: any, newState: T) => newState
 
 export default function create<TState extends State>(
-  createState: (set: SetState<State>, get: GetState<State>) => TState
+  createState: (set: SetState<State>, get: GetState<State>, api: any) => TState
 ): [UseStore<TState>, StoreApi<TState>] {
   const listeners: Set<StateListener<TState>> = new Set()
 
@@ -116,7 +116,8 @@ export default function create<TState extends State>(
     return stateSlice
   }
 
-  let state = createState(setState as SetState<State>, getState)
+  let api = { destroy, getState, setState, subscribe }
+  let state = createState(setState as SetState<State>, getState, api)
 
-  return [useStore, { destroy, getState, setState, subscribe }]
+  return [useStore, api]
 }
