@@ -36,17 +36,15 @@ const [useStore] = create(set => ({
 
 #### Then bind components with the resulting hook, that's it!
 
-Use the hook anywhere, you are not tied to providers and sub-trees. They are valid throughout the system.
+Use the hook anywhere, you are not tied to providers and sub-trees. Once you have selected state your component will re-render whenever your selection changes in the store.
 
 ```jsx
 function Counter() {
-  // Will only re-render the component when "count" changes
   const count = useStore(state => state.count)
   return <h1>{count}</h1>
 }
 
 function Controls() {
-  // We've put our actions under "state.actions", makes fetching them easier
   const actions = useStore(state => state.actions)
   return (
     <>
