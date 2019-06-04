@@ -20,7 +20,7 @@ Small, fast and scaleable bearbones state-management solution. Has a comfy api b
 
 #### First create a store (or multiple, up to you...)
 
-Your store is a hook! Name it anything you like. Everything inside `create` is your state. There are no rules, put it in whatever you like, actions are not special, you don't need to nest them. The `set` function works like Reacts setState, ite *merges* state.
+Your store is a hook! Name it anything you like. Everything inside `create` is your state. There are no rules, you can put anything in it. Actions are not special, you don't need to group them. The `set` function works like Reacts setState, it *merges* state.
 
 ```jsx
 import create from 'zustand'
