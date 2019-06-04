@@ -23,7 +23,7 @@ Small, fast and scaleable bearbones state-management solution. Has a comfy api b
 ```jsx
 import create from 'zustand'
 
-// You store is a hook! Name it anything you like
+// Your store is a hook! Name it anything you like
 const [useStore] = create(set => ({
   // Everything in here is your state, actions are not special, you don't need to nest them
   count: 1,
