@@ -8,14 +8,6 @@
 
 Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Make your paws dirty with a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
-#### Why zustand over redux? This lib ...
-
-1. is simpler and un-opinionated
-2. makes hooks the primary means of consuming state
-3. isn't dependent on actions, types & dispatch
-4. supports [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188)
-5. has a solution for rapidpy changing state (look for transient updates)
-
 ### How to use it
 
 #### First create a store (or multiple, up to you...)
@@ -54,6 +46,14 @@ function Controls() {
   )
 }
 ```
+
+#### Why zustand over redux? This lib ...
+
+1. is simpler and un-opinionated
+2. makes hooks the primary means of consuming state
+3. isn't dependent on actions, types & dispatch
+4. supports [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188)
+5. has a solution for rapidpy changing state (look for transient updates)
 
 # Recipes
 
