@@ -6,13 +6,13 @@
 
     npm install zustand
 
-Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Make your paws dirty with a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
+Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
 ### How to use it
 
 #### First create a store (or multiple, up to you...)
 
-Your store is a hook! Name it anything you like. Everything inside `create` is your state. There are no rules, you can put anything in it. Actions are not special, you don't need to group them. The `set` function works like Reacts setState, it *merges* state.
+Your store is a hook! There are no rules, put anything in it. Actions are not special. Like setState, `set` *merges* state.
 
 ```jsx
 import create from 'zustand'
@@ -28,7 +28,7 @@ const [useStore] = create(set => ({
 
 #### Then bind components with the resulting hook, that's it!
 
-Use the hook anywhere, you are not tied to providers and sub-trees. Once you have selected state your component will re-render whenever your selection changes in the store.
+Use the hook anywhere, no providers needed. Once you have selected state your component will re-render on changes.
 
 ```jsx
 function Counter() {
