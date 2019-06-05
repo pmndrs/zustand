@@ -146,7 +146,7 @@ import produce from "immer"
 
 const [useStore] = create(set => ({
   set: fn => set(produce(fn)),
-  nested: { structure: { constains: { a: "value" } } },
+  nested: { structure: { contains: { a: "value" } } },
 }))
 
 const set = useStore(state => state.set)
