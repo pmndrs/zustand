@@ -47,7 +47,7 @@ function Controls() {
 }
 ```
 
-#### Why zustand over redux? This lib ...
+### Why zustand over redux? This lib ...
 
 1. is simpler and un-opinionated
 2. makes hooks the primary means of consuming state
