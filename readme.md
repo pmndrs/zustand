@@ -229,4 +229,4 @@ const [useStore] = create(logger(set => ({
 
 ## Devtools
 
-Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it via middleware: https://twitter.com/0xca0a/status/1136037199533805573 (it works with regular actions as well of course, you don't need reducers for this).
+Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it via middleware: https://codesandbox.io/s/amazing-kepler-swxol (it works with regular actions as well of course, you don't need reducers for this).
