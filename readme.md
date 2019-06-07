@@ -145,8 +145,8 @@ Reducing nested structures is tiresome. Have you tried [immer](https://github.co
 import produce from "immer"
 
 const [useStore] = create(set => ({
-  set: fn => set(produce(fn)),
   nested: { structure: { contains: { a: "value" } } },
+  set: fn => set(produce(fn)),
 }))
 
 const set = useStore(state => state.set)
