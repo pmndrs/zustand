@@ -20,6 +20,8 @@ import create from 'zustand'
 const [useStore] = create(set => ({
   count: 1,
   actions: {
+    // Neither nesting of actions nor the name "actions" is obligatory
+    // Define them on the root if you like, nesting just makes them easier to fetch
     inc: () => set(state => ({ count: state.count + 1 })),
     dec: () => set(state => ({ count: state.count - 1 })),
   },
