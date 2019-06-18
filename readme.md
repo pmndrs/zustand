@@ -44,9 +44,10 @@ function Controls() {
 
 1. is simpler and un-opinionated
 2. makes hooks the primary means of consuming state
-3. isn't dependent on actions, types & dispatch
-4. supports [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188)
-5. has a solution for rapidly changing state (look for transient updates)
+3. isn't strictly dependent on actions, types & dispatch
+4. doesn't wrap your app into unnecessary context providers
+5. ...which allows it to support [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188) ootb
+6. has a solution for rapid state changes (look below for transient updates)
 
 # Recipes
 
