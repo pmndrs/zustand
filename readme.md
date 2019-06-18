@@ -216,7 +216,7 @@ const log = config => (set, get, api) => config(args => {
   console.log("  new state", get())
 }, get, api)
 
-// Turn the set method into into an immer proxy
+// Turn the set method into an immer proxy
 const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
 
 const [useStore] = create(log(immer(set => ({
@@ -229,4 +229,4 @@ const [useStore] = create(log(immer(set => ({
 
 ## Devtools
 
-Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it via middleware: https://codesandbox.io/s/amazing-kepler-swxol (it works with regular actions as well of course, you don't need reducers for this).
+Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it: https://codesandbox.io/s/amazing-kepler-swxol. It works with regular actions as well, you don't need reducers for this.
