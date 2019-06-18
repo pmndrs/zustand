@@ -55,7 +55,7 @@ function Controls() {
 2. makes hooks the primary means of consuming state
 3. isn't dependent on actions, types & dispatch
 4. supports [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188)
-5. has a solution for rapidpy changing state (look for transient updates)
+5. has a solution for rapidly changing state (look for transient updates)
 
 # Recipes
 
@@ -69,7 +69,7 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-Just like with Reduxes mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
+Just like with Redux's mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
 
 ```jsx
 const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
