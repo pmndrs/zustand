@@ -18,8 +18,9 @@ Your store is a hook! There are no rules, you can put anything in it, atomics, o
 import create from 'zustand'
 
 const [useStore] = create(set => ({
-  count: 1,
-  inc: () => set(state => ({ count: state.count + 1 })),
+  count: 0,
+  increase: () => set(state => ({ count: state.count + 1 })),
+  reset: () => set({ count: 0 })
 }))
 ```
 
@@ -34,8 +35,8 @@ function Counter() {
 }
 
 function Controls() {
-  const inc = useStore(state => state.inc)
-  return <button onClick={inc}>up</button>
+  const increase = useStore(state => state.increase)
+  return <button onClick={increase}>up</button>
 }
 ```
 
