@@ -46,9 +46,9 @@ function Controls() {
 2. makes hooks the primary means of consuming state
 3. isn't strictly dependent on actions, types & dispatch
 4. doesn't wrap your app into context providers (which allows it to support [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188))
-5. state is accessible outside of components (and even React)
+5. can access state outside of components (and even React)
 6. has a solution for rapid state changes (look below for transient updates)
-7. it is (or can be made) compatible with the redux api
+7. is (or can be made) compatible with the redux api
 
 # Recipes
 
