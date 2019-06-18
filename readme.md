@@ -12,19 +12,14 @@ Small, fast and scaleable bearbones state-management solution. Has a comfy api b
 
 #### First create a store (or multiple, up to you...)
 
-Your store is a hook! There are no rules, put anything in it. Actions are not special. Like setState, `set` *merges* state.
+Your store is a hook! There are no rules, you can put anything in it, atomics, objects, functions. Like Reacts setState, `set` *merges* state, and it has the exact same semantics.
 
 ```jsx
 import create from 'zustand'
 
 const [useStore] = create(set => ({
   count: 1,
-  actions: {
-    // Neither nesting of actions nor the name "actions" is obligatory
-    // Define them on the root if you like, nesting just makes them easier to fetch
-    inc: () => set(state => ({ count: state.count + 1 })),
-    dec: () => set(state => ({ count: state.count - 1 })),
-  },
+  inc: () => set(state => ({ count: state.count + 1 })),
 }))
 ```
 
@@ -39,13 +34,8 @@ function Counter() {
 }
 
 function Controls() {
-  const actions = useStore(state => state.actions)
-  return (
-    <>
-      <button onClick={actions.inc}>up</button>
-      <button onClick={actions.dec}>down</button>
-    </>
-  )
+  const inc = useStore(state => state.inc)
+  return <button onClick={inc}>up</button>
 }
 ```
 
