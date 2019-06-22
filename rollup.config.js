@@ -18,7 +18,7 @@ function createConfig(entry, out) {
   return [
     {
       input: entry,
-      output: { file: `dist/esm/${out}.js`, format: 'esm' },
+      output: { file: `dist/${out}.js`, format: 'esm' },
       external,
       plugins: [
         typescript(),
@@ -29,7 +29,7 @@ function createConfig(entry, out) {
     },
     {
       input: entry,
-      output: { file: `dist/cjs/${out}.js`, format: 'cjs' },
+      output: { file: `dist/${out}.cjs.js`, format: 'cjs' },
       external,
       plugins: [
         typescript(),
@@ -41,4 +41,7 @@ function createConfig(entry, out) {
   ]
 }
 
-export default [...createConfig('src/index.ts', 'index')]
+export default [
+  ...createConfig('src/index.ts', 'index'),
+  ...createConfig('src/middleware.ts', 'middleware'),
+]

@@ -2,8 +2,9 @@
   "name": "zustand",
   "version": "0.2.2",
   "description": "🐻 Bear necessities for state management in React",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/**"
   ],
