@@ -6,37 +6,27 @@
 
     npm install zustand
 
-Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Make your paws dirty with a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
-
-#### Why zustand over redux? This lib ...
-
-1. is simpler and un-opinionated
-2. makes hooks the primary means of consuming state
-3. isn't dependent on actions, types & dispatch
-4. supports [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188)
-5. has a solution for rapidpy changing state (look for transient updates)
+Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
 ### How to use it
 
 #### First create a store (or multiple, up to you...)
 
-Your store is a hook! Name it anything you like. Everything inside `create` is your state. There are no rules, you can put anything in it. Actions are not special, you don't need to group them. The `set` function works like Reacts setState, it *merges* state.
+Your store is a hook! There are no rules, you can put anything in it, atomics, objects, functions. Like Reacts setState, `set` *merges* state, and it has the exact same semantics.
 
 ```jsx
 import create from 'zustand'
 
 const [useStore] = create(set => ({
-  count: 1,
-  actions: {
-    inc: () => set(state => ({ count: state.count + 1 })),
-    dec: () => set(state => ({ count: state.count - 1 })),
-  },
+  count: 0,
+  increase: () => set(state => ({ count: state.count + 1 })),
+  reset: () => set({ count: 0 })
 }))
 ```
 
 #### Then bind components with the resulting hook, that's it!
 
-Use the hook anywhere, you are not tied to providers and sub-trees. Once you have selected state your component will re-render whenever your selection changes in the store.
+Use the hook anywhere, no providers needed. Once you have selected state your component will re-render on changes.
 
 ```jsx
 function Counter() {
@@ -45,15 +35,20 @@ function Counter() {
 }
 
 function Controls() {
-  const actions = useStore(state => state.actions)
-  return (
-    <>
-      <button onClick={actions.inc}>up</button>
-      <button onClick={actions.dec}>down</button>
-    </>
-  )
+  const increase = useStore(state => state.increase)
+  return <button onClick={increase}>up</button>
 }
 ```
+
+### Why zustand over react-redux? This lib ...
+
+1. is simpler and un-opinionated
+2. makes hooks the primary means of consuming state
+3. isn't strictly dependent on actions, types & dispatch
+4. doesn't wrap your app into context providers (which allows it to support [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188))
+5. can access state outside of components (and even React)
+6. has a solution for rapid state changes (look below for transient updates)
+7. is (or can be made) compatible with the redux api
 
 # Recipes
 
@@ -67,7 +62,7 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-Just like with Reduxes mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
+Just like with Redux's mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
 
 ```jsx
 const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
@@ -145,8 +140,8 @@ Reducing nested structures is tiresome. Have you tried [immer](https://github.co
 import produce from "immer"
 
 const [useStore] = create(set => ({
+  nested: { structure: { contains: { a: "value" } } },
   set: fn => set(produce(fn)),
-  nested: { structure: { constains: { a: "value" } } },
 }))
 
 const set = useStore(state => state.set)
@@ -215,14 +210,24 @@ function Component({ id }) {
 You can functionally compose your store any way you like.
 
 ```jsx
-const logger = fn => (set, get) => fn(args => {
+// Log every time state is changed
+const log = config => (set, get, api) => config(args => {
   console.log("  applying", args)
   set(args)
   console.log("  new state", get())
-}, get)
+}, get, api)
 
-const [useStore] = create(logger(set => ({
+// Turn the set method into an immer proxy
+const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
+
+const [useStore] = create(log(immer(set => ({
   text: "hello",
-  setText: text => set({ text })
-})))
+  setText: input => set(state => {
+    state.text = input
+  })
+}))))
 ```
+
+## Devtools
+
+Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it: https://codesandbox.io/s/amazing-kepler-swxol. It works with regular actions as well, you don't need reducers for this.
