@@ -1,5 +1,8 @@
-import { useLayoutEffect, useReducer, useRef } from 'react'
+import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
 import shallowEqual from './shallowEqual'
+
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 export type State = Record<string, any>
 export type StateListener<T extends State, U = T> = (state: U) => void
@@ -95,12 +98,12 @@ export default function create<TState extends State>(
     }
 
     // Update refs synchronously after view has been updated
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       selectorRef.current = selector
       depsRef.current = dependencies
     }, dependencies || [selector])
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       return selector
         ? subscribe(
             // Truthy check because it might be possible to set selectorRef to
