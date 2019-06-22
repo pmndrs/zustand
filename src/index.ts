@@ -1,10 +1,7 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
 import shallowEqual from './shallowEqual'
 
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect
-
-export type State = Record<string, any>
+export type State = Record<string | number | symbol, any>
 export type StateListener<T extends State, U = T> = (state: U) => void
 export type StateSelector<T extends State, U> = (state: T) => U
 export type PartialState<T extends State> =
@@ -29,9 +26,13 @@ export interface StoreApi<T> {
 }
 
 const reducer = <T>(state: any, newState: T) => newState
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 export default function create<TState extends State>(
-  createState: (set: SetState<State>, get: GetState<State>, api: any) => TState
+  createState: keyof TState extends never
+    ? (set: any, get: any, api: any) => TState
+    : (set: SetState<TState>, get: GetState<TState>, api: any) => TState
 ): [UseStore<TState>, StoreApi<TState>] {
   const listeners: Set<StateListener<TState>> = new Set()
 
@@ -120,7 +121,7 @@ export default function create<TState extends State>(
   }
 
   let api = { destroy, getState, setState, subscribe }
-  let state = createState(setState as SetState<State>, getState, api)
+  let state = createState(setState, getState, api)
 
   return [useStore, api]
 }
