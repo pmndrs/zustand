@@ -17,6 +17,7 @@ import create, {
   Subscribe,
   UseStore,
 } from '../src/index'
+import { devtools, redux } from '../src/middleware'
 
 afterEach(cleanup)
 
@@ -92,7 +93,7 @@ it('can subscribe to part of the store', async () => {
 it('can get the store', () => {
   const [, { getState }] = create((set, get) => ({
     value: 1,
-    getState1: get,
+    getState1: () => get(),
     getState2: () => getState(),
   }))
 
@@ -103,8 +104,8 @@ it('can get the store', () => {
 it('can set the store', () => {
   const [, { getState, setState }] = create(set => ({
     value: 1,
-    setState1: set,
-    setState2: newState => setState(newState),
+    setState1: v => set(v),
+    setState2: v => setState(v),
   }))
 
   getState().setState1({ ...getState(), value: 2 })
@@ -257,15 +258,22 @@ it('can use exposed types', () => {
   const partial: PartialState<ExampleState> = { num: 2, numGet: () => 2 }
   const partialFn: PartialState<ExampleState> = state => ({ num: 2, ...state })
 
-  const [useStore, storeApi] = create(
-    (set: SetState<ExampleState>, get: GetState<ExampleState>) => ({
-      num: 1,
-      numGet: () => get().num,
-      numGetState: () => storeApi.getState().num,
-      numSet: (v: number) => set({ num: v }),
-      numSetState: (v: number) => storeApi.setState({ num: v }),
-    })
-  )
+  const [useStore, storeApi] = create<ExampleState>((set, get) => ({
+    num: 1,
+    numGet: () => get().num,
+    numGetState: () => {
+      // TypeScript can't get the type of storeApi when it trys to enforce the signature of numGetState.
+      // Need to explicitly state the type of storeApi.getState().num or storeApi type will be type 'any'.
+      const result: number = storeApi.getState().num
+      return result
+    },
+    numSet: v => {
+      set({ num: v })
+    },
+    numSetState: v => {
+      storeApi.setState({ num: v })
+    },
+  }))
 
   function checkAllTypes(
     getState: GetState<ExampleState>,
@@ -292,4 +300,31 @@ it('can use exposed types', () => {
     storeApi.subscribe,
     useStore
   )
+})
+
+describe('redux dev tools middleware', () => {
+  const consoleWarn = console.warn
+
+  afterEach(() => {
+    cleanup()
+    console.warn = consoleWarn
+  })
+
+  it('can warn when trying to use redux devtools without extension', () => {
+    const initialState = { count: 0 }
+    const types = { increase: 'INCREASE', decrease: 'DECREASE' }
+    const reducer = (state, { type, by }) => {
+      switch (type) {
+        case types.increase:
+          return { count: state.count + by }
+        case types.decrease:
+          return { count: state.count - by }
+      }
+    }
+
+    console.warn = jest.fn(console.warn)
+    const [useStore, api] = create(devtools(redux(reducer, initialState)))
+
+    expect(console.warn).toBeCalled()
+  })
 })

@@ -12,9 +12,12 @@ const redux = (reducer: any, initial: any) => (
 }
 
 const devtools = (fn: any) => (set: any, get: any, api: any) => {
-  let extension =
-    (<any>window).__REDUX_DEVTOOLS_EXTENSION__ ||
-    (<any>window).top.__REDUX_DEVTOOLS_EXTENSION__
+  let extension
+  try {
+    extension =
+      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
+      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+  } catch {}
   let ignoreState = false
 
   if (!extension) {
