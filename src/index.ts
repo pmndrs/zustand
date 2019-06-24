@@ -108,7 +108,13 @@ export default function create<TState extends State>(
         ? subscribe(
             // Truthy check because it might be possible to set selectorRef to
             // undefined and call this subscriber before it resubscribes
-            () => (selectorRef.current ? selectorRef.current(state) : state),
+            () => {
+              try {
+                // See: https://react-redux.js.org/next/api/hooks#stale-props-and-zombie-children
+                // And reduxes reference impl: https://github.com/reduxjs/react-redux/blob/master/src/hooks/useSelector.js
+                return selectorRef.current ? selectorRef.current(state) : state
+              } catch (e) {}
+            },
             dispatch
           )
         : subscribe(dispatch)
