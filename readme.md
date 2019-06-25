@@ -88,7 +88,7 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors
 
-Selectors run on state changes, as well as when the component renders. If you give zustand a fixed reference, it will only run on state changes, or when the selector changes. Don't worry about this, unless your selector is expensive.
+Selectors run on state changes, as well as when the component renders. If you give zustand a fixed reference it will only run on state changes, or when the selector changes. Don't worry about this, unless your selector is expensive.
 
 ```js
 const fooSelector = useCallback(state => state.foo[props.id], [props.id])
