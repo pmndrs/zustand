@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="600" src="bear.png" />
+  <img width="500" src="bear.png" />
 </p>
 
 [![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand)
@@ -38,15 +38,12 @@ function Controls() {
 }
 ```
 
-#### Why zustand over react-redux? This lib ...
+#### Why zustand over react-redux?
 
-1. is simpler and un-opinionated
-2. makes hooks the primary means of consuming state
-3. isn't strictly dependent on actions, types & dispatch
-4. doesn't wrap your app into context providers (which allows it to support [mixed reconcilers](https://github.com/konvajs/react-konva/issues/188))
-5. can access state outside of components (and even React)
-6. has a solution for rapid state changes (look below for transient updates)
-7. is (or can be made) compatible with the redux api
+* Simpler and un-opinionated
+* Makes hooks the primary means of consuming state
+* Doesn't wrap your app into context providers
+* Can inform components transiently (without causing render)
 
 ---
 
