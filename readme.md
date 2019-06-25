@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="700" src="bear.png" />
+  <img width="600" src="bear.png" />
 </p>
 
 [![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand)
