@@ -270,7 +270,6 @@ it('can fetch multiple entries with shallow equality', async () => {
   act(() => {
     setState({ c: 1 })
   })
-  //await waitForElement(() => getByText('a: 1 b: 1'))
 
   expect(renderCount).toBe(2)
 })
