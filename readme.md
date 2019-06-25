@@ -228,7 +228,7 @@ const [useStore] = create(redux(reducer, initialState))
 import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
-const [useStore] = create(devtools((set, get => ({ ... })))))
+const [useStore] = create(devtools(store))
 // Usage with a redux store, it will log full action types
 const [useStore] = create(devtools(redux(reducer, initialState)))
 ```
