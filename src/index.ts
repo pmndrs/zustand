@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
 import shallowEqual from './shallowEqual'
+import { redux, devtools } from './middleware'
 
 export type State = Record<string | number | symbol, any>
 export type StateListener<T extends State, U = T> = (state: U) => void
@@ -131,4 +132,4 @@ export default function create<TState extends State>(
   return [useStore, api]
 }
 
-export { shallowEqual }
+export { shallowEqual, redux, devtools }

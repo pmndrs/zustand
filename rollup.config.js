@@ -29,7 +29,7 @@ function createConfig(entry, out) {
     },
     {
       input: entry,
-      output: { file: `dist/${out}.cjs.js`, format: 'cjs' },
+      output: { file: `dist/${out}.cjs.js`, format: 'cjs', exports: 'named' },
       external,
       plugins: [
         typescript(),
@@ -41,7 +41,4 @@ function createConfig(entry, out) {
   ]
 }
 
-export default [
-  ...createConfig('src/index.ts', 'index'),
-  ...createConfig('src/middleware.ts', 'middleware'),
-]
+export default [...createConfig('src/index.ts', 'index')]

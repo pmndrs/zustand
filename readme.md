@@ -134,27 +134,6 @@ const set = useStore(state => state.set)
 set(state => void state.nested.structure.contains = null)
 ```
 
-## Can't live without redux-like reducers and action types?
-
-```jsx
-const types = { increase: "INCREASE", decrease: "DECREASE" }
-
-const reducer = (state, { type, by = 1 }) => {
-  switch (type) {
-    case types.increase: return { count: state.count + by }
-    case types.decrease: return { count: state.count - by }
-  }
-}
-
-const [useStore] = create(set => ({
-  count: 0,
-  dispatch: args => set(state => reducer(state, args)),
-}))
-
-const dispatch = useStore(state => state.dispatch)
-dispatch({ type: types.increase, by: 2 })
-```
-
 ## Reading/writing state and reacting to changes outside of components
 
 You can use it with or without React out of the box.
@@ -214,6 +193,42 @@ const [useStore] = create(log(immer(set => ({
 }))))
 ```
 
+## Can't live without redux-like reducers and action types?
+
+```jsx
+const types = { increase: "INCREASE", decrease: "DECREASE" }
+
+const reducer = (state, { type, by = 1 }) => {
+  switch (type) {
+    case types.increase: return { count: state.count + by }
+    case types.decrease: return { count: state.count - by }
+  }
+}
+
+const [useStore] = create(set => ({
+  count: 0,
+  dispatch: args => set(state => reducer(state, args)),
+}))
+
+const dispatch = useStore(state => state.dispatch)
+dispatch({ type: types.increase, by: 2 })
+```
+
+Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Try [this](https://codesandbox.io/s/amazing-kepler-swxol) example.
+
+```jsx
+import { redux } from 'zustand'
+
+const [useStore] = create(redux(reducer, initialState))
+```
+
 ## Devtools
 
-Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it: https://codesandbox.io/s/amazing-kepler-swxol. It works with regular actions as well, you don't need reducers for this.
+```jsx
+import { devtools } from 'zustand'
+
+// Usage with a plain action store, it will log actions as "setState"
+const [useStore] = create(devtools((set, get => ({ ... })))))
+// Usage with a redux store, it will log full action types
+const [useStore] = create(devtools(redux(reducer, initialState)))
+```
