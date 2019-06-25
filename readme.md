@@ -62,14 +62,14 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-zustand defaults to strict-quality (old === new) to detect changes, this very efficient for atomic state picks. 
+zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks. 
 
 ```jsx
 const foo = useStore(state => state.foo)
 const bar = useStore(state => state.bar)
 ```
 
-If you want to construct a single object with multiple state-picks inside, similar to Redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly.
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly.
 
 ```jsx
 import { shallowEqual } from 'zustand'
