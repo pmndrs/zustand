@@ -4,13 +4,11 @@
 
 [![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand)
 
-    npm install zustand
-
 Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
-### How to use it
+    npm install zustand
 
-#### First create a store
+### First create a store
 
 Your store is a hook! You can put anything in it, atomics, objects, functions. Like Reacts setState, `set` *merges* state.
 
@@ -24,7 +22,7 @@ const [useStore] = create(set => ({
 }))
 ```
 
-#### Then bind your components, that's it!
+### Then bind your components, that's it!
 
 Use the hook anywhere, no providers needed. Once you have selected state your component will re-render on changes.
 
@@ -40,7 +38,7 @@ function Controls() {
 }
 ```
 
-### Why zustand over react-redux? This lib ...
+#### Why zustand over react-redux? This lib ...
 
 1. is simpler and un-opinionated
 2. makes hooks the primary means of consuming state
