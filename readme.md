@@ -10,9 +10,9 @@ Small, fast and scaleable bearbones state-management solution. Has a comfy api b
 
 ### How to use it
 
-#### First create a store (or multiple, up to you...)
+#### First create a store
 
-Your store is a hook! There are no rules, you can put anything in it, atomics, objects, functions. Like Reacts setState, `set` *merges* state, and it has the exact same semantics.
+Your store is a hook! You can put anything in it, atomics, objects, functions. Like Reacts setState, `set` *merges* state.
 
 ```jsx
 import create from 'zustand'
@@ -24,7 +24,7 @@ const [useStore] = create(set => ({
 }))
 ```
 
-#### Then bind components with the resulting hook, that's it!
+#### Then bind your components, that's it!
 
 Use the hook anywhere, no providers needed. Once you have selected state your component will re-render on changes.
 
@@ -49,6 +49,8 @@ function Controls() {
 5. can access state outside of components (and even React)
 6. has a solution for rapid state changes (look below for transient updates)
 7. is (or can be made) compatible with the redux api
+
+---
 
 # Recipes
 
