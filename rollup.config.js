@@ -41,4 +41,7 @@ function createConfig(entry, out) {
   ]
 }
 
-export default [...createConfig('src/index.ts', 'index')]
+export default [
+  ...createConfig('src/index.ts', 'index'),
+  ...createConfig('src/middleware.ts', 'middleware'),
+]

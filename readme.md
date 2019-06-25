@@ -217,7 +217,7 @@ dispatch({ type: types.increase, by: 2 })
 Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Try [this](https://codesandbox.io/s/amazing-kepler-swxol) example.
 
 ```jsx
-import { redux } from 'zustand'
+import { redux } from 'zustand/middleware'
 
 const [useStore] = create(redux(reducer, initialState))
 ```
@@ -225,7 +225,7 @@ const [useStore] = create(redux(reducer, initialState))
 ## Devtools
 
 ```jsx
-import { devtools } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
 const [useStore] = create(devtools((set, get => ({ ... })))))

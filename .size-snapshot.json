@@ -19,9 +19,9 @@
     "gzipped": 597
   },
   "dist/index.js": {
-    "bundled": 4688,
-    "minified": 1774,
-    "gzipped": 898,
+    "bundled": 3333,
+    "minified": 1107,
+    "gzipped": 579,
     "treeshaked": {
       "rollup": {
         "code": 14,
@@ -33,9 +33,9 @@
     }
   },
   "dist/index.cjs.js": {
-    "bundled": 5744,
-    "minified": 2301,
-    "gzipped": 1039
+    "bundled": 3754,
+    "minified": 1277,
+    "gzipped": 624
   },
   "dist/middleware.js": {
     "bundled": 1365,
