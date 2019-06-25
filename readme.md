@@ -62,17 +62,19 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-Just like with Redux's mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
-
-```jsx
-const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
-```
-
-Atomic selects do the same ...
+zustand defaults to strict-quality (old === new) to detect changes, this very efficient for atomic state picks. 
 
 ```jsx
 const foo = useStore(state => state.foo)
 const bar = useStore(state => state.bar)
+```
+
+If you want to construct a single object with multiple state-picks inside, similar to Redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly.
+
+```jsx
+import { shallowEqual } from 'zustand'
+
+const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallowEqual)
 ```
 
 ## Fetching from multiple stores
@@ -84,30 +86,14 @@ const currentUser = useCredentialsStore(state => state.currentUser)
 const person = usePersonStore(state => state.persons[currentUser])
 ```
 
-## Memoizing selectors, optimizing performance
+## Memoizing selectors
 
-Say you select a piece of state ...
-
-```js
-const foo = useStore(state => state.foo[props.id])
-```
-
-Your selector (`state => state.foo[props.id]`) will run on every state change, as well as every time the component renders. It isn't that expensive in this case, but let's optimize it for arguments sake.
-
-You can either pass a static reference:
+Selectors run on state changes, as well as when the component renders. If you give zustand a fixed reference, it will only run on state changes, or when the selector changes. Don't worry about this, unless your selector is expensive.
 
 ```js
 const fooSelector = useCallback(state => state.foo[props.id], [props.id])
 const foo = useStore(fooSelector)
 ```
-
-Or an optional dependencies array to let zustand know when the selector needs to update:
-
-```js
-const foo = useStore(state => state.foo[props.id], [props.id])
-```
-
-From now on your selector is memoized and will only run when either the state changes, or the selector itself.
 
 ## Async actions
 
