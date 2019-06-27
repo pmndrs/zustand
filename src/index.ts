@@ -13,10 +13,15 @@ export type GetState<T extends State> = () => T
 export interface Subscribe<T> {
   (listener: StateListener<T>): () => void
   <U>(selector: StateSelector<T, U>, listener: StateListener<T, U>): () => void
+  <U>(
+    selector: StateSelector<T, U>,
+    listener: StateListener<T, U>,
+    equalityFn: Function | undefined
+  ): () => void
 }
 export interface UseStore<T> {
   (): T
-  <U>(selector: StateSelector<T, U>, dependencies?: ReadonlyArray<any>): U
+  <U>(selector: StateSelector<T, U>, equalityFn?: Function): U
 }
 export interface StoreApi<T> {
   getState: GetState<T>
@@ -26,7 +31,7 @@ export interface StoreApi<T> {
 }
 
 const reducer = <T>(state: any, newState: T) => newState
-const useIsomorphicLayoutEffect =
+const useIsoLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 export default function create<TState extends State>(
@@ -53,7 +58,8 @@ export default function create<TState extends State>(
     selectorOrListener:
       | StateListener<TState>
       | StateSelector<TState, TStateSlice>,
-    listenerOrUndef?: StateListener<TState, TStateSlice>
+    listenerOrUndef?: StateListener<TState, TStateSlice>,
+    equalityFn?: Function
   ) => {
     let listener = selectorOrListener
     // Existance of second param means a selector was passed in
@@ -62,9 +68,16 @@ export default function create<TState extends State>(
       const selector = selectorOrListener as StateSelector<TState, TStateSlice>
       let stateSlice = selector(state)
       listener = () => {
-        const selectedSlice = selector(state)
-        if (!shallowEqual(stateSlice, (stateSlice = selectedSlice)))
-          listenerOrUndef(stateSlice)
+        try {
+          const sel = selector(state)
+          const old = stateSlice
+          // Update local state slice
+          stateSlice = sel
+          // Test for changes
+          const equal = equalityFn ? equalityFn(old, sel) : old === sel
+          // Call listeners if state has changed
+          if (!equal) listenerOrUndef(stateSlice)
+        } catch {}
       }
     }
     listeners.add(listener)
@@ -77,10 +90,9 @@ export default function create<TState extends State>(
 
   const useStore: UseStore<TState> = <TStateSlice>(
     selector?: StateSelector<TState, TStateSlice>,
-    dependencies?: ReadonlyArray<any>
+    equalityFn?: Function
   ): TState | TStateSlice => {
-    const selectorRef = useRef(selector)
-    const depsRef = useRef(dependencies)
+    const selRef = useRef(selector)
     let [stateSlice, dispatch] = useReducer(
       reducer,
       state,
@@ -90,27 +102,20 @@ export default function create<TState extends State>(
 
     // Need to manually get state slice if selector has changed with no deps or
     // deps exist and have changed
-    if (
-      selector &&
-      ((!dependencies && selector !== selectorRef.current) ||
-        (dependencies && !shallowEqual(dependencies, depsRef.current)))
-    ) {
-      stateSlice = selector(state)
-    }
+    if (selector && selector !== selRef.current) stateSlice = selector(state)
 
     // Update refs synchronously after view has been updated
-    useIsomorphicLayoutEffect(() => {
-      selectorRef.current = selector
-      depsRef.current = dependencies
-    }, dependencies || [selector])
+    useIsoLayoutEffect(() => void (selRef.current = selector), [selector])
 
-    useIsomorphicLayoutEffect(() => {
+    // Subscribe to the store
+    useIsoLayoutEffect(() => {
       return selector
         ? subscribe(
-            // Truthy check because it might be possible to set selectorRef to
+            // Truthy check because it might be possible to set selRef to
             // undefined and call this subscriber before it resubscribes
-            () => (selectorRef.current ? selectorRef.current(state) : state),
-            dispatch
+            () => (selRef.current ? selRef.current(state) : state),
+            dispatch,
+            equalityFn
           )
         : subscribe(dispatch)
       // Only resubscribe to the store when changing selector from function to
@@ -125,3 +130,5 @@ export default function create<TState extends State>(
 
   return [useStore, api]
 }
+
+export { shallowEqual }

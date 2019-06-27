@@ -59,17 +59,19 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-Just like with Redux's mapStateToProps, useStore can select state, either atomically or by returning an object. It will run a small shallow-equal test over the results you return and update the component on changes only.
-
-```jsx
-const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }))
-```
-
-Atomic selects do the same ...
+zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks. 
 
 ```jsx
 const foo = useStore(state => state.foo)
 const bar = useStore(state => state.bar)
+```
+
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly.
+
+```jsx
+import { shallowEqual } from 'zustand'
+
+const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallowEqual)
 ```
 
 ## Fetching from multiple stores
@@ -81,30 +83,14 @@ const currentUser = useCredentialsStore(state => state.currentUser)
 const person = usePersonStore(state => state.persons[currentUser])
 ```
 
-## Memoizing selectors, optimizing performance
+## Memoizing selectors
 
-Say you select a piece of state ...
-
-```js
-const foo = useStore(state => state.foo[props.id])
-```
-
-Your selector (`state => state.foo[props.id]`) will run on every state change, as well as every time the component renders. It isn't that expensive in this case, but let's optimize it for arguments sake.
-
-You can either pass a static reference:
+Selectors run on state changes, as well as when the component renders. If you give zustand a fixed reference it will only run on state changes, or when the selector changes. Don't worry about this, unless your selector is expensive.
 
 ```js
 const fooSelector = useCallback(state => state.foo[props.id], [props.id])
 const foo = useStore(fooSelector)
 ```
-
-Or an optional dependencies array to let zustand know when the selector needs to update:
-
-```js
-const foo = useStore(state => state.foo[props.id], [props.id])
-```
-
-From now on your selector is memoized and will only run when either the state changes, or the selector itself.
 
 ## Async actions
 
@@ -143,27 +129,6 @@ const [useStore] = create(set => ({
 
 const set = useStore(state => state.set)
 set(state => void state.nested.structure.contains = null)
-```
-
-## Can't live without redux-like reducers and action types?
-
-```jsx
-const types = { increase: "INCREASE", decrease: "DECREASE" }
-
-const reducer = (state, { type, by = 1 }) => {
-  switch (type) {
-    case types.increase: return { count: state.count + by }
-    case types.decrease: return { count: state.count - by }
-  }
-}
-
-const [useStore] = create(set => ({
-  count: 0,
-  dispatch: args => set(state => reducer(state, args)),
-}))
-
-const dispatch = useStore(state => state.dispatch)
-dispatch({ type: types.increase, by: 2 })
 ```
 
 ## Reading/writing state and reacting to changes outside of components
@@ -225,6 +190,42 @@ const [useStore] = create(log(immer(set => ({
 }))))
 ```
 
+## Can't live without redux-like reducers and action types?
+
+```jsx
+const types = { increase: "INCREASE", decrease: "DECREASE" }
+
+const reducer = (state, { type, by = 1 }) => {
+  switch (type) {
+    case types.increase: return { count: state.count + by }
+    case types.decrease: return { count: state.count - by }
+  }
+}
+
+const [useStore] = create(set => ({
+  count: 0,
+  dispatch: args => set(state => reducer(state, args)),
+}))
+
+const dispatch = useStore(state => state.dispatch)
+dispatch({ type: types.increase, by: 2 })
+```
+
+Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Try [this](https://codesandbox.io/s/amazing-kepler-swxol) example.
+
+```jsx
+import { redux } from 'zustand/middleware'
+
+const [useStore] = create(redux(reducer, initialState))
+```
+
 ## Devtools
 
-Yes, it's currently [being hashed out](https://github.com/react-spring/zustand/issues/6) but you can already start using it: https://codesandbox.io/s/amazing-kepler-swxol. It works with regular actions as well, you don't need reducers for this.
+```jsx
+import { devtools } from 'zustand/middleware'
+
+// Usage with a plain action store, it will log actions as "setState"
+const [useStore] = create(devtools(store))
+// Usage with a redux store, it will log full action types
+const [useStore] = create(devtools(redux(reducer, initialState)))
+```

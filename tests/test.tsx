@@ -7,6 +7,7 @@ import {
   waitForElement,
 } from '@testing-library/react'
 import create, {
+  shallowEqual,
   GetState,
   PartialState,
   SetState,
@@ -18,7 +19,6 @@ import create, {
   UseStore,
 } from '../src/index'
 import { devtools, redux } from '../src/middleware'
-
 afterEach(cleanup)
 
 it('creates a store hook and api object', () => {
@@ -207,9 +207,10 @@ it('can pass optional dependencies to restrict selector calls', () => {
   let selectorCallCount = 0
 
   function Component({ deps }) {
-    useStore(() => {
+    const sel = React.useCallback(() => {
       selectorCallCount++
     }, deps)
+    useStore(sel, deps)
     return <div>{selectorCallCount}</div>
   }
 
@@ -227,7 +228,8 @@ it('can update state without updating dependencies', async () => {
   const [useStore, { setState }] = create(() => ({ value: 0 }))
 
   function Component() {
-    const { value } = useStore(state => state, [])
+    const sel = React.useCallback(state => state, [])
+    const { value } = useStore(sel)
     return <div>value: {value}</div>
   }
 
@@ -238,6 +240,38 @@ it('can update state without updating dependencies', async () => {
     setState({ value: 1 })
   })
   await waitForElement(() => getByText('value: 1'))
+})
+
+it('can fetch multiple entries with shallow equality', async () => {
+  const [useStore, { setState }] = create(() => ({ a: 0, b: 0, c: 0 }))
+
+  let renderCount = 0
+  function Component() {
+    renderCount++
+    const { a, b } = useStore(
+      state => ({ a: state.a, b: state.b }),
+      shallowEqual
+    )
+    return (
+      <div>
+        a: {a} b: {b}
+      </div>
+    )
+  }
+
+  const { getByText } = render(<Component />)
+  await waitForElement(() => getByText('a: 0 b: 0'))
+
+  act(() => {
+    setState({ a: 1, b: 1 })
+  })
+  await waitForElement(() => getByText('a: 1 b: 1'))
+
+  act(() => {
+    setState({ c: 1 })
+  })
+
+  expect(renderCount).toBe(2)
 })
 
 it('can use exposed types', () => {

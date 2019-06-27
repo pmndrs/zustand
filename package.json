@@ -1,21 +1,23 @@
 {
   "name": "zustand",
-  "version": "0.2.2",
+  "private": true,
+  "version": "1.0.0-beta.0",
   "description": "🐻 Bear necessities for state management in React",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.cjs.js",
+  "module": "index.js",
+  "types": "index.d.ts",
   "files": [
-    "dist/**"
+    "**"
   ],
   "sideEffects": false,
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "rollup -c",
+    "build": "rollup -c && npm run copy",
     "prepare": "npm run build --scripts-prepend-node-path",
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
-    "test:coverage:watch": "jest --watch"
+    "test:coverage:watch": "jest --watch",
+    "copy": "copyfiles -f package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "husky": {
     "hooks": {
@@ -83,8 +85,10 @@
     "@testing-library/react": "^8.0.1",
     "@types/jest": "^24.0.15",
     "@types/react": "^16.8.22",
+    "copyfiles": "^2.1.0",
     "husky": "^2.4.1",
     "jest": "^24.8.0",
+    "json": "^9.0.6",
     "lint-staged": "^8.2.1",
     "prettier": "^1.18.2",
     "react": "^16.8.6",

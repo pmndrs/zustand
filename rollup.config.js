@@ -29,7 +29,7 @@ function createConfig(entry, out) {
     },
     {
       input: entry,
-      output: { file: `dist/${out}.cjs.js`, format: 'cjs' },
+      output: { file: `dist/${out}.cjs.js`, format: 'cjs', exports: 'named' },
       external,
       plugins: [
         typescript(),
