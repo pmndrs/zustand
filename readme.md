@@ -219,7 +219,7 @@ import { redux } from 'zustand/middleware'
 const [useStore] = create(redux(reducer, initialState))
 ```
 
-## Devtools
+## Redux devtools
 
 ```jsx
 import { devtools } from 'zustand/middleware'
