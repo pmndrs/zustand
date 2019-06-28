@@ -131,3 +131,5 @@ export default function create<TState extends State>(
 
   return [useStore, api]
 }
+
+export { create }
