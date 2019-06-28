@@ -2,7 +2,7 @@
   <img width="500" src="bear.png" />
 </p>
 
-[![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand)
+[![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand) ![npm](https://img.shields.io/npm/dt/zustand.svg)
 
 Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't that boilerplatey or opinionated, but still just enough to be explicit and flux-like. Try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
@@ -166,10 +166,8 @@ function Component({ id }) {
   // Fetch initial state
   const xy = useRef(api.getState()[id])
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(
-    coords => (xy.current = coords),
-    { selector: state => state[id] }
-  ), [id])
+  useEffect(() => api.subscribe(coords =>
+    (xy.current = coords), { selector: state => state[id] }), [id])
 ```
 
 ## Middleware
