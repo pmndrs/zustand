@@ -95,6 +95,13 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ): StateSlice => {
+    if (Array.isArray(equalityFn)) {
+      equalityFn = Object.is
+      console.warn(
+        'Zustand: the 2nd arg for dependencies was deprecated in 1.0. Please remove it! See: https://github.com/react-spring/zustand#selecting-multiple-state-slices'
+      )
+    }
+
     const isInitial = useRef(true)
     const options = useRef(
       // isInitial prevents the selector from being called every render.
@@ -120,7 +127,6 @@ export default function create<TState extends State>(
     })
 
     const forceUpdate = useReducer(forceUpdateReducer, false)[1]
-
     useIsoLayoutEffect(() => subscribe(forceUpdate, options), [])
 
     return options.currentSlice as StateSlice
