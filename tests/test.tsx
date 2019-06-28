@@ -245,32 +245,35 @@ it('can throw an error in selector', async () => {
 
   const initialState = { value: 'foo' }
   const [useStore, { setState }] = create(() => initialState)
-  const selector = jest.fn(s => s.value.toUpperCase())
+  const selector = s => s.value.toUpperCase()
+
+  class ErrorBoundary extends React.Component {
+    state = { hasError: false }
+    static getDerivedStateFromError() {
+      return { hasError: true }
+    }
+    render() {
+      return this.state.hasError ? <div>errored</div> : this.props.children
+    }
+  }
 
   function Component() {
     useStore(selector)
     return <div>no error</div>
   }
 
-  const { getByText } = render(<Component />)
+  const { getByText } = render(
+    <ErrorBoundary>
+      <Component />
+    </ErrorBoundary>
+  )
   await waitForElement(() => getByText('no error'))
 
   delete initialState.value
   act(() => {
     setState({})
   })
-  expect(selector.mock.results).toMatchInlineSnapshot(`
-    Array [
-      Object {
-        "type": "return",
-        "value": "FOO",
-      },
-      Object {
-        "type": "throw",
-        "value": [TypeError: Cannot read property 'toUpperCase' of undefined],
-      },
-    ]
-  `)
+  await waitForElement(() => getByText('errored'))
 })
 
 it('can throw an error in equality checker', async () => {
@@ -278,28 +281,36 @@ it('can throw an error in equality checker', async () => {
 
   const initialState = { value: 'foo' }
   const [useStore, { setState }] = create(() => initialState)
-  const equalityFn = jest.fn((a, b) => a.value.trim() === b.value.trim())
+  const selector = s => s
+  const equalityFn = (a, b) => a.value.trim() === b.value.trim()
+
+  class ErrorBoundary extends React.Component {
+    state = { hasError: false }
+    static getDerivedStateFromError() {
+      return { hasError: true }
+    }
+    render() {
+      return this.state.hasError ? <div>errored</div> : this.props.children
+    }
+  }
 
   function Component() {
-    useStore(undefined, equalityFn)
+    useStore(selector, equalityFn)
     return <div>no error</div>
   }
 
-  const { getByText } = render(<Component />)
+  const { getByText } = render(
+    <ErrorBoundary>
+      <Component />
+    </ErrorBoundary>
+  )
   await waitForElement(() => getByText('no error'))
 
   delete initialState.value
   act(() => {
     setState({})
   })
-  expect(equalityFn.mock.results).toMatchInlineSnapshot(`
-    Array [
-      Object {
-        "type": "throw",
-        "value": [TypeError: Cannot read property 'trim' of undefined],
-      },
-    ]
-  `)
+  await waitForElement(() => getByText('errored'))
 })
 
 it('can get the store', () => {
@@ -502,6 +513,7 @@ it('can use exposed types', () => {
     selector: s => s.num,
     equalityFn: (a, b) => a < b,
     currentSlice: 1,
+    subscribeError: new Error(),
   }
 
   function checkAllTypes(
@@ -548,6 +560,8 @@ describe('redux dev tools middleware', () => {
   })
 
   it('can warn when trying to use redux devtools without extension', () => {
+    console.warn = jest.fn()
+
     const initialState = { count: 0 }
     const types = { increase: 'INCREASE', decrease: 'DECREASE' }
     const reducer = (state, { type, by }) => {
@@ -559,7 +573,6 @@ describe('redux dev tools middleware', () => {
       }
     }
 
-    console.warn = jest.fn(console.warn)
     create(devtools(redux(reducer, initialState)))
 
     expect(console.warn).toBeCalled()

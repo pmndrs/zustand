@@ -12,6 +12,7 @@ module.exports = ({ env }, targets) => {
       '@babel/plugin-transform-react-jsx',
       ['@babel/plugin-transform-typescript', { isTSX: true }],
       isTest && '@babel/plugin-transform-modules-commonjs',
+      isTest && '@babel/plugin-proposal-class-properties',
     ].filter(Boolean),
   }
 }

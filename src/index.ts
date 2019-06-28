@@ -11,6 +11,7 @@ export interface SubscribeOptions<T extends State, U> {
   selector?: StateSelector<T, U>
   equalityFn?: EqualityChecker<U>
   currentSlice?: U
+  subscribeError?: Error
 }
 export type StateCreator<T extends State> = (
   set: SetState<T>,
@@ -80,7 +81,7 @@ export default function create<TState extends State>(
           listener((options.currentSlice = newStateSlice))
         }
       } catch (error) {
-        console.error(error)
+        options.subscribeError = error
         listener()
       }
     }
@@ -92,7 +93,7 @@ export default function create<TState extends State>(
 
   const useStore = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
-    equalityFn?: EqualityChecker<StateSlice>
+    equalityFn: EqualityChecker<StateSlice> = Object.is
   ): StateSlice => {
     const isInitial = useRef(true)
     const options = useRef(
@@ -104,15 +105,21 @@ export default function create<TState extends State>(
       }
     ).current as SubscribeOptions<TState, StateSlice>
 
-    // Update state slice if selector has changed.
-    if (selector !== options.selector) options.currentSlice = selector(state)
-
-    const forceUpdate = useReducer(forceUpdateReducer, false)[1]
+    // Update state slice if selector has changed or subscriber errored.
+    if (selector !== options.selector || options.subscribeError) {
+      const newStateSlice = selector(state)
+      if (!equalityFn(options.currentSlice as StateSlice, newStateSlice)) {
+        options.currentSlice = newStateSlice
+      }
+    }
 
     useIsoLayoutEffect(() => {
       options.selector = selector
       options.equalityFn = equalityFn
-    }, [selector, equalityFn])
+      options.subscribeError = undefined
+    })
+
+    const forceUpdate = useReducer(forceUpdateReducer, false)[1]
 
     useIsoLayoutEffect(() => subscribe(forceUpdate, options), [])
 
