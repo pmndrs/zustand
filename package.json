@@ -51,6 +51,9 @@
     "store"
   ],
   "author": "Paul Henschel",
+  "contributors": [
+    "Jeremy Holcomb (https://github.com/JeremyRH)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/drcmda/zustand/issues"
