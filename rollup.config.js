@@ -4,6 +4,7 @@ import resolve from 'rollup-plugin-node-resolve'
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
 import typescript from 'rollup-plugin-typescript2'
 
+const packageJson = require('./package.json')
 const getBabelRc = require('./.babelrc.js')
 const root = process.platform === 'win32' ? path.resolve('/') : '/'
 const external = id => !id.startsWith('.') && !id.startsWith(root)
@@ -30,6 +31,25 @@ function createConfig(entry, out) {
     {
       input: entry,
       output: { file: `dist/${out}.cjs.js`, format: 'cjs', exports: 'named' },
+      external,
+      plugins: [
+        typescript(),
+        babel(getBabelOptions()),
+        sizeSnapshot(),
+        resolve({ extensions }),
+      ],
+    },
+    {
+      input: entry,
+      output: {
+        file: `dist/${out}.iife.js`,
+        format: 'iife',
+        exports: 'named',
+        name: packageJson.name,
+        globals: {
+          react: 'React',
+        },
+      },
       external,
       plugins: [
         typescript(),
