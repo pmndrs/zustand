@@ -51,6 +51,9 @@
     "store"
   ],
   "author": "Paul Henschel",
+  "contributors": [
+    "Jeremy Holcomb (https://github.com/JeremyRH)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/drcmda/zustand/issues"
@@ -78,6 +81,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/plugin-transform-typescript": "^7.4.5",

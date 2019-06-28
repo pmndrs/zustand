@@ -59,7 +59,7 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks. 
+zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks.
 
 ```jsx
 const foo = useStore(state => state.foo)
@@ -143,7 +143,9 @@ const num = api.getState().n
 // Listening to all changes, fires on every dispatch
 const unsub1 = api.subscribe(state => console.log("state changed", state))
 // Listening to selected changes
-const unsub2 = api.subscribe(state => state.a, a => console.log("a changed", a))
+const unsub2 = api.subscribe(a => console.log("a changed", a), {
+  selector: state => state.a
+})
 // Updating state, will trigger listeners
 api.setState({ a: 1 })
 // Unsubscribe listeners
@@ -164,7 +166,10 @@ function Component({ id }) {
   // Fetch initial state
   const xy = useRef(api.getState()[id])
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(state => state[id], coords => (xy.current = coords)), [id])
+  useEffect(() => api.subscribe(
+    coords => (xy.current = coords),
+    { selector: state => state[id] }
+  ), [id])
 ```
 
 ## Middleware
