@@ -1,134 +1,126 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
-import shallowEqual from './shallowEqual'
 
 export type State = Record<string | number | symbol, any>
-export type StateListener<T extends State, U = T> = (state: U) => void
+export type StateListener<T> = (state: T) => void
 export type StateSelector<T extends State, U> = (state: T) => U
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
+export type EqualityChecker<T> = (state: T, newState: any) => boolean
+export interface SubscribeOptions<T extends State, U> {
+  selector?: StateSelector<T, U>
+  equalityFn?: EqualityChecker<U>
+  currentSlice?: U
+}
+export type StateCreator<T extends State> = (
+  set: SetState<T>,
+  get: GetState<T>,
+  api: StoreApi<T>
+) => T
 export type SetState<T extends State> = (partial: PartialState<T>) => void
 export type GetState<T extends State> = () => T
-
-export interface Subscribe<T> {
-  (listener: StateListener<T>): () => void
-  <U>(selector: StateSelector<T, U>, listener: StateListener<T, U>): () => void
-  <U>(
-    selector: StateSelector<T, U>,
-    listener: StateListener<T, U>,
-    equalityFn: Function | undefined
-  ): () => void
-}
-export interface UseStore<T> {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: Function): U
-}
-export interface StoreApi<T> {
-  getState: GetState<T>
+export type Subscribe<T extends State> = <U>(
+  listener: StateListener<U | void>,
+  options?: SubscribeOptions<T, U>
+) => () => void
+export type Destroy = () => void
+export type UseStore<T extends State> = <U>(
+  selector?: StateSelector<T, U>,
+  equalityFn?: EqualityChecker<U>
+) => U
+export interface StoreApi<T extends State> {
   setState: SetState<T>
+  getState: GetState<T>
   subscribe: Subscribe<T>
-  destroy: () => void
+  destroy: Destroy
 }
 
-const reducer = <T>(state: any, newState: T) => newState
+const forceUpdateReducer = (state: boolean) => !state
+// For server-side rendering: https://github.com/react-spring/zustand/pull/34
 const useIsoLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect
+  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function create<TState extends State>(
+  // Use TState for createState signature when available.
+  // e.g. create<MyState>(set => ...
   createState: keyof TState extends never
-    ? (set: any, get: any, api: any) => TState
-    : (set: SetState<TState>, get: GetState<TState>, api: any) => TState
+    ? StateCreator<State>
+    : StateCreator<TState>
 ): [UseStore<TState>, StoreApi<TState>] {
-  const listeners: Set<StateListener<TState>> = new Set()
+  const listeners: Set<StateListener<void>> = new Set()
 
   const setState: SetState<TState> = partial => {
     const partialState =
       typeof partial === 'function' ? partial(state) : partial
     if (partialState !== state) {
       state = Object.assign({}, state, partialState)
-      listeners.forEach(listener => listener(state))
+      listeners.forEach(listener => listener())
     }
   }
 
   const getState: GetState<TState> = () => state
 
-  // Optional selector param goes first so we can infer its return type and use
-  // it for listener
-  const subscribe: Subscribe<TState> = <TStateSlice>(
-    selectorOrListener:
-      | StateListener<TState>
-      | StateSelector<TState, TStateSlice>,
-    listenerOrUndef?: StateListener<TState, TStateSlice>,
-    equalityFn?: Function
+  const subscribe: Subscribe<TState> = <StateSlice>(
+    listener: StateListener<StateSlice | void>,
+    options: SubscribeOptions<TState, StateSlice> = {}
   ) => {
-    let listener = selectorOrListener
-    // Existance of second param means a selector was passed in
-    if (listenerOrUndef) {
-      // We know selector is not type StateListener so it must be StateSelector
-      const selector = selectorOrListener as StateSelector<TState, TStateSlice>
-      let stateSlice = selector(state)
-      listener = () => {
-        try {
-          const sel = selector(state)
-          const old = stateSlice
-          // Update local state slice
-          stateSlice = sel
-          // Test for changes
-          const equal = equalityFn ? equalityFn(old, sel) : old === sel
-          // Call listeners if state has changed
-          if (!equal) listenerOrUndef(stateSlice)
-        } catch {}
+    if (!('currentSlice' in options)) {
+      options.currentSlice = (options.selector || getState)(state)
+    }
+    const listenerFn = () => {
+      // Destructure in the listener to get current values. We rely on this
+      // because options is mutated in useStore.
+      const { selector = getState, equalityFn = Object.is } = options
+      // Selector or equality function could throw but we don't want to stop
+      // the listener from being called.
+      // https://github.com/react-spring/zustand/pull/37
+      try {
+        const newStateSlice = selector(state)
+        if (!equalityFn(options.currentSlice as StateSlice, newStateSlice)) {
+          listener((options.currentSlice = newStateSlice))
+        }
+      } catch (error) {
+        console.error(error)
+        listener()
       }
     }
-    listeners.add(listener)
-    return () => void listeners.delete(listener)
+    listeners.add(listenerFn)
+    return () => void listeners.delete(listenerFn)
   }
 
-  const destroy: StoreApi<TState>['destroy'] = () => {
-    listeners.clear()
-  }
+  const destroy: Destroy = () => listeners.clear()
 
-  const useStore: UseStore<TState> = <TStateSlice>(
-    selector?: StateSelector<TState, TStateSlice>,
-    equalityFn?: Function
-  ): TState | TStateSlice => {
-    const selRef = useRef(selector)
-    let [stateSlice, dispatch] = useReducer(
-      reducer,
-      state,
-      // Optional third argument but required to not be 'undefined'
-      selector as StateSelector<TState, TStateSlice>
-    )
+  const useStore = <StateSlice>(
+    selector: StateSelector<TState, StateSlice> = getState,
+    equalityFn?: EqualityChecker<StateSlice>
+  ): StateSlice => {
+    const isInitial = useRef(true)
+    const options = useRef(
+      // isInitial prevents the selector from being called every render.
+      isInitial.current && {
+        selector,
+        equalityFn,
+        currentSlice: ((isInitial.current = false), selector(state)),
+      }
+    ).current as SubscribeOptions<TState, StateSlice>
 
-    // Need to manually get state slice if selector has changed with no deps or
-    // deps exist and have changed
-    if (selector && selector !== selRef.current) stateSlice = selector(state)
+    // Update state slice if selector has changed.
+    if (selector !== options.selector) options.currentSlice = selector(state)
 
-    // Update refs synchronously after view has been updated
-    useIsoLayoutEffect(() => void (selRef.current = selector), [selector])
+    const forceUpdate = useReducer(forceUpdateReducer, false)[1]
 
-    // Subscribe to the store
     useIsoLayoutEffect(() => {
-      return selector
-        ? subscribe(
-            // Truthy check because it might be possible to set selRef to
-            // undefined and call this subscriber before it resubscribes
-            () => (selRef.current ? selRef.current(state) : state),
-            dispatch,
-            equalityFn
-          )
-        : subscribe(dispatch)
-      // Only resubscribe to the store when changing selector from function to
-      // undefined or undefined to function
-    }, [!selector])
+      options.selector = selector
+      options.equalityFn = equalityFn
+    }, [selector, equalityFn])
 
-    return stateSlice
+    useIsoLayoutEffect(() => subscribe(forceUpdate, options), [])
+
+    return options.currentSlice as StateSlice
   }
 
-  let api = { destroy, getState, setState, subscribe }
+  const api = { setState, getState, subscribe, destroy }
   let state = createState(setState, getState, api)
 
   return [useStore, api]
 }
-
-export { shallowEqual }
