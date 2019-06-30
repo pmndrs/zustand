@@ -5,13 +5,17 @@ const redux = (reducer: any, initial: any) => (
 ) => {
   api.dispatch = (action: any) => {
     set((state: any) => reducer(state, action))
-    api.devtools && api.devtools.send(action, get())
+    api.devtools && api.devtools.send(api.devtools.prefix + action, get())
     return action
   }
   return { dispatch: api.dispatch, ...initial }
 }
 
-const devtools = (fn: any) => (set: any, get: any, api: any) => {
+const devtools = (fn: any, prefix?: string) => (
+  set: any,
+  get: any,
+  api: any
+) => {
   let extension
   try {
     extension =
@@ -28,6 +32,7 @@ const devtools = (fn: any) => (set: any, get: any, api: any) => {
     const initialState = fn(set, get, api)
     if (!api.devtools) {
       api.devtools = extension.connect()
+      api.devtools.prefix = prefix ? `${prefix} > ` : ''
       api.devtools.subscribe((message: any) => {
         if (message.type === 'DISPATCH' && message.state) {
           ignoreState =
@@ -40,7 +45,7 @@ const devtools = (fn: any) => (set: any, get: any, api: any) => {
       if (!initialState.dispatch) {
         api.subscribe((state: any) => {
           if (!ignoreState) {
-            api.devtools.send('setState', state)
+            api.devtools.send(api.devtools.prefix + 'setState', state)
           } else {
             ignoreState = false
           }

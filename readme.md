@@ -66,12 +66,12 @@ const foo = useStore(state => state.foo)
 const bar = useStore(state => state.bar)
 ```
 
-If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly.
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing an alternative equality function.
 
 ```jsx
-import shallowequal from 'shallowequal'
+import shallow from 'zustand/shallow'
 
-const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallowequal)
+const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallow)
 ```
 
 ## Fetching from multiple stores
@@ -232,3 +232,5 @@ const [useStore] = create(devtools(store))
 // Usage with a redux store, it will log full action types
 const [useStore] = create(devtools(redux(reducer, initialState)))
 ```
+
+devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.

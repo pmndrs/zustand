@@ -4,7 +4,6 @@ import resolve from 'rollup-plugin-node-resolve'
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
 import typescript from 'rollup-plugin-typescript2'
 
-const packageJson = require('./package.json')
 const getBabelRc = require('./.babelrc.js')
 const root = process.platform === 'win32' ? path.resolve('/') : '/'
 const external = id => !id.startsWith('.') && !id.startsWith(root)
@@ -15,7 +14,7 @@ const getBabelOptions = targets => ({
   ...getBabelRc({ env: v => v === 'production' }, targets),
 })
 
-function createConfig(entry, out) {
+function createConfig(entry, out, name) {
   return [
     {
       input: entry,
@@ -45,7 +44,7 @@ function createConfig(entry, out) {
         file: `dist/${out}.iife.js`,
         format: 'iife',
         exports: 'named',
-        name: packageJson.name,
+        name,
         globals: {
           react: 'React',
         },
@@ -62,6 +61,7 @@ function createConfig(entry, out) {
 }
 
 export default [
-  ...createConfig('src/index.ts', 'index'),
-  ...createConfig('src/middleware.ts', 'middleware'),
+  ...createConfig('src/index.ts', 'index', 'zustand'),
+  ...createConfig('src/shallow.ts', 'shallow', 'shallow'),
+  ...createConfig('src/middleware.ts', 'middleware', 'middleware'),
 ]
