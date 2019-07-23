@@ -42,11 +42,7 @@ const useIsoLayoutEffect =
   typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function create<TState extends State>(
-  // Use TState for createState signature when available.
-  // e.g. create<MyState>(set => ...
-  createState: keyof TState extends never
-    ? StateCreator<State>
-    : StateCreator<TState>
+  createState: StateCreator<TState>
 ): [UseStore<TState>, StoreApi<TState>] {
   const listeners: Set<StateListener<void>> = new Set()
 
