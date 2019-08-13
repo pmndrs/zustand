@@ -136,10 +136,10 @@ set(state => void state.nested.structure.contains = null)
 You can use it with or without React out of the box.
 
 ```jsx
-const [, api] = create({ a: 1, b: 2, c: 3 })
+const [, api] = create(() => ({ a: 1, b: 2, c: 3 }))
 
 // Getting fresh state
-const num = api.getState().n
+const a = api.getState().a
 // Listening to all changes, fires on every dispatch
 const unsub1 = api.subscribe(state => console.log("state changed", state))
 // Listening to selected changes
