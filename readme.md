@@ -136,7 +136,7 @@ set(state => void state.nested.structure.contains = null)
 You can use it with or without React out of the box.
 
 ```jsx
-const [, api] = create(() => ({ a: 1, b: 2, c: 3 }));
+const [, api] = create(() => ({ a: 1, b: 2, c: 3 }))
 
 // Getting fresh state
 const a = api.getState().a
