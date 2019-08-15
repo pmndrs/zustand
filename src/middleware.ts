@@ -5,7 +5,7 @@ const redux = (reducer: any, initial: any) => (
 ) => {
   api.dispatch = (action: any) => {
     set((state: any) => reducer(state, action))
-    api.devtools && api.devtools.send(api.devtools.prefix + action, get())
+    api.devtools && api.devtools.send(api.devtools.prefix + action.type, get())
     return action
   }
   return { dispatch: api.dispatch, ...initial }
