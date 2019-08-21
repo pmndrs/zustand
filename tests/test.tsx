@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import { act } from 'react-dom/test-utils'
 import {
   cleanup,
@@ -155,6 +156,28 @@ it('only re-renders if selected state has changed', async () => {
 
   expect(counterRenderCount).toBe(2)
   expect(controlRenderCount).toBe(1)
+})
+
+it('can batch updates', async () => {
+  const [useStore] = create(set => ({
+    count: 0,
+    inc: () => set(state => ({ count: state.count + 1 })),
+  }))
+
+  function Counter() {
+    const { count, inc } = useStore()
+    React.useEffect(() => {
+      ReactDOM.unstable_batchedUpdates(() => {
+        inc()
+        inc()
+      })
+    }, [])
+    return <div>count: {count}</div>
+  }
+
+  const { getByText } = render(<Counter />)
+
+  await waitForElement(() => getByText('count: 2'))
 })
 
 it('can update the selector', async () => {
