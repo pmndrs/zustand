@@ -36,7 +36,7 @@ export interface StoreApi<T extends State> {
   destroy: Destroy
 }
 
-const forceUpdateReducer = (state: boolean) => !state
+const forceUpdateReducer = (state: number) => state + 1
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
 const useIsoLayoutEffect =
   typeof window === 'undefined' ? useEffect : useLayoutEffect
@@ -122,7 +122,7 @@ export default function create<TState extends State>(
       options.subscribeError = undefined
     })
 
-    const forceUpdate = useReducer(forceUpdateReducer, false)[1]
+    const forceUpdate = useReducer(forceUpdateReducer, 1)[1]
     useIsoLayoutEffect(() => subscribe(forceUpdate, options), [])
 
     return options.currentSlice as StateSlice
