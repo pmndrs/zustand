@@ -44,6 +44,7 @@ const useIsoLayoutEffect =
 export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): [UseStore<TState>, StoreApi<TState>] {
+  let state: TState
   const listeners: Set<StateListener<void>> = new Set()
 
   const setState: SetState<TState> = partial => {
@@ -129,7 +130,7 @@ export default function create<TState extends State>(
   }
 
   const api = { setState, getState, subscribe, destroy }
-  let state = createState(setState, getState, api)
+  state = createState(setState, getState, api)
 
   return [useStore, api]
 }
