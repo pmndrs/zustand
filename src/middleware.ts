@@ -21,7 +21,7 @@ const devtools = (fn: any, prefix?: string) => (
     extension =
       (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
       (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
-  } catch {}
+  } catch (_error) {}
   let ignoreState = false
 
   if (!extension) {
