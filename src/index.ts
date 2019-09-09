@@ -25,10 +25,10 @@ export type Subscribe<T extends State> = <U>(
   options?: SubscribeOptions<T, U>
 ) => () => void
 export type Destroy = () => void
-export type UseStore<T extends State> = <U>(
-  selector?: StateSelector<T, U>,
-  equalityFn?: EqualityChecker<U>
-) => U
+export interface UseStore<T extends State> {
+  (): T
+  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+}
 export interface StoreApi<T extends State> {
   setState: SetState<T>
   getState: GetState<T>
@@ -91,7 +91,7 @@ export default function create<TState extends State>(
   const useStore = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
-  ): StateSlice => {
+  ) => {
     if (Array.isArray(equalityFn)) {
       equalityFn = Object.is
       console.warn(
@@ -126,7 +126,7 @@ export default function create<TState extends State>(
     const forceUpdate = useReducer(forceUpdateReducer, 1)[1]
     useIsoLayoutEffect(() => subscribe(forceUpdate, options), [])
 
-    return options.currentSlice as StateSlice
+    return options.currentSlice
   }
 
   const api = { setState, getState, subscribe, destroy }
