@@ -22,7 +22,7 @@ function createConfig(entry, out, name) {
       external,
       plugins: [
         typescript(),
-        babel(getBabelOptions('last 2 chrome versions')),
+        babel(getBabelOptions('node 8')),
         sizeSnapshot(),
         resolve({ extensions }),
       ],
@@ -33,7 +33,7 @@ function createConfig(entry, out, name) {
       external,
       plugins: [
         typescript(),
-        babel(getBabelOptions()),
+        babel(getBabelOptions('ie 11')),
         sizeSnapshot(),
         resolve({ extensions }),
       ],
@@ -52,7 +52,7 @@ function createConfig(entry, out, name) {
       external,
       plugins: [
         typescript(),
-        babel(getBabelOptions()),
+        babel(getBabelOptions('ie 11')),
         sizeSnapshot(),
         resolve({ extensions }),
       ],
