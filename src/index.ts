@@ -12,6 +12,7 @@ export interface SubscribeOptions<T extends State, U> {
   equalityFn?: EqualityChecker<U>
   currentSlice?: U
   subscribeError?: Error
+  listenerIndex?: string
 }
 export type StateCreator<T extends State> = (
   set: SetState<T>,
@@ -36,6 +37,10 @@ export interface StoreApi<T extends State> {
   destroy: Destroy
 }
 
+// For using symbols as indexers: https://github.com/Microsoft/TypeScript/issues/24587
+const getOwnPropertySymbols = (Object.getOwnPropertySymbols as unknown) as (
+  o: any
+) => string[]
 const forceUpdateReducer = (state: number) => state + 1
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
 const useIsoLayoutEffect =
@@ -45,14 +50,20 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): [UseStore<TState>, StoreApi<TState>] {
   let state: TState
-  const listeners: Set<StateListener<void>> = new Set()
+  let listeners: Record<string, StateListener<void> | null> = {}
 
   const setState: SetState<TState> = partial => {
     const partialState =
       typeof partial === 'function' ? partial(state) : partial
     if (partialState !== state) {
       state = Object.assign({}, state, partialState)
-      listeners.forEach(listener => listener())
+      // listeners is an object to ensure enumeration order.
+      // Parent component's listeners must be called before their children's.
+      // https://github.com/react-spring/zustand/issues/64
+      getOwnPropertySymbols(listeners).forEach(listenerIndex => {
+        const listener = listeners[listenerIndex]
+        if (listener) listener()
+      })
     }
   }
 
@@ -65,6 +76,8 @@ export default function create<TState extends State>(
     if (!('currentSlice' in options)) {
       options.currentSlice = (options.selector || getState)(state)
     }
+    // options.listenerIndex is not mutable to ensure the correct listener is removed on cleanup.
+    const { listenerIndex = (Symbol() as unknown) as string } = options
     const listenerFn = () => {
       // Destructure in the listener to get current values. We rely on this
       // because options is mutated in useStore.
@@ -82,11 +95,11 @@ export default function create<TState extends State>(
         listener()
       }
     }
-    listeners.add(listenerFn)
-    return () => void listeners.delete(listenerFn)
+    listeners[listenerIndex] = listenerFn
+    return () => void delete listeners[listenerIndex]
   }
 
-  const destroy: Destroy = () => listeners.clear()
+  const destroy: Destroy = () => (listeners = {})
 
   const useStore = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
@@ -106,6 +119,7 @@ export default function create<TState extends State>(
         selector,
         equalityFn,
         currentSlice: ((isInitial.current = false), selector(state)),
+        listenerIndex: (Symbol() as unknown) as string,
       }
     ).current as SubscribeOptions<TState, StateSlice>
 
@@ -115,6 +129,16 @@ export default function create<TState extends State>(
       if (!equalityFn(options.currentSlice as StateSlice, newStateSlice)) {
         options.currentSlice = newStateSlice
       }
+    }
+
+    // An object's keys are enumerated by insertion order.
+    // Insert a key for the listener during the component's render phase.
+    // This ensures the listeners are ordered based on the render order (parent to child).
+    // If we did not do this, the listeners would be inserted in useEffect.
+    // useEffect call order seems to be reversed (child effects are called before the parent's).
+    const listenerIndex = options.listenerIndex as string
+    if (!(listenerIndex in listeners)) {
+      listeners[listenerIndex] = null
     }
 
     useIsoLayoutEffect(() => {

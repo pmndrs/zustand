@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { act } from 'react-dom/test-utils'
 import {
@@ -481,6 +481,46 @@ it('only calls selectors when necessary', async () => {
   act(() => setState({ a: 1, b: 1 }))
   await waitForElement(() => getByText('inline: 4'))
   await waitForElement(() => getByText('static: 2'))
+})
+
+it('ensures parent components subscribe before children', async () => {
+  const [useStore] = create(set => ({
+    childIds: [1, 2],
+    children: {
+      '1': { state: 'child 1' },
+      '2': { state: 'child 2' },
+    },
+    swapChildren() {
+      set({
+        childIds: [3],
+        children: {
+          '3': { state: 'child 3' },
+        },
+      })
+    },
+  }))
+
+  function Child({ id }) {
+    const { state } = useStore(s => s.children[id])
+    return <div>{state}</div>
+  }
+
+  function Parent() {
+    const [childIds, swapChildren] = useStore(s => [s.childIds, s.swapChildren])
+    useEffect(() => void setTimeout(swapChildren, 100), [])
+    return (
+      <div>
+        childIds: {childIds.join(',')}
+        {childIds.map(id => (
+          <Child id={id} key={id} />
+        ))}
+      </div>
+    )
+  }
+
+  const { getByText } = render(<Parent />)
+
+  await waitForElement(() => getByText('child 3'))
 })
 
 it('can use exposed types', () => {
