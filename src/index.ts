@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
 
 export type State = Record<string | number | symbol, any>
 export interface StateListener<T> {
-  (state: T, error: null): void
+  (state: T): void
   (state: null, error: Error): void
 }
 export type StateSelector<T extends State, U> = (state: T) => U
@@ -96,7 +96,7 @@ export default function create<TState extends State>(
       try {
         const newStateSlice = selector(state)
         if (!equalityFn(options.currentSlice as StateSlice, newStateSlice)) {
-          listener((options.currentSlice = newStateSlice), null)
+          listener((options.currentSlice = newStateSlice))
         }
       } catch (error) {
         options.subscribeError = error
