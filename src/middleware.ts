@@ -25,7 +25,9 @@ const devtools = (fn: any, prefix?: string) => (
   let ignoreState = false
 
   if (!extension) {
-    console.warn('Please install/enable Redux devtools extension')
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Please install/enable Redux devtools extension')
+    }
     api.devtools = null
     return fn(set, get, api)
   } else {
