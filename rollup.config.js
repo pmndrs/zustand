@@ -5,7 +5,7 @@ import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
 import typescript from 'rollup-plugin-typescript2'
 
 const getBabelRc = require('./.babelrc.js')
-const root = process.platform === 'win32' ? path.resolve('/') : '/'
+const { root } = path.parse(process.cwd())
 const external = id => !id.startsWith('.') && !id.startsWith(root)
 const extensions = ['.js', '.ts', '.tsx']
 const getBabelOptions = targets => ({
@@ -14,54 +14,60 @@ const getBabelOptions = targets => ({
   ...getBabelRc({ env: v => v === 'production' }, targets),
 })
 
-function createConfig(entry, out, name) {
-  return [
-    {
-      input: entry,
-      output: { file: `dist/${out}.js`, format: 'esm' },
-      external,
-      plugins: [
-        typescript(),
-        babel(getBabelOptions('node 8')),
-        sizeSnapshot(),
-        resolve({ extensions }),
-      ],
-    },
-    {
-      input: entry,
-      output: { file: `dist/${out}.cjs.js`, format: 'cjs', exports: 'named' },
-      external,
-      plugins: [
-        typescript(),
-        babel(getBabelOptions('ie 11')),
-        sizeSnapshot(),
-        resolve({ extensions }),
-      ],
-    },
-    {
-      input: entry,
-      output: {
-        file: `dist/${out}.iife.js`,
-        format: 'iife',
-        exports: 'named',
-        name,
-        globals: {
-          react: 'React',
-        },
+function createESMConfig(input, output) {
+  return {
+    input,
+    output: { file: output, format: 'esm' },
+    external,
+    plugins: [
+      typescript(),
+      babel(getBabelOptions('node 8')),
+      sizeSnapshot(),
+      resolve({ extensions }),
+    ],
+  }
+}
+
+function createCommonJSConfig(input, output) {
+  return {
+    input,
+    output: { file: output, format: 'cjs', exports: 'named' },
+    external,
+    plugins: [
+      typescript(),
+      babel(getBabelOptions('ie 11')),
+      sizeSnapshot(),
+      resolve({ extensions }),
+    ],
+  }
+}
+
+function createIIFEConfig(input, output, globalName) {
+  return {
+    input,
+    output: {
+      file: output,
+      format: 'iife',
+      exports: 'named',
+      name: globalName,
+      globals: {
+        react: 'React',
       },
-      external,
-      plugins: [
-        typescript(),
-        babel(getBabelOptions('ie 11')),
-        sizeSnapshot(),
-        resolve({ extensions }),
-      ],
     },
-  ]
+    external,
+    plugins: [
+      typescript(),
+      babel(getBabelOptions('ie 11')),
+      sizeSnapshot(),
+      resolve({ extensions }),
+    ],
+  }
 }
 
 export default [
-  ...createConfig('src/index.ts', 'index', 'zustand'),
-  ...createConfig('src/shallow.ts', 'shallow', 'shallow'),
-  ...createConfig('src/middleware.ts', 'middleware', 'middleware'),
+  createESMConfig('src/index.ts', 'dist/index.js'),
+  createCommonJSConfig('src/index.ts', 'dist/index.cjs.js'),
+  createIIFEConfig('src/index.ts', 'dist/index.iife.js', 'zustand'),
+  createCommonJSConfig('src/shallow.ts', 'dist/shallow.js'),
+  createCommonJSConfig('src/middleware.ts', 'dist/middleware.js'),
 ]
