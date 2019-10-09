@@ -484,41 +484,41 @@ it('only calls selectors when necessary', async () => {
 })
 
 it('ensures parent components subscribe before children', async () => {
-  const [useStore] = create(set => ({
-    childIds: [1, 2],
+  const [useStore, api] = create<any>(() => ({
     children: {
-      '1': { state: 'child 1' },
-      '2': { state: 'child 2' },
-    },
-    swapChildren() {
-      set({
-        childIds: [3],
-        children: {
-          '3': { state: 'child 3' },
-        },
-      })
+      '1': { text: 'child 1' },
+      '2': { text: 'child 2' },
     },
   }))
 
+  function changeState() {
+    api.setState({
+      children: {
+        '3': { text: 'child 3' },
+      },
+    })
+  }
+
   function Child({ id }) {
-    const { state } = useStore(s => s.children[id])
-    return <div>{state}</div>
+    const text = useStore(s => s.children[id].text)
+    return <div>{text}</div>
   }
 
   function Parent() {
-    const [childIds, swapChildren] = useStore(s => [s.childIds, s.swapChildren])
-    useEffect(() => void setTimeout(swapChildren, 100), [])
+    const childStates = useStore(s => s.children)
     return (
-      <div>
-        childIds: {childIds.join(',')}
-        {childIds.map(id => (
+      <>
+        <button onClick={changeState}>change state</button>
+        {Object.keys(childStates).map(id => (
           <Child id={id} key={id} />
         ))}
-      </div>
+      </>
     )
   }
 
   const { getByText } = render(<Parent />)
+
+  fireEvent.click(getByText('change state'))
 
   await waitForElement(() => getByText('child 3'))
 })
@@ -612,32 +612,4 @@ it('can use exposed types', () => {
     useStore,
     subscribeOptions
   )
-})
-
-describe('redux dev tools middleware', () => {
-  const consoleWarn = console.warn
-
-  afterEach(() => {
-    cleanup()
-    console.warn = consoleWarn
-  })
-
-  it('can warn when trying to use redux devtools without extension', () => {
-    console.warn = jest.fn()
-
-    const initialState = { count: 0 }
-    const types = { increase: 'INCREASE', decrease: 'DECREASE' }
-    const reducer = (state, { type, by }) => {
-      switch (type) {
-        case types.increase:
-          return { count: state.count + by }
-        case types.decrease:
-          return { count: state.count - by }
-      }
-    }
-
-    create(devtools(redux(reducer, initialState)))
-
-    expect(console.warn).toBeCalled()
-  })
 })
