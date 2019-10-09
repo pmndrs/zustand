@@ -17,7 +17,7 @@ import create, {
   StateCreator,
   SetState,
   GetState,
-  Subscribe,
+  ApiSubscribe,
   Destroy,
   UseStore,
   StoreApi,
@@ -387,7 +387,7 @@ it('can subscribe to the store', () => {
     () => {
       throw new Error('subscriber called when new state is the same')
     },
-    { selector: s => s.value }
+    s => s.value
   )
   setState({ other: 'b' })
   unsub()
@@ -397,7 +397,7 @@ it('can subscribe to the store', () => {
     (value: number) => {
       expect(value).toBe(initialState.value + 1)
     },
-    { selector: s => s.value }
+    s => s.value
   )
   setState({ value: initialState.value + 1 })
   unsub()
@@ -407,7 +407,8 @@ it('can subscribe to the store', () => {
     () => {
       throw new Error('subscriber called when equality checker returned true')
     },
-    { equalityFn: () => true }
+    undefined,
+    () => true
   )
   setState({ value: initialState.value + 2 })
   unsub()
@@ -417,21 +418,10 @@ it('can subscribe to the store', () => {
     (value: number) => {
       expect(value).toBe(initialState.value + 2)
     },
-    { selector: s => s.value, equalityFn: () => false }
+    s => s.value,
+    () => false
   )
   setState(getState())
-  unsub()
-
-  // Can pass in initial state when subscribing
-  unsub = subscribe(
-    () => {
-      throw new Error(
-        'subscriber called when initial state is the same as new state'
-      )
-    },
-    { selector: s => s.value, currentSlice: initialState.value + 3 }
-  )
-  setState({ value: initialState.value + 3 })
   unsub()
 })
 
@@ -481,6 +471,46 @@ it('only calls selectors when necessary', async () => {
   act(() => setState({ a: 1, b: 1 }))
   await waitForElement(() => getByText('inline: 4'))
   await waitForElement(() => getByText('static: 2'))
+})
+
+it('ensures parent components subscribe before children', async () => {
+  const [useStore, api] = create<any>(() => ({
+    children: {
+      '1': { text: 'child 1' },
+      '2': { text: 'child 2' },
+    },
+  }))
+
+  function changeState() {
+    api.setState({
+      children: {
+        '3': { text: 'child 3' },
+      },
+    })
+  }
+
+  function Child({ id }) {
+    const text = useStore(s => s.children[id].text)
+    return <div>{text}</div>
+  }
+
+  function Parent() {
+    const childStates = useStore(s => s.children)
+    return (
+      <>
+        <button onClick={changeState}>change state</button>
+        {Object.keys(childStates).map(id => (
+          <Child id={id} key={id} />
+        ))}
+      </>
+    )
+  }
+
+  const { getByText } = render(<Parent />)
+
+  fireEvent.click(getByText('change state'))
+
+  await waitForElement(() => getByText('child 3'))
 })
 
 it('can use exposed types', () => {
@@ -547,7 +577,7 @@ it('can use exposed types', () => {
     stateListener: StateListener<ExampleState>,
     stateSelector: StateSelector<ExampleState, number>,
     storeApi: StoreApi<ExampleState>,
-    subscribe: Subscribe<ExampleState>,
+    subscribe: ApiSubscribe<ExampleState>,
     destroy: Destroy,
     equalityFn: EqualityChecker<ExampleState>,
     stateCreator: StateCreator<ExampleState>,
@@ -572,32 +602,4 @@ it('can use exposed types', () => {
     useStore,
     subscribeOptions
   )
-})
-
-describe('redux dev tools middleware', () => {
-  const consoleWarn = console.warn
-
-  afterEach(() => {
-    cleanup()
-    console.warn = consoleWarn
-  })
-
-  it('can warn when trying to use redux devtools without extension', () => {
-    console.warn = jest.fn()
-
-    const initialState = { count: 0 }
-    const types = { increase: 'INCREASE', decrease: 'DECREASE' }
-    const reducer = (state, { type, by }) => {
-      switch (type) {
-        case types.increase:
-          return { count: state.count + by }
-        case types.decrease:
-          return { count: state.count - by }
-      }
-    }
-
-    create(devtools(redux(reducer, initialState)))
-
-    expect(console.warn).toBeCalled()
-  })
 })
