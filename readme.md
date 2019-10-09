@@ -143,9 +143,7 @@ const a = api.getState().a
 // Listening to all changes, fires on every dispatch
 const unsub1 = api.subscribe(state => console.log("state changed", state))
 // Listening to selected changes
-const unsub2 = api.subscribe(a => console.log("a changed", a), {
-  selector: state => state.a
-})
+const unsub2 = api.subscribe(a => console.log("a changed", a), state => state.a)
 // Updating state, will trigger listeners
 api.setState({ a: 1 })
 // Unsubscribe listeners
