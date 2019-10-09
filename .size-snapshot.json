@@ -1,74 +1,36 @@
 {
   "dist/index.js": {
-    "bundled": 4177,
-    "minified": 1457,
-    "gzipped": 739,
+    "bundled": 3649,
+    "minified": 1199,
+    "gzipped": 579,
     "treeshaked": {
       "rollup": {
         "code": 14,
         "import_statements": 14
       },
       "webpack": {
-        "code": 1090
+        "code": 1061
       }
     }
   },
   "dist/index.cjs.js": {
-    "bundled": 5013,
-    "minified": 1705,
-    "gzipped": 814
+    "bundled": 4531,
+    "minified": 1445,
+    "gzipped": 667
   },
   "dist/index.iife.js": {
-    "bundled": 5230,
-    "minified": 1501,
-    "gzipped": 759
+    "bundled": 4746,
+    "minified": 1281,
+    "gzipped": 609
   },
   "dist/shallow.js": {
-    "bundled": 559,
-    "minified": 350,
-    "gzipped": 217,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
-  },
-  "dist/shallow.cjs.js": {
     "bundled": 646,
     "minified": 425,
     "gzipped": 256
   },
-  "dist/shallow.iife.js": {
-    "bundled": 688,
-    "minified": 378,
-    "gzipped": 236
-  },
   "dist/middleware.js": {
-    "bundled": 1492,
-    "minified": 760,
-    "gzipped": 426,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
-  },
-  "dist/middleware.cjs.js": {
-    "bundled": 2185,
-    "minified": 1176,
-    "gzipped": 598
-  },
-  "dist/middleware.iife.js": {
-    "bundled": 2324,
-    "minified": 1095,
-    "gzipped": 567
+    "bundled": 2126,
+    "minified": 1205,
+    "gzipped": 621
   }
 }
