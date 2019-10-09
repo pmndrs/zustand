@@ -17,7 +17,7 @@ import create, {
   StateCreator,
   SetState,
   GetState,
-  Subscribe,
+  ApiSubscribe,
   Destroy,
   UseStore,
   StoreApi,
@@ -387,7 +387,7 @@ it('can subscribe to the store', () => {
     () => {
       throw new Error('subscriber called when new state is the same')
     },
-    { selector: s => s.value }
+    s => s.value
   )
   setState({ other: 'b' })
   unsub()
@@ -397,7 +397,7 @@ it('can subscribe to the store', () => {
     (value: number) => {
       expect(value).toBe(initialState.value + 1)
     },
-    { selector: s => s.value }
+    s => s.value
   )
   setState({ value: initialState.value + 1 })
   unsub()
@@ -407,7 +407,8 @@ it('can subscribe to the store', () => {
     () => {
       throw new Error('subscriber called when equality checker returned true')
     },
-    { equalityFn: () => true }
+    undefined,
+    () => true
   )
   setState({ value: initialState.value + 2 })
   unsub()
@@ -417,21 +418,10 @@ it('can subscribe to the store', () => {
     (value: number) => {
       expect(value).toBe(initialState.value + 2)
     },
-    { selector: s => s.value, equalityFn: () => false }
+    s => s.value,
+    () => false
   )
   setState(getState())
-  unsub()
-
-  // Can pass in initial state when subscribing
-  unsub = subscribe(
-    () => {
-      throw new Error(
-        'subscriber called when initial state is the same as new state'
-      )
-    },
-    { selector: s => s.value, currentSlice: initialState.value + 3 }
-  )
-  setState({ value: initialState.value + 3 })
   unsub()
 })
 
@@ -587,7 +577,7 @@ it('can use exposed types', () => {
     stateListener: StateListener<ExampleState>,
     stateSelector: StateSelector<ExampleState, number>,
     storeApi: StoreApi<ExampleState>,
-    subscribe: Subscribe<ExampleState>,
+    subscribe: ApiSubscribe<ExampleState>,
     destroy: Destroy,
     equalityFn: EqualityChecker<ExampleState>,
     stateCreator: StateCreator<ExampleState>,

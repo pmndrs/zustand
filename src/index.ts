@@ -31,6 +31,11 @@ export type Subscribe<T extends State> = <U>(
   listener: StateListener<U>,
   options?: SubscribeOptions<T, U>
 ) => () => void
+export type ApiSubscribe<T extends State> = <U>(
+  listener: StateListener<U>,
+  selector?: StateSelector<T, U>,
+  equalityFn?: EqualityChecker<U>
+) => () => void
 export type Destroy = () => void
 export interface UseStore<T extends State> {
   (): T
@@ -39,7 +44,7 @@ export interface UseStore<T extends State> {
 export interface StoreApi<T extends State> {
   setState: SetState<T>
   getState: GetState<T>
-  subscribe: Subscribe<T>
+  subscribe: ApiSubscribe<T>
   destroy: Destroy
 }
 
@@ -110,6 +115,9 @@ export default function create<TState extends State>(
     return () => delete listeners[listenerIndex]
   }
 
+  const apiSubscribe: ApiSubscribe<TState> = (listener, selector, equalityFn) =>
+    subscribe(listener, { selector, equalityFn })
+
   const destroy: Destroy = () => (listeners.length = 0)
 
   const useStore = <StateSlice>(
@@ -148,7 +156,7 @@ export default function create<TState extends State>(
     return options.currentSlice
   }
 
-  const api = { setState, getState, subscribe, destroy }
+  const api = { setState, getState, subscribe: apiSubscribe, destroy }
   state = createState(setState, getState, api)
 
   return [useStore, api]
