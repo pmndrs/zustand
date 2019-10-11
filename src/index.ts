@@ -1,41 +1,39 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
 
 export type State = Record<string | number | symbol, any>
-export interface StateListener<T> {
-  (state: T): void
-  (state: null, error: Error): void
-}
-export type StateSelector<T extends State, U> = (state: T) => U
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
-export type EqualityChecker<T> = (state: T, newState: any) => boolean
-export interface UseStoreSubscribeOptions<T extends State, U> {
-  selector: StateSelector<T, U>
-  equalityFn: EqualityChecker<U>
-  currentSlice: U
-  listenerIndex: number
-  subscribeError?: Error
-}
-export type SubscribeOptions<T extends State, U> = Partial<
-  UseStoreSubscribeOptions<T, U>
->
 export type StateCreator<T extends State> = (
   set: SetState<T>,
   get: GetState<T>,
   api: StoreApi<T>
 ) => T
+export type StateSelector<T extends State, U> = (state: T) => U
+export interface StateListener<T> {
+  (state: T): void
+  (state: null, error: Error): void
+}
 export type SetState<T extends State> = (partial: PartialState<T>) => void
 export type GetState<T extends State> = () => T
+export interface Subscriber<T extends State, U> {
+  callback: () => void
+  currentSlice: U
+  equalityFn: EqualityChecker<U>
+  errored: boolean
+  index: number
+  listener: StateListener<U>
+  selector: StateSelector<T, U>
+}
 export type Subscribe<T extends State> = <U>(
-  listener: StateListener<U>,
-  options?: SubscribeOptions<T, U>
+  subscriber: Subscriber<T, U>
 ) => () => void
 export type ApiSubscribe<T extends State> = <U>(
   listener: StateListener<U>,
   selector?: StateSelector<T, U>,
   equalityFn?: EqualityChecker<U>
 ) => () => void
+export type EqualityChecker<T> = (state: T, newState: any) => boolean
 export type Destroy = () => void
 export interface UseStore<T extends State> {
   (): T
@@ -48,7 +46,6 @@ export interface StoreApi<T extends State> {
   destroy: Destroy
 }
 
-const forceUpdateReducer = (state: number) => state + 1
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
 const useIsoLayoutEffect =
   typeof window === 'undefined' ? useEffect : useLayoutEffect
@@ -56,104 +53,131 @@ const useIsoLayoutEffect =
 export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): [UseStore<TState>, StoreApi<TState>] {
-  // All listeners are wrapped in a function with the signature: () => void
-  const listeners: (() => void)[] = []
   let state: TState
-  let renderCount = 0
-
-  // Returns an int for a component based on render order.
-  function useRenderId() {
-    const renderIdRef = useRef<number>()
-    if (!renderIdRef.current) {
-      renderIdRef.current = renderCount++
-    }
-    return renderIdRef.current
-  }
+  let subscribers: Subscriber<TState, any>[] = []
+  let subscriberCount = 0
 
   const setState: SetState<TState> = partial => {
     const partialState =
       typeof partial === 'function' ? partial(state) : partial
     if (partialState !== state) {
       state = Object.assign({}, state, partialState)
-      listeners.forEach(listener => listener())
+      // Reset subscriberCount because we will be removing holes from the
+      // subscribers array and changing the length which should be the same as
+      // subscriberCount.
+      subscriberCount = 0
+      // Create a dense array by removing holes from the subscribers array.
+      // Holes are not iterated by Array.prototype.filter.
+      subscribers = subscribers.filter(subscriber => {
+        subscriber.index = subscriberCount++
+        return true
+      })
+
+      // Call all subscribers only after the subscribers array has been changed
+      // to a dense array. Subscriber callbacks cannot be called above in
+      // subscribers.filter because the callbacks can cause a synchronous
+      // increment of subscriberCount if not batched.
+      subscribers.forEach(subscriber => subscriber.callback())
     }
   }
 
   const getState: GetState<TState> = () => state
 
-  const subscribe: Subscribe<TState> = <StateSlice>(
+  const getSubscriber = <StateSlice>(
     listener: StateListener<StateSlice>,
-    options: SubscribeOptions<TState, StateSlice> = {}
+    selector: StateSelector<TState, StateSlice> = getState,
+    equalityFn: EqualityChecker<StateSlice> = Object.is
+  ): Subscriber<TState, StateSlice> => ({
+    callback: () => {},
+    currentSlice: selector(state),
+    equalityFn,
+    errored: false,
+    index: subscriberCount++,
+    listener,
+    selector,
+  })
+
+  const subscribe: Subscribe<TState> = <StateSlice>(
+    subscriber: Subscriber<TState, StateSlice>
   ) => {
-    if (!('currentSlice' in options)) {
-      options.currentSlice = (options.selector || getState)(state)
-    }
-    // subscribe can be called externally without passing in a listenerIndex so
-    // we need to assign it a default index.
-    const { listenerIndex = renderCount++ } = options
-    const listenerWrapper = () => {
-      // Access the current values of the options object in listenerWrapper.
-      // We rely on this because options is mutated in useStore.
-      const { selector = getState, equalityFn = Object.is } = options
+    subscriber.callback = () => {
       // Selector or equality function could throw but we don't want to stop
       // the listener from being called.
       // https://github.com/react-spring/zustand/pull/37
       try {
-        const newStateSlice = selector(state)
-        if (!equalityFn(options.currentSlice as StateSlice, newStateSlice)) {
-          listener((options.currentSlice = newStateSlice))
+        const newStateSlice = subscriber.selector(state)
+        if (!subscriber.equalityFn(subscriber.currentSlice, newStateSlice)) {
+          subscriber.listener((subscriber.currentSlice = newStateSlice))
         }
       } catch (error) {
-        options.subscribeError = error
-        listener(null, error)
+        subscriber.errored = true
+        subscriber.listener(null, error)
       }
     }
-    listeners[listenerIndex] = listenerWrapper
-    // Intentially using delete because shortening the length of the listeners
-    // array would result in listenerIndex not accessing the correct listener.
-    // This means listeners should be considered a sparce array.
-    return () => delete listeners[listenerIndex]
+    // subscriber.index is set during the render phase in order to store the
+    // subscibers in a top-down order. The subscribers array will become a
+    // sparse array when an index is skipped (due to an interrupted render) or
+    // a component unmounts and the subscriber is deleted. It's converted back
+    // to a dense array in setState.
+    subscribers[subscriber.index] = subscriber
+
+    // Delete creates a hole and preserves the array length. If we used
+    // Array.prototype.splice, subscribers with a greater subscriber.index
+    // would no longer match their actual index in subscribers.
+    return () => delete subscribers[subscriber.index]
   }
 
-  const apiSubscribe: ApiSubscribe<TState> = (listener, selector, equalityFn) =>
-    subscribe(listener, { selector, equalityFn })
+  const apiSubscribe: ApiSubscribe<TState> = <StateSlice>(
+    listener: StateListener<StateSlice>,
+    selector?: StateSelector<TState, StateSlice>,
+    equalityFn?: EqualityChecker<StateSlice>
+  ) => subscribe(getSubscriber(listener, selector, equalityFn))
 
-  const destroy: Destroy = () => (listeners.length = 0)
+  const destroy: Destroy = () => (subscribers = [])
 
-  const useStore = <StateSlice>(
+  const useStore: UseStore<TState> = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const listenerIndex = useRenderId()
-    const optionsRef = useRef<UseStoreSubscribeOptions<TState, StateSlice>>()
-    if (!optionsRef.current) {
-      optionsRef.current = {
-        selector,
-        equalityFn,
-        currentSlice: selector(state),
-        listenerIndex,
-      }
-    }
-    const options = optionsRef.current
+    const forceUpdate = useReducer(c => c + 1, 0)[1]
+    const subscriberRef = useRef<Subscriber<TState, StateSlice>>()
 
-    // Update state slice if selector has changed or subscriber errored.
-    if (selector !== options.selector || options.subscribeError) {
-      const newStateSlice = selector(state)
-      if (!equalityFn(options.currentSlice, newStateSlice)) {
-        options.currentSlice = newStateSlice
-      }
+    if (!subscriberRef.current) {
+      subscriberRef.current = getSubscriber(forceUpdate, selector, equalityFn)
     }
 
+    const subscriber = subscriberRef.current
+    let newStateSlice: StateSlice | undefined
+    let hasNewStateSlice = false
+
+    // The selector or equalityFn need to be called during the render phase if
+    // they change. We also want legitimate errors to be visible so we re-run
+    // them if they errored in the subscriber.
+    if (
+      subscriber.selector !== selector ||
+      subscriber.equalityFn !== equalityFn ||
+      subscriber.errored
+    ) {
+      // Using local variables to avoid mutations in the render phase.
+      newStateSlice = selector(state)
+      hasNewStateSlice = !equalityFn(subscriber.currentSlice, newStateSlice)
+    }
+
+    // Syncing changes in useEffect.
     useIsoLayoutEffect(() => {
-      options.selector = selector
-      options.equalityFn = equalityFn
-      options.subscribeError = undefined
+      if (hasNewStateSlice) {
+        subscriber.currentSlice = newStateSlice as StateSlice
+      }
+      subscriber.selector = selector
+      subscriber.equalityFn = equalityFn
+      subscriber.errored = false
     })
 
-    const forceUpdate = useReducer(forceUpdateReducer, 0)[1]
-    useIsoLayoutEffect(() => subscribe(forceUpdate, options), [])
+    useIsoLayoutEffect(() => subscribe(subscriber), [])
 
-    return options.currentSlice
+    return hasNewStateSlice
+      ? (newStateSlice as StateSlice)
+      : subscriber.currentSlice
   }
 
   const api = { setState, getState, subscribe: apiSubscribe, destroy }
