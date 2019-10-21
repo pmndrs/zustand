@@ -78,7 +78,7 @@ const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), sha
 const [foo, bar] = useBuerli(state => [state.foo, state.bar], shallow)
 
 // Mapped picks
-const keys = useBuerli(state => Object.key(state.objects), shallow)
+const keys = useBuerli(state => Object.keys(state.objects), shallow)
 ```
 
 ## Fetching from multiple stores
