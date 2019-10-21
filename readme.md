@@ -71,13 +71,13 @@ If you want to construct a single object with multiple state-picks inside, simil
 ```jsx
 import shallow from 'zustand/shallow'
 
-// Object pick
+// Object pick, re-renders the component when either foo or bar change
 const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallow)
 
-// Array pick
+// Array pick, re-renders the component when either foo or bar change
 const [foo, bar] = useBuerli(state => [state.foo, state.bar], shallow)
 
-// Mapped picks
+// Mapped picks, re-renders the component when state.objects changes in order, count or keys
 const keys = useBuerli(state => Object.keys(state.objects), shallow)
 ```
 
