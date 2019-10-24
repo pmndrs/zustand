@@ -10,10 +10,7 @@ export type StateCreator<T extends State> = (
   api: StoreApi<T>
 ) => T
 export type StateSelector<T extends State, U> = (state: T) => U
-export interface StateListener<T> {
-  (state: T): void
-  (state: null, error: Error): void
-}
+export type StateListener<T> = (state: T | null, error?: Error) => void
 export type SetState<T extends State> = (partial: PartialState<T>) => void
 export type GetState<T extends State> = () => T
 export interface Subscriber<T extends State, U> {
@@ -139,7 +136,7 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate = useReducer(c => c + 1, 0)[1]
+    const forceUpdate: StateListener<StateSlice> = useReducer(c => c + 1, 0)[1]
     const subscriberRef = useRef<Subscriber<TState, StateSlice>>()
 
     if (!subscriberRef.current) {
