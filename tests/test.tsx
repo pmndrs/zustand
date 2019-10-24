@@ -270,8 +270,11 @@ it('can throw an error in selector', async () => {
   const [useStore, { setState }] = create(() => initialState)
   const selector = s => s.value.toUpperCase()
 
-  class ErrorBoundary extends React.Component {
-    state = { hasError: false }
+  class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
+    constructor(props) {
+      super(props)
+      this.state = { hasError: false }
+    }
     static getDerivedStateFromError() {
       return { hasError: true }
     }
@@ -307,8 +310,11 @@ it('can throw an error in equality checker', async () => {
   const selector = s => s
   const equalityFn = (a, b) => a.value.trim() === b.value.trim()
 
-  class ErrorBoundary extends React.Component {
-    state = { hasError: false }
+  class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
+    constructor(props) {
+      super(props)
+      this.state = { hasError: false }
+    }
     static getDerivedStateFromError() {
       return { hasError: true }
     }
@@ -376,8 +382,8 @@ it('can subscribe to the store', () => {
   unsub()
 
   // Should be called if new state identity is different
-  unsub = subscribe((newState: { value: number; other: string }) => {
-    expect(newState.value).toBe(1)
+  unsub = subscribe((newState: { value: number; other: string } | null) => {
+    expect(newState && newState.value).toBe(1)
   })
   setState({ ...getState() })
   unsub()
@@ -394,7 +400,7 @@ it('can subscribe to the store', () => {
 
   // Should be called when state slice changes
   unsub = subscribe(
-    (value: number) => {
+    (value: number | null) => {
       expect(value).toBe(initialState.value + 1)
     },
     s => s.value
@@ -415,7 +421,7 @@ it('can subscribe to the store', () => {
 
   // Should be called when equality checker returns false
   unsub = subscribe(
-    (value: number) => {
+    (value: number | null) => {
       expect(value).toBe(initialState.value + 2)
     },
     s => s.value,
@@ -523,9 +529,11 @@ it('can use exposed types', () => {
   }
 
   const listener: StateListener<ExampleState> = state => {
-    const value = state.num * state.numGet() * state.numGetState()
-    state.numSet(value)
-    state.numSetState(value)
+    if (state) {
+      const value = state.num * state.numGet() * state.numGetState()
+      state.numSet(value)
+      state.numSetState(value)
+    }
   }
   const selector: StateSelector<ExampleState, number> = state => state.num
   const partial: PartialState<ExampleState> = { num: 2, numGet: () => 2 }
@@ -568,7 +576,7 @@ it('can use exposed types', () => {
     equalityFn: Object.is,
     errored: false,
     index: 0,
-    listener(n: number) {},
+    listener(n: number | null) {},
     selector,
   }
 
