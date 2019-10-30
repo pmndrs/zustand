@@ -47,7 +47,7 @@ const devtools = (fn: any, prefix?: string) => (
           message.payload.type === 'JUMP_TO_STATE'
         namedSet(
           JSON.parse(message.state),
-          !initialState.dispatch && ignoreState && 'setState'
+          !initialState.dispatch && !ignoreState && 'setState'
         )
       }
     })
