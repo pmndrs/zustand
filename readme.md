@@ -171,8 +171,7 @@ function Component({ id }) {
   // Fetch initial state
   const xy = useRef(api.getState()[id])
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(coords =>
-    (xy.current = coords), { selector: state => state[id] }), [id])
+  useEffect(() => api.subscribe(coords => (xy.current = coords), state => state[id]), [id])
 ```
 
 ## Middleware
