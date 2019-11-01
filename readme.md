@@ -162,7 +162,7 @@ api.destroy()
 
 ## Transient updates (for often occuring state-changes)
 
-The api signature of subscribe([selector,] callback):unsub allows you to easily bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. Best combine it with useEffect. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference when you are allowed to mutate the view directly.
+The api signature of subscribe(callback, selector):unsub allows you to easily bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference when you are allowed to mutate the view directly.
 
 ```jsx
 const [useStore, api] = create(set => ({ [0]: [-10, 0], [1]: [10, 5], ... }))
