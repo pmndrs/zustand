@@ -75,10 +75,10 @@ import shallow from 'zustand/shallow'
 const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallow)
 
 // Array pick, re-renders the component when either foo or bar change
-const [foo, bar] = useBuerli(state => [state.foo, state.bar], shallow)
+const [foo, bar] = useStore(state => [state.foo, state.bar], shallow)
 
 // Mapped picks, re-renders the component when state.objects changes in order, count or keys
-const keys = useBuerli(state => Object.keys(state.objects), shallow)
+const keys = useStore(state => Object.keys(state.objects), shallow)
 ```
 
 ## Fetching from multiple stores
