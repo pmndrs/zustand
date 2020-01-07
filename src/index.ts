@@ -100,7 +100,7 @@ export default function create<TState extends State>(
     // subscibers in a top-down order. The subscribers array will become a
     // sparse array when an index is skipped (due to an interrupted render) or
     // a component unmounts and the subscriber is deleted. It's converted back
-    // to a dense array in when a subscriber unsubscribes.
+    // to a dense array when a subscriber unsubscribes.
     subscribers[subscriber.index] = subscriber
 
     return () => {
