@@ -519,6 +519,48 @@ it('ensures parent components subscribe before children', async () => {
   await waitForElement(() => getByText('child 3'))
 })
 
+// https://github.com/react-spring/zustand/issues/84
+it('ensures the correct subscriber is removed on unmount', async () => {
+  const [useStore, api] = create(() => ({ count: 0 }))
+
+  function increment() {
+    api.setState(({ count }) => ({ count: count + 1 }))
+  }
+
+  function Count() {
+    const c = useStore(s => s.count)
+    return <div>count: {c}</div>
+  }
+
+  function CountWithInitialIncrement() {
+    React.useLayoutEffect(increment, [])
+    return <Count />
+  }
+
+  function Component() {
+    const [Counter, setCounter] = React.useState(
+      () => CountWithInitialIncrement
+    )
+    React.useLayoutEffect(() => {
+      setCounter(() => Count)
+    }, [])
+    return (
+      <>
+        <Counter />
+        <Count />
+      </>
+    )
+  }
+
+  const { findAllByText } = render(<Component />)
+
+  expect((await findAllByText('count: 1')).length).toBe(2)
+
+  act(increment)
+
+  expect((await findAllByText('count: 2')).length).toBe(2)
+})
+
 it('can use exposed types', () => {
   interface ExampleState extends State {
     num: number

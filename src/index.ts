@@ -59,21 +59,6 @@ export default function create<TState extends State>(
       typeof partial === 'function' ? partial(state) : partial
     if (partialState !== state) {
       state = Object.assign({}, state, partialState)
-      // Reset subscriberCount because we will be removing holes from the
-      // subscribers array and changing the length which should be the same as
-      // subscriberCount.
-      subscriberCount = 0
-      // Create a dense array by removing holes from the subscribers array.
-      // Holes are not iterated by Array.prototype.filter.
-      subscribers = subscribers.filter(subscriber => {
-        subscriber.index = subscriberCount++
-        return true
-      })
-
-      // Call all subscribers only after the subscribers array has been changed
-      // to a dense array. Subscriber callbacks cannot be called above in
-      // subscribers.filter because the callbacks can cause a synchronous
-      // increment of subscriberCount if not batched.
       subscribers.forEach(subscriber => subscriber.callback())
     }
   }
@@ -115,13 +100,23 @@ export default function create<TState extends State>(
     // subscibers in a top-down order. The subscribers array will become a
     // sparse array when an index is skipped (due to an interrupted render) or
     // a component unmounts and the subscriber is deleted. It's converted back
-    // to a dense array in setState.
+    // to a dense array when a subscriber unsubscribes.
     subscribers[subscriber.index] = subscriber
 
-    // Delete creates a hole and preserves the array length. If we used
-    // Array.prototype.splice, subscribers with a greater subscriber.index
-    // would no longer match their actual index in subscribers.
-    return () => delete subscribers[subscriber.index]
+    return () => {
+      // Reset subscriberCount because we will be removing holes from the
+      // subscribers array and changing the length which should be the same as
+      // subscriberCount.
+      subscriberCount = 0
+      // Create a dense array by removing holes from the subscribers array.
+      // Holes are not iterated by Array.prototype.filter.
+      subscribers = subscribers.filter(s => {
+        if (s !== subscriber) {
+          subscriber.index = subscriberCount++
+          return true
+        }
+      })
+    }
   }
 
   const apiSubscribe: ApiSubscribe<TState> = <StateSlice>(
