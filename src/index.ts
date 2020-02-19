@@ -24,7 +24,7 @@ export interface Subscriber<T extends State, U> {
 }
 export type Subscribe<T extends State> = <U>(
   subscriber: Subscriber<T, U>
-) => () => void
+) => void
 export type ApiSubscribe<T extends State> = <U>(
   listener: StateListener<U>,
   selector?: StateSelector<T, U>,
@@ -102,28 +102,34 @@ export default function create<TState extends State>(
     // a component unmounts and the subscriber is deleted. It's converted back
     // to a dense array when a subscriber unsubscribes.
     subscribers[subscriber.index] = subscriber
+  }
 
-    return () => {
-      // Reset subscriberCount because we will be removing holes from the
-      // subscribers array and changing the length which should be the same as
-      // subscriberCount.
-      subscriberCount = 0
-      // Create a dense array by removing holes from the subscribers array.
-      // Holes are not iterated by Array.prototype.filter.
-      subscribers = subscribers.filter(s => {
-        if (s !== subscriber) {
-          subscriber.index = subscriberCount++
-          return true
-        }
-      })
-    }
+  const makeUnsubscribeFn = <StateSlice>(
+    subscriber: Subscriber<TState, StateSlice>
+  ) => () => {
+    // Reset subscriberCount because we will be removing holes from the
+    // subscribers array and changing the length which should be the same as
+    // subscriberCount.
+    subscriberCount = 0
+    // Create a dense array by removing holes from the subscribers array.
+    // Holes are not iterated by Array.prototype.filter.
+    subscribers = subscribers.filter(s => {
+      if (s !== subscriber) {
+        s.index = subscriberCount++
+        return true
+      }
+    })
   }
 
   const apiSubscribe: ApiSubscribe<TState> = <StateSlice>(
     listener: StateListener<StateSlice>,
     selector?: StateSelector<TState, StateSlice>,
     equalityFn?: EqualityChecker<StateSlice>
-  ) => subscribe(getSubscriber(listener, selector, equalityFn))
+  ) => {
+    const subscriber = getSubscriber(listener, selector, equalityFn)
+    subscribe(subscriber)
+    return makeUnsubscribeFn(subscriber)
+  }
 
   const destroy: Destroy = () => (subscribers = [])
 
@@ -136,6 +142,7 @@ export default function create<TState extends State>(
 
     if (!subscriberRef.current) {
       subscriberRef.current = getSubscriber(forceUpdate, selector, equalityFn)
+      subscribe(subscriberRef.current)
     }
 
     const subscriber = subscriberRef.current
@@ -165,7 +172,7 @@ export default function create<TState extends State>(
       subscriber.errored = false
     })
 
-    useIsoLayoutEffect(() => subscribe(subscriber), [])
+    useIsoLayoutEffect(() => makeUnsubscribeFn(subscriber), [])
 
     return hasNewStateSlice
       ? (newStateSlice as StateSlice)
