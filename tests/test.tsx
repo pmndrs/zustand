@@ -561,6 +561,42 @@ it('ensures the correct subscriber is removed on unmount', async () => {
   expect((await findAllByText('count: 2')).length).toBe(2)
 })
 
+// https://github.com/react-spring/zustand/issues/86
+it('ensures a subscriber is not mistakenly overwritten', async () => {
+  const [useStore, { setState }] = create(() => ({ count: 0 }))
+
+  function Count1() {
+    const c = useStore(s => s.count)
+    return <div>count1: {c}</div>
+  }
+
+  function Count2() {
+    const c = useStore(s => s.count)
+    return <div>count2: {c}</div>
+  }
+
+  // Add 1st subscriber.
+  const { findAllByText, rerender } = render(<Count1 />)
+
+  // Replace 1st subscriber with another.
+  rerender(<Count2 />)
+
+  // Add 2 additional subscribers.
+  rerender(
+    <>
+      <Count2 />
+      <Count1 />
+      <Count1 />
+    </>
+  )
+
+  // Call all subscribers
+  act(() => setState({ count: 1 }))
+
+  expect((await findAllByText('count1: 1')).length).toBe(2)
+  expect((await findAllByText('count2: 1')).length).toBe(1)
+})
+
 it('can use exposed types', () => {
   interface ExampleState extends State {
     num: number
@@ -613,13 +649,12 @@ it('can use exposed types', () => {
   })
 
   const subscriber: Subscriber<ExampleState, number> = {
-    callback: () => {},
     currentSlice: 1,
     equalityFn: Object.is,
     errored: false,
-    index: 0,
     listener(n: number | null) {},
     selector,
+    unsubscribe: () => {},
   }
 
   function checkAllTypes(

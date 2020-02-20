@@ -14,13 +14,12 @@ export type StateListener<T> = (state: T | null, error?: Error) => void
 export type SetState<T extends State> = (partial: PartialState<T>) => void
 export type GetState<T extends State> = () => T
 export interface Subscriber<T extends State, U> {
-  callback: () => void
   currentSlice: U
   equalityFn: EqualityChecker<U>
   errored: boolean
-  index: number
   listener: StateListener<U>
   selector: StateSelector<T, U>
+  unsubscribe: () => void
 }
 export type Subscribe<T extends State> = <U>(
   subscriber: Subscriber<T, U>
@@ -51,15 +50,14 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): [UseStore<TState>, StoreApi<TState>] {
   let state: TState
-  let subscribers: Subscriber<TState, any>[] = []
-  let subscriberCount = 0
+  let listeners: Set<() => void> = new Set()
 
   const setState: SetState<TState> = partial => {
     const partialState =
       typeof partial === 'function' ? partial(state) : partial
     if (partialState !== state) {
       state = Object.assign({}, state, partialState)
-      subscribers.forEach(subscriber => subscriber.callback())
+      listeners.forEach(listener => listener())
     }
   }
 
@@ -70,19 +68,18 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ): Subscriber<TState, StateSlice> => ({
-    callback: () => {},
     currentSlice: selector(state),
     equalityFn,
     errored: false,
-    index: subscriberCount++,
     listener,
     selector,
+    unsubscribe: () => {},
   })
 
   const subscribe: Subscribe<TState> = <StateSlice>(
     subscriber: Subscriber<TState, StateSlice>
   ) => {
-    subscriber.callback = () => {
+    function listener() {
       // Selector or equality function could throw but we don't want to stop
       // the listener from being called.
       // https://github.com/react-spring/zustand/pull/37
@@ -96,26 +93,11 @@ export default function create<TState extends State>(
         subscriber.listener(null, error)
       }
     }
-    // subscriber.index is set during the render phase in order to store the
-    // subscibers in a top-down order. The subscribers array will become a
-    // sparse array when an index is skipped (due to an interrupted render) or
-    // a component unmounts and the subscriber is deleted. It's converted back
-    // to a dense array when a subscriber unsubscribes.
-    subscribers[subscriber.index] = subscriber
+
+    listeners.add(listener)
 
     return () => {
-      // Reset subscriberCount because we will be removing holes from the
-      // subscribers array and changing the length which should be the same as
-      // subscriberCount.
-      subscriberCount = 0
-      // Create a dense array by removing holes from the subscribers array.
-      // Holes are not iterated by Array.prototype.filter.
-      subscribers = subscribers.filter(s => {
-        if (s !== subscriber) {
-          subscriber.index = subscriberCount++
-          return true
-        }
-      })
+      listeners.delete(listener)
     }
   }
 
@@ -125,7 +107,7 @@ export default function create<TState extends State>(
     equalityFn?: EqualityChecker<StateSlice>
   ) => subscribe(getSubscriber(listener, selector, equalityFn))
 
-  const destroy: Destroy = () => (subscribers = [])
+  const destroy: Destroy = () => listeners.clear()
 
   const useStore: UseStore<TState> = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
@@ -136,6 +118,7 @@ export default function create<TState extends State>(
 
     if (!subscriberRef.current) {
       subscriberRef.current = getSubscriber(forceUpdate, selector, equalityFn)
+      subscriberRef.current.unsubscribe = subscribe(subscriberRef.current)
     }
 
     const subscriber = subscriberRef.current
@@ -165,7 +148,7 @@ export default function create<TState extends State>(
       subscriber.errored = false
     })
 
-    useIsoLayoutEffect(() => subscribe(subscriber), [])
+    useIsoLayoutEffect(() => subscriber.unsubscribe, [])
 
     return hasNewStateSlice
       ? (newStateSlice as StateSlice)
