@@ -11,7 +11,10 @@ export type StateCreator<T extends State> = (
 ) => T
 export type StateSelector<T extends State, U> = (state: T) => U
 export type StateListener<T> = (state: T | null, error?: Error) => void
-export type SetState<T extends State> = (partial: PartialState<T>) => void
+export type SetState<T extends State> = (
+  next: PartialState<T>,
+  merge?: boolean
+) => void
 export type GetState<T extends State> = () => T
 export interface Subscriber<T extends State, U> {
   currentSlice: U
@@ -52,11 +55,16 @@ export default function create<TState extends State>(
   let state: TState
   let listeners: Set<() => void> = new Set()
 
-  const setState: SetState<TState> = partial => {
-    const partialState =
-      typeof partial === 'function' ? partial(state) : partial
-    if (partialState !== state) {
-      state = Object.assign({}, state, partialState)
+  const setState: SetState<TState> = (next, merge) => {
+    const nextState = typeof next === 'function' ? next(state) : next
+    const shouldMerge = typeof merge !== 'undefined' ? merge : true
+
+    if (nextState !== state) {
+      if (shouldMerge) {
+        state = Object.assign({}, state, nextState)
+      } else {
+        state = nextState as TState
+      }
       listeners.forEach(listener => listener())
     }
   }
