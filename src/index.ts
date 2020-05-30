@@ -10,6 +10,10 @@ export type StateCreator<T extends State> = (
   api: StoreApi<T>
 ) => T
 export type StateSelector<T extends State, U> = (state: T) => U
+export type StateGetterSelectorIntersection<
+  T extends State,
+  U = never
+> = StateSelector<T, U> & GetState<T>
 export type StateListener<T> = (state: T | null, error?: Error) => void
 export type SetState<T extends State> = (partial: PartialState<T>) => void
 export type GetState<T extends State> = () => T
@@ -46,9 +50,10 @@ export interface StoreApi<T extends State> {
 const useIsoLayoutEffect =
   typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export default function create<TState extends State>(
-  createState: StateCreator<TState>
-): [UseStore<TState>, StoreApi<TState>] {
+export default function create<
+  TStateCreator extends StateCreator<State>,
+  TState = TStateCreator extends StateCreator<infer TState> ? TState : State
+>(createState: TStateCreator): [UseStore<TState>, StoreApi<TState>] {
   let state: TState
   let listeners: Set<() => void> = new Set()
 
@@ -65,7 +70,10 @@ export default function create<TState extends State>(
 
   const getSubscriber = <StateSlice>(
     listener: StateListener<StateSlice>,
-    selector: StateSelector<TState, StateSlice> = getState,
+    selector: StateSelector<
+      TState,
+      StateSlice
+    > = getState as StateGetterSelectorIntersection<TState, StateSlice>,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ): Subscriber<TState, StateSlice> => ({
     currentSlice: selector(state),
@@ -110,7 +118,10 @@ export default function create<TState extends State>(
   const destroy: Destroy = () => listeners.clear()
 
   const useStore: UseStore<TState> = <StateSlice>(
-    selector: StateSelector<TState, StateSlice> = getState,
+    selector: StateSelector<
+      TState,
+      StateSlice
+    > = getState as StateGetterSelectorIntersection<TState, StateSlice>,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     const forceUpdate: StateListener<StateSlice> = useReducer(c => c + 1, 0)[1]

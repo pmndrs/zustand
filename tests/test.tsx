@@ -11,6 +11,7 @@ import create, {
   State,
   StateListener,
   StateSelector,
+  StateGetterSelectorIntersection,
   PartialState,
   EqualityChecker,
   Subscriber,
@@ -619,22 +620,24 @@ it('can use exposed types', () => {
   const equlaityFn: EqualityChecker<ExampleState> = (state, newState) =>
     state !== newState
 
-  const [useStore, storeApi] = create<ExampleState>((set, get) => ({
-    num: 1,
-    numGet: () => get().num,
-    numGetState: () => {
-      // TypeScript can't get the type of storeApi when it trys to enforce the signature of numGetState.
-      // Need to explicitly state the type of storeApi.getState().num or storeApi type will be type 'any'.
-      const result: number = storeApi.getState().num
-      return result
-    },
-    numSet: v => {
-      set({ num: v })
-    },
-    numSetState: v => {
-      storeApi.setState({ num: v })
-    },
-  }))
+  const [useStore, storeApi] = create<StateCreator<ExampleState>>(
+    (set, get) => ({
+      num: 1,
+      numGet: () => get().num,
+      numGetState: () => {
+        // TypeScript can't get the type of storeApi when it trys to enforce the signature of numGetState.
+        // Need to explicitly state the type of storeApi.getState().num or storeApi type will be type 'any'.
+        const result: number = storeApi.getState().num
+        return result
+      },
+      numSet: v => {
+        set({ num: v })
+      },
+      numSetState: v => {
+        storeApi.setState({ num: v })
+      },
+    })
+  )
 
   const stateCreator: StateCreator<ExampleState> = (set, get) => ({
     num: 1,
