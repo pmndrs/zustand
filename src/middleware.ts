@@ -52,6 +52,7 @@ const devtools = (fn: any, prefix?: string) => (
       }
     })
     api.devtools.init(initialState)
+    api.devtools.send('zustand connected', initialState)
   }
   return initialState
 }

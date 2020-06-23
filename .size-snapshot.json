@@ -29,8 +29,8 @@
     "gzipped": 256
   },
   "dist/middleware.js": {
-    "bundled": 2127,
-    "minified": 1206,
-    "gzipped": 622
+    "bundled": 2187,
+    "minified": 1245,
+    "gzipped": 639
   }
 }
