@@ -135,7 +135,9 @@ const [useStore] = create(set => ({
 }))
 
 const set = useStore(state => state.set)
-set(state => void state.nested.structure.contains = null)
+set(state => {
+  state.nested.structure.contains = null
+})
 ```
 
 ## Reading/writing state and reacting to changes outside of components
