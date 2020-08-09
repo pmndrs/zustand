@@ -4,6 +4,7 @@ export type State = Record<string | number | symbol, any>
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
+  | ((state: T) => void)
 export type StateCreator<T extends State> = (
   set: SetState<T>,
   get: GetState<T>,
