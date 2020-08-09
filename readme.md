@@ -15,7 +15,7 @@ Your store is a hook! You can put anything in it, atomics, objects, functions. L
 ```jsx
 import create from 'zustand'
 // or for IE compatibility
-import create from 'zustand/index.cjs.js'
+// import create from 'zustand/index.cjs.js'
 
 const [useStore] = create(set => ({
   count: 0,
