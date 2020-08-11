@@ -130,12 +130,12 @@ export default function create<TState extends State>(
     ])
     const sub = useCallback(
       (_, callback) => {
-        const listener = (nextSlice: StateSlice | null) => {
-          if (nextSlice === null) {
+        const listener = (nextSlice: StateSlice | null, error?: Error) => {
+          if (error) {
             cachedSlices.delete(state) // XXX never delete anything
             subscriber.errored = false
           } else {
-            cachedSlices.set(state, nextSlice)
+            cachedSlices.set(state, nextSlice as StateSlice)
           }
           callback()
         }
@@ -146,7 +146,7 @@ export default function create<TState extends State>(
     )
     const getSnapshot = useCallback(() => {
       const slice = cachedSlices.has(state)
-        ? cachedSlices.get(state)
+        ? (cachedSlices.get(state) as StateSlice)
         : selector(state)
       // https://github.com/facebook/react/issues/18823
       if (typeof slice === 'function') {
