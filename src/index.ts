@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import {
+  useCallback,
+  useMemo,
+  // @ts-ignore
+  unstable_createMutableSource as createMutableSource,
+  // @ts-ignore
+  unstable_useMutableSource as useMutableSource,
+} from 'react'
 
 export type State = Record<string | number | symbol, any>
 export type PartialState<T extends State> =
@@ -42,10 +49,6 @@ export interface StoreApi<T extends State> {
   subscribe: ApiSubscribe<T>
   destroy: Destroy
 }
-
-// For server-side rendering: https://github.com/react-spring/zustand/pull/34
-const useIsoLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function create<TState extends State>(
   createState: StateCreator<TState>
@@ -110,50 +113,60 @@ export default function create<TState extends State>(
 
   const destroy: Destroy = () => listeners.clear()
 
+  // The first param can be anything stable
+  const source = createMutableSource(getState, () => state)
+
+  const FUNCTION_SYNBOL = Symbol()
+  const functionMap = new WeakMap<Function, { [FUNCTION_SYNBOL]: Function }>()
+
   const useStore: UseStore<TState> = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate: StateListener<StateSlice> = useReducer(c => c + 1, 0)[1]
-    const subscriberRef = useRef<Subscriber<TState, StateSlice>>()
-
-    if (!subscriberRef.current) {
-      subscriberRef.current = getSubscriber(forceUpdate, selector, equalityFn)
-      subscriberRef.current.unsubscribe = subscribe(subscriberRef.current)
-    }
-
-    const subscriber = subscriberRef.current
-    let newStateSlice: StateSlice | undefined
-    let hasNewStateSlice = false
-
-    // The selector or equalityFn need to be called during the render phase if
-    // they change. We also want legitimate errors to be visible so we re-run
-    // them if they errored in the subscriber.
-    if (
-      subscriber.selector !== selector ||
-      subscriber.equalityFn !== equalityFn ||
-      subscriber.errored
-    ) {
-      // Using local variables to avoid mutations in the render phase.
-      newStateSlice = selector(state)
-      hasNewStateSlice = !equalityFn(subscriber.currentSlice, newStateSlice)
-    }
-
-    // Syncing changes in useEffect.
-    useIsoLayoutEffect(() => {
-      if (hasNewStateSlice) {
-        subscriber.currentSlice = newStateSlice as StateSlice
+    // cache to avoid double invoking selector
+    const cachedSlices = useMemo(() => new WeakMap<TState, StateSlice>(), [
+      selector,
+      equalityFn,
+    ])
+    const sub = useCallback(
+      (_, callback) => {
+        const listener = (nextSlice: StateSlice | null, error?: Error) => {
+          if (error) {
+            cachedSlices.delete(state) // XXX never delete anything
+            subscriber.errored = false
+          } else {
+            cachedSlices.set(state, nextSlice as StateSlice)
+          }
+          callback()
+        }
+        const subscriber = getSubscriber(listener, selector, equalityFn)
+        return subscribe(subscriber)
+      },
+      [selector, equalityFn]
+    )
+    const getSnapshot = useCallback(() => {
+      const slice = cachedSlices.has(state)
+        ? (cachedSlices.get(state) as StateSlice)
+        : selector(state)
+      // https://github.com/facebook/react/issues/18823
+      if (typeof slice === 'function') {
+        if (functionMap.has(slice)) {
+          return functionMap.get(slice)
+        }
+        const wrappedFunction = { [FUNCTION_SYNBOL]: slice }
+        functionMap.set(slice, wrappedFunction)
+        return wrappedFunction
       }
-      subscriber.selector = selector
-      subscriber.equalityFn = equalityFn
-      subscriber.errored = false
-    })
-
-    useIsoLayoutEffect(() => subscriber.unsubscribe, [])
-
-    return hasNewStateSlice
-      ? (newStateSlice as StateSlice)
-      : subscriber.currentSlice
+      return slice
+    }, [selector])
+    const snapshot = useMutableSource(source, getSnapshot, sub)
+    if (
+      snapshot &&
+      (snapshot as { [FUNCTION_SYNBOL]: unknown })[FUNCTION_SYNBOL]
+    ) {
+      return snapshot[FUNCTION_SYNBOL]
+    }
+    return snapshot
   }
 
   const api = { setState, getState, subscribe: apiSubscribe, destroy }
