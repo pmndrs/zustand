@@ -30,6 +30,7 @@ import {
   TextureEffect,
   BlendFunction,
   NoiseEffect,
+  VignetteEffect,
 } from 'postprocessing'
 
 import PrismCode from 'react-prism'
@@ -141,12 +142,15 @@ function Scene() {
 
     noiseEffect.blendMode.opacity.value = 0.03
 
+    const vignetteEffect = new VignetteEffect()
+
     // 3. compose effect pass
     const effectsPass = new EffectPass(
       camera,
       bloomEffect,
       depthOfFieldEffect,
-      noiseEffect
+      noiseEffect,
+      vignetteEffect
       // I use this effect to overlay my generated texture for debugging purposes
     )
 
