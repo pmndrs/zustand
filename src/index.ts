@@ -35,13 +35,11 @@ export type StateCreator<T extends State> = (
 export interface UseStore<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-  /*
   setState: SetState<T>
   getState: GetState<T>
   subscribe: Subscribe<T>
   destroy: Destroy
   useStore: UseStore<T> // This allows namespace pattern
-  */
 }
 
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
@@ -50,7 +48,7 @@ const useIsoLayoutEffect =
 
 export default function create<TState extends State>(
   createState: StateCreator<TState>
-): [UseStore<TState>, StoreApi<TState>] {
+): UseStore<TState> {
   let state: TState
   let listeners: Set<() => void> = new Set()
 
@@ -97,7 +95,7 @@ export default function create<TState extends State>(
 
   const destroy: Destroy = () => listeners.clear()
 
-  const useStore: UseStore<TState> = <StateSlice>(
+  const useStore: any = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
@@ -187,7 +185,16 @@ export default function create<TState extends State>(
   const api = { setState, getState, subscribe, destroy }
   state = createState(setState, getState, api)
 
-  return [useStore, api]
+  Object.assign(useStore, api, { useStore })
+
+  // For backward compatibility (No TS types for this)
+  useStore[Symbol.iterator] = function*() {
+    console.warn('Tuple API is deprecated in v3 and will be removed in v4')
+    yield useStore
+    yield api
+  }
+
+  return useStore
 }
 
 export { create }

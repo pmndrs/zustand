@@ -47,21 +47,13 @@ it('creates a store hook and api object', () => {
           "subscribe": [Function],
         },
       ],
-      "result": Array [
-        [Function],
-        Object {
-          "destroy": [Function],
-          "getState": [Function],
-          "setState": [Function],
-          "subscribe": [Function],
-        },
-      ],
+      "result": [Function],
     }
   `)
 })
 
 it('uses the store with no args', async () => {
-  const [useStore] = create(set => ({
+  const useStore = create(set => ({
     count: 0,
     inc: () => set(state => ({ count: state.count + 1 })),
   }))
@@ -78,7 +70,7 @@ it('uses the store with no args', async () => {
 })
 
 it('uses the store with selectors', async () => {
-  const [useStore] = create(set => ({
+  const useStore = create(set => ({
     count: 0,
     inc: () => set(state => ({ count: state.count + 1 })),
   }))
@@ -96,7 +88,8 @@ it('uses the store with selectors', async () => {
 })
 
 it('uses the store with a selector and equality checker', async () => {
-  const [useStore, { setState }] = create(() => ({ value: 0 }))
+  const useStore = create(() => ({ value: 0 }))
+  const { setState } = useStore
   let renderCount = 0
 
   function Component() {
@@ -123,7 +116,7 @@ it('uses the store with a selector and equality checker', async () => {
 })
 
 it('only re-renders if selected state has changed', async () => {
-  const [useStore] = create(set => ({
+  const useStore = create(set => ({
     count: 0,
     inc: () => set(state => ({ count: state.count + 1 })),
   }))
@@ -158,7 +151,7 @@ it('only re-renders if selected state has changed', async () => {
 })
 
 it('can batch updates', async () => {
-  const [useStore] = create(set => ({
+  const useStore = create(set => ({
     count: 0,
     inc: () => set(state => ({ count: state.count + 1 })),
   }))
@@ -180,7 +173,7 @@ it('can batch updates', async () => {
 })
 
 it('can update the selector', async () => {
-  const [useStore] = create(() => ({
+  const useStore = create(() => ({
     one: 'one',
     two: 'two',
   }))
@@ -197,7 +190,8 @@ it('can update the selector', async () => {
 })
 
 it('can update the equality checker', async () => {
-  const [useStore, { setState }] = create(() => ({ value: 0 }))
+  const useStore = create(() => ({ value: 0 }))
+  const { setState } = useStore
   const selector = s => s.value
 
   let renderCount = 0
@@ -226,7 +220,8 @@ it('can update the equality checker', async () => {
 })
 
 it('can call useStore with progressively more arguments', async () => {
-  const [useStore, { setState }] = create(() => ({ value: 0 }))
+  const useStore = create(() => ({ value: 0 }))
+  const { setState } = useStore
 
   let renderCount = 0
   function Component({ selector, equalityFn }: any) {
@@ -266,7 +261,8 @@ it('can throw an error in selector', async () => {
   console.error = jest.fn()
 
   const initialState = { value: 'foo' }
-  const [useStore, { setState }] = create(() => initialState)
+  const useStore = create(() => initialState)
+  const { setState } = useStore
   const selector = s => s.value.toUpperCase()
 
   class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
@@ -305,7 +301,8 @@ it('can throw an error in equality checker', async () => {
   console.error = jest.fn()
 
   const initialState = { value: 'foo' }
-  const [useStore, { setState }] = create(() => initialState)
+  const useStore = create(() => initialState)
+  const { setState } = useStore
   const selector = s => s
   const equalityFn = (a, b) => a.value.trim() === b.value.trim()
 
@@ -342,7 +339,7 @@ it('can throw an error in equality checker', async () => {
 })
 
 it('can get the store', () => {
-  const [, { getState }] = create((_, get) => ({
+  const { getState } = create((_, get) => ({
     value: 1,
     getState1: () => get(),
     getState2: () => getState(),
@@ -353,7 +350,7 @@ it('can get the store', () => {
 })
 
 it('can set the store', () => {
-  const [, { setState, getState }] = create(set => ({
+  const { setState, getState } = create(set => ({
     value: 1,
     setState1: v => set(v),
     setState2: v => setState(v),
@@ -370,7 +367,7 @@ it('can set the store', () => {
 })
 
 it('can set the store without merging', () => {
-  const [, { setState, getState }] = create(set => ({
+  const { setState, getState } = create(set => ({
     a: 1,
   }))
 
@@ -381,7 +378,7 @@ it('can set the store without merging', () => {
 
 it('can subscribe to the store', () => {
   const initialState = { value: 1, other: 'a' }
-  const [, { setState, getState, subscribe }] = create(() => initialState)
+  const { setState, getState, subscribe } = create(() => initialState)
 
   // Should not be called if new state identity is the same
   let unsub = subscribe(() => {
@@ -441,7 +438,7 @@ it('can subscribe to the store', () => {
 })
 
 it('can destroy the store', () => {
-  const [, { destroy, getState, setState, subscribe }] = create(() => ({
+  const { destroy, getState, setState, subscribe } = create(() => ({
     value: 1,
   }))
 
@@ -455,7 +452,8 @@ it('can destroy the store', () => {
 })
 
 it('only calls selectors when necessary', async () => {
-  const [useStore, { setState }] = create(() => ({ a: 0, b: 0 }))
+  const useStore = create(() => ({ a: 0, b: 0 }))
+  const { setState } = useStore
   let inlineSelectorCallCount = 0
   let staticSelectorCallCount = 0
 
@@ -489,12 +487,13 @@ it('only calls selectors when necessary', async () => {
 })
 
 it('ensures parent components subscribe before children', async () => {
-  const [useStore, api] = create<any>(() => ({
+  const useStore = create<any>(() => ({
     children: {
       '1': { text: 'child 1' },
       '2': { text: 'child 2' },
     },
   }))
+  const api = useStore
 
   function changeState() {
     api.setState({
@@ -530,7 +529,8 @@ it('ensures parent components subscribe before children', async () => {
 
 // https://github.com/react-spring/zustand/issues/84
 it('ensures the correct subscriber is removed on unmount', async () => {
-  const [useStore, api] = create(() => ({ count: 0 }))
+  const useStore = create(() => ({ count: 0 }))
+  const api = useStore
 
   function increment() {
     api.setState(({ count }) => ({ count: count + 1 }))
@@ -572,7 +572,8 @@ it('ensures the correct subscriber is removed on unmount', async () => {
 
 // https://github.com/react-spring/zustand/issues/86
 it('ensures a subscriber is not mistakenly overwritten', async () => {
-  const [useStore, { setState }] = create(() => ({ count: 0 }))
+  const useStore = create(() => ({ count: 0 }))
+  const { setState } = useStore
 
   function Count1() {
     const c = useStore(s => s.count)
@@ -628,7 +629,7 @@ it('can use exposed types', () => {
   const equlaityFn: EqualityChecker<ExampleState> = (state, newState) =>
     state !== newState
 
-  const [useStore, storeApi] = create<ExampleState>((set, get) => ({
+  const storeApi = create<ExampleState>((set, get) => ({
     num: 1,
     numGet: () => get().num,
     numGetState: () => {
@@ -644,6 +645,7 @@ it('can use exposed types', () => {
       storeApi.setState({ num: v })
     },
   }))
+  const useStore = storeApi
 
   const stateCreator: StateCreator<ExampleState> = (set, get) => ({
     num: 1,
