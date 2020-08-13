@@ -14,35 +14,27 @@ const LayerMaterial = shaderMaterial(
     uniform float time;
     uniform vec2 resolution;
     uniform float wiggle;
-
     varying vec2 vUv;
     varying vec3 vNormal;
 
     void main()	{
-        vUv = uv;
-
-        float theta = sin( time + position.y ) / 2.0 * wiggle;
-        float c = cos( theta );
-        float s = sin( theta );
-        mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );
-        vec3 transformed = vec3( position ) * m;
-        vNormal = vNormal * m;
-
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.);
+      vUv = uv;
+      float theta = sin( time + position.y ) / 2.0 * wiggle;
+      float c = cos( theta );
+      float s = sin( theta );
+      mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );
+      vec3 transformed = vec3( position ) * m;
+      vNormal = vNormal * m;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.);
     }
 `,
   `
-
     uniform float time;
     uniform vec2 resolution;
     uniform float factor;
-
     uniform float scaleFactor;
     uniform vec3 movementVector;
-    
-
     uniform sampler2D textr;
-
     varying vec2 vUv;
 
     #define TWO_PI 6.28318530718
@@ -52,21 +44,12 @@ const LayerMaterial = shaderMaterial(
     }
 
     void main()	{
-
-        vec2 uv = offsetUv(vUv / scaleFactor, movementVector, factor);
-
-        vec4 color = texture2D(textr, uv);
-
-        float alpha = color.a;
-
-        if (alpha < 0.1) {
-            discard;
-        }
-
-        gl_FragColor = vec4(color.rgb, .1);
-    
+      vec2 uv = offsetUv(vUv / scaleFactor, movementVector, factor);
+      vec4 color = texture2D(textr, uv);
+      float alpha = color.a;
+      if (alpha < 0.1) discard;
+      gl_FragColor = vec4(color.rgb, .1);
     }
-
 `
 )
 
