@@ -51,7 +51,7 @@ function Scene() {
         <Plane scale={scale} args={[1, 1, 10, 10]} position-z={z} key={i} ref={ref}>
           <layerMaterial
             attach="material"
-            movementVector={movementVector.current}
+            movementVector={movementVector}
             textr={texture}
             factor={factor}
             ref={el => (layersRef.current[i] = el)}
@@ -75,7 +75,7 @@ export default function App() {
     <Canvas
       gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, alpha: false, depth: false }}
       orthographic
-      camera={{ zoom: 5, position: [0, 0, 200], far: 200, near: 0.00001 }}>
+      camera={{ zoom: 5, position: [0, 0, 200], far: 200, near: 0 }}>
       <Suspense fallback={null}>
         <Scene />
       </Suspense>
