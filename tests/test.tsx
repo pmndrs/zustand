@@ -329,6 +329,16 @@ it('can set the store', () => {
   expect(getState().value).toBe(5)
 })
 
+it('can set the store without merging', () => {
+  const [, { setState, getState }] = create(set => ({
+    a: 1,
+  }))
+
+  // Should override the state instead of merging.
+  setState({ b: 2 }, false)
+  expect(getState()).toEqual({ b: 2 })
+})
+
 it('can subscribe to the store', () => {
   const initialState = { value: 1, other: 'a' }
   const [, { setState, getState, subscribe }] = create(() => initialState)

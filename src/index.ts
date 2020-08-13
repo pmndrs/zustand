@@ -21,7 +21,10 @@ export type Subscribe<T extends State> = <U>(
   selector?: StateSelector<T, U>,
   equalityFn?: EqualityChecker<U>
 ) => () => void
-export type SetState<T extends State> = (partial: PartialState<T>) => void
+export type SetState<T extends State> = (
+  partial: PartialState<T>,
+  replace?: boolean
+) => void
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
 export interface StoreApi<T extends State> {
@@ -47,11 +50,14 @@ export default function create<TState extends State>(
   let state: TState
   let listeners: Set<() => void> = new Set()
 
-  const setState: SetState<TState> = partial => {
-    const partialState =
-      typeof partial === 'function' ? partial(state) : partial
-    if (partialState !== state) {
-      state = Object.assign({}, state, partialState)
+  const setState: SetState<TState> = (partial, replace) => {
+    const nextState = typeof partial === 'function' ? partial(state) : partial
+    if (nextState !== state) {
+      if (replace) {
+        state = nextState as TState
+      } else {
+        state = Object.assign({}, state, nextState)
+      }
       listeners.forEach(listener => listener())
     }
   }
