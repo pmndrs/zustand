@@ -1,35 +1,24 @@
 import * as THREE from 'three'
-import { BasicDepthPacking, HalfFloatType, RGBADepthPacking } from 'three'
+import { BasicDepthPacking, HalfFloatType } from 'three'
 import React, { Suspense, useRef, useMemo, useEffect, forwardRef } from 'react'
 import {
   Canvas,
-  useLoader,
   useFrame,
   extend,
   createPortal,
   useThree,
 } from 'react-three-fiber'
 import create from 'zustand'
-import {
-  OrbitControls,
-  Plane,
-  shaderMaterial,
-  Stats,
-  useAspect,
-  useTextureLoader,
-} from 'drei'
+
+import { Plane, shaderMaterial, Stats, useAspect, useTextureLoader } from 'drei'
+
 import { Controls, useControl } from 'react-three-gui'
 import {
   EffectComposer,
   RenderPass,
   DepthPass,
   EffectPass,
-  SavePass,
-  VignetteEffect,
-  BloomEffect,
   DepthOfFieldEffect,
-  TextureEffect,
-  BlendFunction,
 } from 'postprocessing'
 
 import PrismCode from 'react-prism'
@@ -43,6 +32,9 @@ import groundUrl from './resources/ground.png'
 import bearUrl from './resources/bear.png'
 import leaves1Url from './resources/leaves1.png'
 import leaves2Url from './resources/leaves2.png'
+
+import './materials/depthBufferMaterial'
+import './materials/layerMaterial'
 
 const code = `import create from 'zustand'
 
@@ -81,109 +73,38 @@ function Counter() {
 }
 
 const Img = forwardRef(function Img(
-  { url, factor = 1, offset = 1, ...props },
+  {
+    url,
+    factor = 0,
+    offset = 1,
+    scaleFactor,
+    movementVector,
+    texture,
+    ...props
+  },
   forwardRef
 ) {
-  const ref = useRef()
+  const mat = useRef()
   const scale = useAspect('cover', 1600, 1000, 0.2)
-  const texture = useLoader(THREE.TextureLoader, url)
 
-  const vec = new THREE.Vector3()
-
-  // useFrame(state => {
-  //   ref.current.position.lerp(
-  //     vec.set(state.mouse.x * offset, state.mouse.y * offset, 0),
-  //     0.1
-  //   )
-  // })
+  useEffect(() => {
+    mat.current.uniforms.textr.value = texture
+  }, [texture])
 
   return (
-    <group ref={ref}>
-      <Plane
-        scale={scale}
-        {...props}
-        ref={forwardRef}
-        material-map={texture}
-        material-transparent
-      />
+    <group position={props.transformedPosition}>
+      <Plane scale={scale} {...props} ref={forwardRef}>
+        <layerMaterial
+          attach="material"
+          movementVector={movementVector.current}
+          ref={mat}
+          factor={factor}
+          scaleFactor={scaleFactor}
+        />
+      </Plane>
     </group>
   )
 })
-
-const DepthBufferMaterial = shaderMaterial(
-  {
-    time: 0,
-    bg: null,
-    stars: null,
-    ground: null,
-    bear: null,
-    leaves1: null,
-    leaves2: null,
-  },
-  `
-  
-  uniform float time;
-  uniform vec2 resolution;
-
-  varying vec2 vUv;
-
-  void main()	{
-      vUv = uv;
-
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
-  }
-
-`,
-  `
-
-  uniform float time;
-  uniform vec2 resolution;
-  
-  uniform sampler2D bg;
-  uniform sampler2D stars;
-  uniform sampler2D ground;
-  uniform sampler2D bear;
-  uniform sampler2D leaves1;
-  uniform sampler2D leaves2;
-
-  uniform vec2 mouse;
-
-  varying vec2 vUv;
-
-  #define TWO_PI 6.28318530718
-
-  float getAlpha(sampler2D textr, vec2 uv) {
-
-    return texture2D(textr, uv).a;
-
-  }
-
-  void main()	{
-
-    float leaves1Alpha = getAlpha(leaves1, vUv);
-    float leaves2Alpha = getAlpha(leaves2, vUv) * 0.9;
-    float bearAlpha = getAlpha(bear, vUv) * (0.41);
-    float groundAlpha = getAlpha(ground, vUv) * 0.4;
-    float starsAlpha = getAlpha(stars, vUv) * 0.2;
-    float bgAlpha = getAlpha(bg, vUv) * 0.01;
-
-    float aaa = 0.;
-
-    aaa = max(leaves1Alpha, aaa);
-    aaa = max(leaves2Alpha, aaa);
-    aaa = max(bearAlpha, aaa);
-    aaa = max(groundAlpha, aaa);
-    aaa = max(starsAlpha, aaa);
-    aaa = max(bgAlpha, aaa);
-
-    gl_FragColor = vec4(vec3(aaa), 1.);
-    
-  }
-
-`
-)
-
-extend({ DepthBufferMaterial })
 
 function Scene() {
   const [bg, stars, ground, bear, leaves1, leaves2] = useTextureLoader([
@@ -267,14 +188,39 @@ function Scene() {
     void composer.render(delta)
   }, 1)
 
+  const vec = useRef(new THREE.Vector3(0))
+  const vec2 = useRef(new THREE.Vector3(0))
+
+  useFrame(state => {
+    if (vec.current) {
+      vec.current.lerp(
+        vec2.current.set(state.mouse.x * 1, state.mouse.y * 0.2, 0),
+        1
+      )
+
+      depth.current.uniforms.movementVector.value = vec.current
+    }
+  })
+
   return (
     <Suspense fallback={null}>
-      <Img url={bgUrl} factor={0.2} position-z={0} />
-      <Img url={starsUrl} factor={0.2} position-z={10} />
-      <Img url={groundUrl} factor={0.2} position-z={20} />
-      <Img url={bearUrl} ref={subject} position-z={30} />
-      <Img url={leaves1Url} factor={0.2} position-z={40} />
-      <Img url={leaves2Url} factor={0.2} position-z={49} offset={1} />
+      <Img movementVector={vec} texture={bg} factor={0.01} position-z={0} />
+      <Img movementVector={vec} texture={stars} factor={0.01} position-z={10} />
+      <Img movementVector={vec} texture={ground} factor={0} position-z={20} />
+      <Img movementVector={vec} texture={bear} ref={subject} position-z={30} />
+      <Img
+        movementVector={vec}
+        texture={leaves1}
+        factor={0.1}
+        position-z={40}
+      />
+      <Img
+        movementVector={vec}
+        texture={leaves2}
+        factor={0.12}
+        position-z={49}
+        offset={1}
+      />
 
       {createPortal(
         <Plane position={[0, 0, 20]} args={[1, 1]} scale={scale}>
@@ -315,7 +261,6 @@ export default function App() {
         <Suspense fallback={null}>
           <Scene />
         </Suspense>
-        <OrbitControls />
       </Canvas>
     </>
   )

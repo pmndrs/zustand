@@ -1,0 +1,98 @@
+/**
+ *
+ * This is the shader material used to build the depth map for the DepthOfField effect.
+ *
+ */
+import { shaderMaterial } from 'drei'
+import { extend } from 'react-three-fiber'
+
+import { offsetUVs } from './common'
+
+const DepthBufferMaterial = shaderMaterial(
+  {
+    time: 0,
+
+    movementVector: [0, 0, 0],
+
+    bg: null,
+    stars: null,
+    ground: null,
+    bear: null,
+    leaves1: null,
+    leaves2: null,
+  },
+  `
+    
+    uniform float time;
+    uniform vec2 resolution;
+  
+    varying vec2 vUv;
+  
+    void main()	{
+        vUv = uv;
+  
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+    }
+  
+  `,
+  `
+  
+    uniform float time;
+    uniform vec2 resolution;
+    
+    uniform vec3 movementVector;
+    
+    uniform sampler2D bg;
+    uniform sampler2D stars;
+    uniform sampler2D ground;
+    uniform sampler2D bear;
+    uniform sampler2D leaves1;
+    uniform sampler2D leaves2;
+  
+    uniform vec2 mouse;
+  
+    varying vec2 vUv;
+  
+    #define TWO_PI 6.28318530718
+  
+    float getAlpha(sampler2D textr, vec2 uv) {
+  
+      return ceil(texture2D(textr, uv).a);
+  
+    }
+  
+    ${offsetUVs}
+  
+    void main()	{
+  
+      vec2 uv = vUv;
+  
+      float leaves1Alpha = getAlpha(leaves1, offsetUv(vUv, movementVector, 0.1));
+      float leaves2Alpha = getAlpha(leaves2, offsetUv(vUv, movementVector, 0.12)) * 0.5;
+      
+      float bearAlpha = getAlpha(bear, uv) * (0.41);
+      
+      float groundAlpha = getAlpha(ground, uv) * 0.4;
+      
+      float starsAlpha = getAlpha(stars, offsetUv(vUv, movementVector, 0.1)) * 0.2;
+  
+      float bgAlpha = getAlpha(bg, offsetUv(vUv, movementVector, 0.1)) * 0.01;
+  
+      // make the actual depth map
+      float aaa = 0.;
+  
+      aaa = max(leaves1Alpha, aaa);
+      aaa = max(leaves2Alpha, aaa);
+      aaa = max(bearAlpha, aaa);
+      aaa = max(groundAlpha, aaa);
+      aaa = max(starsAlpha, aaa);
+      aaa = max(bgAlpha, aaa);
+  
+      gl_FragColor = vec4(vec3(aaa), 1.);
+      
+    }
+  
+  `
+)
+
+extend({ DepthBufferMaterial })
