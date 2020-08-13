@@ -11,6 +11,7 @@ export type State = Record<string | number | symbol, any>
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
+  | ((state: T) => void) // for immer https://github.com/react-spring/zustand/pull/99
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: any) => boolean
 
