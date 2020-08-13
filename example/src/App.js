@@ -209,8 +209,6 @@ function Scene() {
         <Vignette />
         <Noise opacity={0.04} />
       </EffectComposer>
-
-      <Stats />
     </Suspense>
   )
 }
@@ -229,11 +227,9 @@ export default function App() {
         pixelRatio={1}
         orthographic
         camera={{ zoom: 5, position: [0, 0, 50], far: 50, near: 0.00001 }}>
-        <ambientLight />
         <Suspense fallback={null}>
           <Scene />
         </Suspense>
-        <OrbitControls />
       </Canvas>
     </>
   )
