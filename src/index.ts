@@ -155,8 +155,7 @@ export default function create<TState extends State>(
   const api = { setState, getState, subscribe, destroy }
   state = createState(setState, getState, api)
 
-  Object.assign(useStore, api)
-  Object.assign(useStore, { useStore })
+  Object.assign(useStore, api, { useStore })
 
   // For backward compatibility (No TS types for this)
   useStore[Symbol.iterator] = function*() {
