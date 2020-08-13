@@ -297,6 +297,48 @@ it('can throw an error in selector', async () => {
   await waitForElement(() => getByText('errored'))
 })
 
+it('can throw an error in equality checker', async () => {
+  console.error = jest.fn()
+
+  const initialState = { value: 'foo' }
+  const useStore = create(() => initialState)
+  const { setState } = useStore
+  const selector = s => s
+  const equalityFn = (a, b) => a.value.trim() === b.value.trim()
+
+  class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
+    constructor(props) {
+      super(props)
+      this.state = { hasError: false }
+    }
+    static getDerivedStateFromError() {
+      return { hasError: true }
+    }
+    render() {
+      return this.state.hasError ? <div>errored</div> : this.props.children
+    }
+  }
+
+  function Component() {
+    useStore(selector, equalityFn)
+    return <div>no error</div>
+  }
+
+  const { getByText } = render(
+    <ErrorBoundary>
+      <Component />
+    </ErrorBoundary>
+  )
+  await waitForElement(() => getByText('no error'))
+
+  delete initialState.value
+  act(() => {
+    setState({})
+  })
+  // in v4 with uMS, we don't use equalityFn in render
+  // await waitForElement(() => getByText('errored'))
+})
+
 it('can get the store', () => {
   const { getState } = create((_, get) => ({
     value: 1,
