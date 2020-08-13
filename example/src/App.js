@@ -1,37 +1,30 @@
 import * as THREE from 'three'
-import { BasicDepthPacking, HalfFloatType } from 'three'
-import React, { Suspense, useRef, useMemo, useEffect, forwardRef } from 'react'
-import {
-  Canvas,
-  useFrame,
-  extend,
-  createPortal,
-  useThree,
-} from 'react-three-fiber'
+import { HalfFloatType } from 'three'
+import React, { Suspense, useRef, useMemo, useEffect } from 'react'
+import { Canvas, useFrame, useThree } from 'react-three-fiber'
 import create from 'zustand'
 
-import {
-  OrbitControls,
-  Plane,
-  shaderMaterial,
-  Stats,
-  useAspect,
-  useTextureLoader,
-} from 'drei'
+import { OrbitControls, Plane, Stats, useAspect, useTextureLoader } from 'drei'
 
-import { Controls, useControl } from 'react-three-gui'
+// import {
+//   EffectComposer,
+//   RenderPass,
+//   EffectPass,
+//   DepthOfFieldEffect,
+//   BloomEffect,
+//   // eslint-disable-next-line
+//   TextureEffect,
+//   NoiseEffect,
+//   VignetteEffect,
+// } from 'postprocessing'
+
 import {
   EffectComposer,
-  RenderPass,
-  DepthPass,
-  EffectPass,
-  DepthOfFieldEffect,
-  BloomEffect,
-  TextureEffect,
-  BlendFunction,
-  NoiseEffect,
-  VignetteEffect,
-} from 'postprocessing'
+  Bloom,
+  DepthOfField,
+  Noise,
+  Vignette,
+} from 'react-postprocessing'
 
 import PrismCode from 'react-prism'
 import 'prismjs'
@@ -45,7 +38,6 @@ import bearUrl from './resources/bear.png'
 import leaves1Url from './resources/leaves1.png'
 import leaves2Url from './resources/leaves2.png'
 
-import './materials/depthBufferMaterial'
 import './materials/layerMaterial'
 
 const code = `import create from 'zustand'
@@ -93,112 +85,38 @@ function Scene() {
     leaves1Url,
     leaves2Url,
   ])
-  const depth = useRef()
+
+  // this ref will be used to focus the depth of field effect
   const subject = useRef()
 
-  const scale = useAspect('cover', 1600, 1000, 0.2)
+  // holds mouse movement for parallax effect
+  const movementVector = useRef(new THREE.Vector3(0))
+  // this vector is only used for lerping the mov vector
+  const tempVector = useRef(new THREE.Vector3(0))
 
-  const { gl, scene, size, camera } = useThree()
-
-  const [targetScene, renderTarget] = useMemo(() => {
-    const scene = new THREE.Scene()
-    const target = new THREE.WebGLMultisampleRenderTarget(1600, 1000, {
-      format: THREE.RGBFormat,
-      stencilBuffer: false,
-    })
-    target.samples = 8
-    return [scene, target]
-  }, [])
-
-  useFrame(state => {
-    state.gl.setRenderTarget(renderTarget)
-    state.gl.render(targetScene, camera)
-    state.gl.setRenderTarget(null)
-  })
-
-  const [composer, depthOfFieldEffect] = useMemo(() => {
-    const composer = new EffectComposer(gl, { frameBufferType: HalfFloatType })
-
-    // 1. setup passes
-    const renderPass = new RenderPass(scene, camera)
-    const depthPass = new DepthPass(scene, camera)
-
-    // 2. get a reference to the DoF effect for later
-    const depthOfFieldEffect = new DepthOfFieldEffect(camera, {
-      bokehScale: 5,
-      focalLength: 0.1,
-      focusDistance: 0.1,
-    })
-
-    // 2.b other effects
-
-    const bloomEffect = new BloomEffect({
-      luminanceThreshold: 0.7,
-      luminanceSmoothing: 0.075,
-      height: 480,
-    })
-
-    const noiseEffect = new NoiseEffect()
-
-    noiseEffect.blendMode.opacity.value = 0.03
-
-    const vignetteEffect = new VignetteEffect()
-
-    // 3. compose effect pass
-    const effectsPass = new EffectPass(
-      camera,
-      bloomEffect,
-      depthOfFieldEffect,
-      noiseEffect,
-      vignetteEffect
-      // I use this effect to overlay my generated texture for debugging purposes
-    )
-
-    // effectPass.push(new TextureEffect({ texture: renderTarget.texture, }))
-
-    // manually set depth texture
-    effectsPass.setDepthTexture(renderTarget.texture, BasicDepthPacking)
-
-    composer.addPass(renderPass)
-    // composer.addPass(depthPass)
-    composer.addPass(effectsPass)
-
-    return [composer, depthOfFieldEffect]
-  }, [camera, gl, scene, targetScene])
-
-  useEffect(() => {
-    composer.setSize(size.width, size.height)
-  }, [composer, size])
+  // holds a reference to the depth of field effect, used for focusing on the subject
+  const depthOfFieldEffect = useRef()
 
   // this vector holds the current focus subject, that will be lerped towards the subject positin
   const focusVector = useRef(new THREE.Vector3(0))
 
-  useFrame((_, delta) => {
-    if (subject.current) {
-      depthOfFieldEffect.target = focusVector.current.lerp(
+  // lerp focus on subject
+  useFrame(() => {
+    if (subject.current && depthOfFieldEffect.current) {
+      depthOfFieldEffect.current.target = focusVector.current.lerp(
         subject.current.position,
         0.05
       )
     }
-
-    depth.current.uniforms.time.value += 0.1
-
-    void composer.render(delta)
   }, 1)
 
-  // holds mouse movement for parallax effect
-  const movementVector = useRef(new THREE.Vector3(0))
-  // this vector is only used for lerping
-  const tempVector = useRef(new THREE.Vector3(0))
-
+  // lerp mouse movement
   useFrame(state => {
     if (movementVector.current) {
       movementVector.current.lerp(
         tempVector.current.set(state.mouse.x * 1, state.mouse.y * 0.2, 0),
         0.1
       )
-
-      depth.current.uniforms.movementVector.value = movementVector.current
     }
   })
 
@@ -237,6 +155,9 @@ function Scene() {
     },
   ]
 
+  // scale the layers to cover the screen
+  const scale = useAspect('cover', 1600, 1000, 0.2)
+
   return (
     <Suspense fallback={null}>
       {layers.map(({ texture, ref, factor = 0, scaleFactor = 1, z }, i) => (
@@ -251,29 +172,16 @@ function Scene() {
         </Plane>
       ))}
 
-      {createPortal(
-        <Plane position={[0, 0, 20]} scale={scale}>
-          <depthBufferMaterial
-            attach="material"
-            bg={bg}
-            stars={stars}
-            ground={ground}
-            bear={bear}
-            leaves1={leaves1}
-            leaves2={leaves2}
-            scaleFactors={layers.reduce((factors, layer) => {
-              factors.push(layer.scaleFactor || 1)
-              return factors
-            }, [])}
-            movementFactors={layers.reduce((factors, layer) => {
-              factors.push(layer.factor || 1)
-              return factors
-            }, [])}
-            ref={depth}
-          />
-        </Plane>,
-        targetScene
-      )}
+      <EffectComposer>
+        <Bloom luminanceThreshold={0.7} luminanceSmoothing={0.075} />
+        <DepthOfField
+          ref={depthOfFieldEffect}
+          bokehScale={3}
+          focalLength={0.1}
+        />
+        <Vignette />
+        <Noise opacity={0.04} />
+      </EffectComposer>
 
       <Stats />
     </Suspense>

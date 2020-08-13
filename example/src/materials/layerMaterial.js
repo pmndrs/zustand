@@ -1,8 +1,6 @@
 import { shaderMaterial } from 'drei'
 import { extend } from 'react-three-fiber'
 
-import { offsetUVs } from './common'
-
 const LayerMaterial = shaderMaterial(
   {
     textr: null,
@@ -38,7 +36,9 @@ const LayerMaterial = shaderMaterial(
 
     #define TWO_PI 6.28318530718
 
-    ${offsetUVs}
+    vec2 offsetUv(vec2 uv, vec3 movement, float factor) {
+      return uv + movement.xy * factor;
+    }
 
     void main()	{
 
