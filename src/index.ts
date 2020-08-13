@@ -13,7 +13,7 @@ export type StateSelector<T extends State, U> = (state: T) => U
 export type StateListener<T> = (state: T | null, error?: Error) => void
 export type SetState<T extends State> = (
   next: PartialState<T>,
-  merge?: boolean
+  replace?: boolean
 ) => void
 export type GetState<T extends State> = () => T
 export interface Subscriber<T extends State, U> {
@@ -55,15 +55,14 @@ export default function create<TState extends State>(
   let state: TState
   let listeners: Set<() => void> = new Set()
 
-  const setState: SetState<TState> = (next, merge) => {
+  const setState: SetState<TState> = (next, replace) => {
     const nextState = typeof next === 'function' ? next(state) : next
-    const shouldMerge = typeof merge !== 'undefined' ? merge : true
 
     if (nextState !== state) {
-      if (shouldMerge) {
-        state = Object.assign({}, state, nextState)
-      } else {
+      if (replace) {
         state = nextState as TState
+      } else {
+        state = Object.assign({}, state, nextState)
       }
       listeners.forEach(listener => listener())
     }
