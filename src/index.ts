@@ -121,12 +121,42 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate: StateListener<StateSlice> = useReducer(c => c + 1, 0)[1]
-    const subscriberRef = useRef<Subscriber<TState, StateSlice>>()
+    const forceUpdate: React.Dispatch<unknown> = useReducer(c => c + 1, 0)[1]
+    const subscriberRef = useRef<{
+      currentSlice: StateSlice
+      equalityFn: EqualityChecker<StateSlice>
+      errored: boolean
+      listener: StateListener<StateSlice>
+      selector: StateSelector<TState, StateSlice>
+      unsubscribe: () => void
+    }>()
 
     if (!subscriberRef.current) {
-      subscriberRef.current = getSubscriber(forceUpdate, selector, equalityFn)
-      subscriberRef.current.unsubscribe = subscribe(subscriberRef.current)
+      subscriberRef.current = {
+        currentSlice: selector(state),
+        equalityFn,
+        errored: false,
+        listener: () => {},
+        selector,
+        unsubscribe: () => {},
+      }
+      const subscriber = subscriberRef.current
+      subscriberRef.current.listener = (
+        nextSlice: StateSlice | null,
+        error?: Error
+      ) => {
+        if (error) {
+          subscriber.errored = true
+        } else {
+          subscriber.currentSlice = nextSlice as StateSlice
+        }
+        forceUpdate(undefined)
+      }
+      subscriberRef.current.unsubscribe = apiSubscribe(
+        subscriber.listener,
+        subscriber.selector,
+        subscriber.equalityFn
+      )
     }
 
     const subscriber = subscriberRef.current
@@ -151,9 +181,20 @@ export default function create<TState extends State>(
       if (hasNewStateSlice) {
         subscriber.currentSlice = newStateSlice as StateSlice
       }
-      subscriber.selector = selector
-      subscriber.equalityFn = equalityFn
       subscriber.errored = false
+      if (
+        subscriber.selector !== selector ||
+        subscriber.equalityFn !== equalityFn
+      ) {
+        subscriber.unsubscribe()
+        subscriber.selector = selector
+        subscriber.equalityFn = equalityFn
+        subscriber.unsubscribe = apiSubscribe(
+          subscriber.listener,
+          subscriber.selector,
+          subscriber.equalityFn
+        )
+      }
     })
 
     useIsoLayoutEffect(() => subscriber.unsubscribe, [])
