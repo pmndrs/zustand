@@ -376,7 +376,7 @@ it('can set the store without merging', () => {
   }))
 
   // Should override the state instead of merging.
-  setState({ b: 2 }, false)
+  setState({ b: 2 }, true)
   expect(getState()).toEqual({ b: 2 })
 })
 
