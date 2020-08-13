@@ -157,12 +157,6 @@ export default function create<TState extends State>(
 
   Object.assign(useStore, api, { useStore })
 
-  // For backward compatibility (No TS types for this)
-  useStore[Symbol.iterator] = function*() {
-    yield useStore
-    yield api
-  }
-
   return useStore
 }
 
