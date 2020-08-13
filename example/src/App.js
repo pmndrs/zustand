@@ -10,7 +10,14 @@ import {
 } from 'react-three-fiber'
 import create from 'zustand'
 
-import { Plane, shaderMaterial, Stats, useAspect, useTextureLoader } from 'drei'
+import {
+  OrbitControls,
+  Plane,
+  shaderMaterial,
+  Stats,
+  useAspect,
+  useTextureLoader,
+} from 'drei'
 
 import { Controls, useControl } from 'react-three-gui'
 import {
@@ -19,6 +26,10 @@ import {
   DepthPass,
   EffectPass,
   DepthOfFieldEffect,
+  BloomEffect,
+  TextureEffect,
+  BlendFunction,
+  NoiseEffect,
 } from 'postprocessing'
 
 import PrismCode from 'react-prism'
@@ -72,40 +83,6 @@ function Counter() {
   )
 }
 
-const Img = forwardRef(function Img(
-  {
-    url,
-    factor = 0,
-    offset = 1,
-    scaleFactor,
-    movementVector,
-    texture,
-    ...props
-  },
-  forwardRef
-) {
-  const mat = useRef()
-  const scale = useAspect('cover', 1600, 1000, 0.2)
-
-  useEffect(() => {
-    mat.current.uniforms.textr.value = texture
-  }, [texture])
-
-  return (
-    <group position={props.transformedPosition}>
-      <Plane scale={scale} {...props} ref={forwardRef}>
-        <layerMaterial
-          attach="material"
-          movementVector={movementVector.current}
-          ref={mat}
-          factor={factor}
-          scaleFactor={scaleFactor}
-        />
-      </Plane>
-    </group>
-  )
-})
-
 function Scene() {
   const [bg, stars, ground, bear, leaves1, leaves2] = useTextureLoader([
     bgUrl,
@@ -147,7 +124,7 @@ function Scene() {
 
     // 2. get a reference to the DoF effect for later
     const depthOfFieldEffect = new DepthOfFieldEffect(camera, {
-      bokehScale: 4,
+      bokehScale: 5,
       focalLength: 0.1,
       focusDistance: 0.1,
     })
@@ -155,14 +132,12 @@ function Scene() {
     // 3. compose effect pass
     const effectsPass = new EffectPass(
       camera,
-      depthOfFieldEffect
-
+      depthOfFieldEffect,
+      new BloomEffect()
       // I use this effect to overlay my generated texture for debugging purposes
-      // new TextureEffect({
-      //   texture: renderTarget.texture,
-      //   blendFunction: BlendFunction.SOFT_LIGHT,
-      // })
     )
+
+    // effectPass.push(new TextureEffect({ texture: renderTarget.texture, }))
 
     // manually set depth texture
     effectsPass.setDepthTexture(renderTarget.texture, BasicDepthPacking)
@@ -188,42 +163,73 @@ function Scene() {
     void composer.render(delta)
   }, 1)
 
-  const vec = useRef(new THREE.Vector3(0))
-  const vec2 = useRef(new THREE.Vector3(0))
+  // holds mouse movement for parallax effect
+  const movementVector = useRef(new THREE.Vector3(0))
+  // this vector is only used for lerping
+  const tempVector = useRef(new THREE.Vector3(0))
 
   useFrame(state => {
-    if (vec.current) {
-      vec.current.lerp(
-        vec2.current.set(state.mouse.x * 1, state.mouse.y * 0.2, 0),
-        1
+    if (movementVector.current) {
+      movementVector.current.lerp(
+        tempVector.current.set(state.mouse.x * 1, state.mouse.y * 0.2, 0),
+        0.1
       )
 
-      depth.current.uniforms.movementVector.value = vec.current
+      depth.current.uniforms.movementVector.value = movementVector.current
     }
   })
 
+  const layers = [
+    {
+      texture: bg,
+      z: 0,
+      factor: 0.01,
+    },
+    {
+      texture: stars,
+      z: 10,
+      factor: 0.02,
+    },
+    {
+      texture: ground,
+      z: 20,
+    },
+    {
+      texture: bear,
+      z: 30,
+      ref: subject,
+      scaleFactor: 0.9,
+    },
+    {
+      texture: leaves1,
+      factor: 0.1,
+      scaleFactor: 1,
+      z: 40,
+    },
+    {
+      texture: leaves2,
+      factor: 0.12,
+      scaleFactor: 1.1,
+      z: 49,
+    },
+  ]
+
   return (
     <Suspense fallback={null}>
-      <Img movementVector={vec} texture={bg} factor={0.01} position-z={0} />
-      <Img movementVector={vec} texture={stars} factor={0.01} position-z={10} />
-      <Img movementVector={vec} texture={ground} factor={0} position-z={20} />
-      <Img movementVector={vec} texture={bear} ref={subject} position-z={30} />
-      <Img
-        movementVector={vec}
-        texture={leaves1}
-        factor={0.1}
-        position-z={40}
-      />
-      <Img
-        movementVector={vec}
-        texture={leaves2}
-        factor={0.12}
-        position-z={49}
-        offset={1}
-      />
+      {layers.map(({ texture, ref, factor = 0, scaleFactor = 1, z }, i) => (
+        <Plane scale={scale} position-z={z} key={i} ref={ref}>
+          <layerMaterial
+            attach="material"
+            movementVector={movementVector.current}
+            textr={texture}
+            factor={factor}
+            scaleFactor={scaleFactor}
+          />
+        </Plane>
+      ))}
 
       {createPortal(
-        <Plane position={[0, 0, 20]} args={[1, 1]} scale={scale}>
+        <Plane position={[0, 0, 20]} scale={scale}>
           <depthBufferMaterial
             attach="material"
             bg={bg}
@@ -232,6 +238,14 @@ function Scene() {
             bear={bear}
             leaves1={leaves1}
             leaves2={leaves2}
+            scaleFactors={layers.reduce((factors, layer) => {
+              factors.push(layer.scaleFactor || 1)
+              return factors
+            }, [])}
+            movementFactors={layers.reduce((factors, layer) => {
+              factors.push(layer.factor || 1)
+              return factors
+            }, [])}
             ref={depth}
           />
         </Plane>,
@@ -261,6 +275,7 @@ export default function App() {
         <Suspense fallback={null}>
           <Scene />
         </Suspense>
+        <OrbitControls />
       </Canvas>
     </>
   )

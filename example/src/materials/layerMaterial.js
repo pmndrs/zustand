@@ -42,7 +42,7 @@ const LayerMaterial = shaderMaterial(
 
     void main()	{
 
-        vec2 uv = offsetUv(vUv, movementVector, factor);
+        vec2 uv = offsetUv(vUv / scaleFactor, movementVector, factor);
 
         vec4 color = texture2D(textr, uv);
 

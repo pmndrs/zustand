@@ -20,6 +20,9 @@ const DepthBufferMaterial = shaderMaterial(
     bear: null,
     leaves1: null,
     leaves2: null,
+
+    scaleFactors: [],
+    movementFactors: [],
   },
   `
     
@@ -48,6 +51,9 @@ const DepthBufferMaterial = shaderMaterial(
     uniform sampler2D bear;
     uniform sampler2D leaves1;
     uniform sampler2D leaves2;
+
+    uniform float scaleFactors[6];
+    uniform float movementFactors[6];
   
     uniform vec2 mouse;
   
@@ -66,17 +72,17 @@ const DepthBufferMaterial = shaderMaterial(
     void main()	{
   
       vec2 uv = vUv;
+
+      float leaves2Alpha = getAlpha(leaves2, offsetUv(vUv / scaleFactors[5], movementVector, movementFactors[5]));
+      float leaves1Alpha = getAlpha(leaves1, offsetUv(vUv / scaleFactors[4], movementVector, movementFactors[4])) * .9;
+      
+      // bear and ground don't move
+      float bearAlpha = getAlpha(bear, vUv / scaleFactors[3]) * 0.41;
+      float groundAlpha = getAlpha(ground, vUv / scaleFactors[2]) * 0.4;
+      
+      float starsAlpha = getAlpha(stars, offsetUv(vUv / scaleFactors[1], movementVector, movementFactors[1])) * 0.2;
   
-      float leaves1Alpha = getAlpha(leaves1, offsetUv(vUv, movementVector, 0.1));
-      float leaves2Alpha = getAlpha(leaves2, offsetUv(vUv, movementVector, 0.12)) * 0.5;
-      
-      float bearAlpha = getAlpha(bear, uv) * (0.41);
-      
-      float groundAlpha = getAlpha(ground, uv) * 0.4;
-      
-      float starsAlpha = getAlpha(stars, offsetUv(vUv, movementVector, 0.1)) * 0.2;
-  
-      float bgAlpha = getAlpha(bg, offsetUv(vUv, movementVector, 0.1)) * 0.01;
+      float bgAlpha = getAlpha(bg, offsetUv(vUv / scaleFactors[0], movementVector, movementFactors[0])) * 0.01;
   
       // make the actual depth map
       float aaa = 0.;
