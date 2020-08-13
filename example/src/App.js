@@ -153,19 +153,19 @@ function Scene() {
       factor: 0.03,
       scaleFactor: 1,
       z: 40,
-      wiggle: 0.2,
+      wiggle: 0.24,
     },
     {
       texture: leaves2,
       factor: 0.04,
       scaleFactor: 1.3,
       z: 49,
-      wiggle: 0.2,
+      wiggle: 0.24,
     },
   ]
 
   // scale the layers to cover the screen
-  const scale = useAspect('cover', 1600, 1000, 0.2)
+  const scale = useAspect('cover', 1600, 1000, 0.21)
 
   const layersRef = useRef([])
   useFrame(({ clock }) => {
