@@ -4,7 +4,14 @@ import React, { Suspense, useRef, useMemo, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from 'react-three-fiber'
 import create from 'zustand'
 
-import { OrbitControls, Plane, Stats, useAspect, useTextureLoader } from 'drei'
+import {
+  MeshWobbleMaterial,
+  OrbitControls,
+  Plane,
+  Stats,
+  useAspect,
+  useTextureLoader,
+} from 'drei'
 
 // import {
 //   EffectComposer,
@@ -146,31 +153,51 @@ function Scene() {
       factor: 0.03,
       scaleFactor: 1,
       z: 40,
+      wiggle: 0.2,
     },
     {
       texture: leaves2,
       factor: 0.04,
       scaleFactor: 1.3,
       z: 49,
+      wiggle: 0.2,
     },
   ]
 
   // scale the layers to cover the screen
   const scale = useAspect('cover', 1600, 1000, 0.2)
 
+  const layersRef = useRef([])
+  useFrame(({ clock }) => {
+    layersRef.current.forEach(layer => {
+      if (layer) {
+        layer.uniforms.time.value += 0.04
+      }
+    })
+  })
+
   return (
     <Suspense fallback={null}>
-      {layers.map(({ texture, ref, factor = 0, scaleFactor = 1, z }, i) => (
-        <Plane scale={scale} position-z={z} key={i} ref={ref}>
-          <layerMaterial
-            attach="material"
-            movementVector={movementVector.current}
-            textr={texture}
-            factor={factor}
-            scaleFactor={scaleFactor}
-          />
-        </Plane>
-      ))}
+      {layers.map(
+        ({ texture, ref, factor = 0, scaleFactor = 1, wiggle = 0, z }, i) => (
+          <Plane
+            scale={scale}
+            args={[1, 1, 10, 10]}
+            position-z={z}
+            key={i}
+            ref={ref}>
+            <layerMaterial
+              attach="material"
+              movementVector={movementVector.current}
+              textr={texture}
+              factor={factor}
+              ref={el => (layersRef.current[i] = el)}
+              wiggle={wiggle}
+              scaleFactor={scaleFactor}
+            />
+          </Plane>
+        )
+      )}
 
       <EffectComposer>
         <Bloom luminanceThreshold={0.7} luminanceSmoothing={0.075} />

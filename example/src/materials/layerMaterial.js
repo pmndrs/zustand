@@ -7,17 +7,28 @@ const LayerMaterial = shaderMaterial(
     movementVector: [0, 0, 0],
     scaleFactor: 1,
     factor: 0, // how much the movement vector is multiplied by, 0 means no movement,
+    wiggle: 0,
+    time: 0,
   },
   `
     uniform float time;
     uniform vec2 resolution;
+    uniform float wiggle;
 
     varying vec2 vUv;
+    varying vec3 vNormal;
 
     void main()	{
         vUv = uv;
 
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+        float theta = sin( time + position.y ) / 2.0 * wiggle;
+        float c = cos( theta );
+        float s = sin( theta );
+        mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );
+        vec3 transformed = vec3( position ) * m;
+        vNormal = vNormal * m;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.);
     }
 `,
   `
