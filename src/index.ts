@@ -83,9 +83,11 @@ export default function create<TState extends State>(
     return unsubscribe
   }
 
-  const destroy: Destroy = () => listeners.clear()
+  const destroy: Destroy = () => {
+    listeners.clear()
+  }
 
-  // The first param can be anything stable
+  // The first param can be anything stable within this closure
   const source = createMutableSource(getState, () => state)
 
   const FUNCTION_SYNBOL = Symbol()
@@ -116,6 +118,7 @@ export default function create<TState extends State>(
       const slice = cachedSlices.has(state)
         ? (cachedSlices.get(state) as StateSlice)
         : selector(state)
+      // Unfortunately, returning a function is not supported
       // https://github.com/facebook/react/issues/18823
       if (typeof slice === 'function') {
         if (functionMap.has(slice)) {
