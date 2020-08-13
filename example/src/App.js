@@ -202,12 +202,12 @@ function Scene() {
     {
       texture: bg,
       z: 0,
-      factor: 0.01,
+      factor: 0.005,
     },
     {
       texture: stars,
       z: 10,
-      factor: 0.02,
+      factor: 0.005,
     },
     {
       texture: ground,
@@ -221,14 +221,14 @@ function Scene() {
     },
     {
       texture: leaves1,
-      factor: 0.1,
+      factor: 0.03,
       scaleFactor: 1,
       z: 40,
     },
     {
       texture: leaves2,
-      factor: 0.12,
-      scaleFactor: 1.4,
+      factor: 0.04,
+      scaleFactor: 1.3,
       z: 49,
     },
   ]
