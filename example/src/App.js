@@ -129,11 +129,24 @@ function Scene() {
       focusDistance: 0.1,
     })
 
+    // 2.b other effects
+
+    const bloomEffect = new BloomEffect({
+      luminanceThreshold: 0.7,
+      luminanceSmoothing: 0.075,
+      height: 480,
+    })
+
+    const noiseEffect = new NoiseEffect()
+
+    noiseEffect.blendMode.opacity.value = 0.03
+
     // 3. compose effect pass
     const effectsPass = new EffectPass(
       camera,
+      bloomEffect,
       depthOfFieldEffect,
-      new BloomEffect()
+      noiseEffect
       // I use this effect to overlay my generated texture for debugging purposes
     )
 
@@ -153,9 +166,15 @@ function Scene() {
     composer.setSize(size.width, size.height)
   }, [composer, size])
 
+  // this vector holds the current focus subject, that will be lerped towards the subject positin
+  const focusVector = useRef(new THREE.Vector3(0))
+
   useFrame((_, delta) => {
     if (subject.current) {
-      depthOfFieldEffect.target = subject.current.position
+      depthOfFieldEffect.target = focusVector.current.lerp(
+        subject.current.position,
+        0.05
+      )
     }
 
     depth.current.uniforms.time.value += 0.1
@@ -209,7 +228,7 @@ function Scene() {
     {
       texture: leaves2,
       factor: 0.12,
-      scaleFactor: 1.1,
+      scaleFactor: 1.4,
       z: 49,
     },
   ]
