@@ -146,7 +146,7 @@ function Scene() {
       texture: bear,
       z: 30,
       ref: subject,
-      scaleFactor: 0.9,
+      scaleFactor: 0.83,
     },
     {
       texture: leaves1,
