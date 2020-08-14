@@ -23,12 +23,18 @@ body,
   overflow: hidden;
 }
 
+body {
+  image-rendering: pixelated;
+}
+
 .main {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background: #1b1f21;
   color: white;
-  overflow: hidden;
+  pointer-events: none;
 }
 
 .main > div {
@@ -90,23 +96,23 @@ body,
   position: absolute;
   left: 50%;
   top: 50%;
+  margin-top: -10px;
   transform: translate3d(-50%, -50%, 0);
 }
 
-.counter > button:nth-of-type(1) {
+.counter > button {
   margin: 10px;
+  padding: 5px 10px;
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 50px;
-}
-
-.counter > button:nth-of-type(2) {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 50px;
-  margin: 10px;
+  width: 100px;
+  border-radius: 5px;
+  border: solid 2px white;
+  outline: none;
+  background:transparent;
+  color: white;
+  cursor: pointer;
 }
 
 .bear {
@@ -200,6 +206,7 @@ a {
   display: inline;
   text-decoration: none;
   z-index: 1;
+  pointer-events: all;
 }
 
 a.top-left {
