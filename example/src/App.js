@@ -9,7 +9,6 @@ import groundUrl from './resources/ground.png'
 import bearUrl from './resources/bear.png'
 import leaves1Url from './resources/leaves1.png'
 import leaves2Url from './resources/leaves2.png'
-import codeUrl from './resources/code.png'
 import './materials/layerMaterial'
 
 import create from 'zustand'
@@ -53,14 +52,13 @@ function Counter() {
 function Scene({ dof }) {
   const scaleN = useAspect('cover', 1600, 1000, 0.21)
   const scaleW = useAspect('cover', 2200, 1000, 0.21)
-  const [bg, stars, ground, bear, leaves1, leaves2, code] = useTextureLoader([
+  const [bg, stars, ground, bear, leaves1, leaves2] = useTextureLoader([
     bgUrl,
     starsUrl,
     groundUrl,
     bearUrl,
     leaves1Url,
     leaves2Url,
-    codeUrl,
   ])
   const subject = useRef()
   const group = useRef()
@@ -72,7 +70,6 @@ function Scene({ dof }) {
     { texture: bg, z: 0, factor: 0.005, scale: scaleW },
     { texture: stars, z: 10, factor: 0.005, scale: scaleW },
     { texture: ground, z: 20, scale: scaleW },
-    { texture: bear, z: 30, ref: subject, scaleFactor: 0.83, scale: scaleN },
     { texture: bear, z: 30, ref: subject, scaleFactor: 0.83, scale: scaleN },
     { texture: leaves1, factor: 0.03, scaleFactor: 1, z: 40, wiggle: 0.24, scale: scaleW },
     { texture: leaves2, factor: 0.04, scaleFactor: 1.3, z: 49, wiggle: 0.3, scale: scaleW },
