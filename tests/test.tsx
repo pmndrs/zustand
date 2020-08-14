@@ -393,48 +393,6 @@ it('can subscribe to the store', () => {
   })
   setState({ ...getState() })
   unsub()
-
-  // Should not be called when state slice is the same
-  unsub = subscribe(
-    () => {
-      throw new Error('subscriber called when new state is the same')
-    },
-    s => s.value
-  )
-  setState({ other: 'b' })
-  unsub()
-
-  // Should be called when state slice changes
-  unsub = subscribe(
-    (value: number | null) => {
-      expect(value).toBe(initialState.value + 1)
-    },
-    s => s.value
-  )
-  setState({ value: initialState.value + 1 })
-  unsub()
-
-  // Should not be called when equality checker returns true
-  unsub = subscribe(
-    () => {
-      throw new Error('subscriber called when equality checker returned true')
-    },
-    undefined,
-    () => true
-  )
-  setState({ value: initialState.value + 2 })
-  unsub()
-
-  // Should be called when equality checker returns false
-  unsub = subscribe(
-    (value: number | null) => {
-      expect(value).toBe(initialState.value + 2)
-    },
-    s => s.value,
-    () => false
-  )
-  setState(getState())
-  unsub()
 })
 
 it('can destroy the store', () => {
@@ -474,16 +432,16 @@ it('only calls selectors when necessary', async () => {
   }
 
   const { rerender, getByText } = render(<Component />)
-  await waitForElement(() => getByText('inline: 2'))
-  await waitForElement(() => getByText('static: 2'))
+  await waitForElement(() => getByText('inline: 1'))
+  await waitForElement(() => getByText('static: 1'))
 
   rerender(<Component />)
-  await waitForElement(() => getByText('inline: 3'))
-  await waitForElement(() => getByText('static: 2'))
+  await waitForElement(() => getByText('inline: 2'))
+  await waitForElement(() => getByText('static: 1'))
 
   act(() => setState({ a: 1, b: 1 }))
-  await waitForElement(() => getByText('inline: 6'))
-  await waitForElement(() => getByText('static: 3'))
+  await waitForElement(() => getByText('inline: 4'))
+  await waitForElement(() => getByText('static: 2'))
 })
 
 it('ensures parent components subscribe before children', async () => {

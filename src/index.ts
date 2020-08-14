@@ -8,11 +8,9 @@ export type PartialState<T extends State> =
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: any) => boolean
 
-export type StateListener<T> = (state: T | null, error?: Error) => void
-export type Subscribe<T extends State> = <U>(
-  listener: StateListener<U>,
-  selector?: StateSelector<T, U>,
-  equalityFn?: EqualityChecker<U>
+export type StateListener<T> = (state: T) => void
+export type Subscribe<T extends State> = (
+  listener: StateListener<T>
 ) => () => void
 export type SetState<T extends State> = (
   partial: PartialState<T>,
@@ -50,7 +48,7 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): UseStore<TState> {
   let state: TState
-  let listeners: Set<() => void> = new Set()
+  let listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
     const nextState = typeof partial === 'function' ? partial(state) : partial
@@ -61,34 +59,16 @@ export default function create<TState extends State>(
       } else {
         state = Object.assign({}, state, nextState)
       }
-      listeners.forEach(listener => listener())
+      listeners.forEach(listener => listener(state))
     }
   }
 
   const getState: GetState<TState> = () => state
 
-  const subscribe: Subscribe<TState> = <StateSlice>(
-    listener: StateListener<StateSlice>,
-    selector: StateSelector<TState, StateSlice> = getState,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
-  ) => {
-    let currentSlice: StateSlice = selector(state)
-    function listenerToAdd() {
-      // Selector or equality function could throw but we don't want to stop
-      // the listener from being called.
-      // https://github.com/react-spring/zustand/pull/37
-      try {
-        const newStateSlice = selector(state)
-        if (!equalityFn(currentSlice, newStateSlice)) {
-          listener((currentSlice = newStateSlice))
-        }
-      } catch (error) {
-        listener(null, error)
-      }
-    }
-    listeners.add(listenerToAdd)
+  const subscribe: Subscribe<TState> = (listener: StateListener<TState>) => {
+    listeners.add(listener)
     const unsubscribe = () => {
-      listeners.delete(listenerToAdd)
+      listeners.delete(listener)
     }
     return unsubscribe
   }
@@ -104,7 +84,7 @@ export default function create<TState extends State>(
       currentSlice: StateSlice
       equalityFn: EqualityChecker<StateSlice>
       errored: boolean
-      listener: StateListener<StateSlice>
+      listener: StateListener<TState>
       selector: StateSelector<TState, StateSlice>
       unsubscribe: () => void
     }>()
@@ -119,22 +99,19 @@ export default function create<TState extends State>(
         unsubscribe: () => {},
       }
       const subscriber = subscriberRef.current
-      subscriberRef.current.listener = (
-        nextSlice: StateSlice | null,
-        error?: Error
-      ) => {
-        if (error) {
+      subscriber.listener = (nextState: TState) => {
+        try {
+          const nextStateSlice = subscriber.selector(nextState)
+          if (!subscriber.equalityFn(subscriber.currentSlice, nextStateSlice)) {
+            subscriber.currentSlice = nextStateSlice
+            forceUpdate(undefined)
+          }
+        } catch (error) {
           subscriber.errored = true
-        } else {
-          subscriber.currentSlice = nextSlice as StateSlice
+          forceUpdate(undefined)
         }
-        forceUpdate(undefined)
       }
-      subscriberRef.current.unsubscribe = subscribe(
-        subscriber.listener,
-        subscriber.selector,
-        subscriber.equalityFn
-      )
+      subscriber.unsubscribe = subscribe(subscriber.listener)
     }
 
     const subscriber = subscriberRef.current
@@ -160,19 +137,8 @@ export default function create<TState extends State>(
         subscriber.currentSlice = newStateSlice as StateSlice
       }
       subscriber.errored = false
-      if (
-        subscriber.selector !== selector ||
-        subscriber.equalityFn !== equalityFn
-      ) {
-        subscriber.unsubscribe()
-        subscriber.selector = selector
-        subscriber.equalityFn = equalityFn
-        subscriber.unsubscribe = subscribe(
-          subscriber.listener,
-          subscriber.selector,
-          subscriber.equalityFn
-        )
-      }
+      subscriber.selector = selector
+      subscriber.equalityFn = equalityFn
     })
 
     useIsoLayoutEffect(() => subscriber.unsubscribe, [])
