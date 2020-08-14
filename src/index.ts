@@ -84,9 +84,7 @@ export default function create<TState extends State>(
       currentSlice: StateSlice
       equalityFn: EqualityChecker<StateSlice>
       errored: boolean
-      listener: StateListener<TState>
       selector: StateSelector<TState, StateSlice>
-      unsubscribe: () => void
     }>()
 
     if (!subscriberRef.current) {
@@ -94,24 +92,8 @@ export default function create<TState extends State>(
         currentSlice: selector(state),
         equalityFn,
         errored: false,
-        listener: () => {},
         selector,
-        unsubscribe: () => {},
       }
-      const subscriber = subscriberRef.current
-      subscriber.listener = (nextState: TState) => {
-        try {
-          const nextStateSlice = subscriber.selector(nextState)
-          if (!subscriber.equalityFn(subscriber.currentSlice, nextStateSlice)) {
-            subscriber.currentSlice = nextStateSlice
-            forceUpdate(undefined)
-          }
-        } catch (error) {
-          subscriber.errored = true
-          forceUpdate(undefined)
-        }
-      }
-      subscriber.unsubscribe = subscribe(subscriber.listener)
     }
 
     const subscriber = subscriberRef.current
@@ -141,7 +123,22 @@ export default function create<TState extends State>(
       subscriber.equalityFn = equalityFn
     })
 
-    useIsoLayoutEffect(() => subscriber.unsubscribe, [])
+    useIsoLayoutEffect(() => {
+      const listener = (nextState: TState) => {
+        try {
+          const nextStateSlice = subscriber.selector(nextState)
+          if (!subscriber.equalityFn(subscriber.currentSlice, nextStateSlice)) {
+            subscriber.currentSlice = nextStateSlice
+            forceUpdate(undefined)
+          }
+        } catch (error) {
+          subscriber.errored = true
+          forceUpdate(undefined)
+        }
+      }
+      const unsubscribe = subscribe(listener)
+      return unsubscribe
+    }, [])
 
     return hasNewStateSlice
       ? (newStateSlice as StateSlice)
