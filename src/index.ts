@@ -79,24 +79,16 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate: React.Dispatch<unknown> = useReducer(c => c + 1, 0)[1]
-    const subscriberRef = useRef<{
-      currentSlice: StateSlice
-      equalityFn: EqualityChecker<StateSlice>
-      errored: boolean
-      selector: StateSelector<TState, StateSlice>
-    }>()
+    const forceUpdate = useReducer(c => c + 1, 0)[1] as () => void
+    const currentSliceRef = useRef<StateSlice>()
+    const selectorRef = useRef(selector)
+    const equalityFnRef = useRef(equalityFn)
+    const erroredRef = useRef(false)
 
-    if (!subscriberRef.current) {
-      subscriberRef.current = {
-        currentSlice: selector(state),
-        equalityFn,
-        errored: false,
-        selector,
-      }
+    if (currentSliceRef.current === undefined) {
+      currentSliceRef.current = selector(state)
     }
 
-    const subscriber = subscriberRef.current
     let newStateSlice: StateSlice | undefined
     let hasNewStateSlice = false
 
@@ -104,36 +96,44 @@ export default function create<TState extends State>(
     // they change. We also want legitimate errors to be visible so we re-run
     // them if they errored in the subscriber.
     if (
-      subscriber.selector !== selector ||
-      subscriber.equalityFn !== equalityFn ||
-      subscriber.errored
+      selectorRef.current !== selector ||
+      equalityFnRef.current !== equalityFn ||
+      erroredRef.current
     ) {
       // Using local variables to avoid mutations in the render phase.
       newStateSlice = selector(state)
-      hasNewStateSlice = !equalityFn(subscriber.currentSlice, newStateSlice)
+      hasNewStateSlice = !equalityFn(
+        currentSliceRef.current as StateSlice,
+        newStateSlice
+      )
     }
 
     // Syncing changes in useEffect.
     useIsoLayoutEffect(() => {
       if (hasNewStateSlice) {
-        subscriber.currentSlice = newStateSlice as StateSlice
+        currentSliceRef.current = newStateSlice as StateSlice
       }
-      subscriber.errored = false
-      subscriber.selector = selector
-      subscriber.equalityFn = equalityFn
+      selectorRef.current = selector
+      equalityFnRef.current = equalityFn
+      erroredRef.current = false
     })
 
     useIsoLayoutEffect(() => {
-      const listener = (nextState: TState) => {
+      const listener = () => {
         try {
-          const nextStateSlice = subscriber.selector(nextState)
-          if (!subscriber.equalityFn(subscriber.currentSlice, nextStateSlice)) {
-            subscriber.currentSlice = nextStateSlice
-            forceUpdate(undefined)
+          const nextStateSlice = selectorRef.current(state)
+          if (
+            !equalityFnRef.current(
+              currentSliceRef.current as StateSlice,
+              nextStateSlice
+            )
+          ) {
+            currentSliceRef.current = nextStateSlice
+            forceUpdate()
           }
         } catch (error) {
-          subscriber.errored = true
-          forceUpdate(undefined)
+          erroredRef.current = true
+          forceUpdate()
         }
       }
       const unsubscribe = subscribe(listener)
@@ -142,7 +142,7 @@ export default function create<TState extends State>(
 
     return hasNewStateSlice
       ? (newStateSlice as StateSlice)
-      : subscriber.currentSlice
+      : currentSliceRef.current
   }
 
   const api = { setState, getState, subscribe, destroy }
