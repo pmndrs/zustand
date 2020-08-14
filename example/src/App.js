@@ -75,7 +75,7 @@ export default function App() {
       <Suspense fallback={null}>
         <Scene dof={dof} />
       </Suspense>
-      <EffectComposer>
+      <EffectComposer multisampling={0}>
         <DepthOfField ref={dof} bokehScale={4} focalLength={0.1} />
         <Vignette />
       </EffectComposer>
