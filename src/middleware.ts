@@ -1,8 +1,4 @@
-const redux = (reducer: any, initial: any) => (
-  set: any,
-  get: any,
-  api: any
-) => {
+const redux = (reducer: any, initial: any) => (set: any, get: any, api: any) => {
   api.dispatch = (action: any) => {
     set((state: any) => reducer(state, action))
     api.devtools && api.devtools.send(api.devtools.prefix + action.type, get())
@@ -11,16 +7,10 @@ const redux = (reducer: any, initial: any) => (
   return { dispatch: api.dispatch, ...initial }
 }
 
-const devtools = (fn: any, prefix?: string) => (
-  set: any,
-  get: any,
-  api: any
-) => {
+const devtools = (fn: any, prefix?: string) => (set: any, get: any, api: any) => {
   let extension
   try {
-    extension =
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+    extension = (window as any).__REDUX_DEVTOOLS_EXTENSION__ || (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
   } catch {}
 
   if (!extension) {
@@ -42,13 +32,8 @@ const devtools = (fn: any, prefix?: string) => (
     api.devtools.prefix = prefix ? `${prefix} > ` : ''
     api.devtools.subscribe((message: any) => {
       if (message.type === 'DISPATCH' && message.state) {
-        const ignoreState =
-          message.payload.type === 'JUMP_TO_ACTION' ||
-          message.payload.type === 'JUMP_TO_STATE'
-        namedSet(
-          JSON.parse(message.state),
-          !initialState.dispatch && !ignoreState && 'setState'
-        )
+        const ignoreState = message.payload.type === 'JUMP_TO_ACTION' || message.payload.type === 'JUMP_TO_STATE'
+        namedSet(JSON.parse(message.state), !initialState.dispatch && !ignoreState && 'setState')
       }
     })
     api.devtools.init(initialState)

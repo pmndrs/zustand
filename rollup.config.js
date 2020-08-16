@@ -19,12 +19,7 @@ function createESMConfig(input, output) {
     input,
     output: { file: output, format: 'esm' },
     external,
-    plugins: [
-      typescript(),
-      babel(getBabelOptions({ node: 8 })),
-      sizeSnapshot(),
-      resolve({ extensions }),
-    ],
+    plugins: [typescript(), babel(getBabelOptions({ node: 8 })), sizeSnapshot(), resolve({ extensions })],
   }
 }
 
@@ -33,12 +28,7 @@ function createCommonJSConfig(input, output) {
     input,
     output: { file: output, format: 'cjs', exports: 'named' },
     external,
-    plugins: [
-      typescript(),
-      babel(getBabelOptions({ ie: 11 })),
-      sizeSnapshot(),
-      resolve({ extensions }),
-    ],
+    plugins: [typescript(), babel(getBabelOptions({ ie: 11 })), sizeSnapshot(), resolve({ extensions })],
   }
 }
 
@@ -55,12 +45,7 @@ function createIIFEConfig(input, output, globalName) {
       },
     },
     external,
-    plugins: [
-      typescript(),
-      babel(getBabelOptions({ ie: 11 })),
-      sizeSnapshot(),
-      resolve({ extensions }),
-    ],
+    plugins: [typescript(), babel(getBabelOptions({ ie: 11 })), sizeSnapshot(), resolve({ extensions })],
   }
 }
 
@@ -70,4 +55,5 @@ export default [
   createIIFEConfig('src/index.ts', 'dist/index.iife.js', 'zustand'),
   createCommonJSConfig('src/shallow.ts', 'dist/shallow.js'),
   createCommonJSConfig('src/middleware.ts', 'dist/middleware.js'),
+  createCommonJSConfig('src/vanilla.ts', 'dist/vanilla.js'),
 ]

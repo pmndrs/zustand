@@ -1,12 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { act } from 'react-dom/test-utils'
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitForElement,
-} from '@testing-library/react'
+import { cleanup, fireEvent, render, waitForElement } from '@testing-library/react'
 import create, {
   State,
   StateListener,
@@ -242,12 +237,7 @@ it('can call useStore with progressively more arguments', async () => {
   await waitForElement(() => getByText('renderCount: 2, value: 0'))
 
   // Render with selector and equality checker.
-  rerender(
-    <Component
-      selector={s => s.value}
-      equalityFn={(oldV, newV) => oldV > newV}
-    />
-  )
+  rerender(<Component selector={s => s.value} equalityFn={(oldV, newV) => oldV > newV} />)
 
   // Should not cause a re-render because new value is less than previous.
   act(() => setState({ value: -1 }))
@@ -547,9 +537,7 @@ it('ensures the correct subscriber is removed on unmount', async () => {
   }
 
   function Component() {
-    const [Counter, setCounter] = React.useState(
-      () => CountWithInitialIncrement
-    )
+    const [Counter, setCounter] = React.useState(() => CountWithInitialIncrement)
     React.useLayoutEffect(() => {
       setCounter(() => Count)
     }, [])
@@ -626,8 +614,7 @@ it('can use exposed types', () => {
   const selector: StateSelector<ExampleState, number> = state => state.num
   const partial: PartialState<ExampleState> = { num: 2, numGet: () => 2 }
   const partialFn: PartialState<ExampleState> = state => ({ num: 2, ...state })
-  const equlaityFn: EqualityChecker<ExampleState> = (state, newState) =>
-    state !== newState
+  const equlaityFn: EqualityChecker<ExampleState> = (state, newState) => state !== newState
 
   const storeApi = create<ExampleState>((set, get) => ({
     num: 1,
