@@ -1,8 +1,14 @@
 import * as THREE from 'three'
 import React, { Suspense, useRef, useState } from 'react'
-import { Canvas, useFrame } from 'react-three-fiber'
+import { Canvas, useFrame, useThree } from 'react-three-fiber'
 import { Plane, useAspect, useTextureLoader } from 'drei'
 import { EffectComposer, DepthOfField, Vignette } from 'react-postprocessing'
+import create from 'zustand'
+import PrismCode from 'react-prism'
+import 'prismjs'
+import 'prismjs/components/prism-jsx.min'
+import 'prismjs/themes/prism-okaidia.css'
+import Fireflies from './components/Fireflies'
 import bgUrl from './resources/bg.jpg'
 import starsUrl from './resources/stars.png'
 import groundUrl from './resources/ground.png'
@@ -10,12 +16,6 @@ import bearUrl from './resources/bear.png'
 import leaves1Url from './resources/leaves1.png'
 import leaves2Url from './resources/leaves2.png'
 import './materials/layerMaterial'
-
-import create from 'zustand'
-import PrismCode from 'react-prism'
-import 'prismjs'
-import 'prismjs/components/prism-jsx.min'
-import 'prismjs/themes/prism-okaidia.css'
 
 const code = `import create from 'zustand'
 
@@ -75,19 +75,20 @@ function Scene({ dof }) {
     { texture: leaves2, factor: 0.04, scaleFactor: 1.3, z: 49, wiggle: 0.3, scale: scaleW },
   ]
 
-  useFrame(({ clock, mouse }) => {
+  useFrame((state, delta) => {
     dof.current.target = focusVector.lerp(subject.current.position, 0.05)
-    movementVector.lerp(tempVector.set(mouse.x, mouse.y * 0.2, 0), 0.2)
-    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, mouse.x * 20, 0.2)
-    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -mouse.x / 2, 0.2)
-    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, mouse.y / 10, 0.2)
-    layersRef.current.forEach(layer => (layer.uniforms.time.value += 0.04))
+    movementVector.lerp(tempVector.set(state.mouse.x, state.mouse.y * 0.2, 0), 0.2)
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, state.mouse.x * 20, 0.2)
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.mouse.y / 10, 0.2)
+    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -state.mouse.x / 2, 0.2)
+    layersRef.current[4].uniforms.time.value = layersRef.current[5].uniforms.time.value += delta
   }, 1)
 
   return (
     <group ref={group}>
+      <Fireflies count={10} radius={80} colors={['orange']} />
       {layers.map(({ scale, texture, ref, factor = 0, scaleFactor = 1, wiggle = 0, z }, i) => (
-        <Plane scale={scale} args={[1, 1, 10, 10]} position-z={z} key={i} ref={ref}>
+        <Plane scale={scale} args={[1, 1, wiggle ? 10 : 1, wiggle ? 10 : 1]} position-z={z} key={i} ref={ref}>
           <layerMaterial
             attach="material"
             movementVector={movementVector}
@@ -103,6 +104,22 @@ function Scene({ dof }) {
   )
 }
 
+const Effects = React.forwardRef((props, ref) => {
+  const { viewport } = useThree()
+  return (
+    <EffectComposer multisampling={0}>
+      <DepthOfField
+        ref={ref}
+        bokehScale={4}
+        focalLength={0.1}
+        width={viewport.width / 2}
+        height={viewport.height / 2}
+      />
+      <Vignette />
+    </EffectComposer>
+  )
+})
+
 export default function App() {
   const dof = useRef()
   return (
@@ -110,15 +127,11 @@ export default function App() {
       <Canvas
         gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, alpha: false, depth: false }}
         orthographic
-        pixelRatio={1}
         camera={{ zoom: 5, position: [0, 0, 200], far: 300, near: 0 }}>
         <Suspense fallback={null}>
           <Scene dof={dof} />
         </Suspense>
-        <EffectComposer multisampling={0}>
-          <DepthOfField ref={dof} bokehScale={4} focalLength={0.1} />
-          <Vignette />
-        </EffectComposer>
+        <Effects ref={dof} />
       </Canvas>
       <div class="main">
         <div class="code">

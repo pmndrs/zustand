@@ -24,7 +24,8 @@ body,
 }
 
 body {
-  image-rendering: pixelated;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+  helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
 }
 
 .main {
@@ -85,8 +86,6 @@ body {
   box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
   width: 120px;
   height: 120px;
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
-    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
   font-size: 3em;
   z-index: 20000;
   pointer-events: all;
@@ -151,7 +150,6 @@ code {
 }
 
 span.header-left {
-  font-family: 'Josefin Sans', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   position: absolute;
