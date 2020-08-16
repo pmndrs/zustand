@@ -1,40 +1,19 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+export * from './vanilla'
+import createImpl, {
+  Destroy,
+  EqualityChecker,
+  GetState,
+  SetState,
+  State,
+  StateCreator,
+  StateSelector,
+  Subscribe,
+} from './vanilla'
 
-export type State = Record<string | number | symbol, any>
-export type PartialState<T extends State> =
-  | Partial<T>
-  | ((state: T) => Partial<T>)
-  | ((state: T) => void) // for immer https://github.com/react-spring/zustand/pull/99
-export type StateSelector<T extends State, U> = (state: T) => U
-export type EqualityChecker<T> = (state: T, newState: any) => boolean
-
-export type StateListener<T> = (state: T) => void
-export type StateSliceListener<T> = (state: T | null, error?: Error) => void
-export interface Subscribe<T extends State> {
-  (listener: StateListener<T>): () => void
-  <StateSlice>(
-    listener: StateSliceListener<StateSlice>,
-    selector: StateSelector<T, StateSlice>,
-    equalityFn?: EqualityChecker<StateSlice>
-  ): () => void
-}
-export type SetState<T extends State> = (
-  partial: PartialState<T>,
-  replace?: boolean
-) => void
-export type GetState<T extends State> = () => T
-export type Destroy = () => void
-export interface StoreApi<T extends State> {
-  setState: SetState<T>
-  getState: GetState<T>
-  subscribe: Subscribe<T>
-  destroy: Destroy
-}
-export type StateCreator<T extends State> = (
-  set: SetState<T>,
-  get: GetState<T>,
-  api: StoreApi<T>
-) => T
+// For server-side rendering: https://github.com/react-spring/zustand/pull/34
+const useIsoLayoutEffect =
+  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export interface UseStore<T extends State> {
   (): T
@@ -43,83 +22,15 @@ export interface UseStore<T extends State> {
   getState: GetState<T>
   subscribe: Subscribe<T>
   destroy: Destroy
-  useStore: UseStore<T> // This allows namespace pattern
 }
-
-// For server-side rendering: https://github.com/react-spring/zustand/pull/34
-const useIsoLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): UseStore<TState> {
-  let state: TState
-  const listeners: Set<(s: any) => void> = new Set()
-
-  const setState: SetState<TState> = (partial, replace) => {
-    const nextState = typeof partial === 'function' ? partial(state) : partial
-
-    if (nextState !== state) {
-      if (replace) {
-        state = nextState as TState
-      } else {
-        state = Object.assign({}, state, nextState)
-      }
-      listeners.forEach(listener => listener(state))
-    }
-  }
-
-  const getState: GetState<TState> = () => state
-
-  const subscribeWithSelector = <StateSlice>(
-    listener: StateSliceListener<StateSlice>,
-    selector: StateSelector<TState, StateSlice> = getState,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
-  ) => {
-    let currentSlice: StateSlice = selector(state)
-    function listenerToAdd() {
-      // Selector or equality function could throw but we don't want to stop
-      // the listener from being called.
-      // https://github.com/react-spring/zustand/pull/37
-      try {
-        const newStateSlice = selector(state)
-        if (!equalityFn(currentSlice, newStateSlice)) {
-          listener((currentSlice = newStateSlice))
-        }
-      } catch (error) {
-        listener(null, error)
-      }
-    }
-    listeners.add(listenerToAdd)
-    const unsubscribe = () => {
-      listeners.delete(listenerToAdd)
-    }
-    return unsubscribe
-  }
-
-  const subscribe: Subscribe<TState> = <StateSlice>(
-    listener: StateListener<TState> | StateSliceListener<StateSlice>,
-    selector?: StateSelector<TState, StateSlice>,
-    equalityFn?: EqualityChecker<StateSlice>
-  ) => {
-    if (selector || equalityFn) {
-      return subscribeWithSelector(
-        listener as StateSliceListener<StateSlice>,
-        selector,
-        equalityFn
-      )
-    }
-    listeners.add(listener)
-    const unsubscribe = () => {
-      listeners.delete(listener)
-    }
-    return unsubscribe
-  }
-
-  const destroy: Destroy = () => listeners.clear()
+  const api = createImpl(createState)
 
   const useStore: any = <StateSlice>(
-    selector: StateSelector<TState, StateSlice> = getState,
+    selector: StateSelector<TState, StateSlice> = api.getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     const forceUpdate = useReducer(c => c + 1, 0)[1] as () => void
@@ -129,7 +40,7 @@ export default function create<TState extends State>(
     const erroredRef = useRef(false)
 
     if (currentSliceRef.current === undefined) {
-      currentSliceRef.current = selector(state)
+      currentSliceRef.current = selector(api.getState())
     }
 
     let newStateSlice: StateSlice | undefined
@@ -144,7 +55,7 @@ export default function create<TState extends State>(
       erroredRef.current
     ) {
       // Using local variables to avoid mutations in the render phase.
-      newStateSlice = selector(state)
+      newStateSlice = selector(api.getState())
       hasNewStateSlice = !equalityFn(
         currentSliceRef.current as StateSlice,
         newStateSlice
@@ -164,7 +75,7 @@ export default function create<TState extends State>(
     useIsoLayoutEffect(() => {
       const listener = () => {
         try {
-          const nextStateSlice = selectorRef.current(state)
+          const nextStateSlice = selectorRef.current(api.getState())
           if (
             !equalityFnRef.current(
               currentSliceRef.current as StateSlice,
@@ -179,7 +90,7 @@ export default function create<TState extends State>(
           forceUpdate()
         }
       }
-      const unsubscribe = subscribe(listener)
+      const unsubscribe = api.subscribe(listener)
       return unsubscribe
     }, [])
 
@@ -188,10 +99,7 @@ export default function create<TState extends State>(
       : currentSliceRef.current
   }
 
-  const api = { setState, getState, subscribe, destroy }
-  state = createState(setState, getState, api)
-
-  Object.assign(useStore, api, { useStore })
+  Object.assign(useStore, api)
 
   // For backward compatibility (No TS types for this)
   useStore[Symbol.iterator] = function*() {
@@ -202,5 +110,3 @@ export default function create<TState extends State>(
 
   return useStore
 }
-
-export { create }
