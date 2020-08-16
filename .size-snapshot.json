@@ -1,6 +1,6 @@
 {
   "dist/index.js": {
-    "bundled": 3092,
+    "bundled": 3094,
     "minified": 1066,
     "gzipped": 568,
     "treeshaked": {

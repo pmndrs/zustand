@@ -48,7 +48,7 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): UseStore<TState> {
   let state: TState
-  let listeners: Set<StateListener<TState>> = new Set()
+  const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
     const nextState = typeof partial === 'function' ? partial(state) : partial
