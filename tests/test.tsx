@@ -393,6 +393,48 @@ it('can subscribe to the store', () => {
   })
   setState({ ...getState() })
   unsub()
+
+  // Should not be called when state slice is the same
+  unsub = subscribe(
+    () => {
+      throw new Error('subscriber called when new state is the same')
+    },
+    s => s.value
+  )
+  setState({ other: 'b' })
+  unsub()
+
+  // Should be called when state slice changes
+  unsub = subscribe(
+    (value: number | null) => {
+      expect(value).toBe(initialState.value + 1)
+    },
+    s => s.value
+  )
+  setState({ value: initialState.value + 1 })
+  unsub()
+
+  // Should not be called when equality checker returns true
+  unsub = subscribe(
+    () => {
+      throw new Error('subscriber called when equality checker returned true')
+    },
+    undefined,
+    () => true
+  )
+  setState({ value: initialState.value + 2 })
+  unsub()
+
+  // Should be called when equality checker returns false
+  unsub = subscribe(
+    (value: number | null) => {
+      expect(value).toBe(initialState.value + 2)
+    },
+    s => s.value,
+    () => false
+  )
+  setState(getState())
+  unsub()
 })
 
 it('can destroy the store', () => {

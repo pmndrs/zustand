@@ -9,9 +9,15 @@ export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: any) => boolean
 
 export type StateListener<T> = (state: T) => void
-export type Subscribe<T extends State> = (
-  listener: StateListener<T>
-) => () => void
+export type StateSliceListener<T> = (state: T | null, error?: Error) => void
+export interface Subscribe<T extends State> {
+  (listener: StateListener<T>): () => void
+  <StateSlice>(
+    listener: StateSliceListener<StateSlice>,
+    selector: StateSelector<T, StateSlice>,
+    equalityFn?: EqualityChecker<StateSlice>
+  ): () => void
+}
 export type SetState<T extends State> = (
   partial: PartialState<T>,
   replace?: boolean
@@ -48,7 +54,7 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): UseStore<TState> {
   let state: TState
-  const listeners: Set<StateListener<TState>> = new Set()
+  const listeners: Set<(s: any) => void> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
     const nextState = typeof partial === 'function' ? partial(state) : partial
@@ -65,7 +71,44 @@ export default function create<TState extends State>(
 
   const getState: GetState<TState> = () => state
 
-  const subscribe: Subscribe<TState> = (listener: StateListener<TState>) => {
+  const subscribeWithSelector = <StateSlice>(
+    listener: StateSliceListener<StateSlice>,
+    selector: StateSelector<TState, StateSlice> = getState,
+    equalityFn: EqualityChecker<StateSlice> = Object.is
+  ) => {
+    let currentSlice: StateSlice = selector(state)
+    function listenerToAdd() {
+      // Selector or equality function could throw but we don't want to stop
+      // the listener from being called.
+      // https://github.com/react-spring/zustand/pull/37
+      try {
+        const newStateSlice = selector(state)
+        if (!equalityFn(currentSlice, newStateSlice)) {
+          listener((currentSlice = newStateSlice))
+        }
+      } catch (error) {
+        listener(null, error)
+      }
+    }
+    listeners.add(listenerToAdd)
+    const unsubscribe = () => {
+      listeners.delete(listenerToAdd)
+    }
+    return unsubscribe
+  }
+
+  const subscribe: Subscribe<TState> = <StateSlice>(
+    listener: StateListener<TState> | StateSliceListener<StateSlice>,
+    selector?: StateSelector<TState, StateSlice>,
+    equalityFn?: EqualityChecker<StateSlice>
+  ) => {
+    if (selector || equalityFn) {
+      return subscribeWithSelector(
+        listener as StateSliceListener<StateSlice>,
+        selector,
+        equalityFn
+      )
+    }
     listeners.add(listener)
     const unsubscribe = () => {
       listeners.delete(listener)
