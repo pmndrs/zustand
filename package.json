@@ -31,7 +31,7 @@
     "singleQuote": true,
     "jsxBracketSameLine": true,
     "tabWidth": 2,
-    "printWidth": 80
+    "printWidth": 120
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
