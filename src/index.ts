@@ -8,12 +8,16 @@ export type PartialState<T extends State> =
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: any) => boolean
 
-export type StateListener<T> = (state: T | null, error?: Error) => void
-export type Subscribe<T extends State> = <U>(
-  listener: StateListener<U>,
-  selector?: StateSelector<T, U>,
-  equalityFn?: EqualityChecker<U>
-) => () => void
+export type StateListener<T> = (state: T) => void
+export type StateSliceListener<T> = (state: T | null, error?: Error) => void
+export interface Subscribe<T extends State> {
+  (listener: StateListener<T>): () => void
+  <StateSlice>(
+    listener: StateSliceListener<StateSlice>,
+    selector: StateSelector<T, StateSlice>,
+    equalityFn?: EqualityChecker<StateSlice>
+  ): () => void
+}
 export type SetState<T extends State> = (
   partial: PartialState<T>,
   replace?: boolean
@@ -50,7 +54,7 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): UseStore<TState> {
   let state: TState
-  let listeners: Set<() => void> = new Set()
+  const listeners: Set<(s: any) => void> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
     const nextState = typeof partial === 'function' ? partial(state) : partial
@@ -61,14 +65,14 @@ export default function create<TState extends State>(
       } else {
         state = Object.assign({}, state, nextState)
       }
-      listeners.forEach(listener => listener())
+      listeners.forEach(listener => listener(state))
     }
   }
 
   const getState: GetState<TState> = () => state
 
-  const subscribe: Subscribe<TState> = <StateSlice>(
-    listener: StateListener<StateSlice>,
+  const subscribeWithSelector = <StateSlice>(
+    listener: StateSliceListener<StateSlice>,
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
@@ -93,51 +97,41 @@ export default function create<TState extends State>(
     return unsubscribe
   }
 
+  const subscribe: Subscribe<TState> = <StateSlice>(
+    listener: StateListener<TState> | StateSliceListener<StateSlice>,
+    selector?: StateSelector<TState, StateSlice>,
+    equalityFn?: EqualityChecker<StateSlice>
+  ) => {
+    if (selector || equalityFn) {
+      return subscribeWithSelector(
+        listener as StateSliceListener<StateSlice>,
+        selector,
+        equalityFn
+      )
+    }
+    listeners.add(listener)
+    const unsubscribe = () => {
+      listeners.delete(listener)
+    }
+    return unsubscribe
+  }
+
   const destroy: Destroy = () => listeners.clear()
 
   const useStore: any = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate: React.Dispatch<unknown> = useReducer(c => c + 1, 0)[1]
-    const subscriberRef = useRef<{
-      currentSlice: StateSlice
-      equalityFn: EqualityChecker<StateSlice>
-      errored: boolean
-      listener: StateListener<StateSlice>
-      selector: StateSelector<TState, StateSlice>
-      unsubscribe: () => void
-    }>()
+    const forceUpdate = useReducer(c => c + 1, 0)[1] as () => void
+    const currentSliceRef = useRef<StateSlice>()
+    const selectorRef = useRef(selector)
+    const equalityFnRef = useRef(equalityFn)
+    const erroredRef = useRef(false)
 
-    if (!subscriberRef.current) {
-      subscriberRef.current = {
-        currentSlice: selector(state),
-        equalityFn,
-        errored: false,
-        listener: () => {},
-        selector,
-        unsubscribe: () => {},
-      }
-      const subscriber = subscriberRef.current
-      subscriberRef.current.listener = (
-        nextSlice: StateSlice | null,
-        error?: Error
-      ) => {
-        if (error) {
-          subscriber.errored = true
-        } else {
-          subscriber.currentSlice = nextSlice as StateSlice
-        }
-        forceUpdate(undefined)
-      }
-      subscriberRef.current.unsubscribe = subscribe(
-        subscriber.listener,
-        subscriber.selector,
-        subscriber.equalityFn
-      )
+    if (currentSliceRef.current === undefined) {
+      currentSliceRef.current = selector(state)
     }
 
-    const subscriber = subscriberRef.current
     let newStateSlice: StateSlice | undefined
     let hasNewStateSlice = false
 
@@ -145,41 +139,53 @@ export default function create<TState extends State>(
     // they change. We also want legitimate errors to be visible so we re-run
     // them if they errored in the subscriber.
     if (
-      subscriber.selector !== selector ||
-      subscriber.equalityFn !== equalityFn ||
-      subscriber.errored
+      selectorRef.current !== selector ||
+      equalityFnRef.current !== equalityFn ||
+      erroredRef.current
     ) {
       // Using local variables to avoid mutations in the render phase.
       newStateSlice = selector(state)
-      hasNewStateSlice = !equalityFn(subscriber.currentSlice, newStateSlice)
+      hasNewStateSlice = !equalityFn(
+        currentSliceRef.current as StateSlice,
+        newStateSlice
+      )
     }
 
     // Syncing changes in useEffect.
     useIsoLayoutEffect(() => {
       if (hasNewStateSlice) {
-        subscriber.currentSlice = newStateSlice as StateSlice
+        currentSliceRef.current = newStateSlice as StateSlice
       }
-      subscriber.errored = false
-      if (
-        subscriber.selector !== selector ||
-        subscriber.equalityFn !== equalityFn
-      ) {
-        subscriber.unsubscribe()
-        subscriber.selector = selector
-        subscriber.equalityFn = equalityFn
-        subscriber.unsubscribe = subscribe(
-          subscriber.listener,
-          subscriber.selector,
-          subscriber.equalityFn
-        )
-      }
+      selectorRef.current = selector
+      equalityFnRef.current = equalityFn
+      erroredRef.current = false
     })
 
-    useIsoLayoutEffect(() => subscriber.unsubscribe, [])
+    useIsoLayoutEffect(() => {
+      const listener = () => {
+        try {
+          const nextStateSlice = selectorRef.current(state)
+          if (
+            !equalityFnRef.current(
+              currentSliceRef.current as StateSlice,
+              nextStateSlice
+            )
+          ) {
+            currentSliceRef.current = nextStateSlice
+            forceUpdate()
+          }
+        } catch (error) {
+          erroredRef.current = true
+          forceUpdate()
+        }
+      }
+      const unsubscribe = subscribe(listener)
+      return unsubscribe
+    }, [])
 
     return hasNewStateSlice
       ? (newStateSlice as StateSlice)
-      : subscriber.currentSlice
+      : currentSliceRef.current
   }
 
   const api = { setState, getState, subscribe, destroy }

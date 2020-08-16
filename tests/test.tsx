@@ -474,16 +474,16 @@ it('only calls selectors when necessary', async () => {
   }
 
   const { rerender, getByText } = render(<Component />)
-  await waitForElement(() => getByText('inline: 2'))
-  await waitForElement(() => getByText('static: 2'))
+  await waitForElement(() => getByText('inline: 1'))
+  await waitForElement(() => getByText('static: 1'))
 
   rerender(<Component />)
-  await waitForElement(() => getByText('inline: 3'))
-  await waitForElement(() => getByText('static: 2'))
+  await waitForElement(() => getByText('inline: 2'))
+  await waitForElement(() => getByText('static: 1'))
 
   act(() => setState({ a: 1, b: 1 }))
-  await waitForElement(() => getByText('inline: 6'))
-  await waitForElement(() => getByText('static: 3'))
+  await waitForElement(() => getByText('inline: 4'))
+  await waitForElement(() => getByText('static: 2'))
 })
 
 it('ensures parent components subscribe before children', async () => {
