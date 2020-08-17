@@ -14,7 +14,7 @@
     "react-dom": "^16.13.1",
     "react-postprocessing": "^1.1.4",
     "react-prism": "^4.3.2",
-    "react-scripts": "4.0.0-next.77",
+    "react-scripts": "3.4.3",
     "react-spring": "^8.0.27",
     "react-three-fiber": "^4.2.20",
     "react-three-gui": "^0.1.5",
@@ -24,9 +24,9 @@
     "zustand": "^2.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -51,5 +51,11 @@
     "jsxBracketSameLine": true,
     "tabWidth": 2,
     "printWidth": 120
+  },
+  "devDependencies": {
+    "customize-cra": "^1.0.0",
+    "customize-cra-react-refresh": "^1.1.0",
+    "react-app-rewired": "^2.1.6",
+    "webpack-bundle-analyzer": "^3.8.0"
   }
 }
