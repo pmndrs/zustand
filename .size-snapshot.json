@@ -63,9 +63,9 @@
     "gzipped": 763
   },
   "shallow.js": {
-    "bundled": 671,
-    "minified": 425,
-    "gzipped": 256
+    "bundled": 644,
+    "minified": 401,
+    "gzipped": 251
   },
   "middleware.js": {
     "bundled": 2039,
