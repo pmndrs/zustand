@@ -92,10 +92,20 @@ const person = usePersonStore(state => state.persons[currentUser])
 
 ## Memoizing selectors
 
-It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary re-subscriptions each update. For larger scale stores this can make a real difference and also allows React to optimize performance in concurrent mode.
+It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. For larger scale apps this can make a real difference. It also allows React to optimize performance in concurrent mode.
 
 ```jsx
 const foo = useStore(useCallback(state => state.foo[id], [id]))
+```
+
+*Note:* If a selector doesn't depend on props or other states, you can define it outside render function.
+
+```jsx
+// outside render
+const selectFoo = state => state.foo
+
+// inside render
+const foo = useStore(selectFoo)
 ```
 
 ## Async actions
