@@ -9,6 +9,7 @@ import createImpl, {
   StateCreator,
   StateSelector,
   Subscribe,
+  StoreApi,
 } from './vanilla'
 
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
@@ -25,9 +26,10 @@ export interface UseStore<T extends State> {
 }
 
 export default function create<TState extends State>(
-  createState: StateCreator<TState>
+  createState: StateCreator<TState> | StoreApi<TState>
 ): UseStore<TState> {
-  const api = createImpl(createState)
+  const api: StoreApi<TState> =
+    typeof createState === 'function' ? createImpl(createState) : createState
 
   const useStore: any = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = api.getState,
