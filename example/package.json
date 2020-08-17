@@ -21,7 +21,7 @@
     "three": "^0.119.1",
     "threejs-meshline": "^2.0.11",
     "web-vitals": "^0.2.2",
-    "zustand": "^2.2.4"
+    "zustand": "^3.0.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
