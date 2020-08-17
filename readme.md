@@ -11,11 +11,7 @@ Don't disregard it because it's cute. It has quite the claws, lots of time was s
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
 ```bash
-# with NPM
 npm install zustand
-
-# with Yarn
-yarn add zustand
 ```    
 
 ### First create a store
