@@ -13,14 +13,14 @@ export default function shallow<T extends any, U extends any>(
   ) {
     return false
   }
-  const keysA = Object.keys(objA)
-  if (keysA.length !== Object.keys(objB).length) {
+  const keysA = Object.keys(objA as object)
+  if (keysA.length !== Object.keys(objB as object).length) {
     return false
   }
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i]) ||
-      !Object.is(objA[keysA[i]], objB[keysA[i]])
+      !Object.is((objA as any)[keysA[i]], (objB as any)[keysA[i]]) // FIXME no-any
     ) {
       return false
     }

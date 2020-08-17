@@ -46,7 +46,7 @@ export default function create<TState extends State>(
       state = replace
         ? (nextState as TState)
         : Object.assign({}, state, nextState)
-      listeners.forEach(listener => listener(state))
+      listeners.forEach((listener) => listener(state))
     }
   }
 
