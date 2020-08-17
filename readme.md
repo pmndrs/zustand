@@ -126,7 +126,7 @@ const useStore = create((set, get) => ({
 Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
 ```jsx
-import produce from "immer"
+import produce from 'immer'
 
 const useStore = create(set => ({
   nested: { structure: { contains: { a: "value" } } },
