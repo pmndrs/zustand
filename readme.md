@@ -6,9 +6,9 @@
 
 Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
 
-Don't disregard it because of its cute size. It is quite powerful and lots of time was spent to deal with common pitfalls, like the dreaded [zombi child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It *may* be the only state-manager in the React space that gets all of these right.
+Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombi child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
-You can try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
+You can try a live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
     npm install zustand
 
@@ -26,7 +26,7 @@ const useStore = create(set => ({
 }))
 ```
 
-### Then bind your components, that's it!
+### Then bind your components, and that's it!
 
 Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
@@ -55,7 +55,7 @@ function Controls() {
 
 ## Fetching everything
 
-You can, but remember that it will cause the component to update on every state change!
+You can, but bear in mind that it will cause the component to update on every state change!
 
 ```jsx
 const state = useStore()
@@ -63,7 +63,7 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks.
+It detects changes with strict-equality (old === new) by default, this is efficient for atomic state picks.
 
 ```jsx
 const nuts = useStore(state => state.nuts)
@@ -121,7 +121,7 @@ import omit from "lodash-es/omit"
 const useStore = create(set => ({
   salmon: 1,
   tuna: 2,
-  deleteEverything: () => set({ }), true),
+  deleteEverything: () => set({ }), true), // clears the entire store, actions included
   deleteTuna: () => set(state => omit(state, ['tuna']), true)
 }))
 ```
@@ -189,7 +189,7 @@ unsub2()
 useStore.destroy()
 
 // You can of course use the hook as you always would
-function SomeComponent() {
+function Component() {
   const paw = useStore(state => state.paw)
 ```
 
@@ -244,8 +244,8 @@ const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, a
 
 const useStore = create(log(immer(set => ({
   bees: false,
-  setText: input => set(state => {
-    state.bees = true
+  setBees: input => set(state => {
+    state.bees = input
   })
 }))))
 ```
@@ -257,13 +257,13 @@ const types = { increase: "INCREASE", decrease: "DECREASE" }
 
 const reducer = (state, { type, by = 1 }) => {
   switch (type) {
-    case types.increase: return { count: state.count + by }
-    case types.decrease: return { count: state.count - by }
+    case types.increase: return { grumpiness: state.grumpiness + by }
+    case types.decrease: return { grumpiness: state.grumpiness - by }
   }
 }
 
 const useStore = create(set => ({
-  count: 0,
+  grumpiness: 0,
   dispatch: args => set(state => reducer(state, args)),
 }))
 
