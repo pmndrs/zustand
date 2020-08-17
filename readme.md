@@ -98,6 +98,21 @@ It is generally recommended to memoize selectors with useCallback. This will pre
 const foo = useStore(useCallback(state => state.foo[id], [id]))
 ```
 
+## Overwriting state
+
+The `set` function has a second argument, false by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
+
+```jsx
+import omit from "lodash-es/omit"
+
+const useStore = create(set => ({
+  foo: 1,
+  bar: 2,
+  deleteEverything: () => set({ }), true),
+  deleteFoo: () => set(state => omit(state, ['foo']), true)
+}))
+```
+
 ## Async actions
 
 Just call `set` when you're ready, it doesn't care if your actions are async or not.
