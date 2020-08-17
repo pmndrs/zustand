@@ -136,6 +136,8 @@ const useStore = create(set => ({
   fetch: async pond => {
     const response = await fetch(pond)
     set({ fishies: await response.json() })
+  }
+}))
 ```
 
 ## Read from state in actions
@@ -147,6 +149,8 @@ const useStore = create((set, get) => ({
   sound: "grunt",
   action: () => {
     const sound = get().sound
+  }
+})
 ```
 
 ## Reading/writing state and reacting to changes outside of components
