@@ -4,9 +4,9 @@
 
 ![Bundle Size](https://badgen.net/bundlephobia/minzip/zustand) [![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand) ![npm](https://img.shields.io/npm/dt/zustand.svg)
 
-Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, that isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
+Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
 
-Don't disregard it because of its cute size. It is powerful and lots of time was spent to solve common pitfalls, like the dreaded [zombi child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It *may* be the only state-manager in the React space that gets all of these right.
+Don't disregard it because of its cute size. It is quite powerful and lots of time was spent to deal with common pitfalls, like the dreaded [zombi child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It *may* be the only state-manager in the React space that gets all of these right.
 
 You can try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
