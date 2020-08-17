@@ -102,14 +102,13 @@ It is generally recommended to memoize selectors with useCallback. This will pre
 const foo = useStore(useCallback(state => state.foo[id], [id]))
 ```
 
-*Note:* If a selector doesn't depend on props or other states, you can define it outside render function.
+If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
 
 ```jsx
-// outside render
 const selectFoo = state => state.foo
 
-// inside render
-const foo = useStore(selectFoo)
+function Component() {
+  const foo = useStore(selectFoo)
 ```
 
 ## Overwriting state
