@@ -8,7 +8,7 @@
     "@testing-library/user-event": "^12.0.11",
     "drei": "^0.0.72",
     "postprocessing": "^6.16.0",
-    "prismjs": "1.2.0",
+    "prismjs": "1.21.0",
     "raw.macro": "^0.4.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
