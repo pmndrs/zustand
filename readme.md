@@ -20,9 +20,9 @@ Your store is a hook! You can put anything in it, atomics, objects, functions. T
 import create from 'zustand'
 
 const useStore = create(set => ({
-  count: 0,
-  increase: () => set(state => ({ count: state.count + 1 })),
-  reset: () => set({ count: 0 })
+  bears: 0,
+  increasePopulation: () => set(state => ({ count: state.bears + 1 })),
+  resetPopulation: () => set({ bears: 0 })
 }))
 ```
 
@@ -31,14 +31,14 @@ const useStore = create(set => ({
 Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
 ```jsx
-function Counter() {
-  const count = useStore(state => state.count)
-  return <h1>{count}</h1>
+function BearCounter() {
+  const bears = useStore(state => state.bears)
+  return <h1>{bears} around here ...</h1>
 }
 
 function Controls() {
-  const increase = useStore(state => state.increase)
-  return <button onClick={increase}>one up</button>
+  const increasePopulation = useStore(state => state.increasePopulation)
+  return <button onClick={increasePopulation}>one up</button>
 }
 ```
 
@@ -144,9 +144,9 @@ const useStore = create(set => ({
 
 ```jsx
 const useStore = create((set, get) => ({
-  text: "grunt",
+  sound: "grunt",
   action: () => {
-    const text = get().text
+    const sound = get().sound
 ```
 
 ## Sick of reducers and changing nested state? Use Immer!
@@ -157,7 +157,7 @@ Reducing nested structures is tiresome. Have you tried [immer](https://github.co
 import produce from 'immer'
 
 const useStore = create(set => ({
-  nested: { structure: { contains: { a: "value" } } },
+  nested: { structure: { contains: { a: "bear" } } },
   set: fn => set(produce(fn)),
 }))
 
@@ -172,16 +172,16 @@ set(state => {
 Sometimes you need to access the state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
 
 ```jsx
-const useStore = create(() => ({ a: 1, b: 2, c: 3 }))
+const useStore = create(() => ({ paw: true, snout: true, fur: true }))
 
 // Getting non-reactive fresh state
-const a = useStore.getState().a
+const paw = useStore.getState().paw
 // Listening to all changes, fires on every change
 const unsub1 = useStore.subscribe(console.log)
-// Listening to selected changes, in this case when "a" changes
-const unsub2 = useStore.subscribe(console.log, state => state.a)
+// Listening to selected changes, in this case when "paw" changes
+const unsub2 = useStore.subscribe(console.log, state => state.paw)
 // Updating state, will trigger listeners
-useStore.setState({ a: 10 })
+useStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
 unsub2()
@@ -190,7 +190,7 @@ useStore.destroy()
 
 // You can of course use the hook as you always would
 function SomeComponent() {
-  const a = useStore(state => state.a)
+  const paw = useStore(state => state.paw)
 ```
 
 ## Using zustand without React
