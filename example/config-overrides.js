@@ -8,6 +8,6 @@ module.exports = override(
     three$: path.resolve('./src/utils/three.js'),
     '../../../build/three.module.js': path.resolve('./src/utils/three.js'),
   }),
-  addReactRefresh(),
-  addWebpackPlugin(new BundleAnalyzerPlugin())
+  addReactRefresh()
+  //addWebpackPlugin(new BundleAnalyzerPlugin())
 )
