@@ -23,7 +23,7 @@ import create from 'zustand'
 
 const useStore = create(set => ({
   bears: 0,
-  increasePopulation: () => set(state => ({ count: state.bears + 1 })),
+  increasePopulation: () => set(state => ({ bears: state.bears + 1 })),
   resetPopulation: () => set({ bears: 0 })
 }))
 ```
@@ -139,6 +139,8 @@ const useStore = create(set => ({
   fetch: async pond => {
     const response = await fetch(pond)
     set({ fishies: await response.json() })
+  }
+}))
 ```
 
 ## Read from state in actions
@@ -150,6 +152,8 @@ const useStore = create((set, get) => ({
   sound: "grunt",
   action: () => {
     const sound = get().sound
+  }
+})
 ```
 
 ## Reading/writing state and reacting to changes outside of components
