@@ -4,43 +4,47 @@
 
 ![Bundle Size](https://badgen.net/bundlephobia/minzip/zustand) [![Build Status](https://travis-ci.org/react-spring/zustand.svg?branch=master)](https://travis-ci.org/react-spring/zustand) [![npm version](https://badge.fury.io/js/zustand.svg)](https://badge.fury.io/js/zustand) ![npm](https://img.shields.io/npm/dt/zustand.svg)
 
-Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, that isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like. Try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
+Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
+
+Don't disregard it because of its cute size. It is quite powerful and lots of time was spent to deal with common pitfalls, like the dreaded [zombi child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It *may* be the only state-manager in the React space that gets all of these right.
+
+You can try a small live demo [here](https://codesandbox.io/s/v8pjv251w7).
 
     npm install zustand
 
 ### First create a store
 
-Your store is a hook! You can put anything in it, atomics, objects, functions. Like Reacts setState, `set` *merges* state.
+Your store is a hook! You can put anything in it, atomics, objects, functions. The `set` function *merges* state.
 
 ```jsx
 import create from 'zustand'
 
-const [useStore] = create(set => ({
-  count: 0,
-  increase: () => set(state => ({ count: state.count + 1 })),
-  reset: () => set({ count: 0 })
+const useStore = create(set => ({
+  bears: 0,
+  increasePopulation: () => set(state => ({ count: state.bears + 1 })),
+  resetPopulation: () => set({ bears: 0 })
 }))
 ```
 
 ### Then bind your components, that's it!
 
-Use the hook anywhere, no providers needed. Once you have selected state your component will re-render on changes.
+Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
 ```jsx
-function Counter() {
-  const count = useStore(state => state.count)
-  return <h1>{count}</h1>
+function BearCounter() {
+  const bears = useStore(state => state.bears)
+  return <h1>{bears} around here ...</h1>
 }
 
 function Controls() {
-  const increase = useStore(state => state.increase)
-  return <button onClick={increase}>up</button>
+  const increasePopulation = useStore(state => state.increasePopulation)
+  return <button onClick={increasePopulation}>one up</button>
 }
 ```
 
 #### Why zustand over react-redux?
 
-* Simpler and un-opinionated
+* Simple and un-opinionated
 * Makes hooks the primary means of consuming state
 * Doesn't wrap your app into context providers
 * Can inform components transiently (without causing render)
@@ -62,8 +66,8 @@ const state = useStore()
 zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks.
 
 ```jsx
-const foo = useStore(state => state.foo)
-const bar = useStore(state => state.bar)
+const nuts = useStore(state => state.nuts)
+const honey = useStore(state => state.honey)
 ```
 
 If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing an alternative equality function.
@@ -72,13 +76,13 @@ If you want to construct a single object with multiple state-picks inside, simil
 import shallow from 'zustand/shallow'
 
 // Object pick, re-renders the component when either foo or bar change
-const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallow)
+const { nuts, honey } = useStore(state => ({ nuts: state.nuts, honey: state.honey }), shallow)
 
 // Array pick, re-renders the component when either foo or bar change
-const [foo, bar] = useStore(state => [state.foo, state.bar], shallow)
+const [nuts, honey] = useStore(state => [state.nuts, state.honey], shallow)
 
 // Mapped picks, re-renders the component when state.objects changes in order, count or keys
-const keys = useStore(state => Object.keys(state.objects), shallow)
+const treats = useStore(state => Object.keys(state.treats), shallow)
 ```
 
 ## Fetching from multiple stores
@@ -86,17 +90,40 @@ const keys = useStore(state => Object.keys(state.objects), shallow)
 Since you can create as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
 
 ```jsx
-const currentUser = useCredentialsStore(state => state.currentUser)
-const person = usePersonStore(state => state.persons[currentUser])
+const currentBear = useCredentialsStore(state => state.currentBear)
+const bear = useBearStore(state => state.bears[currentBear])
 ```
 
 ## Memoizing selectors
 
-Selectors run on state changes, as well as when the component renders. If you give zustand a fixed reference it will only run on state changes, or when the selector changes. Don't worry about this, unless your selector is expensive.
+It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
 
-```js
-const fooSelector = useCallback(state => state.foo[props.id], [props.id])
-const foo = useStore(fooSelector)
+```jsx
+const fruit = useStore(useCallback(state => state.fruits[id], [id]))
+```
+
+If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
+
+```jsx
+const selector = state => state.berries
+
+function Component() {
+  const berries = useStore(selector)
+```
+
+## Overwriting state
+
+The `set` function has a second argument, false by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
+
+```jsx
+import omit from "lodash-es/omit"
+
+const useStore = create(set => ({
+  salmon: 1,
+  tuna: 2,
+  deleteEverything: () => set({ }), true),
+  deleteTuna: () => set(state => omit(state, ['tuna']), true)
+}))
 ```
 
 ## Async actions
@@ -104,11 +131,11 @@ const foo = useStore(fooSelector)
 Just call `set` when you're ready, it doesn't care if your actions are async or not.
 
 ```jsx
-const [useStore] = create(set => ({
-  json: {},
-  fetch: async url => {
-    const response = await fetch(url)
-    set({ json: await response.json() })
+const useStore = create(set => ({
+  fishies: {},
+  fetch: async pond => {
+    const response = await fetch(pond)
+    set({ fishies: await response.json() })
 ```
 
 ## Read from state in actions
@@ -116,10 +143,10 @@ const [useStore] = create(set => ({
 `set` allows fn-updates `set(state => result)`, but you still have access to state outside of it through `get`.
 
 ```jsx
-const [useStore] = create((set, get) => ({
-  text: "hello",
+const useStore = create((set, get) => ({
+  sound: "grunt",
   action: () => {
-    const text = get().text
+    const sound = get().sound
 ```
 
 ## Sick of reducers and changing nested state? Use Immer!
@@ -127,10 +154,10 @@ const [useStore] = create((set, get) => ({
 Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
 ```jsx
-import produce from "immer"
+import produce from 'immer'
 
-const [useStore] = create(set => ({
-  nested: { structure: { contains: { a: "value" } } },
+const useStore = create(set => ({
+  nested: { structure: { contains: { a: "bear" } } },
   set: fn => set(produce(fn)),
 }))
 
@@ -142,38 +169,62 @@ set(state => {
 
 ## Reading/writing state and reacting to changes outside of components
 
-You can use it with or without React out of the box.
+Sometimes you need to access the state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
 
 ```jsx
-const [, api] = create(() => ({ a: 1, b: 2, c: 3 }))
+const useStore = create(() => ({ paw: true, snout: true, fur: true }))
 
-// Getting fresh state
-const a = api.getState().a
-// Listening to all changes, fires on every dispatch
-const unsub1 = api.subscribe(state => console.log("state changed", state))
-// Listening to selected changes
-const unsub2 = api.subscribe(a => console.log("a changed", a), state => state.a)
+// Getting non-reactive fresh state
+const paw = useStore.getState().paw
+// Listening to all changes, fires on every change
+const unsub1 = useStore.subscribe(console.log)
+// Listening to selected changes, in this case when "paw" changes
+const unsub2 = useStore.subscribe(console.log, state => state.paw)
 // Updating state, will trigger listeners
-api.setState({ a: 1 })
+useStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
 unsub2()
 // Destroying the store (removing all listeners)
-api.destroy()
+useStore.destroy()
+
+// You can of course use the hook as you always would
+function SomeComponent() {
+  const paw = useStore(state => state.paw)
+```
+
+## Using zustand without React
+
+Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
+
+```jsx
+import create from 'zustand/vanilla'
+
+const store = create(() => ({ ... }))
+const { getState, setState, subscribe, destroy } = store
+```
+
+You can even consume an existing vanilla store with React:
+
+```jsx
+import create from 'zustand'
+import vanillaStore from './vanillaStore'
+
+const useStore = create(vanillaStore)
 ```
 
 ## Transient updates (for often occuring state-changes)
 
-The api signature of subscribe(callback, selector):unsub allows you to easily bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference when you are allowed to mutate the view directly.
+The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
 ```jsx
-const [useStore, api] = create(set => ({ "0": [-10, 0], "1": [10, 5], ... }))
+const useStore = create(set => ({ scratches: 0, ... }))
 
-function Component({ id }) {
+function Component() {
   // Fetch initial state
-  const xy = useRef(api.getState()[id])
-  // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => api.subscribe(coords => (xy.current = coords), state => state[id]), [id])
+  const scratchRef = useRef(useStore.getState().scratches)
+  // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
+  useEffect(() => useStore.subscribe(scratches => (scratchRef.current = scratches), state => state.scratches), [])
 ```
 
 ## Middleware
@@ -191,10 +242,10 @@ const log = config => (set, get, api) => config(args => {
 // Turn the set method into an immer proxy
 const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
 
-const [useStore] = create(log(immer(set => ({
-  text: "hello",
+const useStore = create(log(immer(set => ({
+  bees: false,
   setText: input => set(state => {
-    state.text = input
+    state.bees = true
   })
 }))))
 ```
@@ -211,7 +262,7 @@ const reducer = (state, { type, by = 1 }) => {
   }
 }
 
-const [useStore] = create(set => ({
+const useStore = create(set => ({
   count: 0,
   dispatch: args => set(state => reducer(state, args)),
 }))
@@ -225,7 +276,7 @@ Or, just use our redux-middleware. It wires up your main-reducer, sets initial s
 ```jsx
 import { redux } from 'zustand/middleware'
 
-const [useStore] = create(redux(reducer, initialState))
+const useStore = create(redux(reducer, initialState))
 ```
 
 ## Redux devtools
@@ -234,9 +285,9 @@ const [useStore] = create(redux(reducer, initialState))
 import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
-const [useStore] = create(devtools(store))
+const useStore = create(devtools(store))
 // Usage with a redux store, it will log full action types
-const [useStore] = create(devtools(redux(reducer, initialState)))
+const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
