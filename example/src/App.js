@@ -114,7 +114,7 @@ export default function App() {
           </div>
         </div>
         <a href="https://github.com/drcmda/zustand" class="top-right" children="Github" />
-        <a href="https://twitter.com/0xca0a" class="bottom-right" children="Twitter" />
+        <a href="https://codesandbox.io/s/xgjtc" class="bottom-right" children="<Source />" />
         <a
           href="https://www.instagram.com/tina.henschel/"
           class="bottom-left"
