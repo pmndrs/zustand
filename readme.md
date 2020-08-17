@@ -187,16 +187,16 @@ const useStore = create(vanillaStore)
 
 ## Transient updates (for often occuring state-changes)
 
-The api signature of subscribe(callback, selector):unsub allows you to easily bind a component to a store without forcing it to re-render on state changes, you will be notified in a callback instead. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance difference when you are allowed to mutate the view directly.
+The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
 ```jsx
-const useStore = create(set => ({ "0": [-10, 0], "1": [10, 5], ... }))
+const useStore = create(set => ({ elapsedTime: 0, ... }))
 
-function Component({ id }) {
+function Component() {
   // Fetch initial state
-  const xy = useRef(useStore.getState()[id])
+  const time = useRef(useStore.getState().elapsedTime)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
-  useEffect(() => useStore.subscribe(coords => (xy.current = coords), state => state[id]), [id])
+  useEffect(() => useStore.subscribe(time => (time.current = time), state => elapsedTime), [])
 ```
 
 ## Middleware
