@@ -5,14 +5,24 @@ import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
 import typescript from 'rollup-plugin-typescript2'
 
 const createBabelConfig = require('./babel.config')
-
 const { root } = path.parse(process.cwd())
-const external = id => !id.startsWith('.') && !id.startsWith(root)
+const external = (id) => !id.startsWith('.') && !id.startsWith(root)
 const extensions = ['.js', '.ts', '.tsx']
-const getBabelOptions = targets => ({
-  ...createBabelConfig({ env: env => env === 'build' }, targets),
-  extensions,
-})
+const getBabelOptions = (targets) => {
+  const config = createBabelConfig({ env: (env) => env === 'build' }, targets)
+  if (targets.ie) {
+    config.plugins = [
+      ...config.plugins,
+      '@babel/plugin-transform-regenerator',
+      ['@babel/plugin-transform-runtime', { helpers: true, regenerator: true }],
+    ]
+  }
+  return {
+    ...config,
+    runtimeHelpers: targets.ie,
+    extensions,
+  }
+}
 
 function createESMConfig(input, output) {
   return {
@@ -52,6 +62,7 @@ function createIIFEConfig(input, output, globalName) {
       name: globalName,
       globals: {
         react: 'React',
+        '@babel/runtime/regenerator': 'regeneratorRuntime',
       },
     },
     external,

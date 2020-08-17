@@ -105,7 +105,9 @@ export default function create<TState extends State>(
 
   // For backward compatibility (No TS types for this)
   useStore[Symbol.iterator] = function* () {
-    console.warn('Tuple API is deprecated in v3 and will be removed in v4')
+    console.warn(
+      '[useStore, api] = create() is deprecated and will be removed in v4'
+    )
     yield useStore
     yield api
   }

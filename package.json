@@ -5,7 +5,7 @@
   "description": "🐻 Bear necessities for state management in React",
   "main": "index.cjs.js",
   "module": "index.js",
-  "types": "index.d.ts",
+  "types": "src/index.d.ts",
   "files": [
     "**"
   ],
@@ -52,7 +52,8 @@
   ],
   "author": "Paul Henschel",
   "contributors": [
-    "Jeremy Holcomb (https://github.com/JeremyRH)"
+    "Jeremy Holcomb (https://github.com/JeremyRH)",
+    "Daishi Kato (https://github.com/dai-shi)"
   ],
   "license": "MIT",
   "bugs": {
@@ -81,7 +82,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
+    "@babel/plugin-external-helpers": "^7.10.4",
     "@babel/plugin-transform-react-jsx": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.11.0",
     "@babel/plugin-transform-typescript": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
     "@testing-library/react": "^10.4.8",

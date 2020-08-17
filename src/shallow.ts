@@ -27,5 +27,3 @@ export default function shallow<T extends any, U extends any>(
   }
   return true
 }
-
-export { shallow }
