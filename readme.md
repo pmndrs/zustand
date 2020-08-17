@@ -66,8 +66,8 @@ const state = useStore()
 zustand defaults to strict-equality (old === new) to detect changes, this is efficient for atomic state picks.
 
 ```jsx
-const foo = useStore(state => state.foo)
-const bar = useStore(state => state.bar)
+const nuts = useStore(state => state.nuts)
+const honey = useStore(state => state.honey)
 ```
 
 If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing an alternative equality function.
@@ -76,13 +76,13 @@ If you want to construct a single object with multiple state-picks inside, simil
 import shallow from 'zustand/shallow'
 
 // Object pick, re-renders the component when either foo or bar change
-const { foo, bar } = useStore(state => ({ foo: state.foo, bar: state.bar }), shallow)
+const { nuts, honey } = useStore(state => ({ nuts: state.nuts, honey: state.honey }), shallow)
 
 // Array pick, re-renders the component when either foo or bar change
-const [foo, bar] = useStore(state => [state.foo, state.bar], shallow)
+const [nuts, honey] = useStore(state => [state.nuts, state.honey], shallow)
 
 // Mapped picks, re-renders the component when state.objects changes in order, count or keys
-const keys = useStore(state => Object.keys(state.objects), shallow)
+const treats = useStore(state => Object.keys(state.treats), shallow)
 ```
 
 ## Fetching from multiple stores
@@ -90,8 +90,8 @@ const keys = useStore(state => Object.keys(state.objects), shallow)
 Since you can create as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
 
 ```jsx
-const currentUser = useCredentialsStore(state => state.currentUser)
-const person = usePersonStore(state => state.persons[currentUser])
+const currentBear = useCredentialsStore(state => state.currentBear)
+const bear = useBearStore(state => state.bears[currentBear])
 ```
 
 ## Memoizing selectors
@@ -99,16 +99,16 @@ const person = usePersonStore(state => state.persons[currentUser])
 It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
 
 ```jsx
-const foo = useStore(useCallback(state => state.foo[id], [id]))
+const fruits = useStore(useCallback(state => state.fruits[id], [id]))
 ```
 
 If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
 
 ```jsx
-const selectFoo = state => state.foo
+const selector = state => state.berries
 
 function Component() {
-  const foo = useStore(selectFoo)
+  const berries = useStore(selector)
 ```
 
 ## Overwriting state
@@ -119,10 +119,10 @@ The `set` function has a second argument, false by default. Instead of merging, 
 import omit from "lodash-es/omit"
 
 const useStore = create(set => ({
-  foo: 1,
-  bar: 2,
+  salmon: 1,
+  tuna: 2,
   deleteEverything: () => set({ }), true),
-  deleteFoo: () => set(state => omit(state, ['foo']), true)
+  deleteTuna: () => set(state => omit(state, ['tuna']), true)
 }))
 ```
 
