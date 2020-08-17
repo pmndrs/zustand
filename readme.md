@@ -24,7 +24,7 @@ const useStore = create(set => ({
 
 ### Then bind your components, that's it!
 
-Use the hook anywhere, no providers needed. Once you have selected state your component will re-render on changes.
+Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
 ```jsx
 function Counter() {
