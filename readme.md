@@ -50,7 +50,6 @@ function Controls() {
 * Makes hooks the primary means of consuming state
 * Doesn't wrap your app in context providers
 * [Can inform components transiently (without causing render)](#transient-updates-for-often-occuring-state-changes)
-)
 
 ---
 
@@ -152,6 +151,7 @@ const useStore = create((set, get) => ({
   sound: "grunt",
   action: () => {
     const sound = get().sound
+    // ...
   }
 })
 ```
