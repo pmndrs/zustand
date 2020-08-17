@@ -6,15 +6,17 @@
 
 Small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
 
-Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombi child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
+Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurreny](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
-    npm install zustand
+```bash
+npm install zustand
+```    
 
 ### First create a store
 
-Your store is a hook! You can put anything in it, atomics, objects, functions. The `set` function *merges* state.
+Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function *merges* state.
 
 ```jsx
 import create from 'zustand'
@@ -46,8 +48,9 @@ function Controls() {
 
 * Simple and un-opinionated
 * Makes hooks the primary means of consuming state
-* Doesn't wrap your app into context providers
-* Can inform components transiently (without causing render)
+* Doesn't wrap your app in context providers
+* [Can inform components transiently (without causing render)](#transient-updates-for-often-occuring-state-changes)
+)
 
 ---
 
@@ -113,7 +116,7 @@ function Component() {
 
 ## Overwriting state
 
-The `set` function has a second argument, false by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
+The `set` function has a second argument, `false` by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
 
 ```jsx
 import omit from "lodash-es/omit"
@@ -128,7 +131,7 @@ const useStore = create(set => ({
 
 ## Async actions
 
-Just call `set` when you're ready, it doesn't care if your actions are async or not.
+Just call `set` when you're ready, zustand doesn't care if your actions are async or not.
 
 ```jsx
 const useStore = create(set => ({
