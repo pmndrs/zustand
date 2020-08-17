@@ -195,7 +195,7 @@ const useStore = create(set => ({ elapsedTime: 0, ... }))
 function Component() {
   // Fetch initial state
   const time = useRef(useStore.getState().elapsedTime)
-  // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
+  // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
   useEffect(() => useStore.subscribe(time => (time.current = time), state => elapsedTime), [])
 ```
 
