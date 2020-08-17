@@ -33,7 +33,7 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = api.getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate = useReducer(c => c + 1, 0)[1] as () => void
+    const forceUpdate = useReducer((c) => c + 1, 0)[1] as () => void
     const currentSliceRef = useRef<StateSlice>()
     const selectorRef = useRef(selector)
     const equalityFnRef = useRef(equalityFn)
@@ -102,7 +102,7 @@ export default function create<TState extends State>(
   Object.assign(useStore, api)
 
   // For backward compatibility (No TS types for this)
-  useStore[Symbol.iterator] = function*() {
+  useStore[Symbol.iterator] = function* () {
     console.warn('Tuple API is deprecated in v3 and will be removed in v4')
     yield useStore
     yield api
