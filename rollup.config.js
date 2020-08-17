@@ -70,4 +70,5 @@ export default [
   createIIFEConfig('src/index.ts', 'dist/index.iife.js', 'zustand'),
   createCommonJSConfig('src/shallow.ts', 'dist/shallow.js'),
   createCommonJSConfig('src/middleware.ts', 'dist/middleware.js'),
+  createCommonJSConfig('src/vanilla.ts', 'dist/vanilla.js'),
 ]
