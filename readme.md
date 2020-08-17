@@ -132,10 +132,10 @@ Just call `set` when you're ready, it doesn't care if your actions are async or 
 
 ```jsx
 const useStore = create(set => ({
-  json: {},
-  fetch: async url => {
-    const response = await fetch(url)
-    set({ json: await response.json() })
+  fishies: {},
+  fetch: async pond => {
+    const response = await fetch(pond)
+    set({ fishies: await response.json() })
 ```
 
 ## Read from state in actions
@@ -218,13 +218,13 @@ const useStore = create(vanillaStore)
 The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
 ```jsx
-const useStore = create(set => ({ elapsedTime: 0, ... }))
+const useStore = create(set => ({ scratches: 0, ... }))
 
 function Component() {
   // Fetch initial state
-  const time = useRef(useStore.getState().elapsedTime)
+  const scratchRef = useRef(useStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
-  useEffect(() => useStore.subscribe(time => (time.current = time), state => elapsedTime), [])
+  useEffect(() => useStore.subscribe(scratches => (scratchRef.current = scratches), state => state.scratches), [])
 ```
 
 ## Middleware
@@ -243,9 +243,9 @@ const log = config => (set, get, api) => config(args => {
 const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
 
 const useStore = create(log(immer(set => ({
-  text: "hello",
+  bees: false,
   setText: input => set(state => {
-    state.text = input
+    state.bees = true
   })
 }))))
 ```
