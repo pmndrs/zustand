@@ -99,7 +99,7 @@ const bear = useBearStore(state => state.bears[currentBear])
 It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
 
 ```jsx
-const fruits = useStore(useCallback(state => state.fruits[id], [id]))
+const fruit = useStore(useCallback(state => state.fruits[id], [id]))
 ```
 
 If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
@@ -144,7 +144,7 @@ const useStore = create(set => ({
 
 ```jsx
 const useStore = create((set, get) => ({
-  text: "hello",
+  text: "grunt",
   action: () => {
     const text = get().text
 ```
