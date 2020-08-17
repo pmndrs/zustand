@@ -77,13 +77,13 @@ If you want to construct a single object with multiple state-picks inside, simil
 ```jsx
 import shallow from 'zustand/shallow'
 
-// Object pick, re-renders the component when either foo or bar change
+// Object pick, re-renders the component when either state.nuts or state.honey change
 const { nuts, honey } = useStore(state => ({ nuts: state.nuts, honey: state.honey }), shallow)
 
-// Array pick, re-renders the component when either foo or bar change
+// Array pick, re-renders the component when either state.nuts or state.honey change
 const [nuts, honey] = useStore(state => [state.nuts, state.honey], shallow)
 
-// Mapped picks, re-renders the component when state.objects changes in order, count or keys
+// Mapped picks, re-renders the component when state.treats changes in order, count or keys
 const treats = useStore(state => Object.keys(state.treats), shallow)
 ```
 
