@@ -149,24 +149,6 @@ const useStore = create((set, get) => ({
     const sound = get().sound
 ```
 
-## Sick of reducers and changing nested state? Use Immer!
-
-Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
-
-```jsx
-import produce from 'immer'
-
-const useStore = create(set => ({
-  nested: { structure: { contains: { a: "bear" } } },
-  set: fn => set(produce(fn)),
-}))
-
-const set = useStore(state => state.set)
-set(state => {
-  state.nested.structure.contains = null
-})
-```
-
 ## Reading/writing state and reacting to changes outside of components
 
 Sometimes you need to access the state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
@@ -225,6 +207,24 @@ function Component() {
   const scratchRef = useRef(useStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
   useEffect(() => useStore.subscribe(scratches => (scratchRef.current = scratches), state => state.scratches), [])
+```
+
+## Sick of reducers and changing nested state? Use Immer!
+
+Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
+
+```jsx
+import produce from 'immer'
+
+const useStore = create(set => ({
+  nested: { structure: { contains: { a: "bear" } } },
+  set: fn => set(produce(fn)),
+}))
+
+const set = useStore(state => state.set)
+set(state => {
+  state.nested.structure.contains = null
+})
 ```
 
 ## Middleware
