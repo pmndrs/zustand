@@ -1,7 +1,10 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "3.0.0",
+  "version": "4.0.0-experimental.0",
+  "publishConfig": {
+    "tag": "experimental"
+  },
   "description": "🐻 Bear necessities for state management in React",
   "main": "index.cjs.js",
   "module": "index.js",
@@ -97,8 +100,8 @@
     "json": "^9.0.6",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^0.0.0-experimental-94c0244ba",
+    "react-dom": "^0.0.0-experimental-94c0244ba",
     "rimraf": "^3.0.2",
     "rollup": "^2.26.3",
     "rollup-plugin-babel": "^4.4.0",
@@ -108,6 +111,6 @@
     "typescript": "^3.9.7"
   },
   "peerDependencies": {
-    "react": ">=16.8"
+    "react": "experimental"
   }
 }
