@@ -36,8 +36,8 @@ export default function create<TState extends State>(
 
   const source = createMutableSource(api, () => api.getState())
 
-  const FUNCTION_SYNBOL = Symbol()
-  const functionMap = new WeakMap<Function, { [FUNCTION_SYNBOL]: Function }>()
+  const FUNCTION_SYMBOL = Symbol()
+  const functionMap = new WeakMap<Function, { [FUNCTION_SYMBOL]: Function }>()
 
   const useStore: any = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = api.getState,
@@ -63,7 +63,7 @@ export default function create<TState extends State>(
           if (functionMap.has(slice)) {
             return functionMap.get(slice)
           }
-          const wrappedFunction = { [FUNCTION_SYNBOL]: slice }
+          const wrappedFunction = { [FUNCTION_SYMBOL]: slice }
           functionMap.set(slice, wrappedFunction)
           return wrappedFunction
         }
@@ -73,9 +73,9 @@ export default function create<TState extends State>(
     const snapshot = useMutableSource(source, getSnapshot, api.subscribe)
     if (
       snapshot &&
-      (snapshot as { [FUNCTION_SYNBOL]: unknown })[FUNCTION_SYNBOL]
+      (snapshot as { [FUNCTION_SYMBOL]: unknown })[FUNCTION_SYMBOL]
     ) {
-      return snapshot[FUNCTION_SYNBOL]
+      return snapshot[FUNCTION_SYMBOL]
     }
     return snapshot
   }
