@@ -214,14 +214,14 @@ it('can update the equality checker', async () => {
 
   // This will cause a re-render due to the equality checker.
   act(() => setState({ value: 0 }))
-  await waitForElement(() => getByText('renderCount: 2, value: 0'))
+  await waitForElement(() => getByText('renderCount: 1, value: 0'))
 
   // Set an equality checker that always returns true to never re-render.
   rerender(<Component equalityFn={() => true} />)
 
   // This will NOT cause a re-render due to the equality checker.
   act(() => setState({ value: 1 }))
-  await waitForElement(() => getByText('renderCount: 3, value: 0'))
+  await waitForElement(() => getByText('renderCount: 2, value: 0'))
 })
 
 it('can call useStore with progressively more arguments', async () => {
@@ -299,7 +299,8 @@ it('can throw an error in selector', async () => {
   act(() => {
     setState({})
   })
-  await waitForElement(() => getByText('errored'))
+  // in v4 with uMS, we don't use equalityFn in render
+  // await waitForElement(() => getByText('errored'))
 })
 
 it('can throw an error in equality checker', async () => {
@@ -340,7 +341,8 @@ it('can throw an error in equality checker', async () => {
   act(() => {
     setState({})
   })
-  await waitForElement(() => getByText('errored'))
+  // in v4 with uMS, we don't use equalityFn in render
+  // await waitForElement(() => getByText('errored'))
 })
 
 it('can get the store', () => {
@@ -460,6 +462,7 @@ it('only calls selectors when necessary', async () => {
   const useStore = create(() => ({ a: 0, b: 0 }))
   const { setState } = useStore
   let inlineSelectorCallCount = 0
+  let callbackSelectorCallCount = 0
   let staticSelectorCallCount = 0
 
   function staticSelector(s: any) {
@@ -469,10 +472,12 @@ it('only calls selectors when necessary', async () => {
 
   function Component() {
     useStore((s) => (inlineSelectorCallCount++, s.b))
+    useStore(React.useCallback((s) => (callbackSelectorCallCount++, s.b), []))
     useStore(staticSelector)
     return (
       <>
         <div>inline: {inlineSelectorCallCount}</div>
+        <div>callback: {callbackSelectorCallCount}</div>
         <div>static: {staticSelectorCallCount}</div>
       </>
     )
@@ -480,15 +485,18 @@ it('only calls selectors when necessary', async () => {
 
   const { rerender, getByText } = render(<Component />)
   await waitForElement(() => getByText('inline: 1'))
+  await waitForElement(() => getByText('callback: 1'))
   await waitForElement(() => getByText('static: 1'))
 
   rerender(<Component />)
-  await waitForElement(() => getByText('inline: 2'))
-  await waitForElement(() => getByText('static: 1'))
+  await waitForElement(() => getByText('inline: 3'))
+  await waitForElement(() => getByText('callback: 2'))
+  await waitForElement(() => getByText('static: 2'))
 
   act(() => setState({ a: 1, b: 1 }))
-  await waitForElement(() => getByText('inline: 4'))
-  await waitForElement(() => getByText('static: 2'))
+  await waitForElement(() => getByText('inline: 5'))
+  await waitForElement(() => getByText('callback: 3'))
+  await waitForElement(() => getByText('static: 3'))
 })
 
 it('ensures parent components subscribe before children', async () => {

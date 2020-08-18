@@ -44,13 +44,15 @@ export default function create<TState extends State>(
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     const getSnapshot = useMemo(() => {
-      let currentSlice = selector(api.getState())
+      let lastSlice: StateSlice | undefined
       return () => {
-        let slice = currentSlice
+        let slice = lastSlice
         try {
           slice = selector(api.getState())
-          if (!equalityFn(currentSlice, slice)) {
-            currentSlice = slice
+          if (lastSlice !== undefined && equalityFn(lastSlice, slice)) {
+            slice = lastSlice
+          } else {
+            lastSlice = slice
           }
         } catch (error) {
           // ignore and let react reschedule update
