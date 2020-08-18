@@ -38,7 +38,7 @@ const devtools = (fn: any, prefix?: string) => (
   }
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
-    api.devtools = extension.connect()
+    api.devtools = extension.connect({ name: prefix })
     api.devtools.prefix = prefix ? `${prefix} > ` : ''
     api.devtools.subscribe((message: any) => {
       if (message.type === 'DISPATCH' && message.state) {

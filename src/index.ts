@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useMemo,
   // @ts-ignore
   unstable_createMutableSource as createMutableSource,
@@ -7,37 +6,18 @@ import {
   unstable_useMutableSource as useMutableSource,
 } from 'react'
 
-export type State = Record<string | number | symbol, any>
-export type PartialState<T extends State> =
-  | Partial<T>
-  | ((state: T) => Partial<T>)
-  | ((state: T) => void) // for immer https://github.com/react-spring/zustand/pull/99
-export type StateSelector<T extends State, U> = (state: T) => U
-export type EqualityChecker<T> = (state: T, newState: any) => boolean
-
-export type StateListener<T> = (state: T | null, error?: Error) => void
-export type Subscribe<T extends State> = <U>(
-  listener: StateListener<U>,
-  selector?: StateSelector<T, U>,
-  equalityFn?: EqualityChecker<U>
-) => () => void
-export type SetState<T extends State> = (
-  partial: PartialState<T>,
-  replace?: boolean
-) => void
-export type GetState<T extends State> = () => T
-export type Destroy = () => void
-export interface StoreApi<T extends State> {
-  setState: SetState<T>
-  getState: GetState<T>
-  subscribe: Subscribe<T>
-  destroy: Destroy
-}
-export type StateCreator<T extends State> = (
-  set: SetState<T>,
-  get: GetState<T>,
-  api: StoreApi<T>
-) => T
+export * from './vanilla'
+import createImpl, {
+  Destroy,
+  EqualityChecker,
+  GetState,
+  SetState,
+  State,
+  StateCreator,
+  StateSelector,
+  Subscribe,
+  StoreApi,
+} from './vanilla'
 
 export interface UseStore<T extends State> {
   (): T
@@ -46,103 +26,49 @@ export interface UseStore<T extends State> {
   getState: GetState<T>
   subscribe: Subscribe<T>
   destroy: Destroy
-  useStore: UseStore<T> // This allows namespace pattern
 }
 
 export default function create<TState extends State>(
-  createState: StateCreator<TState>
+  createState: StateCreator<TState> | StoreApi<TState>
 ): UseStore<TState> {
-  let state: TState
-  let listeners: Set<() => void> = new Set()
+  const api: StoreApi<TState> =
+    typeof createState === 'function' ? createImpl(createState) : createState
 
-  const setState: SetState<TState> = (partial, replace) => {
-    const nextState = typeof partial === 'function' ? partial(state) : partial
-    if (nextState !== state) {
-      if (replace) {
-        state = nextState as TState
-      } else {
-        state = Object.assign({}, state, nextState)
-      }
-      listeners.forEach(listener => listener())
-    }
-  }
-
-  const getState: GetState<TState> = () => state
-
-  const subscribe: Subscribe<TState> = <StateSlice>(
-    listener: StateListener<StateSlice>,
-    selector: StateSelector<TState, StateSlice> = getState,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
-  ) => {
-    let currentSlice: StateSlice = selector(state)
-    function listenerToAdd() {
-      // Selector or equality function could throw but we don't want to stop
-      // the listener from being called.
-      // https://github.com/react-spring/zustand/pull/37
-      try {
-        const newStateSlice = selector(state)
-        if (!equalityFn(currentSlice, newStateSlice)) {
-          listener((currentSlice = newStateSlice))
-        }
-      } catch (error) {
-        listener(null, error)
-      }
-    }
-    listeners.add(listenerToAdd)
-    const unsubscribe = () => {
-      listeners.delete(listenerToAdd)
-    }
-    return unsubscribe
-  }
-
-  const destroy: Destroy = () => {
-    listeners.clear()
-  }
-
-  // The first param can be anything stable within this closure
-  const source = createMutableSource(getState, () => state)
+  const source = createMutableSource(api, () => api.getState())
 
   const FUNCTION_SYNBOL = Symbol()
   const functionMap = new WeakMap<Function, { [FUNCTION_SYNBOL]: Function }>()
 
   const useStore: any = <StateSlice>(
-    selector: StateSelector<TState, StateSlice> = getState,
+    selector: StateSelector<TState, StateSlice> = api.getState,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    // cache to avoid double invoking selector
-    const cachedSlices = useMemo(() => new WeakMap<TState, StateSlice>(), [
-      selector,
-      equalityFn,
-    ])
-    const sub = useCallback(
-      (_, callback) => {
-        const listener = (nextSlice: StateSlice | null, error?: Error) => {
-          if (!error) {
-            cachedSlices.set(state, nextSlice as StateSlice)
+    const getSnapshot = useMemo(() => {
+      let currentSlice = selector(api.getState())
+      return () => {
+        let slice = currentSlice
+        try {
+          slice = selector(api.getState())
+          if (!equalityFn(currentSlice, slice)) {
+            currentSlice = slice
           }
-          callback()
+        } catch (error) {
+          // ignore and let react reschedule update
         }
-        return subscribe(listener, selector, equalityFn)
-      },
-      [selector, equalityFn]
-    )
-    const getSnapshot = useCallback(() => {
-      const slice = cachedSlices.has(state)
-        ? (cachedSlices.get(state) as StateSlice)
-        : selector(state)
-      // Unfortunately, returning a function is not supported
-      // https://github.com/facebook/react/issues/18823
-      if (typeof slice === 'function') {
-        if (functionMap.has(slice)) {
-          return functionMap.get(slice)
+        // Unfortunately, returning a function is not supported
+        // https://github.com/facebook/react/issues/18823
+        if (typeof slice === 'function') {
+          if (functionMap.has(slice)) {
+            return functionMap.get(slice)
+          }
+          const wrappedFunction = { [FUNCTION_SYNBOL]: slice }
+          functionMap.set(slice, wrappedFunction)
+          return wrappedFunction
         }
-        const wrappedFunction = { [FUNCTION_SYNBOL]: slice }
-        functionMap.set(slice, wrappedFunction)
-        return wrappedFunction
+        return slice
       }
-      return slice
-    }, [selector])
-    const snapshot = useMutableSource(source, getSnapshot, sub)
+    }, [selector, equalityFn])
+    const snapshot = useMutableSource(source, getSnapshot, api.subscribe)
     if (
       snapshot &&
       (snapshot as { [FUNCTION_SYNBOL]: unknown })[FUNCTION_SYNBOL]
@@ -152,12 +78,7 @@ export default function create<TState extends State>(
     return snapshot
   }
 
-  const api = { setState, getState, subscribe, destroy }
-  state = createState(setState, getState, api)
-
-  Object.assign(useStore, api, { useStore })
+  Object.assign(useStore, api)
 
   return useStore
 }
-
-export { create }

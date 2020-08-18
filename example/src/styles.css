@@ -1,0 +1,258 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  overflow: hidden;
+  background: #010101;
+}
+
+#root {
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+  helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+}
+
+.main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: white;
+  pointer-events: none;
+}
+
+.main > div {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.bg {
+  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/DWLR-bg.jpg');
+}
+
+.stars {
+  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/OiNX-stars.png');
+}
+
+.ground {
+  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/xyC5-ground.png');
+}
+
+.code {
+  position: relative;
+  margin-left: -140px;
+  left: 50%;
+  width: 50% !important;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.code-container {
+  position: absolute;
+}
+
+.counter {
+  position: absolute;
+  top: -100px;
+  right: -40px;
+  color: white;
+  background: #394a52;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
+  width: 120px;
+  height: 120px;
+  font-size: 3em;
+  z-index: 20000;
+  pointer-events: all;
+}
+
+.counter > span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-top: -10px;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.counter > button {
+  margin: 10px;
+  padding: 5px 10px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100px;
+  border-radius: 5px;
+  border: solid 2px white;
+  outline: none;
+  background:transparent;
+  color: white;
+  cursor: pointer;
+}
+
+.bear {
+  top: 12.5%;
+  height: 80% !important;
+  min-height: 600px;
+  left: -19%;
+  background-size: 1000px !important;
+  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/TiR4-bear.png');
+}
+
+.leaves1 {
+  left: -2.5%;
+  top: -2.5%;
+  width: 105% !important;
+  height: 105% !important;
+  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/zjhf-leaves1.png');
+}
+
+.leaves2 {
+  left: -2.5%;
+  top: -2.5%;
+  width: 105% !important;
+  height: 105% !important;
+  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/3n-p-leaves2.png');
+}
+
+code {
+  margin-top: -50px;
+  display: inline-block;
+  width: auto !important;
+  padding: 40px 50px 40px 45px !important;
+  font-size: 0.8em;
+  border-radius: 10px !important;
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
+}
+
+span.header-left {
+  font-weight: 700;
+  text-transform: uppercase;
+  position: absolute;
+  display: inline-block;
+  top: 40px;
+  left: 40px;
+  font-size: 3em;
+  color: white;
+}
+
+@media only screen and (max-width: 1200px) {
+  .bear {
+    left: -20%;
+  }
+}
+
+@media only screen and (max-width: 1140px) {
+  .bear {
+    left: -25%;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .bear {
+    left: -20%;
+  }
+  .code {
+    justify-content: center;
+    width: 100% !important;
+    left: 0;
+    z-index: 1000;
+    margin-left: 0;
+  }
+  code {
+    font-size: 0.8em;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  code {
+    font-size: 0.6em;
+  }
+}
+
+a {
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: inherit;
+  position: absolute;
+  display: inline;
+  text-decoration: none;
+  z-index: 1;
+  pointer-events: all;
+}
+
+a.top-left {
+  font-size: 0.8em;
+  top: 90px;
+  left: 40px;
+}
+
+a.top-right {
+  top: 40px;
+  right: 40px;
+}
+
+a.bottom-left {
+  bottom: 40px;
+  left: 40px;
+}
+
+a.bottom-right {
+  bottom: 40px;
+  right: 40px;
+}
+
+@media only screen and (max-width: 500px) {
+  code {
+    font-size: 0.4em;
+  }
+  span.header-left {
+    top: 20px;
+    left: 20px;
+  }
+  a.top-left {
+    top: 70px;
+    left: 20px;
+  }
+
+  a.top-right {
+    top: 20px;
+    right: 20px;
+  }
+
+  a.bottom-left {
+    bottom: 20px;
+    left: 20px;
+  }
+
+  a.bottom-right {
+    bottom: 20px;
+    right: 20px;
+  }
+}
