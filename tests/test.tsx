@@ -1,12 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  waitForElement,
-} from '@testing-library/react'
+import { act, cleanup, fireEvent, render } from '@testing-library/react'
 import create, {
   State,
   StateListener,
@@ -21,7 +15,7 @@ import create, {
   UseStore,
   StoreApi,
 } from '../src/index'
-import { devtools, redux } from '../src/middleware'
+// import { devtools, redux } from '../src/middleware'
 
 const consoleError = console.error
 afterEach(() => {
@@ -64,9 +58,9 @@ it('uses the store with no args', async () => {
     return <div>count: {count}</div>
   }
 
-  const { getByText } = render(<Counter />)
+  const { findByText } = render(<Counter />)
 
-  await waitForElement(() => getByText('count: 1'))
+  await findByText('count: 1')
 })
 
 it('uses the store with selectors', async () => {
@@ -82,9 +76,9 @@ it('uses the store with selectors', async () => {
     return <div>count: {count}</div>
   }
 
-  const { getByText } = render(<Counter />)
+  const { findByText } = render(<Counter />)
 
-  await waitForElement(() => getByText('count: 1'))
+  await findByText('count: 1')
 })
 
 it('uses the store with a selector and equality checker', async () => {
@@ -105,17 +99,17 @@ it('uses the store with a selector and equality checker', async () => {
     )
   }
 
-  const { getByText } = render(<Component />)
+  const { findByText } = render(<Component />)
 
-  await waitForElement(() => getByText('renderCount: 1, value: 0'))
+  await findByText('renderCount: 1, value: 0')
 
   // This will not cause a re-render.
   act(() => setState({ value: 1 }))
-  await waitForElement(() => getByText('renderCount: 1, value: 0'))
+  await findByText('renderCount: 1, value: 0')
 
   // This will cause a re-render.
   act(() => setState({ value: 2 }))
-  await waitForElement(() => getByText('renderCount: 2, value: 2'))
+  await findByText('renderCount: 2, value: 2')
 })
 
 it('only re-renders if selected state has changed', async () => {
@@ -138,7 +132,7 @@ it('only re-renders if selected state has changed', async () => {
     return <button onClick={inc}>button</button>
   }
 
-  const { getByText } = render(
+  const { getByText, findByText } = render(
     <>
       <Counter />
       <Control />
@@ -147,7 +141,7 @@ it('only re-renders if selected state has changed', async () => {
 
   fireEvent.click(getByText('button'))
 
-  await waitForElement(() => getByText('count: 1'))
+  await findByText('count: 1')
 
   expect(counterRenderCount).toBe(2)
   expect(controlRenderCount).toBe(1)
@@ -170,9 +164,9 @@ it('can batch updates', async () => {
     return <div>count: {count}</div>
   }
 
-  const { getByText } = render(<Counter />)
+  const { findByText } = render(<Counter />)
 
-  await waitForElement(() => getByText('count: 2'))
+  await findByText('count: 2')
 })
 
 it('can update the selector', async () => {
@@ -185,13 +179,13 @@ it('can update the selector', async () => {
     return <div>{useStore(selector)}</div>
   }
 
-  const { getByText, rerender } = render(
+  const { findByText, rerender } = render(
     <Component selector={(s: any) => s.one} />
   )
-  await waitForElement(() => getByText('one'))
+  await findByText('one')
 
   rerender(<Component selector={(s: any) => s.two} />)
-  await waitForElement(() => getByText('two'))
+  await findByText('two')
 })
 
 it('can update the equality checker', async () => {
@@ -210,18 +204,20 @@ it('can update the equality checker', async () => {
   }
 
   // Set an equality checker that always returns false to always re-render.
-  const { getByText, rerender } = render(<Component equalityFn={() => false} />)
+  const { findByText, rerender } = render(
+    <Component equalityFn={() => false} />
+  )
 
   // This will cause a re-render due to the equality checker.
   act(() => setState({ value: 0 }))
-  await waitForElement(() => getByText('renderCount: 2, value: 0'))
+  await findByText('renderCount: 2, value: 0')
 
   // Set an equality checker that always returns true to never re-render.
   rerender(<Component equalityFn={() => true} />)
 
   // This will NOT cause a re-render due to the equality checker.
   act(() => setState({ value: 1 }))
-  await waitForElement(() => getByText('renderCount: 3, value: 0'))
+  await findByText('renderCount: 3, value: 0')
 })
 
 it('can call useStore with progressively more arguments', async () => {
@@ -239,12 +235,12 @@ it('can call useStore with progressively more arguments', async () => {
   }
 
   // Render with no args.
-  const { getByText, rerender } = render(<Component />)
-  await waitForElement(() => getByText('renderCount: 1, value: {"value":0}'))
+  const { findByText, rerender } = render(<Component />)
+  await findByText('renderCount: 1, value: {"value":0}')
 
   // Render with selector.
   rerender(<Component selector={(s: any) => s.value} />)
-  await waitForElement(() => getByText('renderCount: 2, value: 0'))
+  await findByText('renderCount: 2, value: 0')
 
   // Render with selector and equality checker.
   rerender(
@@ -256,10 +252,10 @@ it('can call useStore with progressively more arguments', async () => {
 
   // Should not cause a re-render because new value is less than previous.
   act(() => setState({ value: -1 }))
-  await waitForElement(() => getByText('renderCount: 3, value: 0'))
+  await findByText('renderCount: 3, value: 0')
 
   act(() => setState({ value: 1 }))
-  await waitForElement(() => getByText('renderCount: 4, value: 1'))
+  await findByText('renderCount: 4, value: 1')
 })
 
 it('can throw an error in selector', async () => {
@@ -288,18 +284,18 @@ it('can throw an error in selector', async () => {
     return <div>no error</div>
   }
 
-  const { getByText } = render(
+  const { findByText } = render(
     <ErrorBoundary>
       <Component />
     </ErrorBoundary>
   )
-  await waitForElement(() => getByText('no error'))
+  await findByText('no error')
 
   delete initialState.value
   act(() => {
     setState({})
   })
-  await waitForElement(() => getByText('errored'))
+  await findByText('errored')
 })
 
 it('can throw an error in equality checker', async () => {
@@ -329,18 +325,18 @@ it('can throw an error in equality checker', async () => {
     return <div>no error</div>
   }
 
-  const { getByText } = render(
+  const { findByText } = render(
     <ErrorBoundary>
       <Component />
     </ErrorBoundary>
   )
-  await waitForElement(() => getByText('no error'))
+  await findByText('no error')
 
   delete initialState.value
   act(() => {
     setState({})
   })
-  await waitForElement(() => getByText('errored'))
+  await findByText('errored')
 })
 
 it('can get the store', () => {
@@ -372,7 +368,7 @@ it('can set the store', () => {
 })
 
 it('can set the store without merging', () => {
-  const { setState, getState } = create((set) => ({
+  const { setState, getState } = create((_set) => ({
     a: 1,
   }))
 
@@ -478,17 +474,17 @@ it('only calls selectors when necessary', async () => {
     )
   }
 
-  const { rerender, getByText } = render(<Component />)
-  await waitForElement(() => getByText('inline: 1'))
-  await waitForElement(() => getByText('static: 1'))
+  const { rerender, findByText } = render(<Component />)
+  await findByText('inline: 1')
+  await findByText('static: 1')
 
   rerender(<Component />)
-  await waitForElement(() => getByText('inline: 2'))
-  await waitForElement(() => getByText('static: 1'))
+  await findByText('inline: 2')
+  await findByText('static: 1')
 
   act(() => setState({ a: 1, b: 1 }))
-  await waitForElement(() => getByText('inline: 4'))
-  await waitForElement(() => getByText('static: 2'))
+  await findByText('inline: 4')
+  await findByText('static: 2')
 })
 
 it('ensures parent components subscribe before children', async () => {
@@ -525,11 +521,11 @@ it('ensures parent components subscribe before children', async () => {
     )
   }
 
-  const { getByText } = render(<Parent />)
+  const { getByText, findByText } = render(<Parent />)
 
   fireEvent.click(getByText('change state'))
 
-  await waitForElement(() => getByText('child 3'))
+  await findByText('child 3')
 })
 
 // https://github.com/react-spring/zustand/issues/84
@@ -668,18 +664,18 @@ it('can use exposed types', () => {
   })
 
   function checkAllTypes(
-    getState: GetState<ExampleState>,
-    partialState: PartialState<ExampleState>,
-    setState: SetState<ExampleState>,
-    state: State,
-    stateListener: StateListener<ExampleState>,
-    stateSelector: StateSelector<ExampleState, number>,
-    storeApi: StoreApi<ExampleState>,
-    subscribe: Subscribe<ExampleState>,
-    destroy: Destroy,
-    equalityFn: EqualityChecker<ExampleState>,
-    stateCreator: StateCreator<ExampleState>,
-    useStore: UseStore<ExampleState>
+    _getState: GetState<ExampleState>,
+    _partialState: PartialState<ExampleState>,
+    _setState: SetState<ExampleState>,
+    _state: State,
+    _stateListener: StateListener<ExampleState>,
+    _stateSelector: StateSelector<ExampleState, number>,
+    _storeApi: StoreApi<ExampleState>,
+    _subscribe: Subscribe<ExampleState>,
+    _destroy: Destroy,
+    _equalityFn: EqualityChecker<ExampleState>,
+    _stateCreator: StateCreator<ExampleState>,
+    _useStore: UseStore<ExampleState>
   ) {
     expect(true).toBeTruthy()
   }
