@@ -41,8 +41,9 @@ export default function create<TState extends State>(
     const equalityFnRef = useRef(equalityFn)
     const erroredRef = useRef(false)
 
+    const state = api.getState()
     if (currentSliceRef.current === undefined) {
-      currentSliceRef.current = selector(api.getState())
+      currentSliceRef.current = selector(state)
     }
 
     let newStateSlice: StateSlice | undefined
@@ -57,7 +58,7 @@ export default function create<TState extends State>(
       erroredRef.current
     ) {
       // Using local variables to avoid mutations in the render phase.
-      newStateSlice = selector(api.getState())
+      newStateSlice = selector(state)
       hasNewStateSlice = !equalityFn(
         currentSliceRef.current as StateSlice,
         newStateSlice
@@ -74,7 +75,8 @@ export default function create<TState extends State>(
       erroredRef.current = false
     })
 
-    useIsoLayoutEffect(() => {
+    const stateBeforeSubscriptionRef = useRef(state)
+    useEffect(() => {
       const listener = () => {
         try {
           const nextStateSlice = selectorRef.current(api.getState())
@@ -93,6 +95,9 @@ export default function create<TState extends State>(
         }
       }
       const unsubscribe = api.subscribe(listener)
+      if (api.getState() !== stateBeforeSubscriptionRef.current) {
+        listener() // state has changed before subscription
+      }
       return unsubscribe
     }, [])
 
