@@ -1,9 +1,7 @@
 export type State = Record<string | number | symbol, any>
-// (state: T) => void is for immer https://github.com/react-spring/zustand/pull/99
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
-  | ((state: T) => void)
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: any) => boolean
 export type StateListener<T> = (state: T) => void
@@ -28,8 +26,8 @@ export interface StoreApi<T extends State> {
   subscribe: Subscribe<T>
   destroy: Destroy
 }
-export type StateCreator<T extends State> = (
-  set: SetState<T>,
+export type StateCreator<T extends State, CustomSetState = SetState<T>> = (
+  set: CustomSetState,
   get: GetState<T>,
   api: StoreApi<T>
 ) => T
