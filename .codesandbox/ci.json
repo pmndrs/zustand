@@ -1,0 +1,5 @@
+{
+  "publishDirectory": {
+    "zustand": "dist"
+  }
+}
