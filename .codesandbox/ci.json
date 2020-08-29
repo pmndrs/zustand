@@ -1,5 +1,3 @@
 {
-  "publishDirectory": {
-    "zustand": "dist"
-  }
+  "packages": ["dist"]
 }
