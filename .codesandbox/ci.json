@@ -1,3 +1,4 @@
 {
-  "packages": ["dist"]
+  "packages": ["dist"],
+  "sandboxes": ["new", "react-typescript-react-ts"]
 }
