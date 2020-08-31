@@ -25,11 +25,17 @@ const redux = <S extends State, A extends { type: unknown }>(
   return { dispatch: api.dispatch, ...initial }
 }
 
+type NamedSet<S> = (
+  partial: PartialState<S>,
+  replace?: boolean,
+  name?: string
+) => void
+
 const devtools = <S extends State>(
   fn: (
-    set: (partial: PartialState<S>, replace?: boolean, name?: string) => void,
+    set: NamedSet<S>,
     get: GetState<S>,
-    api: StoreApi<S>
+    api: Omit<StoreApi<S>, 'setState'> & { setState: NamedSet<S> }
   ) => S,
   prefix?: string
 ) => (
@@ -51,12 +57,13 @@ const devtools = <S extends State>(
     api.devtools = null
     return fn(set, get, api)
   }
+  const savedSetState = api.setState
   const namedSet = (
     state: PartialState<S>,
     replace?: boolean,
     name?: string | false
   ) => {
-    set(state, replace)
+    savedSetState(state, replace)
     if (name !== false) {
       api.devtools.send(api.devtools.prefix + (name || 'action'), get())
     }
@@ -78,6 +85,7 @@ const devtools = <S extends State>(
       }
     })
     api.devtools.init(initialState)
+    api.setState = namedSet
   }
   return initialState
 }
