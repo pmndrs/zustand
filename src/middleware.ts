@@ -19,9 +19,8 @@ const redux = <S extends State, A extends { type: unknown }>(
 ): S & { dispatch: (a: A) => A } => {
   api.dispatch = (action: A) => {
     api.setState((state: S) => reducer(state, action))
-    if (api.devtools) {
+    api.devtools &&
       api.devtools.send(api.devtools.prefix + action.type, api.getState())
-    }
     return action
   }
   return { dispatch: api.dispatch, ...initial }
@@ -64,9 +63,7 @@ const devtools = <S extends State>(
     const savedSetState = api.setState
     api.setState = (state: PartialState<S>, replace?: boolean) => {
       savedSetState(state, replace)
-      if (!api.dispatch) {
-        api.devtools.send(api.devtools.prefix + 'setState', api.getState())
-      }
+      api.devtools.send(api.devtools.prefix + 'setState', api.getState())
     }
     api.devtools = extension.connect({ name: prefix })
     api.devtools.prefix = prefix ? `${prefix} > ` : ''
@@ -75,10 +72,10 @@ const devtools = <S extends State>(
         const ignoreState =
           message.payload.type === 'JUMP_TO_ACTION' ||
           message.payload.type === 'JUMP_TO_STATE'
-        if (ignoreState) {
-          savedSetState(JSON.parse(message.state))
-        } else {
+        if (!api.dispatch && !ignoreState) {
           api.setState(JSON.parse(message.state))
+        } else {
+          savedSetState(JSON.parse(message.state))
         }
       }
     })
