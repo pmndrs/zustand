@@ -10,16 +10,18 @@ const redux = <S extends State, A extends { type: unknown }>(
   reducer: (state: S, action: A) => S,
   initial: S
 ) => (
-  set: SetState<S & { dispatch: (a: A) => A }>,
-  get: GetState<S & { dispatch: (a: A) => A }>,
-  api: StoreApi<S & { dispatch: (a: A) => A }> & {
+  set: SetState<S>,
+  get: GetState<S>,
+  api: StoreApi<S> & {
     dispatch?: (a: A) => A
     devtools?: any
   }
 ): S & { dispatch: (a: A) => A } => {
   api.dispatch = (action: A) => {
     set((state: S) => reducer(state, action))
-    api.devtools && api.devtools.send(api.devtools.prefix + action.type, get())
+    if (api.devtools) {
+      api.devtools.send(api.devtools.prefix + action.type, get())
+    }
     return action
   }
   return { dispatch: api.dispatch, ...initial }
