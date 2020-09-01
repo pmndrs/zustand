@@ -10,17 +10,16 @@ const redux = <S extends State, A extends { type: unknown }>(
   reducer: (state: S, action: A) => S,
   initial: S
 ) => (
-  _set: unknown,
-  _get: unknown,
-  api: StoreApi<S> & {
+  set: SetState<S & { dispatch: (a: A) => A }>,
+  get: GetState<S & { dispatch: (a: A) => A }>,
+  api: StoreApi<S & { dispatch: (a: A) => A }> & {
     dispatch?: (a: A) => A
     devtools?: any
   }
 ): S & { dispatch: (a: A) => A } => {
   api.dispatch = (action: A) => {
-    api.setState((state: S) => reducer(state, action))
-    api.devtools &&
-      api.devtools.send(api.devtools.prefix + action.type, api.getState())
+    set((state: S) => reducer(state, action))
+    api.devtools && api.devtools.send(api.devtools.prefix + action.type, get())
     return action
   }
   return { dispatch: api.dispatch, ...initial }
@@ -56,7 +55,9 @@ const devtools = <S extends State>(
   }
   const namedSet: NamedSet<S> = (state, replace, name) => {
     set(state, replace)
-    api.devtools.send(api.devtools.prefix + (name || 'action'), get())
+    if (!api.dispatch) {
+      api.devtools.send(api.devtools.prefix + (name || 'action'), get())
+    }
   }
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
