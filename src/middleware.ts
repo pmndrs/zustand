@@ -32,11 +32,7 @@ type NamedSet<S> = (
 ) => void
 
 const devtools = <S extends State>(
-  fn: (
-    set: NamedSet<S>,
-    get: GetState<S>,
-    api: Omit<StoreApi<S>, 'setState'> & { setState: NamedSet<S> }
-  ) => S,
+  fn: (set: NamedSet<S>, get: GetState<S>, api: StoreApi<S>) => S,
   prefix?: string
 ) => (
   set: SetState<S>,
@@ -57,19 +53,17 @@ const devtools = <S extends State>(
     api.devtools = null
     return fn(set, get, api)
   }
-  const savedSetState = api.setState
-  const namedSet = (
-    state: PartialState<S>,
-    replace?: boolean,
-    name?: string | false
-  ) => {
-    savedSetState(state, replace)
-    if (name !== false) {
-      api.devtools.send(api.devtools.prefix + (name || 'action'), get())
-    }
+  const namedSet: NamedSet<S> = (state, replace, name) => {
+    set(state, replace)
+    api.devtools.send(api.devtools.prefix + (name || 'action'), get())
   }
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
+    const savedSetState = api.setState
+    api.setState = (state: PartialState<S>, replace?: boolean) => {
+      savedSetState(state, replace)
+      api.devtools.send(api.devtools.prefix + 'setState', api.getState())
+    }
     api.devtools = extension.connect({ name: prefix })
     api.devtools.prefix = prefix ? `${prefix} > ` : ''
     api.devtools.subscribe((message: any) => {
@@ -77,15 +71,14 @@ const devtools = <S extends State>(
         const ignoreState =
           message.payload.type === 'JUMP_TO_ACTION' ||
           message.payload.type === 'JUMP_TO_STATE'
-        namedSet(
-          JSON.parse(message.state),
-          false,
-          !initialState.dispatch && !ignoreState && 'setState'
-        )
+        if (!initialState.dispatch && !ignoreState) {
+          api.setState(JSON.parse(message.state))
+        } else {
+          savedSetState(JSON.parse(message.state))
+        }
       }
     })
     api.devtools.init(initialState)
-    api.setState = namedSet
   }
   return initialState
 }
