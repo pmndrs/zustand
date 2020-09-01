@@ -37,7 +37,7 @@ const devtools = <S extends State>(
 ) => (
   set: SetState<S>,
   get: GetState<S>,
-  api: StoreApi<S> & { devtools?: any }
+  api: StoreApi<S> & { dispatch?: unknown; devtools?: any }
 ): S => {
   let extension
   try {
@@ -55,7 +55,9 @@ const devtools = <S extends State>(
   }
   const namedSet: NamedSet<S> = (state, replace, name) => {
     set(state, replace)
-    api.devtools.send(api.devtools.prefix + (name || 'action'), get())
+    if (!api.dispatch) {
+      api.devtools.send(api.devtools.prefix + (name || 'action'), get())
+    }
   }
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
@@ -71,7 +73,7 @@ const devtools = <S extends State>(
         const ignoreState =
           message.payload.type === 'JUMP_TO_ACTION' ||
           message.payload.type === 'JUMP_TO_STATE'
-        if (!initialState.dispatch && !ignoreState) {
+        if (!api.dispatch && !ignoreState) {
           api.setState(JSON.parse(message.state))
         } else {
           savedSetState(JSON.parse(message.state))
