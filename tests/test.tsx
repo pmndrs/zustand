@@ -47,7 +47,7 @@ it('creates a store hook and api object', () => {
 })
 
 it('uses the store with no args', async () => {
-  const useStore = create((set) => ({
+  const useStore = create<any>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
   }))
@@ -64,7 +64,7 @@ it('uses the store with no args', async () => {
 })
 
 it('uses the store with selectors', async () => {
-  const useStore = create((set) => ({
+  const useStore = create<any>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
   }))
@@ -113,7 +113,7 @@ it('uses the store with a selector and equality checker', async () => {
 })
 
 it('only re-renders if selected state has changed', async () => {
-  const useStore = create((set) => ({
+  const useStore = create<any>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
   }))
@@ -148,7 +148,7 @@ it('only re-renders if selected state has changed', async () => {
 })
 
 it('can batch updates', async () => {
-  const useStore = create((set) => ({
+  const useStore = create<any>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
   }))
@@ -340,7 +340,7 @@ it('can throw an error in equality checker', async () => {
 })
 
 it('can get the store', () => {
-  const { getState } = create((_, get) => ({
+  const { getState } = create<any>((_, get) => ({
     value: 1,
     getState1: () => get(),
     getState2: () => getState(),
@@ -351,7 +351,7 @@ it('can get the store', () => {
 })
 
 it('can set the store', () => {
-  const { setState, getState } = create((set) => ({
+  const { setState, getState } = create<any>((set) => ({
     value: 1,
     setState1: (v: any) => set(v),
     setState2: (v: any) => setState(v),
