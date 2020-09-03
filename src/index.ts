@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
-
 export * from './vanilla'
 import createImpl, {
   Destroy,

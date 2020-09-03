@@ -10,36 +10,32 @@ const redux = <S extends State, A extends { type: unknown }>(
   reducer: (state: S, action: A) => S,
   initial: S
 ) => (
-  set: SetState<S>,
-  get: GetState<S>,
-  api: StoreApi<S> & {
+  set: SetState<S & { dispatch: (a: A) => A }>,
+  get: GetState<S & { dispatch: (a: A) => A }>,
+  api: StoreApi<S & { dispatch: (a: A) => A }> & {
     dispatch?: (a: A) => A
     devtools?: any
   }
 ): S & { dispatch: (a: A) => A } => {
   api.dispatch = (action: A) => {
     set((state: S) => reducer(state, action))
-    if (api.devtools) {
-      api.devtools.send(api.devtools.prefix + action.type, get())
-    }
+    api.devtools && api.devtools.send(api.devtools.prefix + action.type, get())
     return action
   }
   return { dispatch: api.dispatch, ...initial }
 }
 
-type NamedSet<S> = (
-  partial: PartialState<S>,
-  replace?: boolean,
-  name?: string
-) => void
-
 const devtools = <S extends State>(
-  fn: (set: NamedSet<S>, get: GetState<S>, api: StoreApi<S>) => S,
+  fn: (
+    set: (partial: PartialState<S>, replace?: boolean, name?: string) => void,
+    get: GetState<S>,
+    api: StoreApi<S>
+  ) => S,
   prefix?: string
 ) => (
   set: SetState<S>,
   get: GetState<S>,
-  api: StoreApi<S> & { dispatch?: unknown; devtools?: any }
+  api: StoreApi<S> & { devtools?: any }
 ): S => {
   let extension
   try {
@@ -55,19 +51,18 @@ const devtools = <S extends State>(
     api.devtools = null
     return fn(set, get, api)
   }
-  const namedSet: NamedSet<S> = (state, replace, name) => {
+  const namedSet = (
+    state: PartialState<S>,
+    replace?: boolean,
+    name?: string | false
+  ) => {
     set(state, replace)
-    if (!api.dispatch) {
+    if (name !== false) {
       api.devtools.send(api.devtools.prefix + (name || 'action'), get())
     }
   }
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
-    const savedSetState = api.setState
-    api.setState = (state: PartialState<S>, replace?: boolean) => {
-      savedSetState(state, replace)
-      api.devtools.send(api.devtools.prefix + 'setState', api.getState())
-    }
     api.devtools = extension.connect({ name: prefix })
     api.devtools.prefix = prefix ? `${prefix} > ` : ''
     api.devtools.subscribe((message: any) => {
@@ -75,11 +70,11 @@ const devtools = <S extends State>(
         const ignoreState =
           message.payload.type === 'JUMP_TO_ACTION' ||
           message.payload.type === 'JUMP_TO_STATE'
-        if (!api.dispatch && !ignoreState) {
-          api.setState(JSON.parse(message.state))
-        } else {
-          savedSetState(JSON.parse(message.state))
-        }
+        namedSet(
+          JSON.parse(message.state),
+          false,
+          !initialState.dispatch && !ignoreState && 'setState'
+        )
       }
     })
     api.devtools.init(initialState)
