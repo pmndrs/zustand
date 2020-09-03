@@ -1,9 +1,9 @@
-export type State = Record<string | number | symbol, any>
+export type State = Record<string | number | symbol, unknown>
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
 export type StateSelector<T extends State, U> = (state: T) => U
-export type EqualityChecker<T> = (state: T, newState: any) => boolean
+export type EqualityChecker<T> = (state: T, newState: unknown) => boolean
 export type StateListener<T> = (state: T) => void
 export type StateSliceListener<T> = (state: T | null, error?: Error) => void
 export interface Subscribe<T extends State> {
@@ -36,7 +36,7 @@ export default function create<TState extends State>(
   createState: StateCreator<TState>
 ): StoreApi<TState> {
   let state: TState
-  const listeners: Set<(s: any) => void> = new Set()
+  const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
     const nextState = typeof partial === 'function' ? partial(state) : partial
@@ -52,7 +52,7 @@ export default function create<TState extends State>(
 
   const subscribeWithSelector = <StateSlice>(
     listener: StateSliceListener<StateSlice>,
-    selector: StateSelector<TState, StateSlice> = getState,
+    selector: StateSelector<TState, StateSlice> = getState as any,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     let currentSlice: StateSlice = selector(state)
@@ -86,9 +86,9 @@ export default function create<TState extends State>(
         equalityFn
       )
     }
-    listeners.add(listener)
+    listeners.add(listener as StateListener<TState>)
     // Unsubscribe
-    return () => listeners.delete(listener)
+    return () => listeners.delete(listener as StateListener<TState>)
   }
 
   const destroy: Destroy = () => listeners.clear()

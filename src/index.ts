@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
-export * from './vanilla'
 import createImpl, {
   Destroy,
   EqualityChecker,
@@ -11,6 +10,7 @@ import createImpl, {
   Subscribe,
   StoreApi,
 } from './vanilla'
+export * from './vanilla'
 
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
 const useIsoLayoutEffect =
@@ -32,7 +32,7 @@ export default function create<TState extends State>(
     typeof createState === 'function' ? createImpl(createState) : createState
 
   const useStore: any = <StateSlice>(
-    selector: StateSelector<TState, StateSlice> = api.getState,
+    selector: StateSelector<TState, StateSlice> = api.getState as any,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     const forceUpdate = useReducer((c) => c + 1, 0)[1] as () => void
