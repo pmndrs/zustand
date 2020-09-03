@@ -261,13 +261,13 @@ it('can call useStore with progressively more arguments', async () => {
 it('can throw an error in selector', async () => {
   console.error = jest.fn()
 
-  const initialState = { value: 'foo' }
+  const initialState: { value?: string } = { value: 'foo' }
   const useStore = create(() => initialState)
   const { setState } = useStore
   const selector = (s: any) => s.value.toUpperCase()
 
-  class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
-    constructor(props: any) {
+  class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+    constructor(props: {}) {
       super(props)
       this.state = { hasError: false }
     }
@@ -301,14 +301,14 @@ it('can throw an error in selector', async () => {
 it('can throw an error in equality checker', async () => {
   console.error = jest.fn()
 
-  const initialState = { value: 'foo' }
+  const initialState: { value?: string } = { value: 'foo' }
   const useStore = create(() => initialState)
   const { setState } = useStore
   const selector = (s: any) => s
   const equalityFn = (a: any, b: any) => a.value.trim() === b.value.trim()
 
-  class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
-    constructor(props: any) {
+  class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+    constructor(props: {}) {
       super(props)
       this.state = { hasError: false }
     }
