@@ -88,7 +88,7 @@ export const devtools = <S extends State>(
   return initialState
 }
 
-export const withInitialState = <
+export const combine = <
   PrimaryState extends State,
   SecondaryState extends State
 >(
