@@ -291,7 +291,7 @@ it('can throw an error in selector', async () => {
   )
   await findByText('no error')
 
-  delete initialState.value
+  delete (initialState as any).value
   act(() => {
     setState({})
   })
@@ -332,7 +332,7 @@ it('can throw an error in equality checker', async () => {
   )
   await findByText('no error')
 
-  delete initialState.value
+  delete (initialState as any).value
   act(() => {
     setState({})
   })
