@@ -68,9 +68,9 @@
     "gzipped": 251
   },
   "middleware.js": {
-    "bundled": 2599,
-    "minified": 1469,
-    "gzipped": 676
+    "bundled": 2631,
+    "minified": 1493,
+    "gzipped": 680
   },
   "vanilla.js": {
     "bundled": 1990,
