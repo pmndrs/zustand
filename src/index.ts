@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
-export * from './vanilla'
 import createImpl, {
   Destroy,
   EqualityChecker,
@@ -11,6 +10,7 @@ import createImpl, {
   Subscribe,
   StoreApi,
 } from './vanilla'
+export * from './vanilla'
 
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
 const useIsoLayoutEffect =
