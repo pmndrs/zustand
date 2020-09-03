@@ -88,7 +88,7 @@ export const devtools = <S extends State>(
   return initialState
 }
 
-export const createPS = <
+export const withInitialState = <
   PrimaryState extends State,
   SecondaryState extends State
 >(
