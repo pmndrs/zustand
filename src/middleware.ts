@@ -1,12 +1,13 @@
-import type {
+import {
   State,
   GetState,
   SetState,
   StoreApi,
   PartialState,
+  StateCreator,
 } from './vanilla'
 
-const redux = <S extends State, A extends { type: unknown }>(
+export const redux = <S extends State, A extends { type: unknown }>(
   reducer: (state: S, action: A) => S,
   initial: S
 ) => (
@@ -27,13 +28,13 @@ const redux = <S extends State, A extends { type: unknown }>(
   return { dispatch: api.dispatch, ...initial }
 }
 
-type NamedSet<S> = (
+type NamedSet<S extends State> = (
   partial: PartialState<S>,
   replace?: boolean,
   name?: string
 ) => void
 
-const devtools = <S extends State>(
+export const devtools = <S extends State>(
   fn: (set: NamedSet<S>, get: GetState<S>, api: StoreApi<S>) => S,
   prefix?: string
 ) => (
@@ -87,4 +88,23 @@ const devtools = <S extends State>(
   return initialState
 }
 
-export { devtools, redux }
+export const combine = <
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: SetState<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+): StateCreator<PrimaryState & SecondaryState> => (set, get, api) =>
+  Object.assign(
+    {},
+    initialState,
+    create(
+      set as SetState<PrimaryState>,
+      get as GetState<PrimaryState>,
+      api as StoreApi<PrimaryState>
+    )
+  )

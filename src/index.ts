@@ -6,7 +6,6 @@ import {
   unstable_useMutableSource as useMutableSource,
 } from 'react'
 
-export * from './vanilla'
 import createImpl, {
   Destroy,
   EqualityChecker,
@@ -18,6 +17,7 @@ import createImpl, {
   Subscribe,
   StoreApi,
 } from './vanilla'
+export * from './vanilla'
 
 export interface UseStore<T extends State> {
   (): T
@@ -40,7 +40,7 @@ export default function create<TState extends State>(
   const functionMap = new WeakMap<Function, { [FUNCTION_SYMBOL]: Function }>()
 
   const useStore: any = <StateSlice>(
-    selector: StateSelector<TState, StateSlice> = api.getState,
+    selector: StateSelector<TState, StateSlice> = api.getState as any,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     const getSnapshot = useMemo(() => {
