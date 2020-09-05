@@ -125,7 +125,7 @@ import omit from "lodash-es/omit"
 const useStore = create(set => ({
   salmon: 1,
   tuna: 2,
-  deleteEverything: () => set({ }), true), // clears the entire store, actions included
+  deleteEverything: () => set({ }, true), // clears the entire store, actions included
   deleteTuna: () => set(state => omit(state, ['tuna']), true)
 }))
 ```
