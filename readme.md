@@ -303,3 +303,29 @@ const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
+
+## Using with TypeScript
+
+```tsx
+type State = {
+  bears: number
+  increase: (by: number) => void
+}
+
+const useStore = create<State>(set => ({
+  bears: 0,
+  increase: (by) => set(state => ({ bears: state.bears + by })),
+}))
+```
+
+Or, use `combine` and let tsc infer types.
+
+```tsx
+import { combine } from 'zustand/middleware'
+
+const useStore = create(combine({
+  bears: 0,
+}, set => ({
+  increase: (by: number) => set(state => ({ bears: state.bears + by })),
+})))
+```
