@@ -630,7 +630,7 @@ it('can use exposed types', () => {
     ...state,
     num: 2,
   })
-  const equlaityFn: EqualityChecker<ExampleState> = (state, newState) =>
+  const equalityFn: EqualityChecker<ExampleState> = (state, newState) =>
     state !== newState
 
   const storeApi = create<ExampleState>((set, get) => ({
@@ -690,7 +690,7 @@ it('can use exposed types', () => {
     storeApi,
     storeApi.subscribe,
     storeApi.destroy,
-    equlaityFn,
+    equalityFn,
     stateCreator,
     useStore
   )
