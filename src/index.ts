@@ -36,12 +36,14 @@ export default function create<TState extends State>(
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
     const forceUpdate = useReducer((c) => c + 1, 0)[1] as () => void
-    const currentSliceRef = useRef<StateSlice>()
+
+    const state = api.getState()
+    const stateRef = useRef(state)
     const selectorRef = useRef(selector)
     const equalityFnRef = useRef(equalityFn)
     const erroredRef = useRef(false)
 
-    const state = api.getState()
+    const currentSliceRef = useRef<StateSlice>()
     if (currentSliceRef.current === undefined) {
       currentSliceRef.current = selector(state)
     }
@@ -53,6 +55,7 @@ export default function create<TState extends State>(
     // they change. We also want legitimate errors to be visible so we re-run
     // them if they errored in the subscriber.
     if (
+      stateRef.current !== state ||
       selectorRef.current !== selector ||
       equalityFnRef.current !== equalityFn ||
       erroredRef.current
@@ -70,6 +73,7 @@ export default function create<TState extends State>(
       if (hasNewStateSlice) {
         currentSliceRef.current = newStateSlice as StateSlice
       }
+      stateRef.current = state
       selectorRef.current = selector
       equalityFnRef.current = equalityFn
       erroredRef.current = false
@@ -79,13 +83,15 @@ export default function create<TState extends State>(
     useEffect(() => {
       const listener = () => {
         try {
-          const nextStateSlice = selectorRef.current(api.getState())
+          const nextState = api.getState()
+          const nextStateSlice = selectorRef.current(nextState)
           if (
             !equalityFnRef.current(
               currentSliceRef.current as StateSlice,
               nextStateSlice
             )
           ) {
+            stateRef.current = nextState
             currentSliceRef.current = nextStateSlice
             forceUpdate()
           }
