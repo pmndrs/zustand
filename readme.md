@@ -171,11 +171,14 @@ const paw = useStore.getState().paw
 const unsub1 = useStore.subscribe(console.log)
 // Listening to selected changes, in this case when "paw" changes
 const unsub2 = useStore.subscribe(console.log, state => state.paw)
+// Subscribe also supports an optional equality function
+const unsub3 = useStore.subscribe(console.log, state => [state.paw, state.fur], shallow)
 // Updating state, will trigger listeners
 useStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
 unsub2()
+unsub3()
 // Destroying the store (removing all listeners)
 useStore.destroy()
 
