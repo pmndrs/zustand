@@ -125,7 +125,7 @@ import omit from "lodash-es/omit"
 const useStore = create(set => ({
   salmon: 1,
   tuna: 2,
-  deleteEverything: () => set({ }), true), // clears the entire store, actions included
+  deleteEverything: () => set({ }, true), // clears the entire store, actions included
   deleteTuna: () => set(state => omit(state, ['tuna']), true)
 }))
 ```
@@ -171,11 +171,14 @@ const paw = useStore.getState().paw
 const unsub1 = useStore.subscribe(console.log)
 // Listening to selected changes, in this case when "paw" changes
 const unsub2 = useStore.subscribe(console.log, state => state.paw)
+// Subscribe also supports an optional equality function
+const unsub3 = useStore.subscribe(console.log, state => [state.paw, state.fur], shallow)
 // Updating state, will trigger listeners
 useStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
 unsub2()
+unsub3()
 // Destroying the store (removing all listeners)
 useStore.destroy()
 
@@ -303,3 +306,29 @@ const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
+
+## Using with TypeScript
+
+```tsx
+type State = {
+  bears: number
+  increase: (by: number) => void
+}
+
+const useStore = create<State>(set => ({
+  bears: 0,
+  increase: (by) => set(state => ({ bears: state.bears + by })),
+}))
+```
+
+Or, use `combine` and let tsc infer types.
+
+```tsx
+import { combine } from 'zustand/middleware'
+
+const useStore = create(combine({
+  bears: 0,
+}, set => ({
+  increase: (by: number) => set(state => ({ bears: state.bears + by })),
+})))
+```
