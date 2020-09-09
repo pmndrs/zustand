@@ -255,12 +255,14 @@ const log = config => (set, get, api) => config(args => {
 // Turn the set method into an immer proxy
 const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
 
-const useStore = create(log(immer(set => ({
-  bees: false,
-  setBees: input => set(state => {
-    state.bees = input
-  })
-}))))
+const useStore = create(
+  log(
+    immer((set) => ({
+      bees: false,
+      setBees: (input) => set((state) => void (state.bees = input)),
+    })),
+  ),
+)
 ```
 
 ## Can't live without redux-like reducers and action types?
