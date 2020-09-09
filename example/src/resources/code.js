@@ -8,7 +8,7 @@ const useStore = create(set => ({
 function Controls() {
   const inc = useStore(state => state.inc)
   return <button onClick={inc}>one up</button>
-)
+}
 
 function Counter() {
   const count = useStore(state => state.count)
