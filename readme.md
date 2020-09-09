@@ -12,9 +12,7 @@ You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
 ```bash
 npm install zustand
-```    
-
-Zustand is pronounced "tsoostand" and means "state" in German.
+```
 
 ### First create a store
 
