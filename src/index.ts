@@ -35,7 +35,7 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = api.getState as any,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const forceUpdate = useReducer((c) => c + 1, 0)[1] as () => void
+    const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void]
 
     const state = api.getState()
     const stateRef = useRef(state)
