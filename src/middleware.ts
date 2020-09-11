@@ -81,6 +81,11 @@ export const devtools = <S extends State>(
         } else {
           savedSetState(JSON.parse(message.state))
         }
+      } else if (
+        message.type === 'DISPATCH' &&
+        message.payload?.type === 'COMMIT'
+      ) {
+        api.devtools.init(api.getState())
       }
     })
     api.devtools.init(initialState)
