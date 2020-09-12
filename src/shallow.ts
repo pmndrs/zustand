@@ -1,4 +1,4 @@
-type Object = Record<string, any>
+type Obj = Record<string | number | symbol, unknown>
 
 export default function shallow<T extends any, U extends any>(
   objA: T,
@@ -22,7 +22,7 @@ export default function shallow<T extends any, U extends any>(
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i]) ||
-      !Object.is((objA as Object)[keysA[i]], (objB as Object)[keysA[i]])
+      !Object.is((objA as Obj)[keysA[i]], (objB as Obj)[keysA[i]])
     ) {
       return false
     }
