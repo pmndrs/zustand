@@ -22,7 +22,7 @@ export default function shallow<T extends any, U extends any>(
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i]) ||
-      !shallow((objA as Object)[keysA[i]], (objB as Object)[keysA[i]])
+      !Object.is((objA as Object)[keysA[i]], (objB as Object)[keysA[i]])
     ) {
       return false
     }
