@@ -18,7 +18,7 @@
     "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
     "eslint:ci": "eslint '{src,examples/src}/**/*.{js,ts,jsx,tsx}'",
     "prepare": "yarn build",
-    "pretest": "tsc tests/test.tsx --noEmit --strict --jsx preserve -m None -t ESNext --isolatedModules --esModuleInterop --skipLibCheck --moduleResolution node",
+    "pretest": "tsc tests/*.tsx --noEmit --strict --jsx preserve -m None -t ESNext --isolatedModules --esModuleInterop --skipLibCheck --moduleResolution node",
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",

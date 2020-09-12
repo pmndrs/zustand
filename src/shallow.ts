@@ -1,3 +1,5 @@
+type Object = Record<string, any>
+
 export default function shallow<T extends any, U extends any>(
   objA: T,
   objB: U
@@ -20,7 +22,7 @@ export default function shallow<T extends any, U extends any>(
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i]) ||
-      !Object.is((objA as any)[keysA[i]], (objB as any)[keysA[i]]) // FIXME no-any
+      !Object.is((objA as Object)[keysA[i]], (objB as Object)[keysA[i]])
     ) {
       return false
     }
