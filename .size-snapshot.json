@@ -63,14 +63,14 @@
     "gzipped": 545
   },
   "shallow.js": {
-    "bundled": 644,
+    "bundled": 619,
     "minified": 401,
     "gzipped": 251
   },
   "middleware.js": {
-    "bundled": 2595,
-    "minified": 1466,
-    "gzipped": 677
+    "bundled": 2817,
+    "minified": 1574,
+    "gzipped": 714
   },
   "vanilla.js": {
     "bundled": 1990,

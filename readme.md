@@ -268,6 +268,22 @@ const useStore = create(
 )
 ```
 
+<overview>
+<summary>TypeScript</summary>
+<details>
+
+```ts
+import { State } from 'zustand'
+
+const immer = <T extends State>(
+  config: StateCreator<T, (fn: (state: T) => void) => void>
+): StateCreator<T> => (set, get, api) =>
+  config((fn) => set(produce(fn) as (state: T) => T), get, api)
+```
+
+</details>
+</overview>
+
 ## Can't live without redux-like reducers and action types?
 
 ```jsx
