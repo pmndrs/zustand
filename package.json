@@ -18,11 +18,11 @@
     "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
     "eslint:ci": "eslint '{src,examples/src}/**/*.{js,ts,jsx,tsx}'",
     "prepare": "yarn build",
-    "pretest": "tsc tests/*.test.tsx --noEmit --strict --jsx preserve -m None -t ESNext --isolatedModules --esModuleInterop --skipLibCheck --moduleResolution node",
+    "pretest": "tsc --noEmit",
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "mv dist/src/* dist && rm -rf dist/src && copyfiles -f package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
+    "copy": "mv dist/src/* dist && rm -rf dist/{src,tests} && copyfiles -f package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "husky": {
     "hooks": {
@@ -65,11 +65,6 @@
   },
   "homepage": "https://github.com/react-spring/zustand",
   "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "jest",
-      "legacy"
-    ],
     "testRegex": "test.(js|ts|tsx)$",
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
