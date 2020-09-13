@@ -276,7 +276,7 @@ const useStore = create(
 import { State } from 'zustand'
 
 const immer = <T extends State>(
-  config: StateCreator<T, (fn: (state: T) => void) => void>
+  config: StateCreator<T, (fn: (draft: T) => void) => void>
 ): StateCreator<T> => (set, get, api) =>
   config((fn) => set(produce(fn) as (state: T) => T), get, api)
 ```
