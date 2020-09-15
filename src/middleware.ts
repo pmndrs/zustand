@@ -8,7 +8,7 @@ import {
 } from './vanilla'
 
 export const redux = <S extends State, A extends { type: unknown }>(
-  reducer: (state: S, action: A) => S,
+  reducer: (state: S, action: A, opts: { get: GetState<S> }) => S,
   initial: S
 ) => (
   set: SetState<S>,
@@ -19,7 +19,7 @@ export const redux = <S extends State, A extends { type: unknown }>(
   }
 ): S & { dispatch: (a: A) => A } => {
   api.dispatch = (action: A) => {
-    set((state: S) => reducer(state, action))
+    set((state: S) => reducer(state, action, { get }))
     if (api.devtools) {
       api.devtools.send(api.devtools.prefix + action.type, get())
     }
