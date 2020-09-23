@@ -50,7 +50,10 @@ export const devtools = <S extends State>(
   } catch {}
 
   if (!extension) {
-    if (process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined'
+    ) {
       console.warn('Please install/enable Redux devtools extension')
     }
     api.devtools = null
