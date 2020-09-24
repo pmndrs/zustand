@@ -229,19 +229,37 @@ function Component() {
 
 Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
+Without immer:
+```jsx
+const useStore = create(set => ({
+  lush: { forrest: { contains: { a: "bear" } } },
+  setAnimal: (animal) => set(state => ({ 
+    ...state, 
+    lush: { 
+      ...state.lush, 
+      forrest: { 
+        ...state.lush.forrest, 
+         contains: {
+           ...state.lush.forrest.contains,
+           a: animal,
+         },
+       },
+     },   
+   })),
+}))
+```
+
+With immer:
 ```jsx
 import produce from 'immer'
 
 const useStore = create(set => ({
   lush: { forrest: { contains: { a: "bear" } } },
-  set: fn => set(produce(fn)),
+  setAnimal: (animal) => set(produce(state => state.lush.forrest.contains.a = animal)),
 }))
-
-const set = useStore(state => state.set)
-set(state => {
-  state.lush.forrest.contains = null
-})
 ```
+
+To make even more comfortable, look at the Middleware paragraph below.
 
 ## Middleware
 
@@ -256,13 +274,14 @@ const log = config => (set, get, api) => config(args => {
 }, get, api)
 
 // Turn the set method into an immer proxy
+import produce from 'immer'
 const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
 
 const useStore = create(
   log(
     immer((set) => ({
       bees: false,
-      setBees: (input) => set((state) => void (state.bees = input)),
+      setBees: (input) => set(state => { state.bees = input }),
     })),
   ),
 )
