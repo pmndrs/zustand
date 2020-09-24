@@ -233,7 +233,7 @@ Without immer:
 ```jsx
 const useStore = create(set => ({
   lush: { forrest: { contains: { a: "bear" } } },
-  setAnimal: (animal) => set(state => ({ 
+  setAnimal: animal => set(state => ({ 
     ...state, 
     lush: { 
       ...state.lush, 
@@ -255,11 +255,11 @@ import produce from 'immer'
 
 const useStore = create(set => ({
   lush: { forrest: { contains: { a: "bear" } } },
-  setAnimal: (animal) => set(produce(state => state.lush.forrest.contains.a = animal)),
+  setAnimal: animal => set(produce(state => { state.lush.forrest.contains.a = animal })),
 }))
 ```
 
-To make even more comfortable, look at the Middleware paragraph below.
+To make it even more comfortable, look at the Middleware paragraph below.
 
 ## Middleware
 
@@ -281,7 +281,7 @@ const useStore = create(
   log(
     immer((set) => ({
       bees: false,
-      setBees: (input) => set(state => { state.bees = input }),
+      setBees: input => set(state => { state.bees = input }),
     })),
   ),
 )
