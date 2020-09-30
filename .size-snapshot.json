@@ -76,5 +76,19 @@
     "bundled": 1990,
     "minified": 628,
     "gzipped": 354
+  },
+  "index.mjs": {
+    "bundled": 4353,
+    "minified": 1414,
+    "gzipped": 687,
+    "treeshaked": {
+      "rollup": {
+        "code": 14,
+        "import_statements": 14
+      },
+      "webpack": {
+        "code": 1061
+      }
+    }
   }
 }
