@@ -38,20 +38,6 @@ function createESMConfig(input, output) {
   }
 }
 
-function createMJSConfig(input, output) {
-  return {
-    input,
-    output: { file: output, format: 'es', exports: 'named' },
-    external,
-    plugins: [
-      typescript(),
-      babel(getBabelOptions({ node: 8 })),
-      sizeSnapshot(),
-      resolve({ extensions }),
-    ],
-  }
-}
-
 function createCommonJSConfig(input, output) {
   return {
     input,
@@ -91,7 +77,7 @@ function createIIFEConfig(input, output, globalName) {
 
 export default [
   createESMConfig('src/index.ts', 'dist/index.js'),
-  createMJSConfig('src/index.ts', 'dist/index.mjs'),
+  createEMSConfig('src/index.ts', 'dist/index.mjs'),
   createCommonJSConfig('src/index.ts', 'dist/index.cjs.js'),
   createIIFEConfig('src/index.ts', 'dist/index.iife.js', 'zustand'),
   createCommonJSConfig('src/shallow.ts', 'dist/shallow.js'),
