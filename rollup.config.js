@@ -4,7 +4,7 @@ import resolve from 'rollup-plugin-node-resolve'
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
 import typescript from 'rollup-plugin-typescript2'
 
-const createBabelConfig = require('./babel.config')
+const createBabelConfig = require('./babel.config.cjs')
 const { root } = path.parse(process.cwd())
 const external = (id) => !id.startsWith('.') && !id.startsWith(root)
 const extensions = ['.js', '.ts', '.tsx']
@@ -28,20 +28,6 @@ function createESMConfig(input, output) {
   return {
     input,
     output: { file: output, format: 'esm' },
-    external,
-    plugins: [
-      typescript(),
-      babel(getBabelOptions({ node: 8 })),
-      sizeSnapshot(),
-      resolve({ extensions }),
-    ],
-  }
-}
-
-function createMJSConfig(input, output) {
-  return {
-    input,
-    output: { file: output, format: 'es', exports: 'named' },
     external,
     plugins: [
       typescript(),
@@ -91,10 +77,12 @@ function createIIFEConfig(input, output, globalName) {
 
 export default [
   createESMConfig('src/index.ts', 'dist/index.js'),
-  createMJSConfig('src/index.ts', 'dist/index.mjs'),
-  createCommonJSConfig('src/index.ts', 'dist/index.cjs.js'),
+  createCommonJSConfig('src/index.ts', 'dist/index.cjs'),
   createIIFEConfig('src/index.ts', 'dist/index.iife.js', 'zustand'),
-  createCommonJSConfig('src/shallow.ts', 'dist/shallow.js'),
-  createCommonJSConfig('src/middleware.ts', 'dist/middleware.js'),
-  createCommonJSConfig('src/vanilla.ts', 'dist/vanilla.js'),
+  createESMConfig('src/shallow.ts', 'dist/shallow.js'),
+  createCommonJSConfig('src/shallow.ts', 'dist/shallow.cjs'),
+  createESMConfig('src/middleware.ts', 'dist/middleware.js'),
+  createCommonJSConfig('src/middleware.ts', 'dist/middleware.cjs'),
+  createESMConfig('src/vanilla.ts', 'dist/vanilla.js'),
+  createCommonJSConfig('src/vanilla.ts', 'dist/vanilla.cjs'),
 ]
