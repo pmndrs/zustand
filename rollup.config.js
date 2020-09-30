@@ -77,7 +77,7 @@ function createIIFEConfig(input, output, globalName) {
 
 export default [
   createESMConfig('src/index.ts', 'dist/index.js'),
-  createEMSConfig('src/index.ts', 'dist/index.mjs'),
+  createESMConfig('src/index.ts', 'dist/index.mjs'),
   createCommonJSConfig('src/index.ts', 'dist/index.cjs.js'),
   createIIFEConfig('src/index.ts', 'dist/index.iife.js', 'zustand'),
   createCommonJSConfig('src/shallow.ts', 'dist/shallow.js'),
