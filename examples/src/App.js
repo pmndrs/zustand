@@ -26,7 +26,7 @@ const useStore = create((set) => ({
 function Counter() {
   const { count, inc } = useStore()
   return (
-    <div class="counter">
+    <div className="counter">
       <span>{count}</span>
       <button onClick={inc}>one up</button>
     </div>
@@ -98,6 +98,7 @@ export default function App() {
   return (
     <>
       <Canvas
+        className="canvas-container"
         orthographic
         gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, alpha: false, depth: false }}
         camera={{ zoom: 5, position: [0, 0, 200], far: 300, near: 0 }}>
@@ -106,21 +107,24 @@ export default function App() {
         </Suspense>
         <Effects ref={dof} />
       </Canvas>
-      <div class="main">
-        <div class="code">
-          <div class="code-container">
+      <div className="main">
+        <div className="code">
+          <div className="code-container">
             <PrismCode className="language-jsx" children={code} />
             <Counter />
           </div>
         </div>
-        <a href="https://github.com/drcmda/zustand" class="top-right" children="Github" />
-        <a href="https://codesandbox.io/s/xgjtc" class="bottom-right" children="<Source />" />
-        <a
-          href="https://www.instagram.com/tina.henschel/"
-          class="bottom-left"
-          children="Illustrations @ Tina Henschel"
-        />
-        <span class="header-left">Zustand</span>
+
+        <a href="https://github.com/drcmda/zustand" className="top-right" children="Github" />
+        <div className="bottom">
+          <a href="https://codesandbox.io/s/xgjtc" className="bottom-right" children="<Source />" />
+          <a
+            href="https://www.instagram.com/tina.henschel/"
+            className="bottom-left"
+            children="Illustrations @ Tina Henschel"
+          />
+        </div>
+        <span className="header-left">Zustand</span>
       </div>
     </>
   )
