@@ -84,7 +84,7 @@ body {
 
 @media only screen and (max-width: 500px) {
   .canvas-container {
-    margin-bottom: 0;
+    margin-bottom: -40px;
   }
   .canvas-container::after {
     display: none;
@@ -118,7 +118,7 @@ body {
 .code-container {
   position: absolute;
   bottom: -100px;
-  margin-bottom: 40vh;
+  margin-bottom: 30vh;
 }
 
 .counter {
@@ -160,6 +160,19 @@ body {
   cursor: pointer;
 }
 
+.code-container code[class*='language-'] {
+  margin-top: -50px;
+  display: inline-block;
+  width: auto !important;
+  padding: 40px 50px 40px 45px;
+  font-size: 0.8rem !important;
+  border-radius: 10px !important;
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
+  white-space: pre-wrap !important;
+  pointer-events: all;
+}
+
+
 @media only screen and (max-width: 700px) {
   .main > .code {
     position: relative;
@@ -175,17 +188,21 @@ body {
   .code-container {
     position: relative;
     bottom: 0;
-    margin-bottom: 0;
+    margin-bottom: -60px;
   }
   .code-container > code[class*='language-'] {
     font-size: 0.6rem;
-    padding-right: 50px !important;
+    padding: 20px 50px 70px 20px;
+    border-radius: 10px  10px 0 0 !important;
   }
   .counter {
-    top: -140px;
+    top: -100px;
     right: 20px;
   }
 }
+
+
+
 @media only screen and (max-width: 600px) {
   .code-container {
     position: relative;
@@ -193,11 +210,110 @@ body {
   }
 
   .code-container > code[class*='language-'] {
-    font-size: 0.65rem;
-    padding: 40px 20px 20px !important;
+    font-size: 0.6rem !important;
+    padding: 20px 20px 70px;
     width: 100% !important;
   }
+  
+  .counter {
+    top: 70px;
+    right: 20px;
+  }
+
 }
+
+@media only screen and (max-height: 600px) {
+
+  .code-container {
+    position: relative;
+    bottom: 0;
+    margin-bottom: -60px;
+  }
+  .code-container > code[class*='language-'] {
+    font-size: 0.6rem;
+    padding: 20px 20px 70px;
+  }
+
+  .counter {
+    top: 100px;
+    right: -80px;
+  }
+}
+@media only screen and (max-width: 600px) {
+
+  .counter {
+    top: 70px;
+    right: 20px;
+  }
+}
+
+
+
+@media only screen and (max-height: 500px) {
+  .main > .code {
+  }
+
+  .code-container {
+    position: relative;
+    margin-bottom: -60px;
+  }
+  .code-container > code[class*='language-'] {
+    font-size: 0.5rem !important;
+    padding: 20px 20px 70px;
+  }
+
+  .counter {
+    top: 40px;
+    right: 20px;
+    }
+}
+
+
+@media only screen and (max-width: 360px)  {
+  .code-container {
+    position: relative;
+    bottom: 0;
+    margin-bottom: -60px;
+  }
+  .code-container > code[class*='language-'] {
+    font-size: 0.6rem;
+    padding: 20px 20px 70px;
+  }
+
+  .counter {
+    transform: scale(0.8);
+    transform-origin: bottom right;
+    top: -160px;
+    right: 20px;
+  }
+}
+@media only screen and (max-height: 480px)  {
+  .counter {
+    transform: scale(0.8);
+    transform-origin: bottom right;
+    bottom: 70px;
+    right: 20px;
+    top: unset;
+  }
+}
+
+
+@media only screen and (max-height: 500px) and (min-width: 600px) {
+  .counter {
+    top: 40px;
+    right: -80px;
+    }
+}
+
+@media only screen and (max-height:360px) and (min-width: 600px) {
+  .counter {
+    top: 50px;
+    right: -80px;
+    }
+}
+
+
+
 
 .bear {
   top: 12.5%;
@@ -224,26 +340,18 @@ body {
   background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/3n-p-leaves2.png');
 }
 
-code[class*='language-'] {
-  margin-top: -50px;
-  display: inline-block;
-  width: auto !important;
-  padding: 40px 50px 40px 45px !important;
-  font-size: 0.8rem !important;
-  border-radius: 10px !important;
-  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
-  white-space: pre-wrap !important;
-}
+
 
 span.header-left {
   font-weight: 700;
   text-transform: uppercase;
   position: absolute;
   display: inline-block;
-  top: 40px;
+  top: 30px;
   left: 40px;
   font-size: 3em;
   color: white;
+  z-index: 1000;
 }
 
 @media only screen and (max-width: 1200px) {
@@ -294,6 +402,8 @@ a.top-left {
 a.top-right {
   top: 40px;
   right: 40px;
+  z-index: 1000;
+
 }
 
 a.bottom-left {
@@ -306,9 +416,12 @@ a.bottom-right {
   right: 40px;
 }
 
+.main .bottom {
+  z-index: 1000;
+}
+
 @media only screen and (max-width: 700px) {
   .main .bottom {
-    z-index: 1000;
     bottom: 0;
     height: 60px;
     background-color: rgba(0, 0, 0, 0.2);
@@ -347,7 +460,7 @@ a.bottom-right {
     font-size: 0.6rem !important;
   }
   span.header-left {
-    top: 20px;
+    top: 10px;
     left: 20px;
   }
   a.top-left {
