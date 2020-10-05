@@ -105,7 +105,7 @@ body {
 
 .main > .code {
   position: absolute;
-  right: 20vw;
+  right: 10vw;
   margin-right: -100px;
   width: 640px;
   max-width: 80%;
