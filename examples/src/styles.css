@@ -116,15 +116,14 @@ body {
 }
 
 .code-container {
-  position: absolute;
-  bottom: -100px;
-  margin-bottom: 30vh;
+  position: relative;
+  margin-bottom: -60px;
 }
 
 .counter {
   position: absolute;
   top: -100px;
-  right: -40px;
+  right: -20px;
   color: white;
   background: #394a52;
   padding: 40px;
@@ -186,7 +185,6 @@ body {
   }
 
   .code-container {
-    position: relative;
     bottom: 0;
     margin-bottom: -60px;
   }
@@ -205,7 +203,6 @@ body {
 
 @media only screen and (max-width: 600px) {
   .code-container {
-    position: relative;
     width: 100%;
   }
 
@@ -225,7 +222,6 @@ body {
 @media only screen and (max-height: 600px) {
 
   .code-container {
-    position: relative;
     bottom: 0;
     margin-bottom: -60px;
   }
@@ -235,44 +231,26 @@ body {
   }
 
   .counter {
+    transform: scale(0.8);
+    transform-origin: bottom right;
     top: 100px;
-    right: -80px;
+    right: -30px;
   }
 }
 @media only screen and (max-width: 600px) {
 
   .counter {
-    top: 70px;
+    top: -160px;
     right: 20px;
   }
 }
 
 
 
-@media only screen and (max-height: 500px) {
-  .main > .code {
-  }
 
+
+@media only screen and (max-width: 430px)  {
   .code-container {
-    position: relative;
-    margin-bottom: -60px;
-  }
-  .code-container > code[class*='language-'] {
-    font-size: 0.5rem !important;
-    padding: 20px 20px 70px;
-  }
-
-  .counter {
-    top: 40px;
-    right: 20px;
-    }
-}
-
-
-@media only screen and (max-width: 360px)  {
-  .code-container {
-    position: relative;
-    bottom: 0;
     margin-bottom: -60px;
   }
   .code-container > code[class*='language-'] {
@@ -297,6 +275,16 @@ body {
   }
 }
 
+@media only screen and (max-height: 500px) {
+  .code-container > code[class*='language-'] {
+    font-size: 0.5rem !important;
+  }
+
+  .counter {
+    top: 40px;
+    right: 20px;
+    }
+}
 
 @media only screen and (max-height: 500px) and (min-width: 600px) {
   .counter {
