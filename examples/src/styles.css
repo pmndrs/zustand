@@ -24,8 +24,8 @@ body,
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
-  helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto,
+    segoe ui, arial, sans-serif;
 }
 
 .main {
@@ -48,6 +48,49 @@ body {
   background-repeat: no-repeat;
 }
 
+@media only screen and (max-width: 700px) {
+  #root {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+  }
+  .canvas-container {
+    height: unset;
+    flex: 1 0 0px;
+    margin-bottom: -100px;
+  }
+  .canvas-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    height: 100px;
+    width: 100%;
+    background: linear-gradient(0deg, black, transparent);
+  }
+
+  .main {
+    position: relative;
+    flex: 0 0 auto;
+    height: auto;
+  }
+
+  .main > div {
+    position: relative;
+    height: auto;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .canvas-container {
+    margin-bottom: -40px;
+  }
+  .canvas-container::after {
+    display: none;
+  }
+}
+
 .bg {
   background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/DWLR-bg.jpg');
 }
@@ -60,11 +103,12 @@ body {
   background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/xyC5-ground.png');
 }
 
-.code {
-  position: relative;
-  margin-left: -140px;
-  left: 50%;
-  width: 50% !important;
+.main > .code {
+  position: absolute;
+  right: 10vw;
+  margin-right: -60px;
+  width: 640px;
+  max-width: 80%;
   height: 100%;
   display: flex;
   align-items: center;
@@ -72,13 +116,14 @@ body {
 }
 
 .code-container {
-  position: absolute;
+  position: relative;
+  margin-bottom: -60px;
 }
 
 .counter {
   position: absolute;
   top: -100px;
-  right: -40px;
+  right: -20px;
   color: white;
   background: #394a52;
   padding: 40px;
@@ -109,10 +154,154 @@ body {
   border-radius: 5px;
   border: solid 2px white;
   outline: none;
-  background:transparent;
+  background: transparent;
   color: white;
   cursor: pointer;
 }
+
+.code-container code[class*='language-'] {
+  margin-top: -50px;
+  display: inline-block;
+  width: auto !important;
+  padding: 40px 50px 40px 45px;
+  font-size: 0.8rem !important;
+  border-radius: 10px !important;
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
+  white-space: pre-wrap !important;
+  pointer-events: all;
+}
+
+
+@media only screen and (max-width: 700px) {
+  .main > .code {
+    position: relative;
+    height: auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+  }
+
+  .code-container {
+    bottom: 0;
+    margin-bottom: -60px;
+  }
+  .code-container > code[class*='language-'] {
+    font-size: 0.6rem;
+    padding: 20px 50px 70px 20px;
+    border-radius: 10px  10px 0 0 !important;
+  }
+  .counter {
+    top: -100px;
+    right: 20px;
+  }
+}
+
+
+
+@media only screen and (max-width: 600px) {
+  .code-container {
+    width: 100%;
+  }
+
+  .code-container > code[class*='language-'] {
+    font-size: 0.6rem !important;
+    padding: 20px 20px 70px;
+    width: 100% !important;
+  }
+  
+  .counter {
+    top: 70px;
+    right: 20px;
+  }
+
+}
+
+@media only screen and (max-height: 600px) {
+
+  .code-container {
+    bottom: 0;
+    margin-bottom: -60px;
+  }
+  .code-container > code[class*='language-'] {
+    font-size: 0.6rem;
+    padding: 20px 20px 70px;
+  }
+
+  .counter {
+    transform: scale(0.8);
+    transform-origin: bottom right;
+    top: 100px;
+    right: -30px;
+  }
+}
+@media only screen and (max-width: 600px) {
+
+  .counter {
+    top: -160px;
+    right: 20px;
+  }
+}
+
+
+
+
+
+@media only screen and (max-width: 430px)  {
+  .code-container {
+    margin-bottom: -60px;
+  }
+  .code-container > code[class*='language-'] {
+    font-size: 0.6rem;
+    padding: 20px 20px 70px;
+  }
+
+  .counter {
+    transform: scale(0.8);
+    transform-origin: bottom right;
+    top: -160px;
+    right: 20px;
+  }
+}
+@media only screen and (max-height: 480px)  {
+  .counter {
+    transform: scale(0.8);
+    transform-origin: bottom right;
+    bottom: 70px;
+    right: 20px;
+    top: unset;
+  }
+}
+
+@media only screen and (max-height: 500px) {
+  .code-container > code[class*='language-'] {
+    font-size: 0.5rem !important;
+  }
+
+  .counter {
+    top: 40px;
+    right: 20px;
+    }
+}
+
+@media only screen and (max-height: 500px) and (min-width: 600px) {
+  .counter {
+    top: 40px;
+    right: -80px;
+    }
+}
+
+@media only screen and (max-height:360px) and (min-width: 600px) {
+  .counter {
+    top: 50px;
+    right: -80px;
+    }
+}
+
+
+
 
 .bear {
   top: 12.5%;
@@ -139,25 +328,18 @@ body {
   background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/3n-p-leaves2.png');
 }
 
-code {
-  margin-top: -50px;
-  display: inline-block;
-  width: auto !important;
-  padding: 40px 50px 40px 45px !important;
-  font-size: 0.8em;
-  border-radius: 10px !important;
-  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
-}
+
 
 span.header-left {
   font-weight: 700;
   text-transform: uppercase;
   position: absolute;
   display: inline-block;
-  top: 40px;
+  top: 30px;
   left: 40px;
   font-size: 3em;
   color: white;
+  z-index: 1000;
 }
 
 @media only screen and (max-width: 1200px) {
@@ -178,25 +360,17 @@ span.header-left {
   }
   .code {
     justify-content: center;
-    width: 100% !important;
-    left: 0;
     z-index: 1000;
     margin-left: 0;
   }
-  code {
-    font-size: 0.8em;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  code {
-    font-size: 0.6em;
+  code[class*='language-'] {
+    font-size: 0.7rem !important;
   }
 }
 
 a {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
-    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto,
+    segoe ui, arial, sans-serif;
   font-weight: 400;
   font-size: 16px;
   color: inherit;
@@ -216,6 +390,8 @@ a.top-left {
 a.top-right {
   top: 40px;
   right: 40px;
+  z-index: 1000;
+
 }
 
 a.bottom-left {
@@ -228,12 +404,51 @@ a.bottom-right {
   right: 40px;
 }
 
-@media only screen and (max-width: 500px) {
-  code {
-    font-size: 0.4em;
+.main .bottom {
+  z-index: 1000;
+}
+
+@media only screen and (max-width: 700px) {
+  .main .bottom {
+    bottom: 0;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  a.bottom-left {
+    bottom: 20px;
+    left: 20px;
+  }
+
+  a.bottom-right {
+    bottom: 20px;
+    right: 20px;
+  }
+  a.top-left {
+    position: fixed;
+    font-size: 0.8em;
+    top: 90px;
+    left: 40px;
+  }
+
+  a.top-right {
+    position: fixed;
+    top: 40px;
+    right: 40px;
   }
   span.header-left {
-    top: 20px;
+    position: fixed;
+    top: 30px;
+    left: 40px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  code[class*='language-'] {
+    font-size: 0.6rem !important;
+  }
+  span.header-left {
+    top: 10px;
     left: 20px;
   }
   a.top-left {
@@ -247,12 +462,10 @@ a.bottom-right {
   }
 
   a.bottom-left {
-    bottom: 20px;
     left: 20px;
   }
 
   a.bottom-right {
-    bottom: 20px;
     right: 20px;
   }
 }
