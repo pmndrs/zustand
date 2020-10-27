@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "declaration": true,
     "strict": true,
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
