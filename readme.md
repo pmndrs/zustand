@@ -269,6 +269,31 @@ const useStore = create(
 )
 ```
 
+
+<overview>
+<summary>How to pipe middlewares</summary>
+<details>
+
+```js
+import create from "zustand"
+import produce from "immer"
+import pipe from "ramda/es/pipe"
+
+/* log and immer functions from previous example */
+/* you can pipe as many middlewares as you want */
+const createStore = pipe(log, immer, create)
+
+const useStore = createStore(set => ({
+  bears: 1,
+  increasePopulation: () => set(state => ({ bears: state.bears + 1 }))
+}))
+
+export default useStore
+```
+For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
+</details>
+</overview>
+
 <overview>
 <summary>TypeScript</summary>
 <details>
