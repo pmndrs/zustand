@@ -295,7 +295,7 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 </overview>
 
 <overview>
-<summary>TypeScript</summary>
+<summary>How to type immer middleware in TypeScript</summary>
 <details>
 
 ```ts
