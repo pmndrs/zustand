@@ -98,21 +98,22 @@ export const devtools = <S extends State>(
 
 export const combine = <
   PrimaryState extends State,
-  SecondaryState extends State
+  SecondaryState extends State = State,
+  CustomSetState extends SetState<PrimaryState> = SetState<PrimaryState>
 >(
   initialState: PrimaryState,
   create: (
-    set: SetState<PrimaryState>,
+    set: CustomSetState,
     get: GetState<PrimaryState>,
     api: StoreApi<PrimaryState>
   ) => SecondaryState
-): StateCreator<PrimaryState & SecondaryState> => (set, get, api) =>
+): StateCreator<PrimaryState & SecondaryState, CustomSetState> => (
+  set,
+  get,
+  api
+) =>
   Object.assign(
     {},
     initialState,
-    create(
-      set as SetState<PrimaryState>,
-      get as GetState<PrimaryState>,
-      api as StoreApi<PrimaryState>
-    )
+    create(set, get as GetState<PrimaryState>, api as StoreApi<PrimaryState>)
   )
