@@ -61,9 +61,10 @@ export default function create<TState extends State>(
       // the listener from being called.
       // https://github.com/react-spring/zustand/pull/37
       try {
-        const newStateSlice = selector(state)
-        if (!equalityFn(currentSlice, newStateSlice)) {
-          listener((currentSlice = newStateSlice))
+        const previousSlice = currentSlice
+        currentSlice = selector(state)
+        if (!equalityFn(previousSlice, currentSlice)) {
+          listener(currentSlice)
         }
       } catch (error) {
         listener(null, error)

@@ -438,6 +438,24 @@ it('can subscribe to the store', () => {
   unsub()
 })
 
+it('ensures equalityFn is always called with the correct values', () => {
+  const { setState, subscribe } = create(() => ({ value: 0 }))
+  const equalityFn = jest.fn(() => true);
+
+  subscribe(
+    () => {},
+    (state) => state.value,
+    equalityFn
+  );
+  
+  setState({ value: 1 })
+  expect(equalityFn).toHaveBeenCalledWith(0, 1);
+  setState({ value: 2 })
+  expect(equalityFn).toHaveBeenCalledWith(1, 2);
+  setState({ value: 2 })
+  expect(equalityFn).toHaveBeenCalledWith(2, 2);
+});
+
 it('can destroy the store', () => {
   const { destroy, getState, setState, subscribe } = create(() => ({
     value: 1,
