@@ -299,7 +299,7 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 <details>
 
 ```ts
-import { State } from 'zustand'
+import { State, StateCreator } from 'zustand'
 
 const immer = <T extends State>(
   config: StateCreator<T, (fn: (draft: T) => void) => void>
