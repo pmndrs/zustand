@@ -54,7 +54,7 @@ it('uses the store with no args', async () => {
 
   function Counter() {
     const { count, inc } = useStore()
-    React.useEffect(inc, [])
+    React.useEffect(inc, [inc])
     return <div>count: {count}</div>
   }
 
@@ -72,7 +72,7 @@ it('uses the store with selectors', async () => {
   function Counter() {
     const count = useStore((s) => s.count)
     const inc = useStore((s) => s.inc)
-    React.useEffect(inc, [])
+    React.useEffect(inc, [inc])
     return <div>count: {count}</div>
   }
 
@@ -160,7 +160,7 @@ it('can batch updates', async () => {
         inc()
         inc()
       })
-    }, [])
+    }, [inc])
     return <div>count: {count}</div>
   }
 
