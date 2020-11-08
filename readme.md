@@ -310,6 +310,26 @@ const immer = <T extends State>(
 </details>
 </overview>
 
+## Persist middleware
+
+You can persist you store's data using any kind of storage.
+
+```jsx
+import create from "zustand"
+import { persist } from "zustand/middleware"
+
+export const useStore = create(persist(
+  (set, get) => ({
+    fish: 0,
+    addAFish: () => set({ fish: get().fish + 1 })
+  }),
+  {
+    name: "food-storage", // unique name
+    storage: sessionStorage, // (optional) default is 'localStorage'
+  }
+))
+```
+
 ## Can't live without redux-like reducers and action types?
 
 ```jsx

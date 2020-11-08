@@ -1,10 +1,10 @@
 import {
-  State,
   GetState,
-  SetState,
-  StoreApi,
   PartialState,
+  SetState,
+  State,
   StateCreator,
+  StoreApi,
 } from './vanilla'
 
 export const redux = <S extends State, A extends { type: unknown }>(
@@ -116,3 +116,48 @@ export const combine = <
       api as StoreApi<PrimaryState>
     )
   )
+
+export type StateStorage = {
+  getItem: (name: string) => string | null | Promise<string | null>
+  setItem: (name: string, value: string) => void | Promise<void>
+}
+export type PersistOptions<S> = {
+  name: string
+  storage?: StateStorage
+  serialize?: (state: S) => string | Promise<string>
+  deserialize?: (str: string) => S | Promise<S>
+}
+
+export const persist = <S extends State>(
+  config: StateCreator<S>,
+  options: PersistOptions<S>
+) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
+  const {
+    name,
+    storage = localStorage,
+    serialize = JSON.stringify,
+    deserialize = JSON.parse,
+  } = options || {}
+
+  const state = config(
+    (payload) => {
+      set(payload)
+      ;(async () => {
+        storage.setItem(name, await serialize(get()))
+      })()
+    },
+    get,
+    api
+  )
+
+  ;(async () => {
+    try {
+      const storedState = await storage.getItem(name)
+      if (storedState) set(await deserialize(storedState))
+    } catch (e) {
+      console.error(new Error(`Unable to get to stored state in "${name}"`))
+    }
+  })()
+
+  return state
+}
