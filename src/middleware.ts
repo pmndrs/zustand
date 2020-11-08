@@ -117,11 +117,11 @@ export const combine = <
     )
   )
 
-export type StateStorage = {
+type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
-export type PersistOptions<S> = {
+type PersistOptions<S> = {
   name: string
   storage?: StateStorage
   serialize?: (state: S) => string | Promise<string>
