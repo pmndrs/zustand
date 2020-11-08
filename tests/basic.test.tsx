@@ -436,6 +436,30 @@ it('can subscribe to the store', () => {
   unsub()
   expect(listener).toHaveBeenCalledTimes(1)
   expect(listener).toHaveBeenCalledWith(initialState.value + 2)
+
+  // Should keep consistent behavior with equality check
+  const isRoughEqual = (x: number, y: number) => Math.abs(x - y) < 1
+  setState({ value: 0 })
+  listener.mockReset()
+  const listener2 = jest.fn()
+  let prevValue = getState().value
+  unsub = subscribe((s) => {
+    if (isRoughEqual(prevValue, s.value)) {
+      // skip assuming values are equal
+      return
+    }
+    listener(s.value)
+    prevValue = s.value
+  })
+  const unsub2 = subscribe(listener2, (s) => s.value, isRoughEqual as any)
+  setState({ value: 0.5 })
+  setState({ value: 1 })
+  unsub()
+  unsub2()
+  expect(listener).toHaveBeenCalledTimes(1)
+  expect(listener).toHaveBeenCalledWith(1)
+  expect(listener2).toHaveBeenCalledTimes(1)
+  expect(listener2).toHaveBeenCalledWith(1)
 })
 
 it('can destroy the store', () => {
