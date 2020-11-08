@@ -326,12 +326,6 @@ export const useStore = create(persist(
   {
     name: "food-storage", // unique name
     storage: sessionStorage, // (optional) default is 'localStorage'
-    serialize: (state) => { // (optional) default is 'JSON.stringify'
-      // some stuff to serialize the state and return it
-    }, 
-    deserialize: (str) => { // (optional) default is 'JSON.parse'
-      // some stuff to deserialize the state and return it
-    }
   }
 ))
 ```
