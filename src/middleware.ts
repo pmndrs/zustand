@@ -118,8 +118,8 @@ export const combine = <
   )
 
 export type StateStorage = {
-  getItem: (key: string) => string | null | Promise<string | null>
-  setItem: (key: string, value: string) => void | Promise<void>
+  getItem: (name: string) => string | null | Promise<string | null>
+  setItem: (name: string, value: string) => void | Promise<void>
 }
 export type PersistOptions<S> = {
   name: string
