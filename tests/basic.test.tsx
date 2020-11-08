@@ -380,6 +380,7 @@ it('can set the store without merging', () => {
 it('can subscribe to the store', () => {
   const initialState = { value: 1, other: 'a' }
   const { setState, getState, subscribe } = create(() => initialState)
+  const listener = jest.fn()
 
   // Should not be called if new state identity is the same
   let unsub = subscribe(() => {
@@ -406,14 +407,12 @@ it('can subscribe to the store', () => {
   unsub()
 
   // Should be called when state slice changes
-  unsub = subscribe(
-    (value: number | null) => {
-      expect(value).toBe(initialState.value + 1)
-    },
-    (s) => s.value
-  )
+  listener.mockReset()
+  unsub = subscribe(listener, (s) => s.value)
   setState({ value: initialState.value + 1 })
   unsub()
+  expect(listener).toHaveBeenCalledTimes(1)
+  expect(listener).toHaveBeenCalledWith(initialState.value + 1)
 
   // Should not be called when equality checker returns true
   unsub = subscribe(
@@ -427,15 +426,16 @@ it('can subscribe to the store', () => {
   unsub()
 
   // Should be called when equality checker returns false
+  listener.mockReset()
   unsub = subscribe(
-    (value: number | null) => {
-      expect(value).toBe(initialState.value + 2)
-    },
+    listener,
     (s) => s.value,
     () => false
   )
-  setState(getState())
+  setState({ value: initialState.value + 2 })
   unsub()
+  expect(listener).toHaveBeenCalledTimes(1)
+  expect(listener).toHaveBeenCalledWith(initialState.value + 2)
 })
 
 it('can destroy the store', () => {
