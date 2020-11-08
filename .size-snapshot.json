@@ -58,9 +58,9 @@
     "gzipped": 903
   },
   "index.iife.js": {
-    "bundled": 6280,
-    "minified": 1814,
-    "gzipped": 809
+    "bundled": 6348,
+    "minified": 1863,
+    "gzipped": 840
   },
   "shallow.js": {
     "bundled": 619,
