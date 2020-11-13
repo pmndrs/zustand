@@ -412,7 +412,10 @@ it('can subscribe to the store', () => {
   setState({ value: initialState.value + 1 })
   unsub()
   expect(listener).toHaveBeenCalledTimes(1)
-  expect(listener).toHaveBeenCalledWith(initialState.value + 1)
+  expect(listener).toHaveBeenCalledWith(
+    initialState.value + 1,
+    initialState.value
+  )
 
   // Should not be called when equality checker returns true
   unsub = subscribe(
@@ -435,7 +438,10 @@ it('can subscribe to the store', () => {
   setState({ value: initialState.value + 2 })
   unsub()
   expect(listener).toHaveBeenCalledTimes(1)
-  expect(listener).toHaveBeenCalledWith(initialState.value + 2)
+  expect(listener).toHaveBeenCalledWith(
+    initialState.value + 2,
+    initialState.value + 2
+  )
 
   // Should keep consistent behavior with equality check
   const isRoughEqual = (x: number, y: number) => Math.abs(x - y) < 1
@@ -448,7 +454,7 @@ it('can subscribe to the store', () => {
       // skip assuming values are equal
       return
     }
-    listener(s.value)
+    listener(s.value, prevValue)
     prevValue = s.value
   })
   const unsub2 = subscribe(listener2, (s) => s.value, isRoughEqual as any)
@@ -457,9 +463,9 @@ it('can subscribe to the store', () => {
   unsub()
   unsub2()
   expect(listener).toHaveBeenCalledTimes(1)
-  expect(listener).toHaveBeenCalledWith(1)
+  expect(listener).toHaveBeenCalledWith(1, 0)
   expect(listener2).toHaveBeenCalledTimes(1)
-  expect(listener2).toHaveBeenCalledWith(1)
+  expect(listener2).toHaveBeenCalledWith(1, 0)
 })
 
 it('can destroy the store', () => {
