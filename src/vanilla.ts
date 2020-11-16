@@ -4,8 +4,8 @@ export type PartialState<T extends State> =
   | ((state: T) => Partial<T>)
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: unknown) => boolean
-export type StateListener<T> = (state: T) => void
-export type StateSliceListener<T> = (state: T | null, error?: Error) => void
+export type StateListener<T> = (state: T, previousState: T) => void
+export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export interface Subscribe<T extends State> {
   (listener: StateListener<T>): () => void
   <StateSlice>(
@@ -41,10 +41,11 @@ export default function create<TState extends State>(
   const setState: SetState<TState> = (partial, replace) => {
     const nextState = typeof partial === 'function' ? partial(state) : partial
     if (nextState !== state) {
+      const previousState = state
       state = replace
         ? (nextState as TState)
         : Object.assign({}, state, nextState)
-      listeners.forEach((listener) => listener(state))
+      listeners.forEach((listener) => listener(state, previousState))
     }
   }
 
@@ -57,16 +58,10 @@ export default function create<TState extends State>(
   ) => {
     let currentSlice: StateSlice = selector(state)
     function listenerToAdd() {
-      // Selector or equality function could throw but we don't want to stop
-      // the listener from being called.
-      // https://github.com/react-spring/zustand/pull/37
-      try {
-        const newStateSlice = selector(state)
-        if (!equalityFn(currentSlice, newStateSlice)) {
-          listener((currentSlice = newStateSlice))
-        }
-      } catch (error) {
-        listener(null, error)
+      const nextSlice = selector(state)
+      if (!equalityFn(currentSlice, nextSlice)) {
+        const previousSlice = currentSlice
+        listener((currentSlice = nextSlice), previousSlice)
       }
     }
     listeners.add(listenerToAdd)
