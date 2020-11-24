@@ -134,7 +134,12 @@ export const persist = <S extends State>(
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
   const {
     name,
-    storage = localStorage,
+    storage = typeof localStorage !== 'undefined'
+      ? localStorage
+      : {
+          getItem: () => null,
+          setItem: () => {},
+        },
     serialize = JSON.stringify,
     deserialize = JSON.parse,
   } = options || {}
