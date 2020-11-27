@@ -123,7 +123,7 @@ type StateStorage = {
 }
 type PersistOptions<S> = {
   name: string
-  storage?: StateStorage
+  storage?: StateStorage | 'localStorage' | 'sessionStorage'
   serialize?: (state: S) => string | Promise<string>
   deserialize?: (str: string) => S | Promise<S>
 }
@@ -132,17 +132,20 @@ export const persist = <S extends State>(
   config: StateCreator<S>,
   options: PersistOptions<S>
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
+  
+  const storageDummy = {
+    getItem: () => null,
+    setItem: () => {},
+  }
+
   const {
     name,
-    storage = typeof localStorage !== 'undefined'
-      ? localStorage
-      : {
-          getItem: () => null,
-          setItem: () => {},
-        },
+    storage: providedStorage,
     serialize = JSON.stringify,
     deserialize = JSON.parse,
   } = options || {}
+
+  const storage = typeof window === 'undefined' ? storageDummy : typeof providedStorage === 'string' ? window[providedStorage] as StateStorage : localStorage
 
   const state = config(
     (payload) => {
