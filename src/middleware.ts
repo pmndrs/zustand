@@ -132,7 +132,7 @@ export const persist = <S extends State>(
   config: StateCreator<S>,
   options: PersistOptions<S>
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
-  const storageDummy: StateStorage = {
+  const storageDummy = {
     getItem: () => null,
     setItem: () => {},
   }
