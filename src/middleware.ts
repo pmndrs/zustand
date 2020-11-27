@@ -132,8 +132,7 @@ export const persist = <S extends State>(
   config: StateCreator<S>,
   options: PersistOptions<S>
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
-  
-  const storageDummy = {
+  const storageDummy: StateStorage = {
     getItem: () => null,
     setItem: () => {},
   }
@@ -145,7 +144,12 @@ export const persist = <S extends State>(
     deserialize = JSON.parse,
   } = options || {}
 
-  const storage = typeof window === 'undefined' ? storageDummy : typeof providedStorage === 'string' ? window[providedStorage] as StateStorage : localStorage
+  const storage =
+    typeof window === 'undefined'
+      ? storageDummy
+      : typeof providedStorage === 'string'
+      ? window[providedStorage]
+      : providedStorage || localStorage
 
   const state = config(
     (payload) => {
