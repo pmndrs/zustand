@@ -156,7 +156,7 @@ export const persist = <S extends State>(
   const state = config(
     (payload) => {
       set(payload)
-      ;(async () => await setItem())()
+      setItem()
     },
     get,
     api
