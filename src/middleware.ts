@@ -150,7 +150,7 @@ export const persist = <S extends State>(
 
   api.setState = (state, replace) => {
     savedSetState(state, replace)
-    ;(async () => await setItem())()
+    setItem()
   }
 
   const state = config(
