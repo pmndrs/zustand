@@ -148,7 +148,7 @@ export const persist = <S extends State>(
 
   const savedSetState = api.setState
 
-  api.setState = (state: PartialState<S>, replace?: boolean) => {
+  api.setState = (state, replace) => {
     savedSetState(state, replace)
     ;(async () => await setItem())()
   }
