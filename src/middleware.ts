@@ -143,13 +143,20 @@ export const persist = <S extends State>(
     serialize = JSON.stringify,
     deserialize = JSON.parse,
   } = options || {}
+  
+  const setItem = async () => storage.setItem(name, await serialize(get()));
+
+  const savedSetState = api.setState;
+
+  api.setState = (state: PartialState<S>, replace?: boolean) => {
+    savedSetState(state, replace);
+    (async () => await setItem())();
+  };
 
   const state = config(
     (payload) => {
-      set(payload)
-      ;(async () => {
-        storage.setItem(name, await serialize(get()))
-      })()
+      set(payload);
+      (async () => await setItem())();
     },
     get,
     api
