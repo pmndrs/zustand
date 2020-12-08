@@ -126,6 +126,8 @@ type PersistOptions<S> = {
   storage?: StateStorage
   serialize?: (state: S) => string | Promise<string>
   deserialize?: (str: string) => S | Promise<S>
+  blacklist?: (keyof S)[]
+  whitelist?: (keyof S)[]
 }
 
 export const persist = <S extends State>(
@@ -142,9 +144,22 @@ export const persist = <S extends State>(
         },
     serialize = JSON.stringify,
     deserialize = JSON.parse,
+    blacklist,
+    whitelist,
   } = options || {}
 
-  const setItem = async () => storage.setItem(name, await serialize(get()))
+  const setItem = async () => {
+    const state = { ...get() }
+    if (whitelist) {
+      Object.keys(state).forEach(
+        (key) => !whitelist.includes(key) && delete state[key]
+      )
+    }
+    if (blacklist) {
+      blacklist.forEach((key) => delete state[key])
+    }
+    storage.setItem(name, await serialize(state))
+  }
 
   const savedSetState = api.setState
 
