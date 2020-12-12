@@ -132,7 +132,8 @@ type PersistOptions<S> = {
 
 export const persist = <S extends State>(
   config: StateCreator<S>,
-  options: PersistOptions<S>
+  options: PersistOptions<S>,
+  callback?: () => void
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
   const {
     name,
@@ -183,6 +184,8 @@ export const persist = <S extends State>(
       if (storedState) set(await deserialize(storedState))
     } catch (e) {
       console.error(new Error(`Unable to get to stored state in "${name}"`))
+    } finally {
+      callback?.()
     }
   })()
 
