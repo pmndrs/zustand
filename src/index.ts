@@ -125,3 +125,32 @@ export default function create<TState extends State>(
 
   return useStore
 }
+
+/**
+ * Returns a proxy to a Zustand store that allows more convenient access to a store's
+ * properties in a reactive manner.
+ *
+ * @param store The Zustand store to proxy.
+ */
+export const useStoreProxy = <T extends State>(store: UseStore<T>): T => {
+  return new Proxy<Record<any, any>>(
+    {},
+    {
+      get: (cache, prop: keyof T) => {
+        /* Memoize store access */
+        if (!cache.hasOwnProperty(prop)) cache[prop] = store((s) => s[prop])
+
+        return cache[prop]
+      },
+
+      set: (_cache, prop, _value) => {
+        console.error(
+          `You tried to write to the "${String(
+            prop
+          )}" property of a Zustand snapshot, which is not supported.`
+        )
+        return false
+      },
+    }
+  )
+}
