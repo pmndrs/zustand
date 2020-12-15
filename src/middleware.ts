@@ -128,12 +128,12 @@ type PersistOptions<S> = {
   deserialize?: (str: string) => S | Promise<S>
   blacklist?: (keyof S)[]
   whitelist?: (keyof S)[]
+  postRehydrationMiddleware?: () => void
 }
 
 export const persist = <S extends State>(
   config: StateCreator<S>,
-  options: PersistOptions<S>,
-  callback?: () => void
+  options: PersistOptions<S>
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
   const {
     name,
@@ -147,6 +147,7 @@ export const persist = <S extends State>(
     deserialize = JSON.parse,
     blacklist,
     whitelist,
+    postRehydrationMiddleware,
   } = options || {}
 
   const setItem = async () => {
@@ -185,7 +186,7 @@ export const persist = <S extends State>(
     } catch (e) {
       console.error(new Error(`Unable to get to stored state in "${name}"`))
     } finally {
-      callback?.()
+      postRehydrationMiddleware?.()
     }
   })()
 
