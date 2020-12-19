@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/ZZjjNvJ)
 
-Zustand is pronounced "tsoostand" and means "state" in German. A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
+A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
 
 Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
@@ -175,12 +175,15 @@ const unsub1 = useStore.subscribe(console.log)
 const unsub2 = useStore.subscribe(console.log, state => state.paw)
 // Subscribe also supports an optional equality function
 const unsub3 = useStore.subscribe(console.log, state => [state.paw, state.fur], shallow)
+// Subscribe also exposes the previous value
+const unsub4 = useStore.subscribe((paw, previousPaw) => console.log(paw, previousPaw), state => state.paw)
 // Updating state, will trigger listeners
 useStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
 unsub2()
 unsub3()
+unsub4()
 // Destroying the store (removing all listeners)
 useStore.destroy()
 
@@ -269,21 +272,67 @@ const useStore = create(
 )
 ```
 
+
 <overview>
-<summary>TypeScript</summary>
+<summary>How to pipe middlewares</summary>
+<details>
+
+```js
+import create from "zustand"
+import produce from "immer"
+import pipe from "ramda/es/pipe"
+
+/* log and immer functions from previous example */
+/* you can pipe as many middlewares as you want */
+const createStore = pipe(log, immer, create)
+
+const useStore = createStore(set => ({
+  bears: 1,
+  increasePopulation: () => set(state => ({ bears: state.bears + 1 }))
+}))
+
+export default useStore
+```
+For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
+</details>
+</overview>
+
+<overview>
+<summary>How to type immer middleware in TypeScript</summary>
 <details>
 
 ```ts
-import { State } from 'zustand'
+import { State, StateCreator } from 'zustand'
+import produce, { Draft } from 'immer'
 
 const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: T) => void) => void>
+  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
 ): StateCreator<T> => (set, get, api) =>
   config((fn) => set(produce(fn) as (state: T) => T), get, api)
 ```
 
 </details>
 </overview>
+
+## Persist middleware
+
+You can persist you store's data using any kind of storage.
+
+```jsx
+import create from "zustand"
+import { persist } from "zustand/middleware"
+
+export const useStore = create(persist(
+  (set, get) => ({
+    fish: 0,
+    addAFish: () => set({ fish: get().fish + 1 })
+  }),
+  {
+    name: "food-storage", // unique name
+    storage: sessionStorage, // (optional) default is 'localStorage'
+  }
+))
+```
 
 ## Can't live without redux-like reducers and action types?
 

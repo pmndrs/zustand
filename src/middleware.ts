@@ -1,10 +1,10 @@
 import {
-  State,
   GetState,
-  SetState,
-  StoreApi,
   PartialState,
+  SetState,
+  State,
   StateCreator,
+  StoreApi,
 } from './vanilla'
 
 export const redux = <S extends State, A extends { type: unknown }>(
@@ -116,3 +116,79 @@ export const combine = <
       api as StoreApi<PrimaryState>
     )
   )
+
+type StateStorage = {
+  getItem: (name: string) => string | null | Promise<string | null>
+  setItem: (name: string, value: string) => void | Promise<void>
+}
+type PersistOptions<S> = {
+  name: string
+  storage?: StateStorage
+  serialize?: (state: S) => string | Promise<string>
+  deserialize?: (str: string) => S | Promise<S>
+  blacklist?: (keyof S)[]
+  whitelist?: (keyof S)[]
+  postRehydrationMiddleware?: () => void
+}
+
+export const persist = <S extends State>(
+  config: StateCreator<S>,
+  options: PersistOptions<S>
+) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
+  const {
+    name,
+    storage = typeof localStorage !== 'undefined'
+      ? localStorage
+      : {
+          getItem: () => null,
+          setItem: () => {},
+        },
+    serialize = JSON.stringify,
+    deserialize = JSON.parse,
+    blacklist,
+    whitelist,
+    postRehydrationMiddleware,
+  } = options || {}
+
+  const setItem = async () => {
+    const state = { ...get() }
+    if (whitelist) {
+      Object.keys(state).forEach(
+        (key) => !whitelist.includes(key) && delete state[key]
+      )
+    }
+    if (blacklist) {
+      blacklist.forEach((key) => delete state[key])
+    }
+    storage.setItem(name, await serialize(state))
+  }
+
+  const savedSetState = api.setState
+
+  api.setState = (state, replace) => {
+    savedSetState(state, replace)
+    setItem()
+  }
+
+  const state = config(
+    (payload) => {
+      set(payload)
+      setItem()
+    },
+    get,
+    api
+  )
+
+  ;(async () => {
+    try {
+      const storedState = await storage.getItem(name)
+      if (storedState) set(await deserialize(storedState))
+    } catch (e) {
+      console.error(new Error(`Unable to get to stored state in "${name}"`))
+    } finally {
+      postRehydrationMiddleware?.()
+    }
+  })()
+
+  return state
+}
