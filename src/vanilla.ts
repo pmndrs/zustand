@@ -3,7 +3,7 @@ export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
 export type StateSelector<T extends State, U> = (state: T) => U
-export type EqualityChecker<T> = (state: T, newState: unknown) => boolean
+export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export interface Subscribe<T extends State> {

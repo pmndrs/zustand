@@ -82,19 +82,19 @@ it('uses the store with selectors', async () => {
 })
 
 it('uses the store with a selector and equality checker', async () => {
-  const useStore = create(() => ({ value: 0 }))
+  const useStore = create(() => ({ item: { value: 0 } }))
   const { setState } = useStore
   let renderCount = 0
 
   function Component() {
     // Prevent re-render if new value === 1.
-    const value = useStore(
-      (s) => s.value,
-      (_, newValue) => newValue === 1
+    const item = useStore(
+      (s) => s.item,
+      (_, newItem) => newItem.value === 1
     )
     return (
       <div>
-        renderCount: {++renderCount}, value: {value}
+        renderCount: {++renderCount}, value: {item.value}
       </div>
     )
   }
@@ -104,11 +104,11 @@ it('uses the store with a selector and equality checker', async () => {
   await findByText('renderCount: 1, value: 0')
 
   // This will not cause a re-render.
-  act(() => setState({ value: 1 }))
+  act(() => setState({ item: { value: 1 } }))
   await findByText('renderCount: 1, value: 0')
 
   // This will cause a re-render.
-  act(() => setState({ value: 2 }))
+  act(() => setState({ item: { value: 2 } }))
   await findByText('renderCount: 2, value: 2')
 })
 
