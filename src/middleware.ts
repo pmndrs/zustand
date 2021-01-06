@@ -121,14 +121,51 @@ type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
+type StorageValue<S> = { state: S; version: number }
 type PersistOptions<S> = {
+  /** Name of the storage (must be unique) */
   name: string
-  storage?: StateStorage
-  serialize?: (state: S) => string | Promise<string>
-  deserialize?: (str: string) => S | Promise<S>
+  /**
+   * A function returning a storage.
+   * The storage must fit `window.localStorage`'s api (or an async version of it).
+   * For example the storage could be `AsyncStorage` from React Native.
+   *
+   * @default () => localStorage
+   */
+  getStorage?: () => StateStorage
+  /**
+   * Use a custom serializer.
+   * The returned string will be stored in the storage.
+   *
+   * @default JSON.stringify
+   */
+  serialize?: (state: StorageValue<S>) => string | Promise<string>
+  /**
+   * Use a custom deserializer.
+   *
+   * @param str The storage's current value.
+   * @default JSON.parse
+   */
+  deserialize?: (str: string) => StorageValue<S> | Promise<S>
+  /**
+   * Prevent some items from being stored.
+   */
   blacklist?: (keyof S)[]
+  /**
+   * Only store the listed properties.
+   */
   whitelist?: (keyof S)[]
-  postRehydrationMiddleware?: () => void
+  /**
+   * A function returning another (optional) function.
+   * The main function will be called before the storage rehydration.
+   * The returned function will be called after the storage rehydration.
+   */
+  onRehydrateStorage?: (state: S) => ((state: S) => void) | void
+  /**
+   * If the stored state's version mismatch the one specified here, the storage will not be used.
+   * This is useful when adding a breaking change to your store.
+   */
+  version?: number
 }
 
 export const persist = <S extends State>(
@@ -137,30 +174,38 @@ export const persist = <S extends State>(
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
   const {
     name,
-    storage = typeof localStorage !== 'undefined'
-      ? localStorage
-      : {
-          getItem: () => null,
-          setItem: () => {},
-        },
+    getStorage = () => localStorage,
     serialize = JSON.stringify,
     deserialize = JSON.parse,
     blacklist,
     whitelist,
-    postRehydrationMiddleware,
+    onRehydrateStorage,
+    version = 0,
   } = options || {}
+
+  let storage: StateStorage | undefined
+
+  try {
+    storage = getStorage()
+  } catch (e) {
+    // prevent error if the storage is not defined (e.g. when server side rendering a page)
+  }
+
+  if (!storage) return config(set, get, api)
 
   const setItem = async () => {
     const state = { ...get() }
+
     if (whitelist) {
-      Object.keys(state).forEach(
-        (key) => !whitelist.includes(key) && delete state[key]
-      )
+      Object.keys(state).forEach((key) => {
+        !whitelist.includes(key) && delete state[key]
+      })
     }
     if (blacklist) {
       blacklist.forEach((key) => delete state[key])
     }
-    storage.setItem(name, await serialize(state))
+
+    storage?.setItem(name, await serialize({ state, version }))
   }
 
   const savedSetState = api.setState
@@ -170,7 +215,31 @@ export const persist = <S extends State>(
     setItem()
   }
 
-  const state = config(
+  // rehydrate initial state with existing stored state
+  ;(async () => {
+    const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
+
+    try {
+      const storageValue = await storage.getItem(name)
+
+      if (storageValue) {
+        const deserializedStorageValue = await deserialize(storageValue)
+
+        // if versions mismatch, clear storage by storing the new initial state
+        if (deserializedStorageValue.version !== version) {
+          setItem()
+        } else {
+          set(deserializedStorageValue.state)
+        }
+      }
+    } catch (e) {
+      throw new Error(`Unable to get to stored state in "${name}"`)
+    } finally {
+      postRehydrationCallback?.(get())
+    }
+  })()
+
+  return config(
     (payload) => {
       set(payload)
       setItem()
@@ -178,17 +247,4 @@ export const persist = <S extends State>(
     get,
     api
   )
-
-  ;(async () => {
-    try {
-      const storedState = await storage.getItem(name)
-      if (storedState) set(await deserialize(storedState))
-    } catch (e) {
-      console.error(new Error(`Unable to get to stored state in "${name}"`))
-    } finally {
-      postRehydrationMiddleware?.()
-    }
-  })()
-
-  return state
 }
