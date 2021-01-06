@@ -379,6 +379,8 @@ devtools takes the store function as its first argument, optionally you can name
 ## TypeScript
 
 ```tsx
+// Make sure that `State` is a `type` and not an `interface`, else the typescript compiler 
+// will complain about a missing index signature
 type State = {
   bears: number
   increase: (by: number) => void
