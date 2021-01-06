@@ -237,13 +237,13 @@ Reducing nested structures is tiresome. Have you tried [immer](https://github.co
 import produce from 'immer'
 
 const useStore = create(set => ({
-  lush: { forrest: { contains: { a: "bear" } } },
+  lush: { forest: { contains: { a: "bear" } } },
   set: fn => set(produce(fn)),
 }))
 
 const set = useStore(state => state.set)
 set(state => {
-  state.lush.forrest.contains = null
+  state.lush.forest.contains = null
 })
 ```
 
