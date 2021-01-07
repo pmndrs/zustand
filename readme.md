@@ -390,6 +390,17 @@ const useStore = create<State>(set => ({
 }))
 ```
 
+You can also use an `interface`:
+
+```tsx
+import { State } from 'zustand';
+
+interface BearState extends State {
+  bears: number
+  increase: (by: number) => void
+}
+```
+
 Or, use `combine` and let tsc infer types.
 
 ```tsx
