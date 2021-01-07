@@ -393,14 +393,14 @@ const useStore = create<State>(set => ({
 You can also use an `interface`:
 
 ```tsx
-import { State as ZustandState } from 'zustand';
+import { State } from 'zustand';
 
-interface State extends ZustandState {
+interface BearState extends State {
   bears: number
   increase: (by: number) => void
 }
 
-const useStore = create<State>(set => ({
+const useStore = create<BearState>(set => ({
   bears: 0,
   increase: (by) => set(state => ({ bears: state.bears + by })),
 }))
