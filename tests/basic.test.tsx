@@ -147,6 +147,25 @@ it('only re-renders if selected state has changed', async () => {
   expect(controlRenderCount).toBe(1)
 })
 
+it('re-renders with useLayoutEffect', async () => {
+  const useEffect = jest.spyOn(React, 'useEffect')
+
+  const useStore = create(() => ({ state: false }))
+
+  function Test() {
+    const { state } = useStore()
+    React.useLayoutEffect(() => {
+      useStore.setState({ state: true })
+    }, [])
+    return <>{`${state}`}</>
+  }
+
+  const { container } = render(<Test />)
+
+  expect(container.innerHTML.trim()).toBe('true')
+  expect(useEffect).not.toHaveBeenCalled()
+})
+
 it('can batch updates', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
