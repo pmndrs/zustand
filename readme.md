@@ -413,3 +413,7 @@ const useStore = create(
   ),
 )
 ```
+
+## Testing
+
+For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
