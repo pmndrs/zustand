@@ -324,12 +324,12 @@ import { persist } from "zustand/middleware"
 
 export const useStore = create(persist(
   (set, get) => ({
-    fish: 0,
+    fishes: 0,
     addAFish: () => set({ fish: get().fish + 1 })
   }),
   {
     name: "food-storage", // unique name
-    storage: sessionStorage, // (optional) default is 'localStorage'
+    getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
   }
 ))
 ```
