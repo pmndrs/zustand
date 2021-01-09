@@ -148,8 +148,6 @@ it('only re-renders if selected state has changed', async () => {
 })
 
 it('re-renders with useLayoutEffect', async () => {
-  const useEffect = jest.spyOn(React, 'useEffect')
-
   const useStore = create(() => ({ state: false }))
 
   function Test() {
@@ -160,10 +158,9 @@ it('re-renders with useLayoutEffect', async () => {
     return <>{`${state}`}</>
   }
 
-  const { container } = render(<Test />)
-
-  expect(container.innerHTML.trim()).toBe('true')
-  expect(useEffect).not.toHaveBeenCalled()
+  const container = document.createElement('div')
+  ReactDOM.render(<Test />, container)
+  expect(container.innerHTML).toBe('true')
 })
 
 it('can batch updates', async () => {
