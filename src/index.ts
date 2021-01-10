@@ -80,7 +80,7 @@ export default function create<TState extends State>(
     })
 
     const stateBeforeSubscriptionRef = useRef(state)
-    useEffect(() => {
+    useIsoLayoutEffect(() => {
       const listener = () => {
         try {
           const nextState = api.getState()

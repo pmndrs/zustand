@@ -147,6 +147,23 @@ it('only re-renders if selected state has changed', async () => {
   expect(controlRenderCount).toBe(1)
 })
 
+it('re-renders with useLayoutEffect', async () => {
+  const useStore = create(() => ({ state: false }))
+
+  function Component() {
+    const { state } = useStore()
+    React.useLayoutEffect(() => {
+      useStore.setState({ state: true })
+    }, [])
+    return <>{`${state}`}</>
+  }
+
+  const container = document.createElement('div')
+  ReactDOM.render(<Component />, container)
+  expect(container.innerHTML).toBe('true')
+  ReactDOM.unmountComponentAtNode(container)
+})
+
 it('can batch updates', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
