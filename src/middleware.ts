@@ -191,7 +191,18 @@ export const persist = <S extends State>(
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
   }
 
-  if (!storage) return config(set, get, api)
+  if (!storage) {
+    return config(
+      (...args) => {
+        console.warn(
+          `Persist middleware: unable to update ${name}, the given storage is currently unavailable.`
+        )
+        set(...args)
+      },
+      get,
+      api
+    )
+  }
 
   const setItem = async () => {
     const state = { ...get() }
@@ -240,8 +251,8 @@ export const persist = <S extends State>(
   })()
 
   return config(
-    (payload) => {
-      set(payload)
+    (...args) => {
+      set(...args)
       setItem()
     },
     get,
