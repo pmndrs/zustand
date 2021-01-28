@@ -157,8 +157,8 @@ type PersistOptions<S> = {
   whitelist?: (keyof S)[]
   /**
    * A function returning another (optional) function.
-   * The main function will be called before the storage rehydration.
-   * The returned function will be called after the storage rehydration.
+   * The main function will be called before the state rehydration.
+   * The returned function will be called after the state rehydration.
    */
   onRehydrateStorage?: (state: S) => ((state: S) => void) | void
   /**
