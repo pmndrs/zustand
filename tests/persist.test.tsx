@@ -152,3 +152,85 @@ it('can throw persist error', async () => {
   })
   expect(setStateCallCount).toBe(0)
 })
+
+it('can migrate persisted state', async () => {
+  let migrateCallCount = 0
+  let setItemCallCount = 0
+
+  const useStore = create(
+    persist(() => ({ count: 0 }), {
+      name: 'test-storage',
+      version: 13,
+      getStorage: () => ({
+        getItem: async () =>
+          JSON.stringify({
+            state: { count: 42 },
+            version: 12,
+          }),
+        setItem: (_, value: string) => {
+          setItemCallCount++
+          expect(value).toBe(
+            JSON.stringify({
+              state: { count: 99 },
+              version: 13,
+            })
+          )
+        },
+      }),
+      migrate: (state, version) => {
+        migrateCallCount++
+        expect(state.count).toBe(42)
+        expect(version).toBe(12)
+        return { count: 99 }
+      },
+    })
+  )
+
+  function Counter() {
+    const { count } = useStore()
+    return <div>count: {count}</div>
+  }
+
+  const { findByText } = render(<Counter />)
+
+  await findByText('count: 0')
+  await findByText('count: 99')
+  expect(migrateCallCount).toBe(1)
+  expect(setItemCallCount).toBe(1)
+})
+
+it('can throw migrate error', async () => {
+  let onRehydrateErrorCallCount = 0
+
+  const useStore = create(
+    persist(() => ({ count: 0 }), {
+      name: 'test-storage',
+      version: 13,
+      getStorage: () => ({
+        getItem: async () =>
+          JSON.stringify({
+            state: {},
+            version: 12,
+          }),
+        setItem: () => {},
+      }),
+      migrate: () => {
+        throw new Error('migrate error')
+      },
+      onRehydrateError: (e) => {
+        onRehydrateErrorCallCount++
+        expect(e.message).toBe('migrate error')
+      },
+    })
+  )
+
+  function Counter() {
+    const { count } = useStore()
+    return <div>count: {count}</div>
+  }
+
+  const { findByText } = render(<Counter />)
+
+  await findByText('count: 0')
+  expect(onRehydrateErrorCallCount).toBe(1)
+})

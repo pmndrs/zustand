@@ -171,6 +171,11 @@ type PersistOptions<S> = {
    * This is useful when adding a breaking change to your store.
    */
   version?: number
+  /**
+   * A function to perform persisted state migration.
+   * This function will be called when persisted state versions mismatch with the one specified here.
+   */
+  migrate?: (persistedState: S, version: number) => S | Promise<S>
 }
 
 export const persist = <S extends State>(
@@ -187,6 +192,7 @@ export const persist = <S extends State>(
     onRehydrateStorage,
     onRehydrateError,
     version = 0,
+    migrate,
   } = options || {}
 
   let storage: StateStorage | undefined
@@ -247,10 +253,17 @@ export const persist = <S extends State>(
     }
 
     if (deserializedStorageValue) {
-      // if versions mismatch, clear storage by storing the new initial state
+      // if versions mismatch, run migration
       if (deserializedStorageValue.version !== version) {
         try {
-          await setItem()
+          const migratedState = await migrate?.(
+            deserializedStorageValue.state,
+            deserializedStorageValue.version
+          )
+          if (migratedState) {
+            set(migratedState)
+            await setItem()
+          }
         } catch (e) {
           onRehydrateError?.(e)
         }
