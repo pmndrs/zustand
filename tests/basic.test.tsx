@@ -104,11 +104,15 @@ it('uses the store with a selector and equality checker', async () => {
   await findByText('renderCount: 1, value: 0')
 
   // This will not cause a re-render.
-  act(() => setState({ item: { value: 1 } }))
+  act(() => {
+    setState({ item: { value: 1 } })
+  })
   await findByText('renderCount: 1, value: 0')
 
   // This will cause a re-render.
-  act(() => setState({ item: { value: 2 } }))
+  act(() => {
+    setState({ item: { value: 2 } })
+  })
   await findByText('renderCount: 2, value: 2')
 })
 
@@ -226,14 +230,18 @@ it('can update the equality checker', async () => {
   )
 
   // This will cause a re-render due to the equality checker.
-  act(() => setState({ value: 0 }))
+  act(() => {
+    setState({ value: 0 })
+  })
   await findByText('renderCount: 2, value: 0')
 
   // Set an equality checker that always returns true to never re-render.
   rerender(<Component equalityFn={() => true} />)
 
   // This will NOT cause a re-render due to the equality checker.
-  act(() => setState({ value: 1 }))
+  act(() => {
+    setState({ value: 1 })
+  })
   await findByText('renderCount: 3, value: 0')
 })
 
@@ -268,10 +276,14 @@ it('can call useStore with progressively more arguments', async () => {
   )
 
   // Should not cause a re-render because new value is less than previous.
-  act(() => setState({ value: -1 }))
+  act(() => {
+    setState({ value: -1 })
+  })
   await findByText('renderCount: 3, value: 0')
 
-  act(() => setState({ value: 1 }))
+  act(() => {
+    setState({ value: 1 })
+  })
   await findByText('renderCount: 4, value: 1')
 })
 
@@ -529,7 +541,9 @@ it('only calls selectors when necessary', async () => {
   await findByText('inline: 2')
   await findByText('static: 1')
 
-  act(() => setState({ a: 1, b: 1 }))
+  act(() => {
+    setState({ a: 1, b: 1 })
+  })
   await findByText('inline: 4')
   await findByText('static: 2')
 })
@@ -649,7 +663,9 @@ it('ensures a subscriber is not mistakenly overwritten', async () => {
   )
 
   // Call all subscribers
-  act(() => setState({ count: 1 }))
+  act(() => {
+    setState({ count: 1 })
+  })
 
   expect((await findAllByText('count1: 1')).length).toBe(2)
   expect((await findAllByText('count2: 1')).length).toBe(1)

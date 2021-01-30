@@ -113,7 +113,9 @@ it('can persist state', async () => {
   const { findByText } = render(<Counter />)
 
   await findByText('count: 0')
-  await act(() => useStore.setState({ count: 42 }))
+  act(() => {
+    useStore.setState({ count: 42 })
+  })
 
   await findByText('count: 42')
   expect(setItemCallCount).toBe(1)
