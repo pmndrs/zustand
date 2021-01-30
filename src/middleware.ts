@@ -162,6 +162,11 @@ type PersistOptions<S> = {
    */
   onRehydrateStorage?: (state: S) => ((state: S) => void) | void
   /**
+   * This callback function will be called when an exception occured in rehydration or migration.
+   * The error can be from `storage.getItem` or when deserialization.
+   */
+  onRehydrateError?: (error: Error) => void
+  /**
    * If the stored state's version mismatch the one specified here, the storage will not be used.
    * This is useful when adding a breaking change to your store.
    */
@@ -180,6 +185,7 @@ export const persist = <S extends State>(
     blacklist,
     whitelist,
     onRehydrateStorage,
+    onRehydrateError,
     version = 0,
   } = options || {}
 
@@ -230,24 +236,30 @@ export const persist = <S extends State>(
   ;(async () => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
 
+    let deserializedStorageValue
     try {
-      const storageValue = await storage.getItem(name)
-
+      const storageValue = await storage?.getItem(name)
       if (storageValue) {
-        const deserializedStorageValue = await deserialize(storageValue)
-
-        // if versions mismatch, clear storage by storing the new initial state
-        if (deserializedStorageValue.version !== version) {
-          setItem()
-        } else {
-          set(deserializedStorageValue.state)
-        }
+        deserializedStorageValue = await deserialize(storageValue)
       }
     } catch (e) {
-      throw new Error(`Unable to get to stored state in "${name}"`)
-    } finally {
-      postRehydrationCallback?.(get())
+      onRehydrateError?.(e)
     }
+
+    if (deserializedStorageValue) {
+      // if versions mismatch, clear storage by storing the new initial state
+      if (deserializedStorageValue.version !== version) {
+        try {
+          await setItem()
+        } catch (e) {
+          onRehydrateError?.(e)
+        }
+      } else {
+        set(deserializedStorageValue.state)
+      }
+    }
+
+    postRehydrationCallback?.(get())
   })()
 
   return config(

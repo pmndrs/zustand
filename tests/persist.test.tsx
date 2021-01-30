@@ -53,6 +53,36 @@ it('can rehydrate state', async () => {
   expect(postRehydrationCallbackCallCount).toBe(1)
 })
 
+it('can throw rehydrate error', async () => {
+  let onRehydrateErrorCallCount = 0
+
+  const useStore = create(
+    persist(() => ({ count: 0 }), {
+      name: 'test-storage',
+      getStorage: () => ({
+        getItem: async () => {
+          throw new Error('getItem error')
+        },
+        setItem: () => {},
+      }),
+      onRehydrateError: (e) => {
+        onRehydrateErrorCallCount++
+        expect(e.message).toBe('getItem error')
+      },
+    })
+  )
+
+  function Counter() {
+    const { count } = useStore()
+    return <div>count: {count}</div>
+  }
+
+  const { findByText } = render(<Counter />)
+
+  await findByText('count: 0')
+  expect(onRehydrateErrorCallCount).toBe(1)
+})
+
 it('can persist state', async () => {
   let setItemCallCount = 0
 
