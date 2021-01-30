@@ -216,14 +216,14 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    storage?.setItem(name, await serialize({ state, version }))
+    return storage?.setItem(name, await serialize({ state, version }))
   }
 
   const savedSetState = api.setState
 
   api.setState = (state, replace) => {
     savedSetState(state, replace)
-    setItem()
+    return setItem()
   }
 
   // rehydrate initial state with existing stored state
@@ -253,7 +253,7 @@ export const persist = <S extends State>(
   return config(
     (...args) => {
       set(...args)
-      setItem()
+      return setItem()
     },
     get,
     api

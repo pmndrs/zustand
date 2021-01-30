@@ -83,8 +83,42 @@ it('can persist state', async () => {
   const { findByText } = render(<Counter />)
 
   await findByText('count: 0')
-  act(() => useStore.setState({ count: 42 }))
+  await act(() => useStore.setState({ count: 42 }))
 
   await findByText('count: 42')
   expect(setItemCallCount).toBe(1)
+})
+
+it('can throw persist error', async () => {
+  let setStateCallCount = 0
+
+  const useStore = create<any>(
+    persist(() => ({ count: 0 }), {
+      name: 'test-storage',
+      getStorage: () => ({
+        getItem: () => null,
+        setItem: () => {
+          throw new Error('setItem error')
+        },
+      }),
+    })
+  )
+
+  function Counter() {
+    const { count } = useStore()
+    return <div>count: {count}</div>
+  }
+
+  const { findByText } = render(<Counter />)
+
+  await findByText('count: 0')
+  await act(async () => {
+    try {
+      await useStore.setState({})
+      setStateCallCount++
+    } catch (e) {
+      expect(e.message).toBe('setItem error')
+    }
+  })
+  expect(setStateCallCount).toBe(0)
 })
