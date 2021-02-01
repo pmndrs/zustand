@@ -158,14 +158,9 @@ type PersistOptions<S> = {
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
-   * The returned function will be called after the state rehydration.
+   * The returned function will be called after the state rehydration or when an error occured.
    */
-  onRehydrateStorage?: (state: S) => ((state: S) => void) | void
-  /**
-   * This callback function will be called when an exception occured in rehydration or migration.
-   * The error can be from `storage.getItem` or when deserialization.
-   */
-  onRehydrateError?: (error: Error) => void
+  onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
   /**
    * If the stored state's version mismatch the one specified here, the storage will not be used.
    * This is useful when adding a breaking change to your store.
@@ -190,7 +185,6 @@ export const persist = <S extends State>(
     blacklist,
     whitelist,
     onRehydrateStorage,
-    onRehydrateError,
     version = 0,
     migrate,
   } = options || {}
@@ -242,20 +236,14 @@ export const persist = <S extends State>(
   ;(async () => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
 
-    let deserializedStorageValue
     try {
-      const storageValue = await storage?.getItem(name)
-      if (storageValue) {
-        deserializedStorageValue = await deserialize(storageValue)
-      }
-    } catch (e) {
-      onRehydrateError?.(e)
-    }
+      const storageValue = await storage.getItem(name)
 
-    if (deserializedStorageValue) {
-      // if versions mismatch, run migration
-      if (deserializedStorageValue.version !== version) {
-        try {
+      if (storageValue) {
+        const deserializedStorageValue = await deserialize(storageValue)
+
+        // if versions mismatch, run migration
+        if (deserializedStorageValue.version !== version) {
           const migratedState = await migrate?.(
             deserializedStorageValue.state,
             deserializedStorageValue.version
@@ -264,15 +252,16 @@ export const persist = <S extends State>(
             set(migratedState)
             await setItem()
           }
-        } catch (e) {
-          onRehydrateError?.(e)
+        } else {
+          set(deserializedStorageValue.state)
         }
-      } else {
-        set(deserializedStorageValue.state)
       }
+    } catch (e) {
+      postRehydrationCallback?.(undefined, e)
+      return
     }
 
-    postRehydrationCallback?.(get())
+    postRehydrationCallback?.(get(), undefined)
   })()
 
   return config(

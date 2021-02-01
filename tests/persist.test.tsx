@@ -30,8 +30,8 @@ it('can rehydrate state', async () => {
         }),
         onRehydrateStorage: () => (state) => {
           postRehydrationCallbackCallCount++
-          expect(state.count).toBe(42)
-          expect(state.name).toBe('test-storage')
+          expect(state?.count).toBe(42)
+          expect(state?.name).toBe('test-storage')
         },
       }
     )
@@ -54,7 +54,7 @@ it('can rehydrate state', async () => {
 })
 
 it('can throw rehydrate error', async () => {
-  let onRehydrateErrorCallCount = 0
+  let postRehydrationCallbackCallCount = 0
 
   const useStore = create(
     persist(() => ({ count: 0 }), {
@@ -65,9 +65,9 @@ it('can throw rehydrate error', async () => {
         },
         setItem: () => {},
       }),
-      onRehydrateError: (e) => {
-        onRehydrateErrorCallCount++
-        expect(e.message).toBe('getItem error')
+      onRehydrateStorage: () => (_, e) => {
+        postRehydrationCallbackCallCount++
+        expect(e?.message).toBe('getItem error')
       },
     })
   )
@@ -80,7 +80,7 @@ it('can throw rehydrate error', async () => {
   const { findByText } = render(<Counter />)
 
   await findByText('count: 0')
-  expect(onRehydrateErrorCallCount).toBe(1)
+  expect(postRehydrationCallbackCallCount).toBe(1)
 })
 
 it('can persist state', async () => {
@@ -202,7 +202,7 @@ it('can migrate persisted state', async () => {
 })
 
 it('can throw migrate error', async () => {
-  let onRehydrateErrorCallCount = 0
+  let postRehydrationCallbackCallCount = 0
 
   const useStore = create(
     persist(() => ({ count: 0 }), {
@@ -219,9 +219,9 @@ it('can throw migrate error', async () => {
       migrate: () => {
         throw new Error('migrate error')
       },
-      onRehydrateError: (e) => {
-        onRehydrateErrorCallCount++
-        expect(e.message).toBe('migrate error')
+      onRehydrateStorage: () => (_, e) => {
+        postRehydrationCallbackCallCount++
+        expect(e?.message).toBe('migrate error')
       },
     })
   )
@@ -234,5 +234,5 @@ it('can throw migrate error', async () => {
   const { findByText } = render(<Counter />)
 
   await findByText('count: 0')
-  expect(onRehydrateErrorCallCount).toBe(1)
+  expect(postRehydrationCallbackCallCount).toBe(1)
 })
