@@ -229,7 +229,7 @@ export const persist = <S extends State>(
 
   api.setState = (state, replace) => {
     savedSetState(state, replace)
-    return setItem()
+    setItem()
   }
 
   // rehydrate initial state with existing stored state
@@ -267,7 +267,7 @@ export const persist = <S extends State>(
   return config(
     (...args) => {
       set(...args)
-      return setItem()
+      setItem()
     },
     get,
     api

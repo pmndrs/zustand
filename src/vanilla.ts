@@ -17,7 +17,7 @@ export interface Subscribe<T extends State> {
 export type SetState<T extends State> = (
   partial: PartialState<T>,
   replace?: boolean
-) => void | Promise<void>
+) => void
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
 export interface StoreApi<T extends State> {
