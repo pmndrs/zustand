@@ -389,7 +389,7 @@ async function onClickHandler() {
 }
 ```
 
-More details: https://twitter.com/dan_abramov/status/959507572951797761
+More details: https://github.com/pmndrs/zustand/issues/302
 
 ## Redux devtools
 
