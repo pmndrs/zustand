@@ -365,7 +365,7 @@ const useStore = create(redux(reducer, initialState))
 
 ## Calling actions outside a React event handler
 
-Because React handles `setState` synchronous if it's called outside an event handler. Updating the state outside an event handler will force react to update component synchronously, therefore adding the risk of encountering the zombie-child effect.
+Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
 In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
 
 ```jsx
@@ -388,8 +388,6 @@ async function onClickHandler() {
   })
 }
 ```
-
-
 
 More details: https://twitter.com/dan_abramov/status/959507572951797761
 
