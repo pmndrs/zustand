@@ -369,7 +369,7 @@ Because React handles `setState` synchronously if it's called outside an event h
 In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
 
 ```jsx
-import { unstable_batchedUpdates } from 'react-dom'; // or react-native
+import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
 
 const useStore = create((set) => ({
   fishes: 0,
