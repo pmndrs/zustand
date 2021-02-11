@@ -369,22 +369,16 @@ Because React handles `setState` synchronously if it's called outside an event h
 In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
 
 ```jsx
-import create from 'zustand'
-import { unstable_batchedUpdates } from 'react-dom';
+import { unstable_batchedUpdates } from 'react-dom'; // or react-native
 
-export const useStore = create(persist(
-  (set) => ({
-    fishes: 0,
-    addAFish: () => set({ fish: get().fish + 1 })
-  }),
-))
+const useStore = create((set) => ({
+  fishes: 0,
+  increaseFishes: () => set((prev) => ({ fished: prev.fished + 1 }))
+}))
 
-const addAFish = useStore((state) => state.addAFish)
-
-async function onClickHandler() {
-  await asyncFunc()
+const nonReactCallback = () => {
   unstable_batchedUpdates(() => {
-    addAFish()
+    useStore.getState().increaseFishes()
   })
 }
 ```
