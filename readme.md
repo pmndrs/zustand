@@ -373,7 +373,7 @@ import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
 
 const useStore = create((set) => ({
   fishes: 0,
-  increaseFishes: () => set((prev) => ({ fished: prev.fished + 1 }))
+  increaseFishes: () => set((prev) => ({ fishes: prev.fishes + 1 }))
 }))
 
 const nonReactCallback = () => {
