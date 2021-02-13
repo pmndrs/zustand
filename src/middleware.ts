@@ -1,4 +1,3 @@
-import create from '.'
 import {
   GetState,
   PartialState,
