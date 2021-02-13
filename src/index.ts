@@ -23,6 +23,7 @@ export interface UseStore<T extends State> {
   getState: GetState<T>
   subscribe: Subscribe<T>
   destroy: Destroy
+  getRoot: StateCreator<T>
 }
 
 export default function create<TState extends State>(

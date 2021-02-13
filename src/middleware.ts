@@ -1,3 +1,4 @@
+import create from '.'
 import {
   GetState,
   PartialState,
@@ -258,4 +259,21 @@ export const persist = <S extends State>(
     get,
     api
   )
+}
+
+export const combineStores = <TState extends State>(
+  ...storesToCombine: StoreApi<any>[]
+): StateCreator<TState> => {
+  let values: any = {}
+
+  return (
+    set: SetState<TState>,
+    get: GetState<TState>,
+    api: StoreApi<TState>
+  ) => {
+    storesToCombine.forEach((store) => {
+      values = Object.assign({}, values, store.getRoot(set, get, api))
+    })
+    return values
+  }
 }
