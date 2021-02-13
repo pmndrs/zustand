@@ -39,6 +39,7 @@ it('creates a store hook and api object', () => {
           "getState": [Function],
           "setState": [Function],
           "subscribe": [Function],
+          "getRoot": [Function],
         },
       ],
       "result": [Function],
