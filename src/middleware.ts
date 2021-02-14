@@ -170,7 +170,7 @@ type PersistOptions<S> = {
    * A function to perform persisted state migration.
    * This function will be called when persisted state versions mismatch with the one specified here.
    */
-  migrate?: (persistedState: S, version: number) => S | Promise<S>
+  migrate?: (persistedState: any, version: number) => S | Promise<S>
 }
 
 export const persist = <S extends State>(
