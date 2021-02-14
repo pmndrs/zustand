@@ -259,3 +259,14 @@ export const persist = <S extends State>(
     api
   )
 }
+
+export const combineStateCreators = <TState extends State>(
+  ...stateCreators: StateCreator<any>[]
+): StateCreator<TState> => (set, get, api) => {
+  let values: any = {}
+
+  stateCreators.forEach((sc) => {
+    values = Object.assign({}, values, sc(set, get, api))
+  })
+  return values
+}
