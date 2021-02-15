@@ -272,10 +272,8 @@ const useStore = create(
 )
 ```
 
-
-<overview>
-<summary>How to pipe middlewares</summary>
 <details>
+<summary>How to pipe middlewares</summary>
 
 ```js
 import create from "zustand"
@@ -295,11 +293,9 @@ export default useStore
 ```
 For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
 </details>
-</overview>
 
-<overview>
-<summary>How to type immer middleware in TypeScript</summary>
 <details>
+<summary>How to type immer middleware in TypeScript</summary>
 
 ```ts
 import { State, StateCreator } from 'zustand'
@@ -312,7 +308,6 @@ const immer = <T extends State>(
 ```
 
 </details>
-</overview>
 
 ## Persist middleware
 
