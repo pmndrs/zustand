@@ -158,14 +158,19 @@ type PersistOptions<S> = {
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
-   * The returned function will be called after the state rehydration.
+   * The returned function will be called after the state rehydration or when an error occured.
    */
-  onRehydrateStorage?: (state: S) => ((state: S) => void) | void
+  onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
   /**
    * If the stored state's version mismatch the one specified here, the storage will not be used.
    * This is useful when adding a breaking change to your store.
    */
   version?: number
+  /**
+   * A function to perform persisted state migration.
+   * This function will be called when persisted state versions mismatch with the one specified here.
+   */
+  migrate?: (persistedState: any, version: number) => S | Promise<S>
 }
 
 export const persist = <S extends State>(
@@ -181,6 +186,7 @@ export const persist = <S extends State>(
     whitelist,
     onRehydrateStorage,
     version = 0,
+    migrate,
   } = options || {}
 
   let storage: StateStorage | undefined
@@ -216,7 +222,7 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    storage?.setItem(name, await serialize({ state, version }))
+    return storage?.setItem(name, await serialize({ state, version }))
   }
 
   const savedSetState = api.setState
@@ -236,18 +242,26 @@ export const persist = <S extends State>(
       if (storageValue) {
         const deserializedStorageValue = await deserialize(storageValue)
 
-        // if versions mismatch, clear storage by storing the new initial state
+        // if versions mismatch, run migration
         if (deserializedStorageValue.version !== version) {
-          setItem()
+          const migratedState = await migrate?.(
+            deserializedStorageValue.state,
+            deserializedStorageValue.version
+          )
+          if (migratedState) {
+            set(migratedState)
+            await setItem()
+          }
         } else {
           set(deserializedStorageValue.state)
         }
       }
     } catch (e) {
-      throw new Error(`Unable to get to stored state in "${name}"`)
-    } finally {
-      postRehydrationCallback?.(get())
+      postRehydrationCallback?.(undefined, e)
+      return
     }
+
+    postRehydrationCallback?.(get(), undefined)
   })()
 
   return config(
