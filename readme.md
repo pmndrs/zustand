@@ -311,7 +311,7 @@ const immer = <T extends State>(
 
 ## Persist middleware
 
-You can persist you store's data using any kind of storage.
+You can persist your store's data using any kind of storage.
 
 ```jsx
 import create from "zustand"
