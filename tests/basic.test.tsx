@@ -747,3 +747,35 @@ it('can use exposed types', () => {
     useStore
   )
 })
+
+type AssertEqual<Type, Expected> = Type extends Expected
+  ? Expected extends Type
+    ? true
+    : never
+  : never
+
+it('should have correct (partial) types for setState', () => {
+  type Count = { count: number }
+
+  const store = create<Count>((set) => ({
+    count: 0,
+    // @ts-expect-error we shouldn't be able to set count to undefined
+    a: () => set(() => ({ count: undefined })),
+    // @ts-expect-error we shouldn't be able to set count to undefined
+    b: () => set({ count: undefined }),
+    c: () => set({ count: 1 }),
+  }))
+
+  const setState: AssertEqual<typeof store.setState, SetState<Count>> = true
+  expect(setState).toEqual(true)
+
+  // ok, should not error
+  store.setState({ count: 1 })
+  store.setState({})
+  store.setState(() => {})
+
+  // @ts-expect-error type undefined is not assignable to type number
+  store.setState({ count: undefined })
+  // @ts-expect-error type undefined is not assignable to type number
+  store.setState((state) => ({ ...state, count: undefined }))
+})
