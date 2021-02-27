@@ -46,8 +46,13 @@ it('creates a store hook and api object', () => {
   `)
 })
 
+type CounterState = {
+  count: number
+  inc: () => void
+}
+
 it('uses the store with no args', async () => {
-  const useStore = create<any>((set) => ({
+  const useStore = create<CounterState>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
   }))
@@ -66,7 +71,7 @@ it('uses the store with no args', async () => {
 it('uses the store with selectors', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
+    inc: () => set((state: any) => ({ count: state.count + 1 })),
   }))
 
   function Counter() {
@@ -115,7 +120,7 @@ it('uses the store with a selector and equality checker', async () => {
 it('only re-renders if selected state has changed', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
+    inc: () => set((state: any) => ({ count: state.count + 1 })),
   }))
   let counterRenderCount = 0
   let controlRenderCount = 0
@@ -167,7 +172,7 @@ it('re-renders with useLayoutEffect', async () => {
 it('can batch updates', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
+    inc: () => set((state: any) => ({ count: state.count + 1 })),
   }))
 
   function Counter() {
