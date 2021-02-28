@@ -28,11 +28,13 @@ export const redux = <S extends State, A extends { type: unknown }>(
   return { dispatch: api.dispatch, ...initial }
 }
 
-type NamedSet<S extends State> = (
-  partial: PartialState<S>,
-  replace?: boolean,
-  name?: string
-) => void
+type NamedSet<T extends State> = {
+  <K extends keyof T>(
+    partial: PartialState<T, K>,
+    replace?: boolean,
+    name?: string
+  ): void
+}
 
 export const devtools = <S extends State>(
   fn: (set: NamedSet<S>, get: GetState<S>, api: StoreApi<S>) => S,
@@ -68,7 +70,10 @@ export const devtools = <S extends State>(
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
     const savedSetState = api.setState
-    api.setState = (state: PartialState<S>, replace?: boolean) => {
+    api.setState = <K extends keyof S>(
+      state: PartialState<S, K>,
+      replace?: boolean
+    ) => {
       savedSetState(state, replace)
       api.devtools.send(api.devtools.prefix + 'setState', api.getState())
     }
@@ -121,14 +126,56 @@ type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
+type StorageValue<S> = { state: S; version: number }
 type PersistOptions<S> = {
+  /** Name of the storage (must be unique) */
   name: string
-  storage?: StateStorage
-  serialize?: (state: S) => string | Promise<string>
-  deserialize?: (str: string) => S | Promise<S>
+  /**
+   * A function returning a storage.
+   * The storage must fit `window.localStorage`'s api (or an async version of it).
+   * For example the storage could be `AsyncStorage` from React Native.
+   *
+   * @default () => localStorage
+   */
+  getStorage?: () => StateStorage
+  /**
+   * Use a custom serializer.
+   * The returned string will be stored in the storage.
+   *
+   * @default JSON.stringify
+   */
+  serialize?: (state: StorageValue<S>) => string | Promise<string>
+  /**
+   * Use a custom deserializer.
+   *
+   * @param str The storage's current value.
+   * @default JSON.parse
+   */
+  deserialize?: (str: string) => StorageValue<S> | Promise<S>
+  /**
+   * Prevent some items from being stored.
+   */
   blacklist?: (keyof S)[]
+  /**
+   * Only store the listed properties.
+   */
   whitelist?: (keyof S)[]
-  postRehydrationMiddleware?: () => void
+  /**
+   * A function returning another (optional) function.
+   * The main function will be called before the state rehydration.
+   * The returned function will be called after the state rehydration or when an error occured.
+   */
+  onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
+  /**
+   * If the stored state's version mismatch the one specified here, the storage will not be used.
+   * This is useful when adding a breaking change to your store.
+   */
+  version?: number
+  /**
+   * A function to perform persisted state migration.
+   * This function will be called when persisted state versions mismatch with the one specified here.
+   */
+  migrate?: (persistedState: any, version: number) => S | Promise<S>
 }
 
 export const persist = <S extends State>(
@@ -137,30 +184,50 @@ export const persist = <S extends State>(
 ) => (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
   const {
     name,
-    storage = typeof localStorage !== 'undefined'
-      ? localStorage
-      : {
-          getItem: () => null,
-          setItem: () => {},
-        },
+    getStorage = () => localStorage,
     serialize = JSON.stringify,
     deserialize = JSON.parse,
     blacklist,
     whitelist,
-    postRehydrationMiddleware,
+    onRehydrateStorage,
+    version = 0,
+    migrate,
   } = options || {}
+
+  let storage: StateStorage | undefined
+
+  try {
+    storage = getStorage()
+  } catch (e) {
+    // prevent error if the storage is not defined (e.g. when server side rendering a page)
+  }
+
+  if (!storage) {
+    return config(
+      (...args) => {
+        console.warn(
+          `Persist middleware: unable to update ${name}, the given storage is currently unavailable.`
+        )
+        set(...args)
+      },
+      get,
+      api
+    )
+  }
 
   const setItem = async () => {
     const state = { ...get() }
+
     if (whitelist) {
-      Object.keys(state).forEach(
-        (key) => !whitelist.includes(key) && delete state[key]
-      )
+      Object.keys(state).forEach((key) => {
+        !whitelist.includes(key) && delete state[key]
+      })
     }
     if (blacklist) {
       blacklist.forEach((key) => delete state[key])
     }
-    storage.setItem(name, await serialize(state))
+
+    return storage?.setItem(name, await serialize({ state, version }))
   }
 
   const savedSetState = api.setState
@@ -170,25 +237,44 @@ export const persist = <S extends State>(
     setItem()
   }
 
-  const state = config(
-    (payload) => {
-      set(payload)
+  // rehydrate initial state with existing stored state
+  ;(async () => {
+    const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
+
+    try {
+      const storageValue = await storage.getItem(name)
+
+      if (storageValue) {
+        const deserializedStorageValue = await deserialize(storageValue)
+
+        // if versions mismatch, run migration
+        if (deserializedStorageValue.version !== version) {
+          const migratedState = await migrate?.(
+            deserializedStorageValue.state,
+            deserializedStorageValue.version
+          )
+          if (migratedState) {
+            set(migratedState)
+            await setItem()
+          }
+        } else {
+          set(deserializedStorageValue.state)
+        }
+      }
+    } catch (e) {
+      postRehydrationCallback?.(undefined, e)
+      return
+    }
+
+    postRehydrationCallback?.(get(), undefined)
+  })()
+
+  return config(
+    (...args) => {
+      set(...args)
       setItem()
     },
     get,
     api
   )
-
-  ;(async () => {
-    try {
-      const storedState = await storage.getItem(name)
-      if (storedState) set(await deserialize(storedState))
-    } catch (e) {
-      console.error(new Error(`Unable to get to stored state in "${name}"`))
-    } finally {
-      postRehydrationMiddleware?.()
-    }
-  })()
-
-  return state
 }

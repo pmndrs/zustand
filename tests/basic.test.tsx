@@ -46,8 +46,13 @@ it('creates a store hook and api object', () => {
   `)
 })
 
+type CounterState = {
+  count: number
+  inc: () => void
+}
+
 it('uses the store with no args', async () => {
-  const useStore = create<any>((set) => ({
+  const useStore = create<CounterState>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
   }))
@@ -66,7 +71,7 @@ it('uses the store with no args', async () => {
 it('uses the store with selectors', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
+    inc: () => set((state: any) => ({ count: state.count + 1 })),
   }))
 
   function Counter() {
@@ -82,19 +87,19 @@ it('uses the store with selectors', async () => {
 })
 
 it('uses the store with a selector and equality checker', async () => {
-  const useStore = create(() => ({ value: 0 }))
+  const useStore = create(() => ({ item: { value: 0 } }))
   const { setState } = useStore
   let renderCount = 0
 
   function Component() {
     // Prevent re-render if new value === 1.
-    const value = useStore(
-      (s) => s.value,
-      (_, newValue) => newValue === 1
+    const item = useStore(
+      (s) => s.item,
+      (_, newItem) => newItem.value === 1
     )
     return (
       <div>
-        renderCount: {++renderCount}, value: {value}
+        renderCount: {++renderCount}, value: {item.value}
       </div>
     )
   }
@@ -104,18 +109,18 @@ it('uses the store with a selector and equality checker', async () => {
   await findByText('renderCount: 1, value: 0')
 
   // This will not cause a re-render.
-  act(() => setState({ value: 1 }))
+  act(() => setState({ item: { value: 1 } }))
   await findByText('renderCount: 1, value: 0')
 
   // This will cause a re-render.
-  act(() => setState({ value: 2 }))
+  act(() => setState({ item: { value: 2 } }))
   await findByText('renderCount: 2, value: 2')
 })
 
 it('only re-renders if selected state has changed', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
+    inc: () => set((state: any) => ({ count: state.count + 1 })),
   }))
   let counterRenderCount = 0
   let controlRenderCount = 0
@@ -147,10 +152,27 @@ it('only re-renders if selected state has changed', async () => {
   expect(controlRenderCount).toBe(1)
 })
 
+it('re-renders with useLayoutEffect', async () => {
+  const useStore = create(() => ({ state: false }))
+
+  function Component() {
+    const { state } = useStore()
+    React.useLayoutEffect(() => {
+      useStore.setState({ state: true })
+    }, [])
+    return <>{`${state}`}</>
+  }
+
+  const container = document.createElement('div')
+  ReactDOM.render(<Component />, container)
+  expect(container.innerHTML).toBe('true')
+  ReactDOM.unmountComponentAtNode(container)
+})
+
 it('can batch updates', async () => {
   const useStore = create<any>((set) => ({
     count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
+    inc: () => set((state: any) => ({ count: state.count + 1 })),
   }))
 
   function Counter() {
@@ -732,4 +754,36 @@ it('can use exposed types', () => {
     stateCreator,
     useStore
   )
+})
+
+type AssertEqual<Type, Expected> = Type extends Expected
+  ? Expected extends Type
+    ? true
+    : never
+  : never
+
+it('should have correct (partial) types for setState', () => {
+  type Count = { count: number }
+
+  const store = create<Count>((set) => ({
+    count: 0,
+    // @ts-expect-error we shouldn't be able to set count to undefined
+    a: () => set(() => ({ count: undefined })),
+    // @ts-expect-error we shouldn't be able to set count to undefined
+    b: () => set({ count: undefined }),
+    c: () => set({ count: 1 }),
+  }))
+
+  const setState: AssertEqual<typeof store.setState, SetState<Count>> = true
+  expect(setState).toEqual(true)
+
+  // ok, should not error
+  store.setState({ count: 1 })
+  store.setState({})
+  store.setState(() => {})
+
+  // @ts-expect-error type undefined is not assignable to type number
+  store.setState({ count: undefined })
+  // @ts-expect-error type undefined is not assignable to type number
+  store.setState((state) => ({ ...state, count: undefined }))
 })

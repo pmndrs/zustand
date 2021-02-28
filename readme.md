@@ -6,7 +6,7 @@
 [![Build Size](https://img.shields.io/bundlephobia/min/zustand?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zustand)
 [![Version](https://img.shields.io/npm/v/zustand?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
-[![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/ZZjjNvJ)
+[![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
 A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
 
@@ -237,13 +237,13 @@ Reducing nested structures is tiresome. Have you tried [immer](https://github.co
 import produce from 'immer'
 
 const useStore = create(set => ({
-  lush: { forrest: { contains: { a: "bear" } } },
+  lush: { forest: { contains: { a: "bear" } } },
   set: fn => set(produce(fn)),
 }))
 
 const set = useStore(state => state.set)
 set(state => {
-  state.lush.forrest.contains = null
+  state.lush.forest.contains = null
 })
 ```
 
@@ -272,10 +272,8 @@ const useStore = create(
 )
 ```
 
-
-<overview>
-<summary>How to pipe middlewares</summary>
 <details>
+<summary>How to pipe middlewares</summary>
 
 ```js
 import create from "zustand"
@@ -295,11 +293,9 @@ export default useStore
 ```
 For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
 </details>
-</overview>
 
-<overview>
-<summary>How to type immer middleware in TypeScript</summary>
 <details>
+<summary>How to type immer middleware in TypeScript</summary>
 
 ```ts
 import { State, StateCreator } from 'zustand'
@@ -312,11 +308,10 @@ const immer = <T extends State>(
 ```
 
 </details>
-</overview>
 
 ## Persist middleware
 
-You can persist you store's data using any kind of storage.
+You can persist your store's data using any kind of storage.
 
 ```jsx
 import create from "zustand"
@@ -324,12 +319,12 @@ import { persist } from "zustand/middleware"
 
 export const useStore = create(persist(
   (set, get) => ({
-    fish: 0,
+    fishes: 0,
     addAFish: () => set({ fish: get().fish + 1 })
   }),
   {
     name: "food-storage", // unique name
-    storage: sessionStorage, // (optional) default is 'localStorage'
+    getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
   }
 ))
 ```
@@ -363,6 +358,28 @@ import { redux } from 'zustand/middleware'
 const useStore = create(redux(reducer, initialState))
 ```
 
+## Calling actions outside a React event handler
+
+Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
+In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
+
+```jsx
+import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
+
+const useStore = create((set) => ({
+  fishes: 0,
+  increaseFishes: () => set((prev) => ({ fishes: prev.fishes + 1 }))
+}))
+
+const nonReactCallback = () => {
+  unstable_batchedUpdates(() => {
+    useStore.getState().increaseFishes()
+  })
+}
+```
+
+More details: https://github.com/pmndrs/zustand/issues/302
+
 ## Redux devtools
 
 ```jsx
@@ -390,6 +407,17 @@ const useStore = create<State>(set => ({
 }))
 ```
 
+You can also use an `interface`:
+
+```tsx
+import { State } from 'zustand';
+
+interface BearState extends State {
+  bears: number
+  increase: (by: number) => void
+}
+```
+
 Or, use `combine` and let tsc infer types.
 
 ```tsx
@@ -402,3 +430,7 @@ const useStore = create(
   ),
 )
 ```
+
+## Testing
+
+For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
