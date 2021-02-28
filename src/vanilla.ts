@@ -1,7 +1,9 @@
 export type State = Record<string | number | symbol, unknown>
-export type PartialState<T extends State> =
-  | Partial<T>
-  | ((state: T) => Partial<T>)
+// types inspired by setState from React, see:
+// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
+export type PartialState<T extends State, K extends keyof T = keyof T> =
+  | (Pick<T, K> | T)
+  | ((state: T) => Pick<T, K> | T)
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
@@ -14,10 +16,10 @@ export interface Subscribe<T extends State> {
     equalityFn?: EqualityChecker<StateSlice>
   ): () => void
 }
-export type SetState<T extends State> = (
-  partial: PartialState<T>,
-  replace?: boolean
-) => void
+
+export type SetState<T extends State> = {
+  <K extends keyof T>(partial: PartialState<T, K>, replace?: boolean): void
+}
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
 export interface StoreApi<T extends State> {
