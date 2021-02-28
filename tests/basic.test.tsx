@@ -165,6 +165,7 @@ it('re-renders with useLayoutEffect', async () => {
 
   const container = document.createElement('div')
   ReactDOM.render(<Component />, container)
+  await new Promise((resolve) => setTimeout(resolve, 10))
   expect(container.innerHTML).toBe('true')
   ReactDOM.unmountComponentAtNode(container)
 })
