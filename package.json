@@ -9,6 +9,29 @@
   "files": [
     "**"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "default": "./index.cjs.js"
+    },
+    "./vanilla": {
+      "types": "./vanilla.d.ts",
+      "import": "./vanilla.module.js",
+      "default": "./vanilla.js"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "import": "./middleware.module.js",
+      "default": "./middleware.js"
+    },
+    "./shallow": {
+      "types": "./shallow.d.ts",
+      "import": "./shallow.module.js",
+      "default": "./shallow.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",

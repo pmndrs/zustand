@@ -97,9 +97,9 @@ export default [
   createCommonJSConfig('src/vanilla.ts', 'dist/vanilla.js'),
 
   // Create a purely ESM version, can be imported from `zustand/esm`
-  createESMConfig('src/vanilla.ts', 'dist/esm/vanilla.js'),
-  createESMConfig('src/shallow.ts', 'dist/esm/shallow.js'),
-  createESMConfig('src/index.ts', 'dist/esm/index.js'),
-  // I dont get the one below to succeed with rollup :(
-  // createModernESMConfig('src/middleware.ts', 'dist/esm/middleware.js'),
+  createESMConfig('src/vanilla.ts', 'dist/vanilla.module.js'),
+  createESMConfig('src/shallow.ts', 'dist/shallow.module.js'),
+  createESMConfig('src/index.ts', 'dist/index.module.js'),
+  // get this below to succeed with rollup ... fails currently
+  // createModernESMConfig('src/middleware.ts', 'dist/middleware.module.js'),
 ]
