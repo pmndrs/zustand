@@ -8,7 +8,7 @@
     "@testing-library/user-event": "^12.0.11",
     "drei": "^0.0.72",
     "postprocessing": "^6.16.0",
-    "prismjs": "1.21.0",
+    "prismjs": "1.23.0",
     "raw.macro": "^0.4.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -18,7 +18,7 @@
     "react-spring": "^8.0.27",
     "react-three-fiber": "^4.2.20",
     "react-three-gui": "^0.1.5",
-    "three": "^0.119.1",
+    "three": "^0.125.0",
     "threejs-meshline": "^2.0.11",
     "web-vitals": "^0.2.2",
     "zustand": "^3.0.0"
