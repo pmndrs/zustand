@@ -99,7 +99,6 @@ export default [
   // Create a purely ESM version, can be imported from `zustand/esm`
   createESMConfig('src/vanilla.ts', 'dist/vanilla.module.js'),
   createESMConfig('src/shallow.ts', 'dist/shallow.module.js'),
-  createESMConfig('src/index.ts', 'dist/index.module.js'),
   // get this below to succeed with rollup ... fails currently
   // createModernESMConfig('src/middleware.ts', 'dist/middleware.module.js'),
 ]
