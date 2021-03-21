@@ -307,7 +307,7 @@ const immer = <T extends State>(
 ): StateCreator<T> => (set, get, api) =>
   config((fn) => set(produce(fn) as (state: T) => T), get, api)
 
-// Immer V9 and above
+// Immer V9
 const immer = <T extends State>(
   config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
 ): StateCreator<T> => (set, get, api) =>
