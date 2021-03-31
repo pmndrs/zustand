@@ -16,7 +16,7 @@ export * from './vanilla'
 // Deno support: https://github.com/pmndrs/zustand/issues/347
 const isSSR =
   typeof window === 'undefined' ||
-  typeof window.navigator === 'undefined' ||
+  !window.navigator ||
   /ServerSideRendering/.test(window.navigator.userAgent)
 
 const useIsoLayoutEffect = isSSR ? useEffect : useLayoutEffect
