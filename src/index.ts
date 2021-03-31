@@ -13,8 +13,13 @@ import createImpl, {
 export * from './vanilla'
 
 // For server-side rendering: https://github.com/react-spring/zustand/pull/34
-const useIsoLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
+// Deno support: https://github.com/pmndrs/zustand/issues/347
+const isSSR =
+  typeof window === 'undefined' ||
+  typeof window.navigator === 'undefined' ||
+  /ServerSideRendering/.test(window.navigator.userAgent)
+
+const useIsoLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
 export interface UseStore<T extends State> {
   (): T
