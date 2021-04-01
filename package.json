@@ -3,16 +3,43 @@
   "private": true,
   "version": "3.3.3",
   "description": "🐻 Bear necessities for state management in React",
-  "main": "index.cjs.js",
-  "module": "index.js",
+  "main": "index.js",
+  "module": "index.module.js",
   "types": "index.d.ts",
   "files": [
     "**"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "module": "./index.module.js",
+      "default": "./index.js"
+    },
+    "./vanilla": {
+      "types": "./vanilla.d.ts",
+      "module": "./vanilla.module.js",
+      "default": "./vanilla.js"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "module": "./middleware.module.js",
+      "default": "./middleware.js"
+    },
+    "./shallow": {
+      "types": "./shallow.d.ts",
+      "module": "./shallow.module.js",
+      "default": "./shallow.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
-    "build": "rollup -c",
+    "build": "concurrently 'yarn:build:*'",
+    "build:base": "rollup -c",
+    "build:vanilla": "rollup -c --config-vanilla",
+    "build:middleware": "rollup -c --config-middleware",
+    "build:shallow": "rollup -c --config-shallow",
     "postbuild": "yarn copy",
     "eslint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx}'",
     "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
@@ -80,40 +107,46 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.13.8",
+    "@babel/core": "^7.13.14",
     "@babel/plugin-external-helpers": "^7.12.13",
-    "@babel/plugin-transform-react-jsx": "^7.12.17",
-    "@babel/plugin-transform-runtime": "^7.13.8",
+    "@babel/plugin-transform-react-jsx": "^7.13.12",
     "@babel/plugin-transform-typescript": "^7.13.0",
-    "@babel/preset-env": "^7.13.8",
+    "@babel/preset-env": "^7.13.10",
     "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.2.0",
-    "@rollup/plugin-typescript": "^8.2.0",
-    "@testing-library/react": "^11.2.5",
-    "@types/jest": "^26.0.20",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@typescript-eslint/parser": "^4.15.2",
-    "eslint": "^7.21.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@testing-library/react": "^11.2.6",
+    "@types/jest": "^26.0.22",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/parser": "^4.20.0",
+    "concurrently": "^6.0.0",
+    "esbuild": "^0.11.2",
+    "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.1.5",
+    "eslint-plugin-jest": "^24.3.2",
     "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react": "^7.23.1",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^4.3.8",
     "jest": "^26.6.3",
     "json": "^10.0.0",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "rollup": "^2.40.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "rollup": "^2.44.0",
+    "rollup-plugin-esbuild": "^3.0.2",
     "rollup-plugin-size-snapshot": "^0.12.0",
     "shx": "^0.3.3",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.3"
+  },
+  "resolutions": {
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3"
   },
   "peerDependencies": {
     "react": ">=16.8"
