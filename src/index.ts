@@ -19,7 +19,7 @@ const isSSR =
   !window.navigator ||
   /ServerSideRendering/.test(window.navigator.userAgent)
 
-const useIsoLayoutEffect = isSSR ? useEffect : useLayoutEffect
+const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
 export interface UseStore<T extends State> {
   (): T
@@ -74,7 +74,7 @@ export default function create<TState extends State>(
     }
 
     // Syncing changes in useEffect.
-    useIsoLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       if (hasNewStateSlice) {
         currentSliceRef.current = newStateSlice as StateSlice
       }
@@ -85,7 +85,7 @@ export default function create<TState extends State>(
     })
 
     const stateBeforeSubscriptionRef = useRef(state)
-    useIsoLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       const listener = () => {
         try {
           const nextState = api.getState()
