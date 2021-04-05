@@ -10,9 +10,7 @@ const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
 
 function external(id) {
-  return (
-    id.startsWith('./vanilla') || (!id.startsWith('.') && !id.startsWith(root))
-  )
+  return !id.startsWith('.') && !id.startsWith(root)
 }
 
 function getEsbuild(target) {
