@@ -24,8 +24,12 @@ function getEsbuild(target) {
 function getBabelOptions(targets) {
   const config = createBabelConfig({ env: (env) => env === 'build' }, targets)
   if (targets.ie) {
-    config.plugins = [...config.plugins, '@babel/plugin-transform-regenerator']
-    config.babelHelpers = 'bundled'
+    config.plugins = [
+      ...config.plugins,
+      '@babel/plugin-transform-regenerator',
+      ['@babel/plugin-transform-runtime', { helpers: true, regenerator: true }],
+    ]
+    config.babelHelpers = 'runtime'
   }
   return {
     ...config,
