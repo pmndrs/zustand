@@ -76,7 +76,16 @@ const nuts = useStore(state => state.nuts)
 const honey = useStore(state => state.honey)
 ```
 
-If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing an alternative equality function.
+For more control over re-rendering, you may provide an alternative equality function on the second argument.
+
+```jsx
+const treats = useStore(
+  state => state.treats,
+  (oldTreats, newTreats) => compare(oldTreats, newTreats)
+)
+```
+
+For instance, if you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
 
 ```jsx
 import shallow from 'zustand/shallow'
@@ -301,10 +310,17 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 import { State, StateCreator } from 'zustand'
 import produce, { Draft } from 'immer'
 
+// Immer V8 or lower
 const immer = <T extends State>(
   config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
 ): StateCreator<T> => (set, get, api) =>
   config((fn) => set(produce(fn) as (state: T) => T), get, api)
+
+// Immer V9
+const immer = <T extends State>(
+  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
+): StateCreator<T> => (set, get, api) =>
+  config((fn) => set(produce<T>(fn)), get, api)
 ```
 
 </details>
