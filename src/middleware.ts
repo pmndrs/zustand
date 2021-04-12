@@ -151,7 +151,7 @@ type PersistOptions<S> = {
    * @param str The storage's current value.
    * @default JSON.parse
    */
-  deserialize?: (str: string) => StorageValue<S> | Promise<S>
+  deserialize?: (str: string) => StorageValue<S> | Promise<StorageValue<S>>
   /**
    * Prevent some items from being stored.
    */
@@ -163,7 +163,7 @@ type PersistOptions<S> = {
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
-   * The returned function will be called after the state rehydration or when an error occured.
+   * The returned function will be called after the state rehydration or when an error occurred.
    */
   onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
   /**
