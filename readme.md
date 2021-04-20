@@ -408,6 +408,7 @@ const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
+devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
 
 ## TypeScript
 
