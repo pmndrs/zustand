@@ -336,7 +336,7 @@ import { persist } from "zustand/middleware"
 export const useStore = create(persist(
   (set, get) => ({
     fishes: 0,
-    addAFish: () => set({ fish: get().fish + 1 })
+    addAFish: () => set({ fishes: get().fishes + 1 })
   }),
   {
     name: "food-storage", // unique name
