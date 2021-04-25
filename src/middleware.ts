@@ -94,6 +94,26 @@ export const devtools = <S extends State>(
         message.payload?.type === 'COMMIT'
       ) {
         api.devtools.init(api.getState())
+      } else if (
+        message.type === 'DISPATCH' &&
+        message.payload?.type === 'IMPORT_STATE'
+      ) {
+        const actions = message.payload.nextLiftedState?.actionsById
+        const computedStates =
+          message.payload.nextLiftedState?.computedStates || []
+
+        computedStates.forEach(
+          ({ state }: { state: PartialState<S> }, index: number) => {
+            const action = actions[index] || api.devtools.prefix + 'setState'
+
+            if (index === 0) {
+              api.devtools.init(state)
+            } else {
+              savedSetState(state)
+              api.devtools.send(action, api.getState())
+            }
+          }
+        )
       }
     })
     api.devtools.init(initialState)
