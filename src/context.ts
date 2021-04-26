@@ -31,7 +31,7 @@ export const Provider = <TState extends State>({
   const Provider = (ZustandContext.Provider as unknown) as React.Provider<
     UseStore<TState>
   >
-  return <Provider value={storeRef.current}>{children}</Provider>
+  return React.createElement(Provider, { value: storeRef.current }, children)
 }
 
 export const useZustand = <TState extends State, StateSlice>(
