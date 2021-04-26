@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import { useReducer, useRef } from 'react'
 import createImpl, {
   Destroy,
   EqualityChecker,
@@ -10,16 +10,9 @@ import createImpl, {
   Subscribe,
   StoreApi,
 } from './vanilla'
+import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect'
+
 export * from './vanilla'
-
-// For server-side rendering: https://github.com/react-spring/zustand/pull/34
-// Deno support: https://github.com/pmndrs/zustand/issues/347
-const isSSR =
-  typeof window === 'undefined' ||
-  !window.navigator ||
-  /ServerSideRendering|^Deno\//.test(window.navigator.userAgent)
-
-const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
 export interface UseStore<T extends State> {
   (): T

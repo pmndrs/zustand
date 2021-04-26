@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useRef, useEffect } from 'react'
-import { EqualityChecker, State, StateCreator, StateSelector } from './vanilla'
+import React, { createContext, useContext, useRef } from 'react'
 import create, { UseStore } from './index'
+import { EqualityChecker, State, StateCreator, StateSelector } from './vanilla'
+import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect'
 
 const ZustandContext = createContext<UseStore<State> | undefined>(undefined)
 
@@ -20,8 +21,7 @@ export const Provider = <TState extends State>({
   }
 
   // handle store property change
-  // TODO: decide whether to use useEffect or useIsomorphicLayoutEffect
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!createdFirstTime) {
       storeRef.current = create(createState)
     }
