@@ -1,10 +1,7 @@
 import React from 'react'
 import { cleanup, render } from '@testing-library/react'
 import { StateCreator } from '../src/index'
-import createContext, {
-  Provider as DefaultProvider,
-  useStore as useDefaultStore,
-} from '../src/context'
+import createContext from '../src/context'
 
 const consoleError = console.error
 afterEach(() => {
@@ -16,27 +13,6 @@ type CounterState = {
   count: number
   inc: () => void
 }
-
-it('uses default store with default context', async () => {
-  const createParam: StateCreator<CounterState> = (set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  })
-
-  function Counter() {
-    const { count, inc } = useDefaultStore()
-    React.useEffect(inc, [inc])
-    return <div>count: {count}</div>
-  }
-
-  const { findByText } = render(
-    <DefaultProvider createState={createParam}>
-      <Counter />
-    </DefaultProvider>
-  )
-
-  await findByText('count: 1')
-})
 
 it('creates and uses context store', async () => {
   const { Provider, useStore } = createContext<CounterState>()
@@ -77,8 +53,9 @@ it('throws error when not using provider', async () => {
     }
   }
 
+  const { useStore } = createContext<CounterState>()
   function Component() {
-    useDefaultStore()
+    useStore()
     return <div>no error</div>
   }
 

@@ -57,5 +57,3 @@ function createContext<TState extends State>(initialState?: TState) {
 }
 
 export default createContext
-
-export const { Provider, useStore } = createContext<any>()
