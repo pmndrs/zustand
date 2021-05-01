@@ -3,7 +3,7 @@ import React, {
   useContext,
   useRef,
 } from 'react'
-import create, { UseStore } from './index'
+import create, { UseStore } from 'zustand'
 import { EqualityChecker, State, StateCreator, StateSelector } from './vanilla'
 
 function createContext<TState extends State>(initialState?: TState) {

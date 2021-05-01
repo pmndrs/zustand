@@ -98,6 +98,13 @@
   },
   "homepage": "https://github.com/react-spring/zustand",
   "jest": {
+    "rootDir": ".",
+    "moduleNameMapper": {
+      "^zustand$": "<rootDir>/src/index.ts"
+    },
+    "modulePathIgnorePatterns": [
+      "dist"
+    ],
     "testRegex": "test.(js|ts|tsx)$",
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
