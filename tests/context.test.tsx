@@ -1,6 +1,6 @@
 import React from 'react'
 import { cleanup, render } from '@testing-library/react'
-import { StateCreator } from '../src/index'
+import create, { StateCreator } from '../src/index'
 import createContext from '../src/context'
 
 const consoleError = console.error
@@ -17,10 +17,10 @@ type CounterState = {
 it('creates and uses context store', async () => {
   const { Provider, useStore } = createContext<CounterState>()
 
-  const createParam: StateCreator<CounterState> = (set) => ({
+  const store = create<CounterState>((set) => ({
     count: 0,
     inc: () => set((state) => ({ count: state.count + 1 })),
-  })
+  }))
 
   function Counter() {
     const { count, inc } = useStore()
@@ -29,7 +29,31 @@ it('creates and uses context store', async () => {
   }
 
   const { findByText } = render(
-    <Provider createState={createParam}>
+    <Provider initialStore={store}>
+      <Counter />
+    </Provider>
+  )
+
+  await findByText('count: 1')
+})
+
+it('use context store with selectors', async () => {
+  const { Provider, useStore } = createContext<CounterState>()
+
+  const store = create<CounterState>((set) => ({
+    count: 0,
+    inc: () => set((state) => ({ count: state.count + 1 })),
+  }))
+
+  function Counter() {
+    const count = useStore((state) => state.count)
+    const inc = useStore((state) => state.inc)
+    React.useEffect(inc, [inc])
+    return <div>count: {count}</div>
+  }
+
+  const { findByText } = render(
+    <Provider initialStore={store}>
       <Counter />
     </Provider>
   )
