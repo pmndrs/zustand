@@ -1,4 +1,5 @@
 import React, {
+  createElement,
   createContext as reactCreateContext,
   useContext,
   useRef,
@@ -24,7 +25,7 @@ function createContext<TState extends State>(initialState?: TState) {
       storeRef.current = initialStore
     }
 
-    return React.createElement(
+    return createElement(
       ZustandContext.Provider,
       { value: storeRef.current },
       children
@@ -43,8 +44,6 @@ function createContext<TState extends State>(initialState?: TState) {
       )
     }
     return useProviderStore(
-      // FIXME: this type assertion seems unnecessary, as useStore does accept undefined.
-      // Need to fix useStore()'s types
       selector as StateSelector<TState, StateSlice>,
       equalityFn
     )

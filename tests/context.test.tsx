@@ -25,7 +25,7 @@ it('creates and uses context store', async () => {
   function Counter() {
     const { count, inc } = useStore()
     React.useEffect(inc, [inc])
-    return <div>count: {count}</div>
+    return <div>count: {count * 1}</div>
   }
 
   const { findByText } = render(
@@ -37,7 +37,7 @@ it('creates and uses context store', async () => {
   await findByText('count: 1')
 })
 
-it('use context store with selectors', async () => {
+it('uses context store with selectors', async () => {
   const { Provider, useStore } = createContext<CounterState>()
 
   const store = create<CounterState>((set) => ({
@@ -49,7 +49,7 @@ it('use context store with selectors', async () => {
     const count = useStore((state) => state.count)
     const inc = useStore((state) => state.inc)
     React.useEffect(inc, [inc])
-    return <div>count: {count}</div>
+    return <div>count: {count * 1}</div>
   }
 
   const { findByText } = render(
