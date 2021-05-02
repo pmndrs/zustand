@@ -3,8 +3,8 @@ import React, {
   useContext,
   useRef,
 } from 'react'
-import create, { UseStore } from 'zustand'
-import { EqualityChecker, State, StateCreator, StateSelector } from './vanilla'
+import { UseStore } from 'zustand'
+import { EqualityChecker, State, StateSelector } from './vanilla'
 
 function createContext<TState extends State>(initialState?: TState) {
   const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
@@ -12,16 +12,16 @@ function createContext<TState extends State>(initialState?: TState) {
   )
 
   const Provider = ({
-    createState,
+    initialStore,
     children,
   }: {
-    createState: StateCreator<TState>
+    initialStore: UseStore<TState>
     children: React.ReactNode
   }) => {
     const storeRef = useRef<UseStore<TState>>()
 
     if (!storeRef.current) {
-      storeRef.current = create(createState)
+      storeRef.current = initialStore
     }
 
     return React.createElement(
