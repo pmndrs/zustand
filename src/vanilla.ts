@@ -45,9 +45,12 @@ export default function create<TState extends State>(
   const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
-    // TODO: Fix me once https://github.com/microsoft/TypeScript/issues/37663 is resolved
+    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
     // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
-    const nextState = partial instanceof Function ? partial(state) : partial
+    const nextState =
+      typeof partial === 'function'
+        ? (partial as (state: TState) => TState)(state)
+        : partial
     if (nextState !== state) {
       const previousState = state
       state = replace
