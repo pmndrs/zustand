@@ -1,4 +1,8 @@
-export type State = Record<string | number | symbol, unknown>
+// https://github.com/microsoft/TypeScript/issues/42825
+// https://github.com/microsoft/TypeScript/issues/41746
+// https://www.typescriptlang.org/play?#code/C4TwDgpgBAysCGwIFUB2BrVB7A7qqAvFAEoQDGWATgCYA8AzsJQJaoDmUAPlKgK4C2AIwiUuUeiCFYANgBoovDNjwA+AFChIsBEgCCqEIRLkqdRi3Zi+QkWIlS5UeAfVqKqRlABmqNJlz4RLQAKlAQAB5IqNT02ogoSgEqABTwlGwAXFDBAJSEKk7pblgewN6o+oZBoRFRMXF6LqnpWbn5hWxqaqxIlF7wZNAAUhDUzHDxUADealBzUABWo8wAcvD8EFnmrJ3zi8sACrgiWdbClGoAvsWlUCBY1PBZI2MTSEYze0tjaxtZAOQATQe8H+slm82+zCOOBOUAAjAAGK5dHx+ZSoZL3R45NQ+SpYkE5IA
+// TLDR; Record<string, any> matches any object, while Record<string, unknown> requires an index signature.
+export type State = Record<string | number | symbol, any>
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
 export type PartialState<T extends State, K extends keyof T = keyof T> =
@@ -41,7 +45,9 @@ export default function create<TState extends State>(
   const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
-    const nextState = typeof partial === 'function' ? partial(state) : partial
+    // TODO: Fix me once https://github.com/microsoft/TypeScript/issues/37663 is resolved
+    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
+    const nextState = partial instanceof Function ? partial(state) : partial
     if (nextState !== state) {
       const previousState = state
       state = replace
