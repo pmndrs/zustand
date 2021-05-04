@@ -425,6 +425,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
+// And it is going to work for both
 const useStore = create<BearState>(set => ({
   bears: 0,
   increase: (by) => set(state => ({ bears: state.bears + by })),
