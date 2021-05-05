@@ -413,26 +413,23 @@ devtools will only log actions from each separated store unlike in a typical *co
 ## TypeScript
 
 ```tsx
-type State = {
+// You can use `type`
+type BearState = {
   bears: number
   increase: (by: number) => void
 }
 
-const useStore = create<State>(set => ({
+// Or `interface`
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+// And it is going to work for both
+const useStore = create<BearState>(set => ({
   bears: 0,
   increase: (by) => set(state => ({ bears: state.bears + by })),
 }))
-```
-
-You can also use an `interface`:
-
-```tsx
-import { State } from 'zustand';
-
-interface BearState extends State {
-  bears: number
-  increase: (by: number) => void
-}
 ```
 
 Or, use `combine` and let tsc infer types.

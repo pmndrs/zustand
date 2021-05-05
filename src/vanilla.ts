@@ -1,4 +1,4 @@
-export type State = Record<string | number | symbol, unknown>
+export type State = object
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
 export type PartialState<T extends State, K extends keyof T = keyof T> =
@@ -41,7 +41,12 @@ export default function create<TState extends State>(
   const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
-    const nextState = typeof partial === 'function' ? partial(state) : partial
+    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
+    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
+    const nextState =
+      typeof partial === 'function'
+        ? (partial as (state: TState) => TState)(state)
+        : partial
     if (nextState !== state) {
       const previousState = state
       state = replace

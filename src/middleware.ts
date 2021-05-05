@@ -136,9 +136,9 @@ export const combine = <
     {},
     initialState,
     create(
-      set as SetState<PrimaryState>,
+      (set as unknown) as SetState<PrimaryState>,
       get as GetState<PrimaryState>,
-      api as StoreApi<PrimaryState>
+      (api as unknown) as StoreApi<PrimaryState>
     )
   )
 
@@ -239,7 +239,7 @@ export const persist = <S extends State>(
     const state = { ...get() }
 
     if (whitelist) {
-      Object.keys(state).forEach((key) => {
+      ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
         !whitelist.includes(key) && delete state[key]
       })
     }
