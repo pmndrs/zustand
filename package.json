@@ -72,7 +72,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-spring/zustand.git"
+    "url": "git+https://github.com/pmndrs/zustand.git"
   },
   "keywords": [
     "react",
@@ -89,9 +89,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/react-spring/zustand/issues"
+    "url": "https://github.com/pmndrs/zustand/issues"
   },
-  "homepage": "https://github.com/react-spring/zustand",
+  "homepage": "https://github.com/pmndrs/zustand",
   "jest": {
     "rootDir": ".",
     "moduleNameMapper": {
