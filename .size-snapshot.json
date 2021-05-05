@@ -159,5 +159,19 @@
         "code": 1147
       }
     }
+  },
+  "context.js": {
+    "bundled": 814,
+    "minified": 467,
+    "gzipped": 282,
+    "treeshaked": {
+      "rollup": {
+        "code": 14,
+        "import_statements": 14
+      },
+      "webpack": {
+        "code": 998
+      }
+    }
   }
 }

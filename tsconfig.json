@@ -5,7 +5,13 @@
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "zustand": [
+        "./src/index.ts"
+      ]
+    }
   },
   "include": [
     "src/**/*",

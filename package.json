@@ -30,6 +30,11 @@
       "types": "./shallow.d.ts",
       "module": "./esm/shallow.js",
       "default": "./shallow.js"
+    },
+    "./context": {
+      "types": "./context.d.ts",
+      "module": "./esm/context.js",
+      "default": "./context.js"
     }
   },
   "sideEffects": false,
@@ -40,6 +45,7 @@
     "build:vanilla": "rollup -c --config-vanilla",
     "build:middleware": "rollup -c --config-middleware",
     "build:shallow": "rollup -c --config-shallow",
+    "build:context": "rollup -c --config-context",
     "postbuild": "yarn copy",
     "eslint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx}'",
     "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
@@ -92,6 +98,13 @@
   },
   "homepage": "https://github.com/react-spring/zustand",
   "jest": {
+    "rootDir": ".",
+    "moduleNameMapper": {
+      "^zustand$": "<rootDir>/src/index.ts"
+    },
+    "modulePathIgnorePatterns": [
+      "dist"
+    ],
     "testRegex": "test.(js|ts|tsx)$",
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
