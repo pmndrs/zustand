@@ -103,7 +103,7 @@ export const devtools = <S extends State>(
           message.payload.nextLiftedState?.computedStates || []
 
         computedStates.forEach(
-          ({ state }: { state: PartialState<S, keyof S> }, index: number) => {
+          ({ state }: { state: PartialState<S> }, index: number) => {
             const action = actions[index] || api.devtools.prefix + 'setState'
 
             if (index === 0) {
