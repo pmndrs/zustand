@@ -410,6 +410,37 @@ const useStore = create(devtools(redux(reducer, initialState)))
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
 devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
 
+## React context
+
+The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependncy injection. Because the store is a hook, passing it as a normal context value may violate rules of hooks. To avoid misusage, a special `createContext` is provided.
+
+```jsx
+import create from 'zustand'
+import createContext from 'zustand/context'
+
+const { Provider, useStore } = createContext()
+
+const store = create(...)
+
+const App = () => (
+  <Provider initialStore={store}>
+    ...
+  </Provider>
+)
+
+const Component = () => {
+  const state = useStore()
+  const slice = useStore(selector)
+  ...
+}
+```
+
+Optionally, `createContext` accepts `initialState` to infer store types.
+
+```ts
+const { Provider, useStore } = createContext(initialState)
+```
+
 ## TypeScript
 
 ```tsx
