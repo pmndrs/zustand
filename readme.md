@@ -412,7 +412,7 @@ devtools will only log actions from each separated store unlike in a typical *co
 
 ## React context
 
-The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependncy injection. Because the store is a hook, passing it as a normal context value may violate rules of hooks. To avoid misusage, a special `createContext` is provided.
+The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection. Because the store is a hook, passing it as a normal context value may violate rules of hooks. To avoid misusage, a special `createContext` is provided.
 
 ```jsx
 import create from 'zustand'
