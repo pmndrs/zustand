@@ -239,9 +239,8 @@ export const persist = <S extends State>(
     const state = { ...get() }
 
     if (whitelist) {
-      Object.keys(state).forEach((key) => {
-        const keyTyped = key as keyof S
-        !whitelist.includes(keyTyped) && delete state[keyTyped]
+      ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
+        !whitelist.includes(key) && delete state[key]
       })
     }
     if (blacklist) {

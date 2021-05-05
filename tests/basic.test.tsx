@@ -661,7 +661,7 @@ it('ensures a subscriber is not mistakenly overwritten', async () => {
 })
 
 it('can use exposed types', () => {
-  interface ExampleState extends State {
+  interface ExampleState {
     num: number
     numGet: () => number
     numGetState: () => number
