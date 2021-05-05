@@ -1,6 +1,6 @@
 import React from 'react'
 import { cleanup, render } from '@testing-library/react'
-import create, { StateCreator } from '../src/index'
+import create from '../src/index'
 import createContext from '../src/context'
 
 const consoleError = console.error

@@ -1,4 +1,5 @@
-import React, {
+import {
+  ReactNode,
   createElement,
   createContext as reactCreateContext,
   useContext,
@@ -7,7 +8,7 @@ import React, {
 import { UseStore } from 'zustand'
 import { EqualityChecker, State, StateSelector } from './vanilla'
 
-function createContext<TState extends State>(initialState?: TState) {
+function createContext<TState extends State>(_initialState?: TState) {
   const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
     undefined
   )
@@ -17,7 +18,7 @@ function createContext<TState extends State>(initialState?: TState) {
     children,
   }: {
     initialStore: UseStore<TState>
-    children: React.ReactNode
+    children: ReactNode
   }) => {
     const storeRef = useRef<UseStore<TState>>()
 
