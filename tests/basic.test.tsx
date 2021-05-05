@@ -677,8 +677,11 @@ it('can use exposed types', () => {
     }
   }
   const selector: StateSelector<ExampleState, number> = (state) => state.num
-  const partial: PartialState<ExampleState> = { num: 2, numGet: () => 2 }
-  const partialFn: PartialState<ExampleState> = (state) => ({
+  const partial: PartialState<ExampleState, 'num' | 'numGet'> = {
+    num: 2,
+    numGet: () => 2,
+  }
+  const partialFn: PartialState<ExampleState, 'num' | 'numGet'> = (state) => ({
     ...state,
     num: 2,
   })
@@ -717,7 +720,7 @@ it('can use exposed types', () => {
 
   function checkAllTypes(
     _getState: GetState<ExampleState>,
-    _partialState: PartialState<ExampleState>,
+    _partialState: PartialState<ExampleState, 'num' | 'numGet'>,
     _setState: SetState<ExampleState>,
     _state: State,
     _stateListener: StateListener<ExampleState>,

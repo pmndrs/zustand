@@ -103,7 +103,7 @@ export const devtools = <S extends State>(
           message.payload.nextLiftedState?.computedStates || []
 
         computedStates.forEach(
-          ({ state }: { state: PartialState<S> }, index: number) => {
+          ({ state }: { state: PartialState<S, keyof S> }, index: number) => {
             const action = actions[index] || api.devtools.prefix + 'setState'
 
             if (index === 0) {
@@ -136,9 +136,9 @@ export const combine = <
     {},
     initialState,
     create(
-      set as SetState<PrimaryState>,
+      (set as unknown) as SetState<PrimaryState>,
       get as GetState<PrimaryState>,
-      api as StoreApi<PrimaryState>
+      (api as unknown) as StoreApi<PrimaryState>
     )
   )
 
@@ -240,7 +240,8 @@ export const persist = <S extends State>(
 
     if (whitelist) {
       Object.keys(state).forEach((key) => {
-        !whitelist.includes(key) && delete state[key]
+        const keyTyped = key as keyof S
+        !whitelist.includes(keyTyped) && delete state[keyTyped]
       })
     }
     if (blacklist) {
