@@ -50,9 +50,21 @@ function createContext<TState extends State>(_initialState?: TState) {
     )
   }
 
+  const useStoreApi = () => {
+    // ZustandContext value is guaranteed to be stable.
+    const useProviderStore = useContext(ZustandContext)
+    if (!useProviderStore) {
+      throw new Error(
+        'Seems like you have not used zustand provider as an ancestor.'
+      )
+    }
+    return useProviderStore
+  }
+
   return {
     Provider,
     useStore,
+    useStoreApi,
   }
 }
 
