@@ -58,7 +58,12 @@ function createContext<TState extends State>(_initialState?: TState) {
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
-    return useProviderStore
+    return {
+      getState: useProviderStore.getState,
+      setState: useProviderStore.setState,
+      subscribe: useProviderStore.subscribe,
+      destroy: useProviderStore.destroy,
+    }
   }
 
   return {
