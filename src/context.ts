@@ -8,7 +8,7 @@ import {
 import { UseStore } from 'zustand'
 import { EqualityChecker, State, StateSelector } from './vanilla'
 
-function createContext<TState extends State>(_initialState?: TState) {
+function createContext<TState extends State>() {
   const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
     undefined
   )

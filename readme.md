@@ -435,12 +435,6 @@ const Component = () => {
 }
 ```
 
-Optionally, `createContext` accepts `initialState` to infer store types.
-
-```ts
-const { Provider, useStore } = createContext(initialState)
-```
-
 ## TypeScript
 
 ```tsx
