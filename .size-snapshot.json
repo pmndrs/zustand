@@ -161,8 +161,8 @@
     }
   },
   "context.js": {
-    "bundled": 1238,
-    "minified": 682,
+    "bundled": 1225,
+    "minified": 681,
     "gzipped": 331,
     "treeshaked": {
       "rollup": {
