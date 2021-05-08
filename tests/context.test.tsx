@@ -61,6 +61,46 @@ it('uses context store with selectors', async () => {
   await findByText('count: 1')
 })
 
+it('uses context store api', async () => {
+  const { Provider, useStoreApi } = createContext<CounterState>()
+
+  const store = create<CounterState>((set) => ({
+    count: 0,
+    inc: () => set((state) => ({ count: state.count + 1 })),
+  }))
+
+  function Counter() {
+    const storeApi = useStoreApi()
+    const [count, setCount] = React.useState(0)
+    React.useEffect(
+      () =>
+        storeApi.subscribe(
+          () => setCount(storeApi.getState().count),
+          (state) => state.count
+        ),
+      []
+    )
+    React.useEffect(() => {
+      storeApi.setState({ count: storeApi.getState().count + 1 })
+    }, [])
+    React.useEffect(() => {
+      if (count === 1) {
+        storeApi.destroy()
+        storeApi.setState({ count: storeApi.getState().count + 1 })
+      }
+    }, [count])
+    return <div>count: {count * 1}</div>
+  }
+
+  const { findByText } = render(
+    <Provider initialStore={store}>
+      <Counter />
+    </Provider>
+  )
+
+  await findByText('count: 1')
+})
+
 it('throws error when not using provider', async () => {
   console.error = jest.fn()
 
