@@ -9,6 +9,12 @@ export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export interface Subscribe<T extends State> {
+  (listener: StateListener<T>): () => void;
+  (
+    listener: StateSliceListener<any>,
+    selector?: StateSelector<T, any>,
+    equalityFn?: EqualityChecker<any>
+  ): () => void;
   <StateSlice>(
     listener: StateSliceListener<StateSlice>,
     selector?: StateSelector<T, StateSlice>,
