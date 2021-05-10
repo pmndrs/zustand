@@ -11,9 +11,9 @@ export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export interface Subscribe<T extends State> {
   (listener: StateListener<T>): () => void
   (
-    listener: StateSliceListener<any>,
-    selector?: StateSelector<T, any>,
-    equalityFn?: EqualityChecker<any>
+    listener: StateSliceListener<unknown>,
+    selector?: StateSelector<T, unknown>,
+    equalityFn?: EqualityChecker<unknown>
   ): () => void
   <StateSlice>(
     listener: StateSliceListener<StateSlice>,
