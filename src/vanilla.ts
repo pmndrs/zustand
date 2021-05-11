@@ -10,14 +10,9 @@ export type StateListener<T> = (state: T, previousState: T) => void
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export interface Subscribe<T extends State> {
   (listener: StateListener<T>): () => void
-  (
-    listener: StateSliceListener<unknown>,
-    selector?: StateSelector<T, unknown>,
-    equalityFn?: EqualityChecker<unknown>
-  ): () => void
   <StateSlice>(
     listener: StateSliceListener<StateSlice>,
-    selector: StateSelector<T, StateSlice>,
+    selector?: StateSelector<T, StateSlice>,
     equalityFn?: EqualityChecker<StateSlice>
   ): () => void
 }
