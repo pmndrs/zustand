@@ -17,7 +17,8 @@ export * from './vanilla'
 const isSSR =
   typeof window === 'undefined' ||
   !window.navigator ||
-  /ServerSideRendering|^Deno\//.test(window.navigator.userAgent)
+  /ServerSideRendering|^Deno\//.test(window.navigator.userAgent) ||
+  Object.keys(window.navigator).length === 0
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
