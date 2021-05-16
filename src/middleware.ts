@@ -94,6 +94,26 @@ export const devtools = <S extends State>(
         message.payload?.type === 'COMMIT'
       ) {
         api.devtools.init(api.getState())
+      } else if (
+        message.type === 'DISPATCH' &&
+        message.payload?.type === 'IMPORT_STATE'
+      ) {
+        const actions = message.payload.nextLiftedState?.actionsById
+        const computedStates =
+          message.payload.nextLiftedState?.computedStates || []
+
+        computedStates.forEach(
+          ({ state }: { state: PartialState<S> }, index: number) => {
+            const action = actions[index] || api.devtools.prefix + 'setState'
+
+            if (index === 0) {
+              api.devtools.init(state)
+            } else {
+              savedSetState(state)
+              api.devtools.send(action, api.getState())
+            }
+          }
+        )
       }
     })
     api.devtools.init(initialState)
@@ -116,9 +136,9 @@ export const combine = <
     {},
     initialState,
     create(
-      set as SetState<PrimaryState>,
+      (set as unknown) as SetState<PrimaryState>,
       get as GetState<PrimaryState>,
-      api as StoreApi<PrimaryState>
+      (api as unknown) as StoreApi<PrimaryState>
     )
   )
 
@@ -151,7 +171,7 @@ type PersistOptions<S> = {
    * @param str The storage's current value.
    * @default JSON.parse
    */
-  deserialize?: (str: string) => StorageValue<S> | Promise<S>
+  deserialize?: (str: string) => StorageValue<S> | Promise<StorageValue<S>>
   /**
    * Prevent some items from being stored.
    */
@@ -163,7 +183,7 @@ type PersistOptions<S> = {
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
-   * The returned function will be called after the state rehydration or when an error occured.
+   * The returned function will be called after the state rehydration or when an error occurred.
    */
   onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
   /**
@@ -219,7 +239,7 @@ export const persist = <S extends State>(
     const state = { ...get() }
 
     if (whitelist) {
-      Object.keys(state).forEach((key) => {
+      ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
         !whitelist.includes(key) && delete state[key]
       })
     }

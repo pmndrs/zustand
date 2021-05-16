@@ -2,7 +2,7 @@
   <img width="500" src="bear.png" />
 </p>
 
-[![Build Status](https://img.shields.io/github/workflow/status/react-spring/zustand/Lint?style=flat&colorA=000000&colorB=000000)](https://github.com/react-spring/zustand/actions?query=workflow%3ALint)
+[![Build Status](https://img.shields.io/github/workflow/status/pmndrs/zustand/Lint?style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/zustand/actions?query=workflow%3ALint)
 [![Build Size](https://img.shields.io/bundlephobia/min/zustand?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zustand)
 [![Version](https://img.shields.io/npm/v/zustand?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
@@ -336,7 +336,7 @@ import { persist } from "zustand/middleware"
 export const useStore = create(persist(
   (set, get) => ({
     fishes: 0,
-    addAFish: () => set({ fish: get().fish + 1 })
+    addAFish: () => set({ fishes: get().fishes + 1 })
   }),
   {
     name: "food-storage", // unique name
@@ -408,30 +408,53 @@ const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
+devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
+
+## React context
+
+The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection. Because the store is a hook, passing it as a normal context value may violate rules of hooks. To avoid misusage, a special `createContext` is provided.
+
+```jsx
+import create from 'zustand'
+import createContext from 'zustand/context'
+
+const { Provider, useStore } = createContext()
+
+const store = create(...)
+
+const App = () => (
+  <Provider initialStore={store}>
+    ...
+  </Provider>
+)
+
+const Component = () => {
+  const state = useStore()
+  const slice = useStore(selector)
+  ...
+}
+```
 
 ## TypeScript
 
 ```tsx
-type State = {
+// You can use `type`
+type BearState = {
   bears: number
   increase: (by: number) => void
 }
 
-const useStore = create<State>(set => ({
+// Or `interface`
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+// And it is going to work for both
+const useStore = create<BearState>(set => ({
   bears: 0,
   increase: (by) => set(state => ({ bears: state.bears + by })),
 }))
-```
-
-You can also use an `interface`:
-
-```tsx
-import { State } from 'zustand';
-
-interface BearState extends State {
-  bears: number
-  increase: (by: number) => void
-}
 ```
 
 Or, use `combine` and let tsc infer types.
@@ -450,3 +473,7 @@ const useStore = create(
 ## Testing
 
 For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
+
+## 3rd-Party Libraries
+
+Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/3rd-Party-Libraries).

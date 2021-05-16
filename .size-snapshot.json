@@ -77,9 +77,9 @@
     }
   },
   "middleware.js": {
-    "bundled": 4870,
-    "minified": 2586,
-    "gzipped": 1180,
+    "bundled": 5547,
+    "minified": 2945,
+    "gzipped": 1293,
     "treeshaked": {
       "rollup": {
         "code": 0,
@@ -157,6 +157,20 @@
       },
       "webpack": {
         "code": 1147
+      }
+    }
+  },
+  "context.js": {
+    "bundled": 1225,
+    "minified": 681,
+    "gzipped": 331,
+    "treeshaked": {
+      "rollup": {
+        "code": 14,
+        "import_statements": 14
+      },
+      "webpack": {
+        "code": 998
       }
     }
   }
