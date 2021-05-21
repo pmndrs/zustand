@@ -121,6 +121,7 @@ export const devtools = <S extends State>(
   return initialState
 }
 
+type Combine<T, U> = Omit<T, keyof U> & U
 export const combine = <
   PrimaryState extends State,
   SecondaryState extends State
@@ -131,13 +132,13 @@ export const combine = <
     get: GetState<PrimaryState>,
     api: StoreApi<PrimaryState>
   ) => SecondaryState
-): StateCreator<PrimaryState & SecondaryState> => (set, get, api) =>
+): StateCreator<Combine<PrimaryState, SecondaryState>> => (set, get, api) =>
   Object.assign(
     {},
     initialState,
     create(
       (set as unknown) as SetState<PrimaryState>,
-      get as GetState<PrimaryState>,
+      (get as unknown) as GetState<PrimaryState>,
       (api as unknown) as StoreApi<PrimaryState>
     )
   )
