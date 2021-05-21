@@ -233,7 +233,7 @@ function Component() {
   const scratchRef = useRef(useStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
   useEffect(() => useStore.subscribe(
-    scratches => (scratchRef.current = scratches), 
+    scratches => (scratchRef.current = scratches),
     state => state.scratches
   ), [])
 ```
@@ -457,14 +457,14 @@ const useStore = create<BearState>(set => ({
 }))
 ```
 
-Or, use `combine` and let tsc infer types.
+Or, use `combine` and let tsc infer types. This merges two states shallowly.
 
 ```tsx
 import { combine } from 'zustand/middleware'
 
 const useStore = create(
   combine(
-    { bears: 0 }, 
+    { bears: 0 },
     (set) => ({ increase: (by: number) => set((state) => ({ bears: state.bears + by })) })
   ),
 )
