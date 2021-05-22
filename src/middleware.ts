@@ -281,6 +281,8 @@ export const persist = <S extends State>(
         } else {
           set(deserializedStorageValue.state)
         }
+      } else {
+        await storage.setItem(name, await serialize({...get() || {}})
       }
     } catch (e) {
       postRehydrationCallback?.(undefined, e)
