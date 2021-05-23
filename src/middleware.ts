@@ -71,7 +71,7 @@ export const devtools = <S extends State>(
   if (!api.devtools) {
     const savedSetState = api.setState
     api.setState = <
-      K1 extends keyof State,
+      K1 extends keyof State = keyof State,
       K2 extends keyof State = K1,
       K3 extends keyof State = K2,
       K4 extends keyof State = K3
