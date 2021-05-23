@@ -785,11 +785,11 @@ it('should have correct (partial) types for setState', () => {
 })
 
 it('should allow for different partial keys to be returnable from setState', () => {
-  type State = { count: number; name: string }
+  type State = { count: number; something: string }
 
   const store = create<State>(() => ({
     count: 0,
-    name: 'foo',
+    something: 'foo',
   }))
 
   const setState: AssertEqual<typeof store.setState, SetState<State>> = true
@@ -802,21 +802,21 @@ it('should allow for different partial keys to be returnable from setState', () 
     }
     return { count: 0 }
   })
-  store.setState<'count', 'name'>((previous) => {
+  store.setState<'count', 'something'>((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
     if (previous.count === 1) {
       return previous
     }
-    return { name: 'foo' }
+    return { something: 'foo' }
   })
 
-  // @ts-expect-error type  Type '{ name: boolean; count?: undefined; }' is not assignable to type State.
-  store.setState<'count', 'name'>((previous) => {
+  // @ts-expect-error Type '{ something: boolean; count?: undefined; }' is not assignable to type 'State'.
+  store.setState<'count', 'something'>((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
-    return { name: true }
+    return { something: true }
   })
 })
