@@ -580,7 +580,7 @@ it('ensures parent components subscribe before children', async () => {
   await findByText('child 3')
 })
 
-// https://github.com/react-spring/zustand/issues/84
+// https://github.com/pmndrs/zustand/issues/84
 it('ensures the correct subscriber is removed on unmount', async () => {
   const useStore = create(() => ({ count: 0 }))
   const api = useStore
@@ -623,7 +623,7 @@ it('ensures the correct subscriber is removed on unmount', async () => {
   expect((await findAllByText('count: 2')).length).toBe(2)
 })
 
-// https://github.com/react-spring/zustand/issues/86
+// https://github.com/pmndrs/zustand/issues/86
 it('ensures a subscriber is not mistakenly overwritten', async () => {
   const useStore = create(() => ({ count: 0 }))
   const { setState } = useStore
@@ -661,7 +661,7 @@ it('ensures a subscriber is not mistakenly overwritten', async () => {
 })
 
 it('can use exposed types', () => {
-  interface ExampleState extends State {
+  interface ExampleState {
     num: number
     numGet: () => number
     numGetState: () => number
@@ -677,8 +677,11 @@ it('can use exposed types', () => {
     }
   }
   const selector: StateSelector<ExampleState, number> = (state) => state.num
-  const partial: PartialState<ExampleState> = { num: 2, numGet: () => 2 }
-  const partialFn: PartialState<ExampleState> = (state) => ({
+  const partial: PartialState<ExampleState, 'num' | 'numGet'> = {
+    num: 2,
+    numGet: () => 2,
+  }
+  const partialFn: PartialState<ExampleState, 'num' | 'numGet'> = (state) => ({
     ...state,
     num: 2,
   })
@@ -717,7 +720,7 @@ it('can use exposed types', () => {
 
   function checkAllTypes(
     _getState: GetState<ExampleState>,
-    _partialState: PartialState<ExampleState>,
+    _partialState: PartialState<ExampleState, 'num' | 'numGet'>,
     _setState: SetState<ExampleState>,
     _state: State,
     _stateListener: StateListener<ExampleState>,

@@ -1,18 +1,51 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "3.3.3",
+  "version": "3.5.1",
   "description": "🐻 Bear necessities for state management in React",
-  "main": "index.cjs.js",
-  "module": "index.js",
+  "main": "index.js",
+  "module": "esm/index.js",
   "types": "index.d.ts",
   "files": [
     "**"
   ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "module": "./esm/index.js",
+      "default": "./index.js"
+    },
+    "./vanilla": {
+      "types": "./vanilla.d.ts",
+      "module": "./esm/vanilla.js",
+      "default": "./vanilla.js"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "module": "./esm/middleware.js",
+      "default": "./middleware.js"
+    },
+    "./shallow": {
+      "types": "./shallow.d.ts",
+      "module": "./esm/shallow.js",
+      "default": "./shallow.js"
+    },
+    "./context": {
+      "types": "./context.d.ts",
+      "module": "./esm/context.js",
+      "default": "./context.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
-    "build": "rollup -c",
+    "build": "concurrently 'yarn:build:*'",
+    "build:base": "rollup -c",
+    "build:vanilla": "rollup -c --config-vanilla",
+    "build:middleware": "rollup -c --config-middleware",
+    "build:shallow": "rollup -c --config-shallow",
+    "build:context": "rollup -c --config-context",
     "postbuild": "yarn copy",
     "eslint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx}'",
     "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
@@ -22,12 +55,7 @@
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "prettier": {
     "semi": false,
@@ -44,7 +72,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-spring/zustand.git"
+    "url": "git+https://github.com/pmndrs/zustand.git"
   },
   "keywords": [
     "react",
@@ -61,10 +89,17 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/react-spring/zustand/issues"
+    "url": "https://github.com/pmndrs/zustand/issues"
   },
-  "homepage": "https://github.com/react-spring/zustand",
+  "homepage": "https://github.com/pmndrs/zustand",
   "jest": {
+    "rootDir": ".",
+    "moduleNameMapper": {
+      "^zustand$": "<rootDir>/src/index.ts"
+    },
+    "modulePathIgnorePatterns": [
+      "dist"
+    ],
     "testRegex": "test.(js|ts|tsx)$",
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
@@ -80,40 +115,47 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.13.8",
+    "@babel/core": "^7.14.0",
     "@babel/plugin-external-helpers": "^7.12.13",
-    "@babel/plugin-transform-react-jsx": "^7.12.17",
-    "@babel/plugin-transform-runtime": "^7.13.8",
+    "@babel/plugin-transform-react-jsx": "^7.13.12",
+    "@babel/plugin-transform-runtime": "^7.13.15",
     "@babel/plugin-transform-typescript": "^7.13.0",
-    "@babel/preset-env": "^7.13.8",
+    "@babel/preset-env": "^7.14.1",
     "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.2.0",
-    "@rollup/plugin-typescript": "^8.2.0",
-    "@testing-library/react": "^11.2.5",
-    "@types/jest": "^26.0.20",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@typescript-eslint/parser": "^4.15.2",
-    "eslint": "^7.21.0",
-    "eslint-config-prettier": "^8.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@testing-library/react": "^11.2.6",
+    "@types/jest": "^26.0.23",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "concurrently": "^6.0.2",
+    "esbuild": "^0.11.18",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.1.5",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^4.3.8",
+    "husky": "^6.0.0",
     "jest": "^26.6.3",
-    "json": "^10.0.0",
+    "json": "^11.0.0",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "rollup": "^2.40.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "rollup": "^2.47.0",
+    "rollup-plugin-esbuild": "^4.2.3",
     "rollup-plugin-size-snapshot": "^0.12.0",
     "shx": "^0.3.3",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.4"
+  },
+  "resolutions": {
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3"
   },
   "peerDependencies": {
     "react": ">=16.8"
