@@ -236,7 +236,7 @@ export const persist = <S extends State>(
     )
   }
 
-  const setItem = async () => {
+  const setItem = (): Promise<void> | void => {
     const state = { ...get() }
 
     if (whitelist) {
@@ -248,7 +248,15 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    return storage?.setItem(name, await serialize({ state, version }))
+    let serializedValue = serialize({ state, version })
+    if (serializedValue instanceof Promise) {
+      return serializedValue.then((resultValue) => {
+        serializedValue = resultValue
+        return storage?.setItem(name, serializedValue)
+      })
+    } else {
+      return storage?.setItem(name, serializedValue)
+    }
   }
 
   const savedSetState = api.setState
