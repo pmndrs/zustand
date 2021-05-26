@@ -280,7 +280,14 @@ export const persist = <S extends State>(
               deserializedStorageValue.version
             )
           } else {
-            return set(deserializedStorageValue.state)
+            set(deserializedStorageValue.state)
+            return null
+          }
+        })
+        .then((migratedState) => {
+          if (migratedState) {
+            set(migratedState)
+            return setItem()
           }
         })
         .then(() => {
