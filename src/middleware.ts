@@ -248,10 +248,12 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    let serializeResult = serialize({ state, version })
-    return serializeResult instanceof Promise
-      ? serializeResult.then((value) => storage?.setItem(name, value))
-      : storage?.setItem(name, serializeResult)
+    if (storage) {
+      const serializeResult = serialize({ state, version })
+      return serializeResult instanceof Promise
+        ? serializeResult.then((value) => storage.setItem(name, value))
+        : storage.setItem(name, serializeResult)
+    }
   }
 
   const savedSetState = api.setState
