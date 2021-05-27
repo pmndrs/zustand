@@ -263,56 +263,63 @@ export const persist = <S extends State>(
     void setItem()
   }
 
+  const makeThenable = (value: any) => {
+    if (value instanceof Promise) {
+      return value
+    } else {
+      return {
+        then: (callback) => callback(value),
+        // this is a fake function just to avoid catch is not a function error
+        catch: () => undefined,
+      }
+    }
+  }
   // rehydrate initial state with existing stored state
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
 
-    let storageValueUnknown = storage.getItem(name)
-
-    if (storageValueUnknown instanceof Promise) {
-      storageValueUnknown
-        .then((storageValue) => storageValue && deserialize(storageValue))
-        .then((deserializedStorageValue) => {
-          if (
-            deserializedStorageValue &&
-            deserializedStorageValue.version !== version
-          ) {
-            return migrate?.(
-              deserializedStorageValue.state,
-              deserializedStorageValue.version
+    let storageValuePending = makeThenable(storage.getItem(name))
+    storageValuePending
+      .then((storageValue) => {
+        if (storageValue) {
+          return makeThenable(deserialize(storageValue))
+        } else {
+          return makeThenable(null)
+        }
+      })
+      .then((deserializedStorageValue) => {
+        if (deserializedStorageValue) {
+          if (deserializedStorageValue.version !== version) {
+            return makeThenable(
+              migrate?.(
+                deserializedStorageValue.state,
+                deserializedStorageValue.version
+              )
             )
           } else {
             set(deserializedStorageValue.state)
-            return null
+            return makeThenable(null)
           }
-        })
-        .then((migratedState) => {
-          if (migratedState) {
-            set(migratedState)
-            return setItem()
-          }
-        })
-        .then(() => {
-          postRehydrationCallback?.(get(), undefined)
-        })
-        .catch((e) => {
-          postRehydrationCallback?.(undefined, e)
-        })
-    } else {
-      try {
-        let deserializedValueUnknown = deserialize(
-          storageValueUnknown as string
-        )
-        if (deserializedValueUnknown instanceof Promise) {
-          deserializedValueUnknown.then((result) => set(result.state))
         } else {
-          set(deserializedValueUnknown.state)
+          return makeThenable(null)
         }
+      })
+      .then((migratedState) => {
+        if (migratedState) {
+          set(migratedState)
+          return makeThenable(setItem())
+        } else {
+          return makeThenable(null)
+        }
+      })
+      .then(() => {
         postRehydrationCallback?.(get(), undefined)
-      } catch (e) {
+        return makeThenable(null)
+      })
+      // this handler will only catch promise related errors
+      .catch((e) => {
         postRehydrationCallback?.(undefined, e)
-      }
-    }
+      })
   })()
 
   return config(
