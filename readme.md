@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="500" src="bear.png" />
+  <img src="bear.jpg" />
 </p>
 
 [![Build Status](https://img.shields.io/github/workflow/status/pmndrs/zustand/Lint?style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/zustand/actions?query=workflow%3ALint)
