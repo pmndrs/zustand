@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   GetState,
   PartialState,
@@ -263,60 +264,64 @@ export const persist = <S extends State>(
     void setItem()
   }
 
-  const makeThenable = (value: any) => {
-    if (value instanceof Promise) {
-      return value
-    } else {
+  const toThenable = (fn) => (input) => {
+    try {
+      const result = fn(input)
+      if (result instanceof Promise) {
+        return result
+      }
       return {
-        then: (callback) => callback(value),
-        // this is a fake function just to avoid catch is not a function error
-        catch: () => undefined,
+        then(onFulfilled) {
+          return toThenable(onFulfilled)(result)
+        },
+        catch(onRejected) {
+          return this
+        },
+      }
+    } catch (e) {
+      return {
+        then(onFulfilled) {
+          return this
+        },
+        catch(onRejected) {
+          return toThenable(onRejected)(e)
+        },
       }
     }
   }
   // rehydrate initial state with existing stored state
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
-
-    let storageValuePending = makeThenable(storage.getItem(name))
+    // bind is used to avoid `TypeError: Illegal invocation` error
+    let storageValuePending = toThenable(storage.getItem.bind(storage))(name)
     storageValuePending
       .then((storageValue) => {
         if (storageValue) {
-          return makeThenable(deserialize(storageValue))
-        } else {
-          return makeThenable(null)
+          return deserialize(storageValue)
         }
       })
       .then((deserializedStorageValue) => {
         if (deserializedStorageValue) {
           if (deserializedStorageValue.version !== version) {
-            return makeThenable(
-              migrate?.(
-                deserializedStorageValue.state,
-                deserializedStorageValue.version
-              )
+            if (!migrate) return
+            return migrate(
+              deserializedStorageValue.state,
+              deserializedStorageValue.version
             )
           } else {
             set(deserializedStorageValue.state)
-            return makeThenable(null)
           }
-        } else {
-          return makeThenable(null)
         }
       })
       .then((migratedState) => {
         if (migratedState) {
           set(migratedState)
-          return makeThenable(setItem())
-        } else {
-          return makeThenable(null)
+          return setItem()
         }
       })
       .then(() => {
         postRehydrationCallback?.(get(), undefined)
-        return makeThenable(null)
       })
-      // this handler will only catch promise related errors
       .catch((e) => {
         postRehydrationCallback?.(undefined, e)
       })
