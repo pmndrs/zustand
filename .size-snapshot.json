@@ -77,9 +77,9 @@
     }
   },
   "middleware.js": {
-    "bundled": 6348,
-    "minified": 3148,
-    "gzipped": 1366,
+    "bundled": 6571,
+    "minified": 3214,
+    "gzipped": 1389,
     "treeshaked": {
       "rollup": {
         "code": 0,
