@@ -290,6 +290,12 @@ export const persist = <S extends State>(
     }
   }
   // rehydrate initial state with existing stored state
+
+  let stateFromStorage
+    // The state that was loaded from the storage and is set via set() within this
+    // middleware would later be overriden with the initial state by create(). To
+    // avoid this we merge the state from localStorage into the initial state. This
+    // way the state gets overriden with the state loaded from storage.
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
     // bind is used to avoid `TypeError: Illegal invocation` error
@@ -304,11 +310,13 @@ export const persist = <S extends State>(
         if (deserializedStorageValue) {
           if (deserializedStorageValue.version !== version) {
             if (!migrate) return
-            return migrate(
+            stateFromStorage = migrate(
               deserializedStorageValue.state,
               deserializedStorageValue.version
             )
+            return stateFromStorage
           } else {
+            stateFromStorage = deserializedStorageValue.state
             set(deserializedStorageValue.state)
           }
         }
@@ -327,7 +335,7 @@ export const persist = <S extends State>(
       })
   })()
 
-  return config(
+  const configResult = config(
     (...args) => {
       set(...args)
       void setItem()
@@ -335,4 +343,6 @@ export const persist = <S extends State>(
     get,
     api
   )
+
+  return { ...configResult, ...(stateFromStorage || {}) }
 }
