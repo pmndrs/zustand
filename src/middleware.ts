@@ -201,7 +201,7 @@ type PersistOptions<S> = {
 
 interface Thenable<Value> {
   then<V>(onFulfilled: (value: Value) => V): Thenable<V>
-  catch<V>(onRejected: (value: Error) => V): Thenable<V>
+  catch<V>(onRejected: (reason: Error) => V): Thenable<V>
 }
 
 const toThenable = <Result, Input>(
@@ -300,6 +300,7 @@ export const persist = <S extends State>(
   // a workaround to solve the issue of not storing rehydrated state in sync storage
   // the set(state) value would be later overridden with initial state by create()
   // to avoid this, we merge the state from localStorage into the initial state.
+  // TODO: find a better solution for this
   let stateFromStorage
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
@@ -313,12 +314,13 @@ export const persist = <S extends State>(
       .then((deserializedStorageValue) => {
         if (deserializedStorageValue) {
           if (deserializedStorageValue.version !== version) {
-            if (!migrate) return
-            stateFromStorage = migrate(
-              deserializedStorageValue.state,
-              deserializedStorageValue.version
-            )
-            return stateFromStorage
+            if (migrate) {
+              stateFromStorage = migrate(
+                deserializedStorageValue.state,
+                deserializedStorageValue.version
+              )
+              return stateFromStorage
+            }
           } else {
             stateFromStorage = deserializedStorageValue.state
             set(deserializedStorageValue.state)
