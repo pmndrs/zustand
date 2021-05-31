@@ -198,6 +198,7 @@ type PersistOptions<S> = {
    */
   migrate?: (persistedState: any, version: number) => S | Promise<S>
 }
+
 interface Thenable<Value> {
   then<V>(onFulfilled: (value: Value) => V): Thenable<V>
   catch<V>(onRejected: (value: Error) => V): Thenable<V>
