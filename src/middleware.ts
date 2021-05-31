@@ -297,11 +297,9 @@ export const persist = <S extends State>(
 
   // rehydrate initial state with existing stored state
 
-  // The state that was loaded from the storage and is set via set() within this
-  // middleware would later be overridden with the initial state by create(). To
-  // avoid this we merge the state from localStorage into the initial state. This
-  // way the state gets overridden with the state loaded from storage.
-  // TODO: find a better solution for this
+  // a workaround to solve the issue of not storing rehydrated state in sync storage
+  // the set(state) value would be later overridden with initial state by create()
+  // to avoid this, we merge the state from localStorage into the initial state.
   let stateFromStorage
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
