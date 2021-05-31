@@ -302,44 +302,42 @@ export const persist = <S extends State>(
   // to avoid this, we merge the state from localStorage into the initial state.
   // TODO: find a better solution for this
   let stateFromStorage: any
-  ;(() => {
-    const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
-    // bind is used to avoid `TypeError: Illegal invocation` error
-    toThenable(storage.getItem.bind(storage))(name)
-      .then((storageValue) => {
-        if (storageValue) {
-          return deserialize(storageValue)
-        }
-      })
-      .then((deserializedStorageValue) => {
-        if (deserializedStorageValue) {
-          if (deserializedStorageValue.version !== version) {
-            if (migrate) {
-              stateFromStorage = migrate(
-                deserializedStorageValue.state,
-                deserializedStorageValue.version
-              )
-              return stateFromStorage
-            }
-          } else {
-            stateFromStorage = deserializedStorageValue.state
-            set(deserializedStorageValue.state)
+  const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
+  // bind is used to avoid `TypeError: Illegal invocation` error
+  toThenable(storage.getItem.bind(storage))(name)
+    .then((storageValue) => {
+      if (storageValue) {
+        return deserialize(storageValue)
+      }
+    })
+    .then((deserializedStorageValue) => {
+      if (deserializedStorageValue) {
+        if (deserializedStorageValue.version !== version) {
+          if (migrate) {
+            stateFromStorage = migrate(
+              deserializedStorageValue.state,
+              deserializedStorageValue.version
+            )
+            return stateFromStorage
           }
+        } else {
+          stateFromStorage = deserializedStorageValue.state
+          set(deserializedStorageValue.state)
         }
-      })
-      .then((migratedState) => {
-        if (migratedState) {
-          set(migratedState as PartialState<S, keyof S>)
-          return setItem()
-        }
-      })
-      .then(() => {
-        postRehydrationCallback?.(get(), undefined)
-      })
-      .catch((e: Error) => {
-        postRehydrationCallback?.(undefined, e)
-      })
-  })()
+      }
+    })
+    .then((migratedState) => {
+      if (migratedState) {
+        set(migratedState as PartialState<S, keyof S>)
+        return setItem()
+      }
+    })
+    .then(() => {
+      postRehydrationCallback?.(get(), undefined)
+    })
+    .catch((e: Error) => {
+      postRehydrationCallback?.(undefined, e)
+    })
 
   const configResult = config(
     (...args) => {
