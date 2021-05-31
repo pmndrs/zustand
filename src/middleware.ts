@@ -282,10 +282,9 @@ export const persist = <S extends State>(
     }
 
     if (storage) {
-      const serializeResult = serialize({ state, version })
-      return serializeResult instanceof Promise
-        ? serializeResult.then((value) => storage?.setItem(name, value))
-        : storage.setItem(name, serializeResult)
+      toThenable(serialize)({ state, version }).then((serializedValue) => {
+        storage?.setItem(name, serializedValue)
+      })
     }
   }
 
@@ -307,8 +306,7 @@ export const persist = <S extends State>(
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
     // bind is used to avoid `TypeError: Illegal invocation` error
-    let storageValuePending = toThenable(storage.getItem.bind(storage))(name)
-    storageValuePending
+    toThenable(storage.getItem.bind(storage))(name)
       .then((storageValue) => {
         if (storageValue) {
           return deserialize(storageValue)
