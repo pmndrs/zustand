@@ -301,7 +301,7 @@ export const persist = <S extends State>(
   // the set(state) value would be later overridden with initial state by create()
   // to avoid this, we merge the state from localStorage into the initial state.
   // TODO: find a better solution for this
-  let stateFromStorage
+  let stateFromStorage: any
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
     // bind is used to avoid `TypeError: Illegal invocation` error
@@ -350,5 +350,7 @@ export const persist = <S extends State>(
     api
   )
 
-  return { ...configResult, ...(stateFromStorage || {}) }
+  return stateFromStorage
+    ? { ...configResult, ...stateFromStorage }
+    : configResult
 }
