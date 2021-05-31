@@ -1,4 +1,3 @@
-//@ts-nocheck
 import {
   GetState,
   PartialState,
@@ -199,6 +198,38 @@ type PersistOptions<S> = {
    */
   migrate?: (persistedState: any, version: number) => S | Promise<S>
 }
+interface Thenable<Value> {
+  then<V>(onFulfilled: (value: Value) => V): Thenable<V>
+  catch<V>(onRejected: (value: Error) => V): Thenable<V>
+}
+
+const toThenable = <Result, Input>(
+  fn: (input: Input) => Result | Promise<Result> | Thenable<Result>
+) => (input: Input): Thenable<Result> => {
+  try {
+    const result = fn(input)
+    if (result instanceof Promise) {
+      return result as Thenable<Result>
+    }
+    return {
+      then(onFulfilled) {
+        return toThenable(onFulfilled)(result as Result)
+      },
+      catch(onRejected) {
+        return this as Thenable<any> // FIXME can we avoid any ?
+      },
+    }
+  } catch (e) {
+    return {
+      then(onFulfilled) {
+        return this as Thenable<any> // FIXME can we avoid any ?
+      },
+      catch(onRejected) {
+        return toThenable(onRejected)(e)
+      },
+    }
+  }
+}
 
 export const persist = <S extends State>(
   config: StateCreator<S>,
@@ -252,7 +283,7 @@ export const persist = <S extends State>(
     if (storage) {
       const serializeResult = serialize({ state, version })
       return serializeResult instanceof Promise
-        ? serializeResult.then((value) => storage.setItem(name, value))
+        ? serializeResult.then((value) => storage?.setItem(name, value))
         : storage.setItem(name, serializeResult)
     }
   }
@@ -264,38 +295,14 @@ export const persist = <S extends State>(
     void setItem()
   }
 
-  const toThenable = (fn) => (input) => {
-    try {
-      const result = fn(input)
-      if (result instanceof Promise) {
-        return result
-      }
-      return {
-        then(onFulfilled) {
-          return toThenable(onFulfilled)(result)
-        },
-        catch(onRejected) {
-          return this
-        },
-      }
-    } catch (e) {
-      return {
-        then(onFulfilled) {
-          return this
-        },
-        catch(onRejected) {
-          return toThenable(onRejected)(e)
-        },
-      }
-    }
-  }
   // rehydrate initial state with existing stored state
 
+  // The state that was loaded from the storage and is set via set() within this
+  // middleware would later be overridden with the initial state by create(). To
+  // avoid this we merge the state from localStorage into the initial state. This
+  // way the state gets overridden with the state loaded from storage.
+  // TODO: find a better solution for this
   let stateFromStorage
-    // The state that was loaded from the storage and is set via set() within this
-    // middleware would later be overriden with the initial state by create(). To
-    // avoid this we merge the state from localStorage into the initial state. This
-    // way the state gets overriden with the state loaded from storage.
   ;(() => {
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
     // bind is used to avoid `TypeError: Illegal invocation` error
@@ -323,14 +330,14 @@ export const persist = <S extends State>(
       })
       .then((migratedState) => {
         if (migratedState) {
-          set(migratedState)
+          set(migratedState as PartialState<S, keyof S>)
           return setItem()
         }
       })
       .then(() => {
         postRehydrationCallback?.(get(), undefined)
       })
-      .catch((e) => {
+      .catch((e: Error) => {
         postRehydrationCallback?.(undefined, e)
       })
   })()
