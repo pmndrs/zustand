@@ -269,7 +269,9 @@ export const persist = <S extends State>(
     )
   }
 
-  const setItem = (): Promise<void> | void => {
+  const thenableSerialize = toThenable(serialize)
+
+  const setItem = (): Thenable<void> | void => {
     const state = { ...get() }
 
     if (whitelist) {
@@ -281,11 +283,15 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    if (storage) {
-      toThenable(serialize)({ state, version }).then((serializedValue) => {
-        storage?.setItem(name, serializedValue)
-      })
-    }
+    return thenableSerialize({ state, version }).then((serializedValue) => {
+      if (storage) {
+        storage.setItem(name, serializedValue)
+      } else {
+        console.warn(
+          `Persist middleware: unable to update ${name}, the given storage is currently unavailable.`
+        )
+      }
+    })
   }
 
   const savedSetState = api.setState
@@ -301,7 +307,7 @@ export const persist = <S extends State>(
   // the set(state) value would be later overridden with initial state by create()
   // to avoid this, we merge the state from localStorage into the initial state.
   // TODO: find a better solution for this
-  let stateFromStorage: any
+  let stateFromStorage: S | undefined
   const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
   // bind is used to avoid `TypeError: Illegal invocation` error
   toThenable(storage.getItem.bind(storage))(name)
@@ -314,11 +320,10 @@ export const persist = <S extends State>(
       if (deserializedStorageValue) {
         if (deserializedStorageValue.version !== version) {
           if (migrate) {
-            stateFromStorage = migrate(
+            return migrate(
               deserializedStorageValue.state,
               deserializedStorageValue.version
             )
-            return stateFromStorage
           }
         } else {
           stateFromStorage = deserializedStorageValue.state
@@ -328,6 +333,7 @@ export const persist = <S extends State>(
     })
     .then((migratedState) => {
       if (migratedState) {
+        stateFromStorage = migratedState as S
         set(migratedState as PartialState<S, keyof S>)
         return setItem()
       }
