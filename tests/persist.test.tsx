@@ -151,7 +151,7 @@ it('can migrate persisted state', async () => {
       name: 'test-storage',
       version: 13,
       getStorage: () => storage,
-      migrate: (state, version) => {
+      migrate: async (state, version) => {
         migrateCallCount++
         expect(state.count).toBe(42)
         expect(version).toBe(12)
