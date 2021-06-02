@@ -307,7 +307,7 @@ export const persist = <S extends State>(
   // the set(state) value would be later overridden with initial state by create()
   // to avoid this, we merge the state from localStorage into the initial state.
   // TODO: find a better solution for this
-  let stateFromStorage: S | undefined
+  let stateFromStorageInSync: S | undefined
   const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
   // bind is used to avoid `TypeError: Illegal invocation` error
   toThenable(storage.getItem.bind(storage))(name)
@@ -326,14 +326,14 @@ export const persist = <S extends State>(
             )
           }
         } else {
-          stateFromStorage = deserializedStorageValue.state
+          stateFromStorageInSync = deserializedStorageValue.state
           set(deserializedStorageValue.state)
         }
       }
     })
     .then((migratedState) => {
       if (migratedState) {
-        stateFromStorage = migratedState as S
+        stateFromStorageInSync = migratedState as S
         set(migratedState as PartialState<S, keyof S>)
         return setItem()
       }
@@ -354,7 +354,7 @@ export const persist = <S extends State>(
     api
   )
 
-  return stateFromStorage
-    ? { ...configResult, ...stateFromStorage }
+  return stateFromStorageInSync
+    ? { ...configResult, ...stateFromStorageInSync }
     : configResult
 }
