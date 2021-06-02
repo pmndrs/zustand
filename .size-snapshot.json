@@ -78,8 +78,8 @@
   },
   "middleware.js": {
     "bundled": 6548,
-    "minified": 3259,
-    "gzipped": 1401,
+    "minified": 3299,
+    "gzipped": 1388,
     "treeshaked": {
       "rollup": {
         "code": 0,
