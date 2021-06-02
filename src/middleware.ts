@@ -328,7 +328,6 @@ export const persist = <S extends State>(
           console.error(
             `State loaded from storage couldn't be migrated since no migrate function was provided`
           )
-          stateFromStorageInSync = deserializedStorageValue.state
         } else {
           stateFromStorageInSync = deserializedStorageValue.state
           set(deserializedStorageValue.state)
