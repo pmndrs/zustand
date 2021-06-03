@@ -142,6 +142,32 @@ describe('persist middleware with sync configuration', () => {
     expect(setItemCallCount).toBe(1)
   })
 
+  it.only('can correclty handle a missing migrate function', () => {
+    console.error = jest.fn()
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: { count: 42 },
+          version: 12,
+        }),
+      setItem: (_: string, value: string) => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        version: 13,
+        getStorage: () => storage,
+        onRehydrateStorage: () => (_, error) => {
+          expect(error).toBeUndefined()
+        },
+      })
+    )
+
+    expect(useStore.getState()).toEqual({ count: 0 })
+    expect(console.error).toHaveBeenCalled()
+  })
+
   it('can throw migrate error', () => {
     let postRehydrationCallbackCallCount = 0
 
