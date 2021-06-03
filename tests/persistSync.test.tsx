@@ -164,7 +164,7 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    expect(useStore.getState()).toEqual({ count: 42 })
+    expect(useStore.getState()).toEqual({ count: 0 })
     expect(console.error).toHaveBeenCalled()
   })
 
