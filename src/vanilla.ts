@@ -1,9 +1,15 @@
 export type State = object
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
-export type PartialState<T extends State, K extends keyof T = keyof T> =
-  | (Pick<T, K> | T)
-  | ((state: T) => Pick<T, K> | T)
+export type PartialState<
+  T extends State,
+  K1 extends keyof T = keyof T,
+  K2 extends keyof T = K1,
+  K3 extends keyof T = K2,
+  K4 extends keyof T = K3
+> =
+  | (Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
+  | ((state: T) => Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
@@ -18,7 +24,15 @@ export interface Subscribe<T extends State> {
 }
 
 export type SetState<T extends State> = {
-  <K extends keyof T>(partial: PartialState<T, K>, replace?: boolean): void
+  <
+    K1 extends keyof T,
+    K2 extends keyof T = K1,
+    K3 extends keyof T = K2,
+    K4 extends keyof T = K3
+  >(
+    partial: PartialState<T, K1, K2, K3, K4>,
+    replace?: boolean
+  ): void
 }
 export type GetState<T extends State> = () => T
 export type Destroy = () => void

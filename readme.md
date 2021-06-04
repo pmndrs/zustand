@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="500" src="bear.png" />
+  <img src="bear.jpg" />
 </p>
 
 [![Build Status](https://img.shields.io/github/workflow/status/pmndrs/zustand/Lint?style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/zustand/actions?query=workflow%3ALint)
@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
-A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and flux-like.
+A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and redux-like.
 
 Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
@@ -344,6 +344,42 @@ export const useStore = create(persist(
   }
 ))
 ```
+
+<details>
+<summary>How to use custom storage engines</summary>
+
+You can use other storage methods outside of `localStorage` and `sessionStorage` by defining your own `StateStorage`. A custom `StateStorage` object also allows you to write middlware for the persisted store when getting or setting store data.
+
+```tsx
+import create from "zustand"
+import { persist, StateStorage } from "zustand/middleware"
+import { get, set } from 'idb-keyval' // can use anything: IndexedDB, Ionic Storage, etc.
+
+// Custom storage object
+const storage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    console.log(name, "has been retrieved");
+    return await get(name) || null
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    console.log(name, "with value", value, "has been saved");
+    set(name, value)
+  }
+}
+
+export const useStore = create(persist(
+  (set, get) => ({
+    fishes: 0,
+    addAFish: () => set({ fishes: get().fishes + 1 })
+  }),
+  {
+    name: "food-storage", // unique name
+    getStorage: () => storage,
+  }
+))
+```
+
+</details>
 
 ## Can't live without redux-like reducers and action types?
 
