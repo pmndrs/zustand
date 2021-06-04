@@ -159,5 +159,10 @@
   },
   "peerDependencies": {
     "react": ">=16.8"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   }
 }
