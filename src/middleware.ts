@@ -143,7 +143,7 @@ export const combine = <
     )
   )
 
-type StateStorage = {
+export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
