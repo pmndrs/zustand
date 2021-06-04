@@ -346,7 +346,7 @@ export const useStore = create(persist(
 ```
 
 <details>
-<summary>How to use custom storage options</summary>
+<summary>How to use custom storage engines</summary>
 
 You can use other storage methods outside of `localStorage` and `sessionStorage` by defining your own `StateStorage`. A custom `StateStorage` object also allows you to write middlware for the persisted store when getting or setting store data.
 
