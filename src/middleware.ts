@@ -70,8 +70,13 @@ export const devtools = <S extends State>(
   const initialState = fn(namedSet, get, api)
   if (!api.devtools) {
     const savedSetState = api.setState
-    api.setState = <K extends keyof S>(
-      state: PartialState<S, K>,
+    api.setState = <
+      K1 extends keyof S = keyof S,
+      K2 extends keyof S = K1,
+      K3 extends keyof S = K2,
+      K4 extends keyof S = K3
+    >(
+      state: PartialState<S, K1, K2, K3, K4>,
       replace?: boolean
     ) => {
       savedSetState(state, replace)
