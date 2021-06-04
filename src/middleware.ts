@@ -225,13 +225,13 @@ const toThenable = <Result, Input>(
       then(onFulfilled) {
         return toThenable(onFulfilled)(result as Result)
       },
-      catch(onRejected) {
+      catch(_onRejected) {
         return this as Thenable<any>
       },
     }
   } catch (e) {
     return {
-      then(onFulfilled) {
+      then(_onFulfilled) {
         return this as Thenable<any>
       },
       catch(onRejected) {
@@ -248,8 +248,8 @@ export const persist = <S extends State>(
   const {
     name,
     getStorage = () => localStorage,
-    serialize = JSON.stringify,
-    deserialize = JSON.parse,
+    serialize = JSON.stringify as (state: StorageValue<S>) => string,
+    deserialize = JSON.parse as (str: string) => StorageValue<S>,
     blacklist,
     whitelist,
     onRehydrateStorage,
@@ -292,9 +292,9 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    return thenableSerialize({ state, version }).then((serializedValue) => {
-      return (storage as StateStorage).setItem(name, serializedValue)
-    })
+    return thenableSerialize({ state, version }).then((serializedValue) =>
+      (storage as StateStorage).setItem(name, serializedValue)
+    )
   }
 
   const savedSetState = api.setState
