@@ -200,8 +200,12 @@ type PersistOptions<S> = {
 }
 
 interface Thenable<Value> {
-  then<V>(onFulfilled: (value: Value) => V): Thenable<V>
-  catch<V>(onRejected: (reason: Error) => V): Thenable<V>
+  then<V>(
+    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
+  ): Thenable<V>
+  catch<V>(
+    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>
+  ): Thenable<V>
 }
 
 const toThenable = <Result, Input>(
@@ -217,13 +221,13 @@ const toThenable = <Result, Input>(
         return toThenable(onFulfilled)(result as Result)
       },
       catch(onRejected) {
-        return this as Thenable<any> // FIXME can we avoid any ?
+        return this as Thenable<any>
       },
     }
   } catch (e) {
     return {
       then(onFulfilled) {
-        return this as Thenable<any> // FIXME can we avoid any ?
+        return this as Thenable<any>
       },
       catch(onRejected) {
         return toThenable(onRejected)(e)
@@ -271,7 +275,7 @@ export const persist = <S extends State>(
 
   const thenableSerialize = toThenable(serialize)
 
-  const setItem = (): Thenable<void> | void => {
+  const setItem = (): Thenable<void> => {
     const state = { ...get() }
 
     if (whitelist) {
@@ -284,13 +288,7 @@ export const persist = <S extends State>(
     }
 
     return thenableSerialize({ state, version }).then((serializedValue) => {
-      if (storage) {
-        storage.setItem(name, serializedValue)
-      } else {
-        console.warn(
-          `Persist middleware: unable to update ${name}, the given storage is currently unavailable.`
-        )
-      }
+      return (storage as StateStorage).setItem(name, serializedValue)
     })
   }
 
@@ -306,7 +304,6 @@ export const persist = <S extends State>(
   // a workaround to solve the issue of not storing rehydrated state in sync storage
   // the set(state) value would be later overridden with initial state by create()
   // to avoid this, we merge the state from localStorage into the initial state.
-  // TODO: find a better solution for this
   let stateFromStorageInSync: S | undefined
   const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
   // bind is used to avoid `TypeError: Illegal invocation` error
