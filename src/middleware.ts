@@ -292,9 +292,18 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    return thenableSerialize({ state, version }).then((serializedValue) =>
-      (storage as StateStorage).setItem(name, serializedValue)
-    )
+    let errorInSync: Error | undefined
+    const thenable = thenableSerialize({ state, version })
+      .then((serializedValue) =>
+        (storage as StateStorage).setItem(name, serializedValue)
+      )
+      .catch((e) => {
+        errorInSync = e
+      })
+    if (errorInSync) {
+      throw errorInSync
+    }
+    return thenable
   }
 
   const savedSetState = api.setState
