@@ -204,6 +204,43 @@ type PersistOptions<S> = {
   migrate?: (persistedState: any, version: number) => S | Promise<S>
 }
 
+interface Thenable<Value> {
+  then<V>(
+    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
+  ): Thenable<V>
+  catch<V>(
+    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>
+  ): Thenable<V>
+}
+
+const toThenable = <Result, Input>(
+  fn: (input: Input) => Result | Promise<Result> | Thenable<Result>
+) => (input: Input): Thenable<Result> => {
+  try {
+    const result = fn(input)
+    if (result instanceof Promise) {
+      return result as Thenable<Result>
+    }
+    return {
+      then(onFulfilled) {
+        return toThenable(onFulfilled)(result as Result)
+      },
+      catch(_onRejected) {
+        return this as Thenable<any>
+      },
+    }
+  } catch (e) {
+    return {
+      then(_onFulfilled) {
+        return this as Thenable<any>
+      },
+      catch(onRejected) {
+        return toThenable(onRejected)(e)
+      },
+    }
+  }
+}
+
 export const persist = <S extends State>(
   config: StateCreator<S>,
   options: PersistOptions<S>
@@ -211,8 +248,8 @@ export const persist = <S extends State>(
   const {
     name,
     getStorage = () => localStorage,
-    serialize = JSON.stringify,
-    deserialize = JSON.parse,
+    serialize = JSON.stringify as (state: StorageValue<S>) => string,
+    deserialize = JSON.parse as (str: string) => StorageValue<S>,
     blacklist,
     whitelist,
     onRehydrateStorage,
@@ -241,7 +278,9 @@ export const persist = <S extends State>(
     )
   }
 
-  const setItem = async () => {
+  const thenableSerialize = toThenable(serialize)
+
+  const setItem = (): Thenable<void> => {
     const state = { ...get() }
 
     if (whitelist) {
@@ -253,7 +292,18 @@ export const persist = <S extends State>(
       blacklist.forEach((key) => delete state[key])
     }
 
-    return storage?.setItem(name, await serialize({ state, version }))
+    let errorInSync: Error | undefined
+    const thenable = thenableSerialize({ state, version })
+      .then((serializedValue) =>
+        (storage as StateStorage).setItem(name, serializedValue)
+      )
+      .catch((e) => {
+        errorInSync = e
+      })
+    if (errorInSync) {
+      throw errorInSync
+    }
+    return thenable
   }
 
   const savedSetState = api.setState
@@ -264,38 +314,52 @@ export const persist = <S extends State>(
   }
 
   // rehydrate initial state with existing stored state
-  ;(async () => {
-    const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
 
-    try {
-      const storageValue = await storage.getItem(name)
-
+  // a workaround to solve the issue of not storing rehydrated state in sync storage
+  // the set(state) value would be later overridden with initial state by create()
+  // to avoid this, we merge the state from localStorage into the initial state.
+  let stateFromStorageInSync: S | undefined
+  const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
+  // bind is used to avoid `TypeError: Illegal invocation` error
+  toThenable(storage.getItem.bind(storage))(name)
+    .then((storageValue) => {
       if (storageValue) {
-        const deserializedStorageValue = await deserialize(storageValue)
-
-        // if versions mismatch, run migration
+        return deserialize(storageValue)
+      }
+    })
+    .then((deserializedStorageValue) => {
+      if (deserializedStorageValue) {
         if (deserializedStorageValue.version !== version) {
-          const migratedState = await migrate?.(
-            deserializedStorageValue.state,
-            deserializedStorageValue.version
-          )
-          if (migratedState) {
-            set(migratedState)
-            await setItem()
+          if (migrate) {
+            return migrate(
+              deserializedStorageValue.state,
+              deserializedStorageValue.version
+            )
           }
+          console.error(
+            `State loaded from storage couldn't be migrated since no migrate function was provided`
+          )
         } else {
+          stateFromStorageInSync = deserializedStorageValue.state
           set(deserializedStorageValue.state)
         }
       }
-    } catch (e) {
+    })
+    .then((migratedState) => {
+      if (migratedState) {
+        stateFromStorageInSync = migratedState as S
+        set(migratedState as PartialState<S, keyof S>)
+        return setItem()
+      }
+    })
+    .then(() => {
+      postRehydrationCallback?.(get(), undefined)
+    })
+    .catch((e: Error) => {
       postRehydrationCallback?.(undefined, e)
-      return
-    }
+    })
 
-    postRehydrationCallback?.(get(), undefined)
-  })()
-
-  return config(
+  const configResult = config(
     (...args) => {
       set(...args)
       void setItem()
@@ -303,4 +367,8 @@ export const persist = <S extends State>(
     get,
     api
   )
+
+  return stateFromStorageInSync
+    ? { ...configResult, ...stateFromStorageInSync }
+    : configResult
 }
