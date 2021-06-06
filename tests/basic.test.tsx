@@ -212,10 +212,10 @@ it('can update the selector', async () => {
 
 it('can update the equality checker', async () => {
   type State = { value: number }
-  type Props = { equalityFn: () => boolean }
+  type Props = { equalityFn: EqualityChecker<State> }
   const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
-  const selector = (s: State) => s.value
+  const selector: StateSelector<State, number> = (s) => s.value
 
   let renderCount = 0
   function Component({ equalityFn }: Props) {
@@ -251,7 +251,7 @@ it('can call useStore with progressively more arguments', async () => {
     equalityFn?: EqualityChecker<State>
   }
 
-  const useStore = create(() => ({ value: 0 }))
+  const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
 
   let renderCount = 0
