@@ -142,7 +142,7 @@ describe('persist middleware with sync configuration', () => {
     expect(setItemCallCount).toBe(1)
   })
 
-  it.only('can correclty handle a missing migrate function', () => {
+  it('can correclty handle a missing migrate function', () => {
     console.error = jest.fn()
     const storage = {
       getItem: () =>
