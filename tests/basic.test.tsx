@@ -212,7 +212,7 @@ it('can update the selector', async () => {
 
 it('can update the equality checker', async () => {
   type State = { value: number }
-  type Props = { equalityFn: EqualityChecker<State> }
+  type Props = { equalityFn: EqualityChecker<number> }
   const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
   const selector: StateSelector<State, number> = (s) => s.value
@@ -256,7 +256,7 @@ it('can call useStore with progressively more arguments', async () => {
 
   let renderCount = 0
   function Component({ selector, equalityFn }: Props) {
-    const value = useStore(selector, equalityFn)
+    const value = useStore(selector as any, equalityFn)
     return (
       <div>
         renderCount: {++renderCount}, value: {JSON.stringify(value)}
