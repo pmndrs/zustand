@@ -392,19 +392,26 @@ it('can get the store', () => {
 })
 
 it('can set the store', () => {
-  const { setState, getState } = create<any>((set) => ({
+  type State = {
+    value: number
+    setState1: (v: Arg) => void
+    setState2: (v: Arg) => void
+  }
+  type Arg = Partial<State> | ((s: State) => Partial<State>)
+
+  const { setState, getState } = create<State>((set) => ({
     value: 1,
-    setState1: (v: any) => set(v),
-    setState2: (v: any) => setState(v),
+    setState1: (v: Arg) => set(v),
+    setState2: (v: Arg) => setState(v),
   }))
 
   getState().setState1({ value: 2 })
   expect(getState().value).toBe(2)
   getState().setState2({ value: 3 })
   expect(getState().value).toBe(3)
-  getState().setState1((s: any) => ({ value: ++s.value }))
+  getState().setState1((s) => ({ value: ++s.value }))
   expect(getState().value).toBe(4)
-  getState().setState2((s: any) => ({ value: ++s.value }))
+  getState().setState2((s) => ({ value: ++s.value }))
   expect(getState().value).toBe(5)
 })
 
