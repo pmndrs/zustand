@@ -376,10 +376,15 @@ it('can throw an error in equality checker', async () => {
 })
 
 it('can get the store', () => {
-  const { getState } = create<any>((_, get) => ({
+  type State = {
+    value: number
+    getState1: () => State
+    getState2: () => State
+  }
+  const { getState } = create<State>((_, get) => ({
     value: 1,
     getState1: () => get(),
-    getState2: () => getState(),
+    getState2: (): State => getState(),
   }))
 
   expect(getState().getState1().value).toBe(1)
