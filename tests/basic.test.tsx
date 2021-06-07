@@ -296,7 +296,7 @@ it('can throw an error in selector', async () => {
   const useStore = create<State>(() => initialState)
   const { setState } = useStore
   const selector: StateSelector<State, string | void> = (s) =>
-    // @ts-ignore This function is supposed to throw an error
+    // @ts-expect-error This function is supposed to throw an error
     s.value.toUpperCase()
 
   class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
@@ -340,7 +340,7 @@ it('can throw an error in equality checker', async () => {
   const { setState } = useStore
   const selector: StateSelector<State, State> = (s) => s
   const equalityFn: EqualityChecker<State> = (a, b) =>
-    // @ts-ignore This function is supposed to throw an error
+    // @ts-expect-error This function is supposed to throw an error
     a.value.trim() === b.value?.trim()
 
   class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
