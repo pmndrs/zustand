@@ -3,12 +3,6 @@ import { act, cleanup, render } from '@testing-library/react'
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
-const consoleError = console.error
-afterEach(() => {
-  cleanup()
-  console.error = consoleError
-})
-
 describe('persist middleware with async configuration', () => {
   it('can rehydrate state', async () => {
     let postRehydrationCallbackCallCount = 0

@@ -17,12 +17,6 @@ import create, {
 } from '../src/index'
 // import { devtools, redux } from '../src/middleware'
 
-const consoleError = console.error
-afterEach(() => {
-  cleanup()
-  console.error = consoleError
-})
-
 it('creates a store hook and api object', () => {
   let params
   const result = create((...args) => {
