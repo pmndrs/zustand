@@ -394,15 +394,14 @@ it('can get the store', () => {
 it('can set the store', () => {
   type State = {
     value: number
-    setState1: (v: Arg) => void
-    setState2: (v: Arg) => void
+    setState1: SetState<State>
+    setState2: SetState<State>
   }
-  type Arg = Partial<State> | ((s: State) => Partial<State>)
 
   const { setState, getState } = create<State>((set) => ({
     value: 1,
-    setState1: (v: Arg) => set(v),
-    setState2: (v: Arg) => setState(v),
+    setState1: (v) => set(v),
+    setState2: (v) => setState(v),
   }))
 
   getState().setState1({ value: 2 })
