@@ -99,7 +99,7 @@ describe('persist middleware with async configuration', () => {
       },
     }
 
-    const useStore = create<any>(
+    const useStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,

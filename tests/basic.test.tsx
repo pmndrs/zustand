@@ -63,9 +63,9 @@ it('uses the store with no args', async () => {
 })
 
 it('uses the store with selectors', async () => {
-  const useStore = create<any>((set) => ({
+  const useStore = create<CounterState>((set) => ({
     count: 0,
-    inc: () => set((state: any) => ({ count: state.count + 1 })),
+    inc: () => set((state) => ({ count: state.count + 1 })),
   }))
 
   function Counter() {
@@ -112,9 +112,9 @@ it('uses the store with a selector and equality checker', async () => {
 })
 
 it('only re-renders if selected state has changed', async () => {
-  const useStore = create<any>((set) => ({
+  const useStore = create<CounterState>((set) => ({
     count: 0,
-    inc: () => set((state: any) => ({ count: state.count + 1 })),
+    inc: () => set((state) => ({ count: state.count + 1 })),
   }))
   let counterRenderCount = 0
   let controlRenderCount = 0
@@ -164,9 +164,9 @@ it('re-renders with useLayoutEffect', async () => {
 })
 
 it('can batch updates', async () => {
-  const useStore = create<any>((set) => ({
+  const useStore = create<CounterState>((set) => ({
     count: 0,
-    inc: () => set((state: any) => ({ count: state.count + 1 })),
+    inc: () => set((state) => ({ count: state.count + 1 })),
   }))
 
   function Counter() {
@@ -186,31 +186,33 @@ it('can batch updates', async () => {
 })
 
 it('can update the selector', async () => {
-  const useStore = create(() => ({
+  type State = { one: string; two: string }
+  type Props = { selector: StateSelector<State, string> }
+  const useStore = create<State>(() => ({
     one: 'one',
     two: 'two',
   }))
 
-  function Component({ selector }: any) {
+  function Component({ selector }: Props) {
     return <div>{useStore(selector)}</div>
   }
 
-  const { findByText, rerender } = render(
-    <Component selector={(s: any) => s.one} />
-  )
+  const { findByText, rerender } = render(<Component selector={(s) => s.one} />)
   await findByText('one')
 
-  rerender(<Component selector={(s: any) => s.two} />)
+  rerender(<Component selector={(s) => s.two} />)
   await findByText('two')
 })
 
 it('can update the equality checker', async () => {
-  const useStore = create(() => ({ value: 0 }))
+  type State = { value: number }
+  type Props = { equalityFn: EqualityChecker<number> }
+  const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
-  const selector = (s: any) => s.value
+  const selector: StateSelector<State, number> = (s) => s.value
 
   let renderCount = 0
-  function Component({ equalityFn }: any) {
+  function Component({ equalityFn }: Props) {
     const value = useStore(selector, equalityFn)
     return (
       <div>
@@ -237,12 +239,18 @@ it('can update the equality checker', async () => {
 })
 
 it('can call useStore with progressively more arguments', async () => {
-  const useStore = create(() => ({ value: 0 }))
+  type State = { value: number }
+  type Props = {
+    selector?: StateSelector<State, number>
+    equalityFn?: EqualityChecker<number>
+  }
+
+  const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
 
   let renderCount = 0
-  function Component({ selector, equalityFn }: any) {
-    const value = useStore(selector, equalityFn)
+  function Component({ selector, equalityFn }: Props) {
+    const value = useStore(selector as any, equalityFn)
     return (
       <div>
         renderCount: {++renderCount}, value: {JSON.stringify(value)}
@@ -255,14 +263,14 @@ it('can call useStore with progressively more arguments', async () => {
   await findByText('renderCount: 1, value: {"value":0}')
 
   // Render with selector.
-  rerender(<Component selector={(s: any) => s.value} />)
+  rerender(<Component selector={(s) => s.value} />)
   await findByText('renderCount: 2, value: 0')
 
   // Render with selector and equality checker.
   rerender(
     <Component
-      selector={(s: any) => s.value}
-      equalityFn={(oldV: any, newV: any) => oldV > newV}
+      selector={(s) => s.value}
+      equalityFn={(oldV, newV) => oldV > newV}
     />
   )
 
@@ -276,11 +284,14 @@ it('can call useStore with progressively more arguments', async () => {
 
 it('can throw an error in selector', async () => {
   console.error = jest.fn()
+  type State = { value?: string }
 
-  const initialState: { value?: string } = { value: 'foo' }
-  const useStore = create(() => initialState)
+  const initialState: State = { value: 'foo' }
+  const useStore = create<State>(() => initialState)
   const { setState } = useStore
-  const selector = (s: any) => s.value.toUpperCase()
+  const selector: StateSelector<State, string | void> = (s) =>
+    // @ts-expect-error This function is supposed to throw an error
+    s.value.toUpperCase()
 
   class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     constructor(props: {}) {
@@ -316,12 +327,15 @@ it('can throw an error in selector', async () => {
 
 it('can throw an error in equality checker', async () => {
   console.error = jest.fn()
+  type State = { value?: string }
 
-  const initialState: { value?: string } = { value: 'foo' }
+  const initialState: State = { value: 'foo' }
   const useStore = create(() => initialState)
   const { setState } = useStore
-  const selector = (s: any) => s
-  const equalityFn = (a: any, b: any) => a.value.trim() === b.value.trim()
+  const selector: StateSelector<State, State> = (s) => s
+  const equalityFn: EqualityChecker<State> = (a, b) =>
+    // @ts-expect-error This function is supposed to throw an error
+    a.value.trim() === b.value?.trim()
 
   class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     constructor(props: {}) {
@@ -356,10 +370,15 @@ it('can throw an error in equality checker', async () => {
 })
 
 it('can get the store', () => {
-  const { getState } = create<any>((_, get) => ({
+  type State = {
+    value: number
+    getState1: () => State
+    getState2: () => State
+  }
+  const { getState } = create<State>((_, get) => ({
     value: 1,
     getState1: () => get(),
-    getState2: () => getState(),
+    getState2: (): State => getState(),
   }))
 
   expect(getState().getState1().value).toBe(1)
@@ -367,19 +386,25 @@ it('can get the store', () => {
 })
 
 it('can set the store', () => {
-  const { setState, getState } = create<any>((set) => ({
+  type State = {
+    value: number
+    setState1: SetState<State>
+    setState2: SetState<State>
+  }
+
+  const { setState, getState } = create<State>((set) => ({
     value: 1,
-    setState1: (v: any) => set(v),
-    setState2: (v: any) => setState(v),
+    setState1: (v) => set(v),
+    setState2: (v) => setState(v),
   }))
 
   getState().setState1({ value: 2 })
   expect(getState().value).toBe(2)
   getState().setState2({ value: 3 })
   expect(getState().value).toBe(3)
-  getState().setState1((s: any) => ({ value: ++s.value }))
+  getState().setState1((s) => ({ value: ++s.value }))
   expect(getState().value).toBe(4)
-  getState().setState2((s: any) => ({ value: ++s.value }))
+  getState().setState2((s) => ({ value: ++s.value }))
   expect(getState().value).toBe(5)
 })
 
@@ -438,7 +463,7 @@ it('can subscribe to the store', () => {
     () => {
       throw new Error('subscriber called when equality checker returned true')
     },
-    undefined as any,
+    undefined,
     () => true
   )
   setState({ value: initialState.value + 2 })
@@ -473,7 +498,7 @@ it('can subscribe to the store', () => {
     listener(s.value, prevValue)
     prevValue = s.value
   })
-  const unsub2 = subscribe(listener2, (s) => s.value, isRoughEqual as any)
+  const unsub2 = subscribe(listener2, (s) => s.value, isRoughEqual)
   setState({ value: 0.5 })
   setState({ value: 1 })
   unsub()
@@ -499,12 +524,13 @@ it('can destroy the store', () => {
 })
 
 it('only calls selectors when necessary', async () => {
-  const useStore = create(() => ({ a: 0, b: 0 }))
+  type State = { a: number; b: number }
+  const useStore = create<State>(() => ({ a: 0, b: 0 }))
   const { setState } = useStore
   let inlineSelectorCallCount = 0
   let staticSelectorCallCount = 0
 
-  function staticSelector(s: any) {
+  function staticSelector(s: State) {
     staticSelectorCallCount++
     return s.a
   }
@@ -534,7 +560,11 @@ it('only calls selectors when necessary', async () => {
 })
 
 it('ensures parent components subscribe before children', async () => {
-  const useStore = create<any>(() => ({
+  type State = {
+    children: { [key: string]: { text: string } }
+  }
+  type Props = { id: string }
+  const useStore = create<State>(() => ({
     children: {
       '1': { text: 'child 1' },
       '2': { text: 'child 2' },
@@ -550,7 +580,7 @@ it('ensures parent components subscribe before children', async () => {
     })
   }
 
-  function Child({ id }: any) {
+  function Child({ id }: Props) {
     const text = useStore((s) => s.children[id].text)
     return <div>{text}</div>
   }
