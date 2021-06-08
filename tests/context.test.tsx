@@ -3,12 +3,6 @@ import { cleanup, render } from '@testing-library/react'
 import create from '../src/index'
 import createContext from '../src/context'
 
-const consoleError = console.error
-afterEach(() => {
-  cleanup()
-  console.error = consoleError
-})
-
 type CounterState = {
   count: number
   inc: () => void

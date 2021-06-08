@@ -1,12 +1,12 @@
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
-const consoleError = console.error
-afterEach(() => {
-  console.error = consoleError
-})
-
 describe('persist middleware with sync configuration', () => {
+  const consoleError = console.error
+  afterEach(() => {
+    console.error = consoleError
+  })
+
   it('can rehydrate state', () => {
     let postRehydrationCallbackCallCount = 0
 
