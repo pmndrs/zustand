@@ -248,7 +248,7 @@ it('can call useStore with progressively more arguments', async () => {
   type State = { value: number }
   type Props = {
     selector?: StateSelector<State, number>
-    equalityFn?: EqualityChecker<State>
+    equalityFn?: EqualityChecker<number>
   }
 
   const useStore = create<State>(() => ({ value: 0 }))
