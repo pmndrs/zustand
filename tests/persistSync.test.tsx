@@ -1,15 +1,13 @@
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
+const consoleError = console.error
+afterEach(() => {
+  console.error = consoleError
+})
+
 describe('persist middleware with sync configuration', () => {
-  const consoleError = console.error
-  afterEach(() => {
-    console.error = consoleError
-  })
-
   it('can rehydrate state', () => {
-    let postRehydrationCallbackCallCount = 0
-
     const storage = {
       getItem: (name: string) =>
         JSON.stringify({
@@ -19,6 +17,7 @@ describe('persist middleware with sync configuration', () => {
       setItem: () => {},
     }
 
+    const spy = jest.fn()
     const useStore = create(
       persist(
         () => ({
@@ -28,23 +27,16 @@ describe('persist middleware with sync configuration', () => {
         {
           name: 'test-storage',
           getStorage: () => storage,
-          onRehydrateStorage: () => (state, error) => {
-            postRehydrationCallbackCallCount++
-            expect(error).toBeUndefined()
-            expect(state?.count).toBe(42)
-            expect(state?.name).toBe('test-storage')
-          },
+          onRehydrateStorage: () => spy,
         }
       )
     )
 
     expect(useStore.getState()).toEqual({ count: 42, name: 'test-storage' })
-    expect(postRehydrationCallbackCallCount).toBe(1)
+    expect(spy).toBeCalledWith({ count: 42, name: 'test-storage' }, undefined)
   })
 
   it('can throw rehydrate error', () => {
-    let postRehydrationCallbackCallCount = 0
-
     const storage = {
       getItem: () => {
         throw new Error('getItem error')
@@ -52,56 +44,49 @@ describe('persist middleware with sync configuration', () => {
       setItem: () => {},
     }
 
+    const spy = jest.fn()
     create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
-        onRehydrateStorage: () => (_, e) => {
-          postRehydrationCallbackCallCount++
-          expect(e?.message).toBe('getItem error')
-        },
+        onRehydrateStorage: () => spy,
       })
     )
 
-    expect(postRehydrationCallbackCallCount).toBe(1)
+    expect(spy).toBeCalledWith(undefined, new Error('getItem error'))
   })
 
   it('can persist state', () => {
-    let setItemCallCount = 0
+    const setItemSpy = jest.fn()
+    const onRehydrateStorageSpy = jest.fn()
 
     const storage = {
       getItem: () => null,
-      setItem: (name: string, value: string) => {
-        setItemCallCount++
-        expect(name).toBe('test-storage')
-        expect(value).toBe(
-          JSON.stringify({
-            state: { count: 42 },
-            version: 0,
-          })
-        )
-      },
+      setItem: setItemSpy,
     }
 
     const useStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
-        onRehydrateStorage: () => (_, error) => {
-          expect(error).toBeUndefined()
-        },
+        onRehydrateStorage: () => onRehydrateStorageSpy,
       })
     )
 
     expect(useStore.getState()).toEqual({ count: 0 })
     useStore.setState({ count: 42 })
     expect(useStore.getState()).toEqual({ count: 42 })
-    expect(setItemCallCount).toBe(1)
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({ state: { count: 42 }, version: 0 })
+    )
+    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
   })
 
   it('can migrate persisted state', () => {
-    let migrateCallCount = 0
-    let setItemCallCount = 0
+    const setItemSpy = jest.fn()
+    const onRehydrateStorageSpy = jest.fn()
+    const migrateSpy = jest.fn(() => ({ count: 99 }))
 
     const storage = {
       getItem: () =>
@@ -109,15 +94,7 @@ describe('persist middleware with sync configuration', () => {
           state: { count: 42 },
           version: 12,
         }),
-      setItem: (_: string, value: string) => {
-        setItemCallCount++
-        expect(value).toBe(
-          JSON.stringify({
-            state: { count: 99 },
-            version: 13,
-          })
-        )
-      },
+      setItem: setItemSpy,
     }
 
     const useStore = create(
@@ -125,21 +102,21 @@ describe('persist middleware with sync configuration', () => {
         name: 'test-storage',
         version: 13,
         getStorage: () => storage,
-        onRehydrateStorage: () => (_, error) => {
-          expect(error).toBeUndefined()
-        },
-        migrate: (state, version) => {
-          migrateCallCount++
-          expect(state.count).toBe(42)
-          expect(version).toBe(12)
-          return { count: 99 }
-        },
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+        migrate: migrateSpy,
       })
     )
 
     expect(useStore.getState()).toEqual({ count: 99 })
-    expect(migrateCallCount).toBe(1)
-    expect(setItemCallCount).toBe(1)
+    expect(migrateSpy).toBeCalledWith({ count: 42 }, 12)
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: { count: 99 },
+        version: 13,
+      })
+    )
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
   })
 
   it('can correclty handle a missing migrate function', () => {

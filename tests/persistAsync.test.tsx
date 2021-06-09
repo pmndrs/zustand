@@ -5,8 +5,6 @@ import { persist } from '../src/middleware'
 
 describe('persist middleware with async configuration', () => {
   it('can rehydrate state', async () => {
-    let postRehydrationCallbackCallCount = 0
-
     const storage = {
       getItem: async (name: string) =>
         JSON.stringify({
@@ -16,6 +14,7 @@ describe('persist middleware with async configuration', () => {
       setItem: () => {},
     }
 
+    const spy = jest.fn()
     const useStore = create(
       persist(
         () => ({
@@ -25,11 +24,7 @@ describe('persist middleware with async configuration', () => {
         {
           name: 'test-storage',
           getStorage: () => storage,
-          onRehydrateStorage: () => (state) => {
-            postRehydrationCallbackCallCount++
-            expect(state?.count).toBe(42)
-            expect(state?.name).toBe('test-storage')
-          },
+          onRehydrateStorage: () => spy,
         }
       )
     )
@@ -47,7 +42,7 @@ describe('persist middleware with async configuration', () => {
 
     await findByText('count: 0, name: empty')
     await findByText('count: 42, name: test-storage')
-    expect(postRehydrationCallbackCallCount).toBe(1)
+    expect(spy).toBeCalledWith({ count: 42, name: 'test-storage' }, undefined)
   })
 
   it('can throw rehydrate error', async () => {
