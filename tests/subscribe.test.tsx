@@ -80,6 +80,24 @@ describe('subscribe()', () => {
     )
   })
 
+  it('should unsubscribe correctly', () => {
+    const initialState = { value: 1, other: 'a' }
+    const { setState, subscribe } = create(() => initialState)
+    const listener = jest.fn()
+
+    const unsub = subscribe(listener, (s) => s.value)
+
+    setState({ value: initialState.value + 1 })
+    unsub()
+    setState({ value: initialState.value + 2 })
+
+    expect(listener).toHaveBeenCalledTimes(1)
+    expect(listener).toHaveBeenCalledWith(
+      initialState.value + 1,
+      initialState.value
+    )
+  })
+
   it('should keep consistent behavior with equality check', () => {
     const initialState = { value: 1, other: 'a' }
     const { getState, setState, subscribe } = create(() => initialState)
