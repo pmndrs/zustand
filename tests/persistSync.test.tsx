@@ -17,7 +17,7 @@ describe('persist middleware with sync configuration', () => {
       setItem: () => {},
     }
 
-    const spy = jest.fn()
+    const onRehydrateStorageSpy = jest.fn()
     const useStore = create(
       persist(
         () => ({
@@ -27,13 +27,16 @@ describe('persist middleware with sync configuration', () => {
         {
           name: 'test-storage',
           getStorage: () => storage,
-          onRehydrateStorage: () => spy,
+          onRehydrateStorage: () => onRehydrateStorageSpy,
         }
       )
     )
 
     expect(useStore.getState()).toEqual({ count: 42, name: 'test-storage' })
-    expect(spy).toBeCalledWith({ count: 42, name: 'test-storage' }, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { count: 42, name: 'test-storage' },
+      undefined
+    )
   })
 
   it('can throw rehydrate error', () => {
@@ -121,6 +124,7 @@ describe('persist middleware with sync configuration', () => {
 
   it('can correclty handle a missing migrate function', () => {
     console.error = jest.fn()
+    const onRehydrateStorageSpy = jest.fn()
     const storage = {
       getItem: () =>
         JSON.stringify({
@@ -135,18 +139,17 @@ describe('persist middleware with sync configuration', () => {
         name: 'test-storage',
         version: 13,
         getStorage: () => storage,
-        onRehydrateStorage: () => (_, error) => {
-          expect(error).toBeUndefined()
-        },
+        onRehydrateStorage: () => onRehydrateStorageSpy,
       })
     )
 
     expect(useStore.getState()).toEqual({ count: 0 })
     expect(console.error).toHaveBeenCalled()
+    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
   })
 
   it('can throw migrate error', () => {
-    let postRehydrationCallbackCallCount = 0
+    const onRehydrateStorageSpy = jest.fn()
 
     const storage = {
       getItem: () =>
@@ -165,14 +168,14 @@ describe('persist middleware with sync configuration', () => {
         migrate: () => {
           throw new Error('migrate error')
         },
-        onRehydrateStorage: () => (_, e) => {
-          postRehydrationCallbackCallCount++
-          expect(e?.message).toBe('migrate error')
-        },
+        onRehydrateStorage: () => onRehydrateStorageSpy,
       })
     )
 
     expect(useStore.getState()).toEqual({ count: 0 })
-    expect(postRehydrationCallbackCallCount).toBe(1)
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      undefined,
+      new Error('migrate error')
+    )
   })
 })
