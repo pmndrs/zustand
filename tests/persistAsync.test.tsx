@@ -164,6 +164,39 @@ describe('persist middleware with async configuration', () => {
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
   })
 
+  it('can correclty handle a missing migrate function', async () => {
+    console.error = jest.fn()
+    const onRehydrateStorageSpy = jest.fn()
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: { count: 42 },
+          version: 12,
+        }),
+      setItem: (_: string, value: string) => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        version: 13,
+        getStorage: () => storage,
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 0')
+    expect(console.error).toHaveBeenCalled()
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+  })
+
   it('can throw migrate error', async () => {
     console.error = jest.fn()
     const onRehydrateStorageSpy = jest.fn()
