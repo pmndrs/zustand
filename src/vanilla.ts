@@ -1,4 +1,11 @@
 export type State = object
+type PartialStateCallable<
+  T extends State,
+  K1 extends keyof T = keyof T,
+  K2 extends keyof T = K1,
+  K3 extends keyof T = K2,
+  K4 extends keyof T = K3
+> = (state: T) => Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
 export type PartialState<
@@ -8,8 +15,25 @@ export type PartialState<
   K3 extends keyof T = K2,
   K4 extends keyof T = K3
 > =
-  | (Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
-  | ((state: T) => Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
+  | PartialStateCallable<T, K1, K2, K3, K4>
+  | Pick<T, K1>
+  | Pick<T, K2>
+  | Pick<T, K3>
+  | Pick<T, K4>
+  | T
+
+function isPartialStateCallable<
+  T extends State,
+  K1 extends keyof T,
+  K2 extends keyof T = K1,
+  K3 extends keyof T = K2,
+  K4 extends keyof T = K3
+>(
+  partial: PartialState<T, K1, K2, K3, K4>
+): partial is PartialStateCallable<T, K1, K2, K3, K4> {
+  return typeof partial === 'function'
+}
+
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
@@ -48,24 +72,20 @@ export type StateCreator<T extends State, CustomSetState = SetState<T>> = (
   api: StoreApi<T>
 ) => T
 
-export default function create<TState extends State>(
-  createState: StateCreator<TState>
-): StoreApi<TState> {
+export default function create<
+  TState extends State,
+  CustomSetState = SetState<TState>
+>(createState: StateCreator<TState, CustomSetState>): StoreApi<TState> {
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
     // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
     // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
-    const nextState =
-      typeof partial === 'function'
-        ? (partial as (state: TState) => TState)(state)
-        : partial
+    const nextState = isPartialStateCallable(partial) ? partial(state) : partial
     if (nextState !== state) {
       const previousState = state
-      state = replace
-        ? (nextState as TState)
-        : Object.assign({}, state, nextState)
+      state = replace ? (nextState as TState) : { ...state, ...nextState }
       listeners.forEach((listener) => listener(state, previousState))
     }
   }
