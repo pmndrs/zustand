@@ -173,3 +173,39 @@ it('should allow for different partial keys to be returnable from setState', () 
     return { something: true }
   })
 })
+
+it('can accept a store has CustomSetState', () => {
+  function dummyMiddleware<T extends State, Settable extends keyof T>(
+    creator: StateCreator<T, SetState<Pick<T, Settable>>>
+  ): StateCreator<T, SetState<Pick<T, Settable>>> {
+    return creator
+  }
+
+  type ExampleState = {
+    a: string
+    b: string
+    readA(): string
+    readB(): string
+    send(): void
+  }
+
+  const store = create(
+    dummyMiddleware<ExampleState, 'a' | 'b'>((set, get) => ({
+      a: 'aaa',
+      b: 'bbbb',
+      readA() {
+        return get().a
+      },
+      readB() {
+        return get().b
+      },
+      send() {
+        // @ts-expect-error  Argument of type '{ readA: () => string; }' is not assignable to parameter of type 'PartialState<Pick<ExampleState, "a" | "b">, "a" | "b", "a" | "b", "a" | "b", "a" | "b">'.
+        set({ readA: () => 'ttt' })
+      },
+    }))
+  )
+
+  store.setState({ a: 'next a' })
+  store.setState({ readA: () => 'next a' })
+})
