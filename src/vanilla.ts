@@ -129,6 +129,7 @@ export default function create<
 
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  state = createState(setState, getState, api)
+  // SetState<TState> includes CustomSetState so it should be ok
+  state = createState(setState as any as CustomSetState, getState, api)
   return api
 }

@@ -30,8 +30,11 @@ export interface UseStore<T extends State> {
   destroy: Destroy
 }
 
-export default function create<TState extends State>(
-  createState: StateCreator<TState> | StoreApi<TState>
+export default function create<
+  TState extends State,
+  CustomSetState = SetState<TState>
+>(
+  createState: StateCreator<TState, CustomSetState> | StoreApi<TState>
 ): UseStore<TState> {
   const api: StoreApi<TState> =
     typeof createState === 'function' ? createImpl(createState) : createState
