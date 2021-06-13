@@ -471,7 +471,7 @@ const Component = () => {
 }
 ```
 <details>
-  <summary>`createContext` snippet</summary>
+  <summary>createContext usage in real components</summary>
 
   ```jsx
   import create from "zustand";
