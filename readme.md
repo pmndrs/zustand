@@ -456,10 +456,10 @@ import createContext from 'zustand/context'
 
 const { Provider, useStore } = createContext()
 
-const store = create(...)
+const store = () => create(...)
 
 const App = () => (
-  <Provider initialStore={store}>
+  <Provider initialStore={store()}>
     ...
   </Provider>
 )
@@ -470,6 +470,8 @@ const Component = () => {
   ...
 }
 ```
+
+For a more detailed code snippet on using zustand context in real components check [here](./snippets/context.md)
 
 ## TypeScript
 
