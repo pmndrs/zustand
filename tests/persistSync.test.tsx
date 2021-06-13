@@ -1,6 +1,28 @@
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
+const createPersistantStore = (initialValue: string | null) => {
+  let state = initialValue
+
+  const getItem = (): string | null => {
+    getItemSpy()
+    return state
+  }
+  const setItem = (name: string, newState: string) => {
+    setItemSpy(name, newState)
+    state = newState
+  }
+
+  const getItemSpy = jest.fn()
+  const setItemSpy = jest.fn()
+
+  return {
+    storage: { getItem, setItem },
+    getItemSpy,
+    setItemSpy,
+  }
+}
+
 describe('persist middleware with sync configuration', () => {
   const consoleError = console.error
   afterEach(() => {
@@ -60,30 +82,41 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can persist state', () => {
-    const setItemSpy = jest.fn()
-    const onRehydrateStorageSpy = jest.fn()
-
-    const storage = {
-      getItem: () => null,
-      setItem: setItemSpy,
+    const createStore = () => {
+      const onRehydrateStorageSpy = jest.fn()
+      const useStore = create(
+        persist(() => ({ count: 0 }), {
+          name: 'test-storage',
+          getStorage: () => storage,
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+        })
+      )
+      return { useStore, onRehydrateStorageSpy }
     }
 
-    const useStore = create(
-      persist(() => ({ count: 0 }), {
-        name: 'test-storage',
-        getStorage: () => storage,
-        onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
-    )
+    const { storage, setItemSpy } = createPersistantStore(null)
 
+    // Initialize from empty storage
+    const { useStore, onRehydrateStorageSpy } = createStore()
     expect(useStore.getState()).toEqual({ count: 0 })
+    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+
+    // Write something to the store
     useStore.setState({ count: 42 })
     expect(useStore.getState()).toEqual({ count: 42 })
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
       JSON.stringify({ state: { count: 42 }, version: 0 })
     )
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+
+    // Create the same store a second time and check if the persisted state
+    // is loaded correctly
+    const {
+      useStore: useStore2,
+      onRehydrateStorageSpy: onRehydrateStorageSpy2,
+    } = createStore()
+    expect(useStore2.getState()).toEqual({ count: 42 })
+    expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
   })
 
   it('can migrate persisted state', () => {
