@@ -30,7 +30,7 @@ export const redux =
     return { dispatch: api.dispatch, ...initial }
   }
 
-type NamedSet<T extends State> = {
+export type NamedSet<T extends State> = {
   <K extends keyof T>(
     partial: PartialState<T, K>,
     replace?: boolean,
