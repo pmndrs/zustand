@@ -22,18 +22,6 @@ export type PartialState<
   | Pick<T, K4>
   | T
 
-function isPartialStateCallable<
-  T extends State,
-  K1 extends keyof T,
-  K2 extends keyof T = K1,
-  K3 extends keyof T = K2,
-  K4 extends keyof T = K3
->(
-  partial: PartialState<T, K1, K2, K3, K4>
-): partial is PartialStateCallable<T, K1, K2, K3, K4> {
-  return typeof partial === 'function'
-}
-
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
@@ -82,10 +70,12 @@ export default function create<
   const setState: SetState<TState> = (partial, replace) => {
     // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
     // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
-    const nextState = isPartialStateCallable(partial) ? partial(state) : partial
+    const nextState = typeof partial === 'function' ? partial(state) : partial
     if (nextState !== state) {
       const previousState = state
-      state = replace ? (nextState as TState) : { ...state, ...nextState }
+      state = replace
+        ? (nextState as TState)
+        : Object.assign({}, state, nextState)
       listeners.forEach((listener) => listener(state, previousState))
     }
   }
