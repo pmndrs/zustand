@@ -19,12 +19,8 @@ function createContext<TState extends State>() {
     initialStore: UseStore<TState>
     children: ReactNode
   }) => {
-    const storeRef = useRef<UseStore<TState>>()
-
-    if (!storeRef.current) {
-      storeRef.current = initialStore
-    }
-
+    // Put store (hook) in ref to make it stable
+    const storeRef = useRef(initialStore)
     return createElement(
       ZustandContext.Provider,
       { value: storeRef.current },
