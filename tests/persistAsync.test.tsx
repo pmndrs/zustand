@@ -194,7 +194,7 @@ describe('persist middleware with async configuration', () => {
 
     await findByText('count: 0')
     expect(console.error).toHaveBeenCalled()
-    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
   })
 
   it('can throw migrate error', async () => {
