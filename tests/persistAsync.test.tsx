@@ -3,6 +3,28 @@ import { act, cleanup, render } from '@testing-library/react'
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
+const createPersistantStore = (initialValue: string | null) => {
+  let state = initialValue
+
+  const getItem = async (): Promise<string | null> => {
+    getItemSpy()
+    return state
+  }
+  const setItem = async (name: string, newState: string) => {
+    setItemSpy(name, newState)
+    state = newState
+  }
+
+  const getItemSpy = jest.fn()
+  const setItemSpy = jest.fn()
+
+  return {
+    storage: { getItem, setItem },
+    getItemSpy,
+    setItemSpy,
+  }
+}
+
 describe('persist middleware with async configuration', () => {
   const consoleError = console.error
   afterEach(() => {
@@ -86,21 +108,22 @@ describe('persist middleware with async configuration', () => {
   })
 
   it('can persist state', async () => {
-    const setItemSpy = jest.fn()
-    const onRehydrateStorageSpy = jest.fn()
+    const { storage, setItemSpy } = createPersistantStore(null)
 
-    const storage = {
-      getItem: () => null,
-      setItem: setItemSpy,
+    const createStore = () => {
+      const onRehydrateStorageSpy = jest.fn()
+      const useStore = create(
+        persist(() => ({ count: 0 }), {
+          name: 'test-storage',
+          getStorage: () => storage,
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+        })
+      )
+      return { useStore, onRehydrateStorageSpy }
     }
 
-    const useStore = create(
-      persist(() => ({ count: 0 }), {
-        name: 'test-storage',
-        getStorage: () => storage,
-        onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
-    )
+    // Initialize from empty storage
+    const { useStore, onRehydrateStorageSpy } = createStore()
 
     function Counter() {
       const { count } = useStore()
@@ -108,16 +131,31 @@ describe('persist middleware with async configuration', () => {
     }
 
     const { findByText } = render(<Counter />)
-
     await findByText('count: 0')
-    act(() => useStore.setState({ count: 42 }))
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
 
+    // Write something to the store
+    act(() => useStore.setState({ count: 42 }))
     await findByText('count: 42')
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
       JSON.stringify({ state: { count: 42 }, version: 0 })
     )
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+
+    // Create the same store a second time and check if the persisted state
+    // is loaded correctly
+    const {
+      useStore: useStore2,
+      onRehydrateStorageSpy: onRehydrateStorageSpy2,
+    } = createStore()
+    function Counter2() {
+      const { count } = useStore2()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText: findByText2 } = render(<Counter2 />)
+    await findByText2('count: 42')
+    expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
   })
 
   it('can migrate persisted state', async () => {

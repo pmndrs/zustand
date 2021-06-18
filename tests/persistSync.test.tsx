@@ -82,6 +82,8 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can persist state', () => {
+    const { storage, setItemSpy } = createPersistantStore(null)
+
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
       const useStore = create(
@@ -93,8 +95,6 @@ describe('persist middleware with sync configuration', () => {
       )
       return { useStore, onRehydrateStorageSpy }
     }
-
-    const { storage, setItemSpy } = createPersistantStore(null)
 
     // Initialize from empty storage
     const { useStore, onRehydrateStorageSpy } = createStore()
