@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
-A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and redux-like.
+A small, fast and scaleable bearbones state-management solution using simplified flux principles. Has a comfy api based on hooks, isn't boilerplatey or opinionated.
 
 Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
@@ -76,16 +76,7 @@ const nuts = useStore(state => state.nuts)
 const honey = useStore(state => state.honey)
 ```
 
-For more control over re-rendering, you may provide an alternative equality function on the second argument.
-
-```jsx
-const treats = useStore(
-  state => state.treats,
-  (oldTreats, newTreats) => compare(oldTreats, newTreats)
-)
-```
-
-For instance, if you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
 
 ```jsx
 import shallow from 'zustand/shallow'
@@ -100,9 +91,18 @@ const [nuts, honey] = useStore(state => [state.nuts, state.honey], shallow)
 const treats = useStore(state => Object.keys(state.treats), shallow)
 ```
 
+For more control over re-rendering, you may provide any custom equality function.
+
+```jsx
+const treats = useStore(
+  state => state.treats,
+  (oldTreats, newTreats) => compare(oldTreats, newTreats)
+)
+```
+
 ## Fetching from multiple stores
 
-Since you can create as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
+You can make as many stores as you like, forwarding results to succeeding selectors is as natural as it gets. But nonetheless the recommended approach would be to unify state into a single store, as it scales better.
 
 ```jsx
 const currentBear = useCredentialsStore(state => state.currentBear)
