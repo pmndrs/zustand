@@ -221,6 +221,8 @@ import vanillaStore from './vanillaStore'
 const useStore = create(vanillaStore)
 ```
 
+:warning: Note that middlewares that modify `set` or `get` are not applied to `getState` and `setState`.
+
 ## Transient updates (for often occuring state-changes)
 
 The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
