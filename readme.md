@@ -18,7 +18,7 @@ You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 npm install zustand
 ```
 
-### First create a store
+## First create a store
 
 Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function *merges* state.
 
@@ -32,7 +32,7 @@ const useStore = create(set => ({
 }))
 ```
 
-### Then bind your components, and that's it!
+## Then bind your components, and that's it!
 
 Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
@@ -48,7 +48,7 @@ function Controls() {
 }
 ```
 
-#### Why zustand over react-redux?
+### Why zustand over react-redux?
 
 * Simple and un-opinionated
 * Makes hooks the primary means of consuming state
