@@ -49,7 +49,7 @@
     "postbuild": "yarn copy",
     "eslint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx}' 'tests/**/*.{js,ts,jsx,tsx}'",
     "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
-    "eslint:ci": "eslint  'src/**/*.{js,ts,jsx,tsx}' 'tests/**/*.{js,ts,jsx,tsx}'",
+    "eslint:ci": "eslint 'src/**/*.{js,ts,jsx,tsx}' 'tests/**/*.{js,ts,jsx,tsx}'",
     "prepare": "yarn build",
     "pretest": "tsc --noEmit",
     "test": "jest",
