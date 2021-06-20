@@ -30,9 +30,14 @@ export const redux =
     return { dispatch: api.dispatch, ...initial }
   }
 
-type NamedSet<T extends State> = {
-  <K extends keyof T>(
-    partial: PartialState<T, K>,
+export type NamedSet<T extends State> = {
+  <
+    K1 extends keyof T,
+    K2 extends keyof T = K1,
+    K3 extends keyof T = K2,
+    K4 extends keyof T = K3
+  >(
+    partial: PartialState<T, K1, K2, K3, K4>,
     replace?: boolean,
     name?: string
   ): void
@@ -357,7 +362,7 @@ export const persist =
         }
       })
       .then(() => {
-        postRehydrationCallback?.(get(), undefined)
+        postRehydrationCallback?.(stateFromStorageInSync, undefined)
       })
       .catch((e: Error) => {
         postRehydrationCallback?.(undefined, e)
