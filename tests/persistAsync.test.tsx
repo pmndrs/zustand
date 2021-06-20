@@ -132,7 +132,7 @@ describe('persist middleware with async configuration', () => {
 
     const { findByText } = render(<Counter />)
     await findByText('count: 0')
-    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
 
     // Write something to the store
     act(() => useStore.setState({ count: 42 }))

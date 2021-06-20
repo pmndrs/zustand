@@ -142,6 +142,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^6.0.0",
+    "immer": "^9.0.3",
     "jest": "^27.0.4",
     "json": "^11.0.0",
     "lint-staged": "^11.0.0",
