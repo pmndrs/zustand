@@ -17,6 +17,10 @@ You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 ```bash
 npm install zustand
 ```
+#### or
+```bash
+yarn add zustand
+```
 
 ## First create a store
 
