@@ -62,14 +62,12 @@ export type StateCreator<T extends State, CustomSetState = SetState<T>> = (
 
 export default function create<
   TState extends State,
-  CustomSetState = SetState<TState>
+  CustomSetState extends SetState<any> = SetState<TState>
 >(createState: StateCreator<TState, CustomSetState>): StoreApi<TState> {
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
 
   const setState: SetState<TState> = (partial, replace) => {
-    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
-    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
     const nextState = typeof partial === 'function' ? partial(state) : partial
     if (nextState !== state) {
       const previousState = state
@@ -120,6 +118,6 @@ export default function create<
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
   // SetState<TState> includes CustomSetState so it should be ok
-  state = createState(setState as any as CustomSetState, getState, api)
+  state = createState(setState as CustomSetState, getState, api)
   return api
 }
