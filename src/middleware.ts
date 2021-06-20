@@ -357,7 +357,7 @@ export const persist =
         }
       })
       .then(() => {
-        postRehydrationCallback?.(get(), undefined)
+        postRehydrationCallback?.(stateFromStorageInSync, undefined)
       })
       .catch((e: Error) => {
         postRehydrationCallback?.(undefined, e)
