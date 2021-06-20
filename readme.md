@@ -15,13 +15,8 @@ Don't disregard it because it's cute. It has quite the claws, lots of time was s
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
 ```bash
-npm install zustand
+npm install zustand # or yarn add zustand
 ```
-#### or
-```bash
-yarn add zustand
-```
-
 ## First create a store
 
 Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function *merges* state.
