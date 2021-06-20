@@ -32,7 +32,7 @@ export interface UseStore<T extends State> {
 
 export default function create<
   TState extends State,
-  CustomSetState extends SetState<any> = SetState<TState>
+  CustomSetState extends SetState<TState> = SetState<TState>
 >(
   createState: StateCreator<TState, CustomSetState> | StoreApi<TState>
 ): UseStore<TState> {

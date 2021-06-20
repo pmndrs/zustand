@@ -1,4 +1,11 @@
 export type State = object
+type PartialStatePlain<
+  T extends State,
+  K1 extends keyof T = keyof T,
+  K2 extends keyof T = K1,
+  K3 extends keyof T = K2,
+  K4 extends keyof T = K3
+> = Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T
 type PartialStateCallable<
   T extends State,
   K1 extends keyof T = keyof T,
@@ -15,12 +22,8 @@ export type PartialState<
   K3 extends keyof T = K2,
   K4 extends keyof T = K3
 > =
+  | PartialStatePlain<T, K1, K2, K3, K4>
   | PartialStateCallable<T, K1, K2, K3, K4>
-  | Pick<T, K1>
-  | Pick<T, K2>
-  | Pick<T, K3>
-  | Pick<T, K4>
-  | T
 
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
@@ -62,7 +65,7 @@ export type StateCreator<T extends State, CustomSetState = SetState<T>> = (
 
 export default function create<
   TState extends State,
-  CustomSetState extends SetState<any> = SetState<TState>
+  CustomSetState extends SetState<TState> = SetState<TState>
 >(createState: StateCreator<TState, CustomSetState>): StoreApi<TState> {
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
@@ -117,7 +120,6 @@ export default function create<
 
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  // SetState<TState> includes CustomSetState so it should be ok
   state = createState(setState as CustomSetState, getState, api)
   return api
 }
