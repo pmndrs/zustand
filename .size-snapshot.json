@@ -28,8 +28,8 @@
     }
   },
   "middleware.js": {
-    "bundled": 6662,
-    "minified": 3355,
+    "bundled": 6679,
+    "minified": 3353,
     "gzipped": 1460,
     "treeshaked": {
       "rollup": {
@@ -56,9 +56,9 @@
     }
   },
   "context.js": {
-    "bundled": 1227,
-    "minified": 681,
-    "gzipped": 331,
+    "bundled": 1165,
+    "minified": 657,
+    "gzipped": 324,
     "treeshaked": {
       "rollup": {
         "code": 14,
