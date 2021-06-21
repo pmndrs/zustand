@@ -274,7 +274,7 @@ const log = config => (set, get, api) => config(args => {
 const immer = config => (set, get, api) => config((partial, replace) => {
   const nextState = typeof partial === 'function'
       ? produce(partial)
-      : produce(() => partial)
+      : partial
   return set(nextState, replace)
 }, get, api)
 
@@ -315,14 +315,14 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 
 ```ts
 import { State, StateCreator } from 'zustand'
-import produce from 'immer'
+import produce, { Draft } from 'immer'
 
 const immer = <T extends State>config: StateCreator<T>): StateCreator<T> => 
   (set, get, api) => config((partial, replace) => {
     const nextState =
       typeof partial === 'function'
         ? produce(partial as (state: T) => T)
-        : produce(() => partial)
+        : partial as Draft<T>
     return set(nextState, replace)
   }, get, api)
 ```
