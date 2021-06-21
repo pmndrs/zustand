@@ -178,7 +178,7 @@ it('can accept a store has CustomSetState', () => {
   function dummyMiddleware<T extends State, Settable extends keyof T>(
     creator: StateCreator<T, SetState<Pick<T, Settable>>>
   ) {
-    return creator as unknown as StateCreator<T, SetState<T>>
+    return creator as unknown as StateCreator<T>
   }
 
   type ExampleState = {

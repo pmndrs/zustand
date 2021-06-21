@@ -21,10 +21,10 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
-export interface UseStore<T extends State> {
+export interface UseStore<T extends State, CustomSetState = SetState<T>> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-  setState: SetState<T>
+  setState: CustomSetState
   getState: GetState<T>
   subscribe: Subscribe<T>
   destroy: Destroy
@@ -35,7 +35,7 @@ export default function create<
   CustomSetState extends SetState<TState> = SetState<TState>
 >(
   createState: StateCreator<TState, CustomSetState> | StoreApi<TState>
-): UseStore<TState> {
+): UseStore<TState, CustomSetState> {
   const api: StoreApi<TState> =
     typeof createState === 'function' ? createImpl(createState) : createState
 
