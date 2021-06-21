@@ -3,6 +3,7 @@ import {
   createElement,
   createContext as reactCreateContext,
   useContext,
+  useMemo,
   useRef,
 } from 'react'
 import { UseStore } from 'zustand'
@@ -54,12 +55,15 @@ function createContext<TState extends State>() {
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
-    return {
-      getState: useProviderStore.getState,
-      setState: useProviderStore.setState,
-      subscribe: useProviderStore.subscribe,
-      destroy: useProviderStore.destroy,
-    }
+    return useMemo(
+      () => ({
+        getState: useProviderStore.getState,
+        setState: useProviderStore.setState,
+        subscribe: useProviderStore.subscribe,
+        destroy: useProviderStore.destroy,
+      }),
+      [useProviderStore]
+    )
   }
 
   return {
