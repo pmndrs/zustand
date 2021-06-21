@@ -271,7 +271,12 @@ const log = config => (set, get, api) => config(args => {
 }, get, api)
 
 // Turn the set method into an immer proxy
-const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
+const immer = config => (set, get, api) => config((partial, replace) => {
+  const nextState = typeof partial === 'function'
+      ? produce(partial)
+      : produce(() => partial);
+  return set(nextState, replace)
+}, get, api)
 
 const useStore = create(
   log(
