@@ -322,7 +322,7 @@ const immer = <T extends State>config: StateCreator<T>): StateCreator<T> =>
     const nextState =
       typeof partial === 'function'
         ? produce(partial as (state: T) => T)
-        : partial as Draft<T>
+        : partial as T
     return set(nextState, replace)
   }, get, api)
 ```
