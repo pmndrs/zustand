@@ -11,10 +11,11 @@ type CounterState = {
 it('creates and uses context store', async () => {
   const { Provider, useStore } = createContext<CounterState>()
 
-  const store = create<CounterState>((set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  }))
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
 
   function Counter() {
     const { count, inc } = useStore()
@@ -23,7 +24,7 @@ it('creates and uses context store', async () => {
   }
 
   const { findByText } = render(
-    <Provider initialStore={store}>
+    <Provider createStore={createStore}>
       <Counter />
     </Provider>
   )
@@ -34,10 +35,11 @@ it('creates and uses context store', async () => {
 it('uses context store with selectors', async () => {
   const { Provider, useStore } = createContext<CounterState>()
 
-  const store = create<CounterState>((set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  }))
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
 
   function Counter() {
     const count = useStore((state) => state.count)
@@ -47,7 +49,7 @@ it('uses context store with selectors', async () => {
   }
 
   const { findByText } = render(
-    <Provider initialStore={store}>
+    <Provider createStore={createStore}>
       <Counter />
     </Provider>
   )
@@ -58,10 +60,11 @@ it('uses context store with selectors', async () => {
 it('uses context store api', async () => {
   const { Provider, useStoreApi } = createContext<CounterState>()
 
-  const store = create<CounterState>((set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  }))
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
 
   function Counter() {
     const storeApi = useStoreApi()
@@ -87,7 +90,7 @@ it('uses context store api', async () => {
   }
 
   const { findByText } = render(
-    <Provider initialStore={store}>
+    <Provider createStore={createStore}>
       <Counter />
     </Provider>
   )
