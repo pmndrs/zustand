@@ -1,5 +1,5 @@
 import React from 'react'
-import { cleanup, render } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import create from '../src/index'
 import createContext from '../src/context'
 
@@ -72,17 +72,17 @@ it('uses context store api', async () => {
           () => setCount(storeApi.getState().count),
           (state) => state.count
         ),
-      []
+      [storeApi]
     )
     React.useEffect(() => {
       storeApi.setState({ count: storeApi.getState().count + 1 })
-    }, [])
+    }, [storeApi])
     React.useEffect(() => {
       if (count === 1) {
         storeApi.destroy()
         storeApi.setState({ count: storeApi.getState().count + 1 })
       }
-    }, [count])
+    }, [storeApi, count])
     return <div>count: {count * 1}</div>
   }
 
