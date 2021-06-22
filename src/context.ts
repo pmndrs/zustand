@@ -15,14 +15,28 @@ function createContext<TState extends State>() {
   )
 
   const Provider = ({
+    // @ts-expect-error deprecated
     initialStore,
+    createStore,
     children,
   }: {
-    initialStore: UseStore<TState>
+    createStore: () => UseStore<TState>
     children: ReactNode
   }) => {
-    // Put store (hook) in ref to make it stable
-    const storeRef = useRef(initialStore)
+    const storeRef = useRef<UseStore<TState>>()
+
+    if (!storeRef.current) {
+      if (initialStore) {
+        console.warn(
+          'Provider initialStore is deprecated and will be removed in the next version.'
+        )
+        if (!createStore) {
+          createStore = () => initialStore
+        }
+      }
+      storeRef.current = createStore()
+    }
+
     return createElement(
       ZustandContext.Provider,
       { value: storeRef.current },

@@ -463,7 +463,7 @@ const { Provider, useStore } = createContext()
 const createStore = () => create(...)
 
 const App = () => (
-  <Provider initialStore={createStore()}>
+  <Provider createStore={createStore}>
     ...
   </Provider>
 )
@@ -495,7 +495,7 @@ const Component = () => {
   const Button = () => {
     return (
         {/** store() - This will create a store for each time using the Button component instead of using one store for all components **/}
-      <Provider initialStore={createStore()}> 
+      <Provider createStore={createStore}> 
         <ButtonChild />
       </Provider>
     );
