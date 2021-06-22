@@ -271,7 +271,12 @@ const log = config => (set, get, api) => config(args => {
 }, get, api)
 
 // Turn the set method into an immer proxy
-const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
+const immer = config => (set, get, api) => config((partial, replace) => {
+  const nextState = typeof partial === 'function'
+      ? produce(partial)
+      : partial
+  return set(nextState, replace)
+}, get, api)
 
 const useStore = create(
   log(
@@ -312,17 +317,14 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 import { State, StateCreator } from 'zustand'
 import produce, { Draft } from 'immer'
 
-// Immer V8 or lower
-const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-): StateCreator<T> => (set, get, api) =>
-  config((fn) => set(produce(fn) as (state: T) => T), get, api)
-
-// Immer V9
-const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-): StateCreator<T> => (set, get, api) =>
-  config((fn) => set(produce<T>(fn)), get, api)
+const immer = <T extends State>config: StateCreator<T>): StateCreator<T> => 
+  (set, get, api) => config((partial, replace) => {
+    const nextState =
+      typeof partial === 'function'
+        ? produce(partial as (state: T) => T)
+        : partial as T
+    return set(nextState, replace)
+  }, get, api)
 ```
 
 </details>
