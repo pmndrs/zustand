@@ -132,7 +132,7 @@ describe('persist middleware with async configuration', () => {
 
     const { findByText } = render(<Counter />)
     await findByText('count: 0')
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
 
     // Write something to the store
     act(() => useStore.setState({ count: 42 }))
@@ -232,7 +232,7 @@ describe('persist middleware with async configuration', () => {
 
     await findByText('count: 0')
     expect(console.error).toHaveBeenCalled()
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
   })
 
   it('can throw migrate error', async () => {
@@ -271,6 +271,42 @@ describe('persist middleware with async configuration', () => {
     expect(onRehydrateStorageSpy).toBeCalledWith(
       undefined,
       new Error('migrate error')
+    )
+  })
+
+  it('gives the merged state to onRehydrateStorage', async () => {
+    const onRehydrateStorageSpy = jest.fn()
+
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: { count: 1 },
+          version: 0,
+        }),
+      setItem: () => {},
+    }
+
+    const unstorableMethod = () => {}
+
+    const useStore = create(
+      persist(() => ({ count: 0, unstorableMethod }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 0')
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { count: 1, unstorableMethod },
+      undefined
     )
   })
 })
