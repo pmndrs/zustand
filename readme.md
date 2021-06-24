@@ -317,7 +317,7 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 import { State, StateCreator } from 'zustand'
 import produce, { Draft } from 'immer'
 
-const immer = <T extends State>config: StateCreator<T>): StateCreator<T> => 
+const immer = <T extends State>(config: StateCreator<T>): StateCreator<T> => 
   (set, get, api) => config((partial, replace) => {
     const nextState =
       typeof partial === 'function'
