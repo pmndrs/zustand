@@ -210,6 +210,11 @@ type PersistOptions<S> = {
    * This function will be called when persisted state versions mismatch with the one specified here.
    */
   migrate?: (persistedState: any, version: number) => S | Promise<S>
+  /**
+   * A function to perform custom hydration merges when combining the stored state with the current one.
+   * By default, this function does a shallow merge.
+   */
+  merge?: (persistedState: any, currentState: S) => S
 }
 
 interface Thenable<Value> {
@@ -264,6 +269,10 @@ export const persist =
       onRehydrateStorage,
       version = 0,
       migrate,
+      merge = (persistedState: any, currentState: S) => ({
+        ...currentState,
+        ...persistedState,
+      }),
     } = options || {}
 
     let storage: StateStorage | undefined
@@ -371,7 +380,10 @@ export const persist =
         }
       })
       .then(() => {
-        stateFromStorageInSync = { ...configResult, ...stateFromStorageInSync }
+        stateFromStorageInSync = merge(
+          stateFromStorageInSync as S,
+          configResult
+        )
         postRehydrationCallback?.(stateFromStorageInSync, undefined)
       })
       .catch((e: Error) => {
