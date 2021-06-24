@@ -322,6 +322,15 @@ export const persist =
       void setItem()
     }
 
+    const configResult = config(
+      (...args) => {
+        set(...args)
+        void setItem()
+      },
+      get,
+      api
+    )
+
     // rehydrate initial state with existing stored state
 
     // a workaround to solve the issue of not storing rehydrated state in sync storage
@@ -362,22 +371,12 @@ export const persist =
         }
       })
       .then(() => {
+        stateFromStorageInSync = { ...configResult, ...stateFromStorageInSync }
         postRehydrationCallback?.(stateFromStorageInSync, undefined)
       })
       .catch((e: Error) => {
         postRehydrationCallback?.(undefined, e)
       })
 
-    const configResult = config(
-      (...args) => {
-        set(...args)
-        void setItem()
-      },
-      get,
-      api
-    )
-
-    return stateFromStorageInSync
-      ? { ...configResult, ...stateFromStorageInSync }
-      : configResult
+    return stateFromStorageInSync || configResult
   }

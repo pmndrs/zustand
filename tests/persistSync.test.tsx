@@ -99,7 +99,7 @@ describe('persist middleware with sync configuration', () => {
     // Initialize from empty storage
     const { useStore, onRehydrateStorageSpy } = createStore()
     expect(useStore.getState()).toEqual({ count: 0 })
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
 
     // Write something to the store
     useStore.setState({ count: 42 })
@@ -178,7 +178,7 @@ describe('persist middleware with sync configuration', () => {
 
     expect(useStore.getState()).toEqual({ count: 0 })
     expect(console.error).toHaveBeenCalled()
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
   })
 
   it('can throw migrate error', () => {
@@ -210,5 +210,33 @@ describe('persist middleware with sync configuration', () => {
       undefined,
       new Error('migrate error')
     )
+  })
+
+  it('gives the merged state to onRehydrateStorage', () => {
+    const onRehydrateStorageSpy = jest.fn()
+
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: { count: 1 },
+          version: 0,
+        }),
+      setItem: () => {},
+    }
+
+    const unstorableMethod = () => {}
+
+    const useStore = create(
+      persist(() => ({ count: 0, unstorableMethod }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+      })
+    )
+
+    const expectedState = { count: 1, unstorableMethod }
+
+    expect(useStore.getState()).toEqual(expectedState)
+    expect(onRehydrateStorageSpy).toBeCalledWith(expectedState, undefined)
   })
 })
