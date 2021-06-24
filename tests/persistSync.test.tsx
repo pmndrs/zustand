@@ -239,4 +239,34 @@ describe('persist middleware with sync configuration', () => {
     expect(useStore.getState()).toEqual(expectedState)
     expect(onRehydrateStorageSpy).toBeCalledWith(expectedState, undefined)
   })
+
+  it('recursively hydrate nested objects', () => {
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: {
+            count: 1,
+            actions: {},
+          },
+          version: 0,
+        }),
+      setItem: () => {},
+    }
+
+    const unstorableMethod = () => {}
+
+    const useStore = create(
+      persist(() => ({ count: 0, actions: { unstorableMethod } }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    expect(useStore.getState()).toEqual({
+      count: 1,
+      actions: {
+        unstorableMethod,
+      },
+    })
+  })
 })

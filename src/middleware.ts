@@ -6,6 +6,7 @@ import {
   StateCreator,
   StoreApi,
 } from './vanilla'
+import { deepMerge } from './utils'
 
 export const redux =
   <S extends State, A extends { type: unknown }>(
@@ -371,7 +372,7 @@ export const persist =
         }
       })
       .then(() => {
-        stateFromStorageInSync = { ...configResult, ...stateFromStorageInSync }
+        stateFromStorageInSync = deepMerge(configResult, stateFromStorageInSync)
         postRehydrationCallback?.(stateFromStorageInSync, undefined)
       })
       .catch((e: Error) => {
