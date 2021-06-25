@@ -183,11 +183,14 @@ export const combine =
       )
     )
 
+type DeepPartial<T extends Object> = {
+  [P in keyof T]?: DeepPartial<T[P]>
+}
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
-type StorageValue<S> = { state: S; version?: number }
+type StorageValue<S> = { state: DeepPartial<S>; version?: number }
 type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   /** Name of the storage (must be unique) */
   name: string
@@ -218,12 +221,22 @@ type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
   /**
    * Prevent some items from being stored.
+   *
+   * @deprecated This options is deprecated and will be removed in the next version. Please use the `partialize` option instead.
    */
   blacklist?: (keyof S)[]
   /**
    * Only store the listed properties.
+   *
+   * @deprecated This options is deprecated and will be removed in the next version. Please use the `partialize` option instead.
    */
   whitelist?: (keyof S)[]
+  /**
+   * Filter the persisted value.
+   *
+   * @params state The state's value
+   */
+  partialize?: (state: S) => DeepPartial<S>
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
@@ -296,6 +309,7 @@ export const persist =
       deserialize = JSON.parse as (str: string) => StorageValue<Partial<S>>,
       blacklist,
       whitelist,
+      partialize = (state: S) => state,
       onRehydrateStorage,
       version = 0,
       migrate,
@@ -304,6 +318,14 @@ export const persist =
         ...persistedState,
       }),
     } = options || {}
+
+    if (blacklist || whitelist) {
+      console.warn(
+        `The ${
+          blacklist ? 'blacklist' : 'whitelist'
+        } option is deprecated and will be removed in the next version. Please use the 'partialize' option instead.`
+      )
+    }
 
     let storage: StateStorage | undefined
 
@@ -329,7 +351,7 @@ export const persist =
     const thenableSerialize = toThenable(serialize)
 
     const setItem = (): Thenable<void> => {
-      const state = { ...get() }
+      const state = partialize({ ...get() })
 
       if (whitelist) {
         ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
