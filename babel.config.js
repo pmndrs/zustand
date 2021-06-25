@@ -12,7 +12,6 @@ module.exports = (api, targets) => {
           loose: true,
           modules: isTestEnv ? 'commonjs' : false,
           targets: isTestEnv ? { node: 'current' } : targets,
-          exclude: ['@babel/plugin-transform-regenerator'],
         },
       ],
     ],
