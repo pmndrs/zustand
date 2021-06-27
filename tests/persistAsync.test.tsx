@@ -309,4 +309,50 @@ describe('persist middleware with async configuration', () => {
       undefined
     )
   })
+
+  it('can custom merge the stored state', async () => {
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: {
+            count: 1,
+            actions: {},
+          },
+          version: 0,
+        }),
+      setItem: () => {},
+    }
+
+    const unstorableMethod = () => {}
+
+    const useStore = create(
+      persist(() => ({ count: 0, actions: { unstorableMethod } }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        merge: (persistedState, currentState) => {
+          delete persistedState.actions
+
+          return {
+            ...currentState,
+            ...persistedState,
+          }
+        },
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 1')
+    expect(useStore.getState()).toEqual({
+      count: 1,
+      actions: {
+        unstorableMethod,
+      },
+    })
+  })
 })
