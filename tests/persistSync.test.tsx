@@ -277,4 +277,28 @@ describe('persist middleware with sync configuration', () => {
       },
     })
   })
+
+  it("can merge the state when the storage item doesn't have a version", () => {
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: {
+            count: 1,
+          },
+        }),
+      setItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        deserialize: (str) => JSON.parse(str),
+      })
+    )
+
+    expect(useStore.getState()).toEqual({
+      count: 1,
+    })
+  })
 })

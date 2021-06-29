@@ -160,7 +160,7 @@ export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
-type StorageValue<S> = { state: S; version: number }
+type StorageValue<S> = { state: S; version?: number }
 type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   /** Name of the storage (must be unique) */
   name: string
@@ -181,6 +181,7 @@ type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   serialize?: (state: StorageValue<S>) => string | Promise<string>
   /**
    * Use a custom deserializer.
+   * Must return an object matching StorageValue<State>
    *
    * @param str The storage's current value.
    * @default JSON.parse
@@ -358,7 +359,10 @@ export const persist =
       })
       .then((deserializedStorageValue) => {
         if (deserializedStorageValue) {
-          if (deserializedStorageValue.version !== version) {
+          if (
+            typeof deserializedStorageValue.version === 'number' &&
+            deserializedStorageValue.version !== version
+          ) {
             if (migrate) {
               return migrate(
                 deserializedStorageValue.state,
