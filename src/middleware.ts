@@ -161,7 +161,7 @@ export type StateStorage = {
   setItem: (name: string, value: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: S; version?: number }
-type PersistOptions<S> = {
+type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   /** Name of the storage (must be unique) */
   name: string
   /**
@@ -186,7 +186,9 @@ type PersistOptions<S> = {
    * @param str The storage's current value.
    * @default JSON.parse
    */
-  deserialize?: (str: string) => StorageValue<S> | Promise<StorageValue<S>>
+  deserialize?: (
+    str: string
+  ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
   /**
    * Prevent some items from being stored.
    */
@@ -264,7 +266,7 @@ export const persist =
       name,
       getStorage = () => localStorage,
       serialize = JSON.stringify as (state: StorageValue<S>) => string,
-      deserialize = JSON.parse as (str: string) => StorageValue<S>,
+      deserialize = JSON.parse as (str: string) => StorageValue<Partial<S>>,
       blacklist,
       whitelist,
       onRehydrateStorage,
@@ -346,7 +348,7 @@ export const persist =
     // a workaround to solve the issue of not storing rehydrated state in sync storage
     // the set(state) value would be later overridden with initial state by create()
     // to avoid this, we merge the state from localStorage into the initial state.
-    let stateFromStorageInSync: S | undefined
+    let stateFromStorage: S | undefined
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
     // bind is used to avoid `TypeError: Illegal invocation` error
     toThenable(storage.getItem.bind(storage))(name)
@@ -371,28 +373,22 @@ export const persist =
               `State loaded from storage couldn't be migrated since no migrate function was provided`
             )
           } else {
-            stateFromStorageInSync = deserializedStorageValue.state
-            set(deserializedStorageValue.state)
+            return deserializedStorageValue.state
           }
         }
       })
       .then((migratedState) => {
-        if (migratedState) {
-          stateFromStorageInSync = migratedState as S
-          set(migratedState as PartialState<S, keyof S>)
-          return setItem()
-        }
+        stateFromStorage = merge(migratedState as S, configResult)
+
+        set(stateFromStorage as S, true)
+        return setItem()
       })
       .then(() => {
-        stateFromStorageInSync = merge(
-          stateFromStorageInSync as S,
-          configResult
-        )
-        postRehydrationCallback?.(stateFromStorageInSync, undefined)
+        postRehydrationCallback?.(stateFromStorage, undefined)
       })
       .catch((e: Error) => {
         postRehydrationCallback?.(undefined, e)
       })
 
-    return stateFromStorageInSync || configResult
+    return stateFromStorage || configResult
   }
