@@ -355,4 +355,36 @@ describe('persist middleware with async configuration', () => {
       },
     })
   })
+
+  it("can merge the state when the storage item doesn't have a version", async () => {
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: {
+            count: 1,
+          },
+        }),
+      setItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        deserialize: (str) => JSON.parse(str),
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 1')
+    expect(useStore.getState()).toEqual({
+      count: 1,
+    })
+  })
 })
