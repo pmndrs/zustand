@@ -161,7 +161,7 @@ export type StateStorage = {
   setItem: (name: string, value: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: S; version: number }
-type PersistOptions<S> = {
+type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   /** Name of the storage (must be unique) */
   name: string
   /**
@@ -185,7 +185,9 @@ type PersistOptions<S> = {
    * @param str The storage's current value.
    * @default JSON.parse
    */
-  deserialize?: (str: string) => StorageValue<S> | Promise<StorageValue<S>>
+  deserialize?: (
+    str: string
+  ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
   /**
    * Prevent some items from being stored.
    */
@@ -263,7 +265,7 @@ export const persist =
       name,
       getStorage = () => localStorage,
       serialize = JSON.stringify as (state: StorageValue<S>) => string,
-      deserialize = JSON.parse as (str: string) => StorageValue<S>,
+      deserialize = JSON.parse as (str: string) => StorageValue<Partial<S>>,
       blacklist,
       whitelist,
       onRehydrateStorage,
