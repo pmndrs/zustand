@@ -345,7 +345,7 @@ export const persist =
     // a workaround to solve the issue of not storing rehydrated state in sync storage
     // the set(state) value would be later overridden with initial state by create()
     // to avoid this, we merge the state from localStorage into the initial state.
-    let stateFromStorageInSync: S | undefined
+    let stateFromStorage: S | undefined
     const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
     // bind is used to avoid `TypeError: Illegal invocation` error
     toThenable(storage.getItem.bind(storage))(name)
@@ -367,28 +367,22 @@ export const persist =
               `State loaded from storage couldn't be migrated since no migrate function was provided`
             )
           } else {
-            stateFromStorageInSync = deserializedStorageValue.state
-            set(deserializedStorageValue.state)
+            return deserializedStorageValue.state
           }
         }
       })
       .then((migratedState) => {
-        if (migratedState) {
-          stateFromStorageInSync = migratedState as S
-          set(migratedState as PartialState<S, keyof S>)
-          return setItem()
-        }
+        stateFromStorage = merge(migratedState as S, configResult)
+
+        set(stateFromStorage as S, true)
+        return setItem()
       })
       .then(() => {
-        stateFromStorageInSync = merge(
-          stateFromStorageInSync as S,
-          configResult
-        )
-        postRehydrationCallback?.(stateFromStorageInSync, undefined)
+        postRehydrationCallback?.(stateFromStorage, undefined)
       })
       .catch((e: Error) => {
         postRehydrationCallback?.(undefined, e)
       })
 
-    return stateFromStorageInSync || configResult
+    return stateFromStorage || configResult
   }
