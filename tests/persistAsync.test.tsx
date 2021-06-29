@@ -312,7 +312,7 @@ describe('persist middleware with async configuration', () => {
 
   it('can custom merge the stored state', async () => {
     const storage = {
-      getItem: () =>
+      getItem: async () =>
         JSON.stringify({
           state: {
             count: 1,
