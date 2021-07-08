@@ -14,9 +14,18 @@
     }
   },
   "vanilla.js": {
-    "bundled": 1797,
-    "minified": 631,
-    "gzipped": 350
+    "bundled": 1345,
+    "minified": 440,
+    "gzipped": 284,
+    "treeshaked": {
+      "rollup": {
+        "code": 0,
+        "import_statements": 0
+      },
+      "webpack": {
+        "code": 951
+      }
+    }
   },
   "middleware.js": {
     "bundled": 6679,
