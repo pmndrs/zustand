@@ -15,11 +15,11 @@ function createContext<TState extends State>() {
   )
 
   const Provider = ({
-    // @ts-expect-error deprecated
     initialStore,
     createStore,
     children,
   }: {
+    initialStore?: UseStore<TState>
     createStore: () => UseStore<TState>
     children: ReactNode
   }) => {
