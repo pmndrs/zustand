@@ -100,15 +100,6 @@ const treats = useStore(
 )
 ```
 
-## Fetching from multiple stores
-
-You can make as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
-
-```jsx
-const currentBear = useCredentialsStore(state => state.currentBear)
-const bear = useBearStore(state => state.bears[currentBear])
-```
-
 ## Memoizing selectors
 
 It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
