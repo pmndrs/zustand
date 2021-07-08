@@ -102,7 +102,7 @@ const treats = useStore(
 
 ## Fetching from multiple stores
 
-You can make as many stores as you like, forwarding results to succeeding selectors is as natural as it gets. But nonetheless the recommended approach would be to unify state into a single store, as it scales better.
+You can make as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
 
 ```jsx
 const currentBear = useCredentialsStore(state => state.currentBear)
