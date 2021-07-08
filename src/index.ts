@@ -21,12 +21,9 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
-export interface UseStoreData<T extends State> {
+export interface UseStore<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-}
-
-export interface UseStore<T extends State> extends UseStoreData<T> {
   setState: SetState<T>
   getState: GetState<T>
   subscribe: Subscribe<T>

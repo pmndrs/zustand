@@ -6,8 +6,13 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { UseStore, UseStoreData } from 'zustand'
+import { EqualityChecker, UseStore } from 'zustand'
 import { State, StateSelector } from './vanilla'
+
+export interface UseStoreData<T extends State> {
+  (): T
+  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+}
 
 function createContext<TState extends State>() {
   const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
