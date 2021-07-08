@@ -1,9 +1,4 @@
 {
-  "vanilla.js": {
-    "bundled": 1797,
-    "minified": 631,
-    "gzipped": 350
-  },
   "index.js": {
     "bundled": 3986,
     "minified": 1610,
@@ -17,6 +12,11 @@
         "code": 1144
       }
     }
+  },
+  "vanilla.js": {
+    "bundled": 1797,
+    "minified": 631,
+    "gzipped": 350
   },
   "middleware.js": {
     "bundled": 6679,
