@@ -19,7 +19,7 @@ function createContext<TState extends State>() {
     createStore,
     children,
   }: {
-    initialStore?: UseStore<TState>
+    initialStore?: UseStore<TState> /** @deprecated */
     createStore: () => UseStore<TState>
     children: ReactNode
   }) => {
