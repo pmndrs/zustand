@@ -6,8 +6,13 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { UseStore } from 'zustand'
-import { EqualityChecker, State, StateSelector } from './vanilla'
+import { EqualityChecker, UseStore } from 'zustand'
+import { State, StateSelector } from './vanilla'
+
+interface UseStoreData<T extends State> {
+  (): T
+  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+}
 
 function createContext<TState extends State>() {
   const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
@@ -47,9 +52,9 @@ function createContext<TState extends State>() {
     )
   }
 
-  const useStore = <StateSlice>(
+  const useStore: UseStoreData<TState> = <StateSlice>(
     selector?: StateSelector<TState, StateSlice>,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
+    equalityFn = Object.is
   ) => {
     // ZustandContext value is guaranteed to be stable.
     const useProviderStore = useContext(ZustandContext)
