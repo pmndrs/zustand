@@ -14,26 +14,31 @@
     ".": {
       "types": "./index.d.ts",
       "module": "./esm/index.js",
+      "import": "./esm/index.js",
       "default": "./index.js"
     },
     "./vanilla": {
       "types": "./vanilla.d.ts",
       "module": "./esm/vanilla.js",
+      "import": "./esm/vanilla.js",
       "default": "./vanilla.js"
     },
     "./middleware": {
       "types": "./middleware.d.ts",
       "module": "./esm/middleware.js",
+      "import": "./esm/middleware.js",
       "default": "./middleware.js"
     },
     "./shallow": {
       "types": "./shallow.d.ts",
       "module": "./esm/shallow.js",
+      "import": "./esm/shallow.js",
       "default": "./shallow.js"
     },
     "./context": {
       "types": "./context.d.ts",
       "module": "./esm/context.js",
+      "import": "./esm/context.js",
       "default": "./context.js"
     }
   },
