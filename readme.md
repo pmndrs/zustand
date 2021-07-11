@@ -561,3 +561,7 @@ For information regarding testing with Zustand, visit the dedicated [Wiki page](
 ## 3rd-Party Libraries
 
 Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/3rd-Party-Libraries).
+
+## Comparison with other libraries
+
+- [Difference between zustand and valtio](https://github.com/pmndrs/zustand/wiki/Difference-between-zustand-and-valtio)
