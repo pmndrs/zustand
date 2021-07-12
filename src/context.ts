@@ -9,7 +9,7 @@ import {
 import { EqualityChecker, UseStore } from 'zustand'
 import { State, StateSelector } from './vanilla'
 
-interface UseStoreData<T extends State> {
+export interface UseStoreData<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 }
