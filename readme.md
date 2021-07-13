@@ -240,13 +240,13 @@ import produce from 'immer'
 
 const useStore = create(set => ({
   lush: { forest: { contains: { a: "bear" } } },
-  set: fn => set(produce(fn)),
+  clearForest: () => set(produce(state => {
+    state.lush.forest.contains = null
+  }))
 }))
 
-const set = useStore(state => state.set)
-set(state => {
-  state.lush.forest.contains = null
-})
+const clearForest = useStore(state => state.clearForest)
+clearForest();
 ```
 
 ## Middleware
