@@ -9,7 +9,7 @@ import {
 import { EqualityChecker, UseStore } from 'zustand'
 import { State, StateSelector } from './vanilla'
 
-interface UseStoreData<T extends State> {
+export interface UseContextStore<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 }
@@ -52,7 +52,7 @@ function createContext<TState extends State>() {
     )
   }
 
-  const useStore: UseStoreData<TState> = <StateSlice>(
+  const useStore: UseContextStore<TState> = <StateSlice>(
     selector?: StateSelector<TState, StateSlice>,
     equalityFn = Object.is
   ) => {
