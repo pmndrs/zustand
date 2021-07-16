@@ -48,12 +48,18 @@ function Controls() {
 }
 ```
 
-### Why zustand over react-redux?
+### Why zustand over redux?
 
 * Simple and un-opinionated
 * Makes hooks the primary means of consuming state
 * Doesn't wrap your app in context providers
 * [Can inform components transiently (without causing render)](#transient-updates-for-often-occuring-state-changes)
+
+### Why zustand over context?
+
+* Less boilerplate
+* Renders components only on changes
+* Centralized, action-based state management
 
 ---
 
