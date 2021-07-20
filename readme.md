@@ -559,7 +559,57 @@ const useStore = create(
   ),
 )
 ```
+  
+## Splitting the store into separate files and combining it 
+  
+When your project is big with different kind of datas, for convenient coding you want to keep small files. 
+So, like combineReducers in Redux, you can split your store in different functions that will be able to access each other, keeping track of global state. 
 
+
+```jsx
+
+import create from 'zustand'
+
+const bearStore = (set, get) => ({
+    bears: 1,
+    eatsFish: () => set((prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0}))
+  })
+
+  const fishStore = (set, get) => ({
+    fishes: 10
+  })
+
+const useStore = create( (set, get) => ({
+    ...bearStore(set, get),
+    ...fishStore(set, get)
+}))
+
+function App() {
+
+  const fishes = useStore(state => state.fishes);
+  const eatsFish = useStore(state => state.eatsFish);
+
+  return (
+    <div className="App">
+      
+      <p>Fishes : {fishes}</p>
+      <p><button onClick={eatsFish}>Eat</button></p>
+    
+    </div>
+  );
+}
+
+export default App;
+
+```
+ 
+Here for example, you will see that the the bearStore will have access to the fishStore. 
+Obiously you can write theses specific stores in separate files. 
+Export (with export default "nameofyourstore") and import it in useStore (with import "nameofyourstore" from "pathofyourstore".
+In the same way, you can write useStore in its own file, export and import it in your component.
+I wrote this tutorial thanks to dai-shi : https://github.com/pmndrs/zustand/issues/497
+
+  
 ## Testing
 
 For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
