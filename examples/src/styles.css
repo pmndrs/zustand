@@ -159,7 +159,7 @@ body {
   cursor: pointer;
 }
 
-.code-container code[class*='language-'] {
+.code-container pre[class*='language-'] {
   margin-top: -50px;
   display: inline-block;
   width: auto !important;
@@ -187,7 +187,7 @@ body {
     bottom: 0;
     margin-bottom: -60px;
   }
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem;
     padding: 20px 50px 70px 20px;
     border-radius: 10px 10px 0 0 !important;
@@ -203,7 +203,7 @@ body {
     width: 100%;
   }
 
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem !important;
     padding: 20px 20px 70px;
     width: 100% !important;
@@ -220,7 +220,7 @@ body {
     bottom: 0;
     margin-bottom: -60px;
   }
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem;
     padding: 20px 20px 70px;
   }
@@ -243,7 +243,7 @@ body {
   .code-container {
     margin-bottom: -60px;
   }
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem;
     padding: 20px 20px 70px;
   }
@@ -266,7 +266,7 @@ body {
 }
 
 @media only screen and (max-height: 500px) {
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.5rem !important;
   }
 
@@ -348,7 +348,7 @@ span.header-left {
     z-index: 1000;
     margin-left: 0;
   }
-  code[class*='language-'] {
+  pre[class*='language-'] {
     font-size: 0.7rem !important;
   }
 }
@@ -428,7 +428,7 @@ a.bottom-right {
 }
 
 @media only screen and (max-width: 500px) {
-  code[class*='language-'] {
+  pre[class*='language-'] {
     font-size: 0.6rem !important;
   }
   span.header-left {
