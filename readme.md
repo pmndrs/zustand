@@ -570,18 +570,18 @@ So, like combineReducers in Redux, you can split your store in different functio
 
 import create from 'zustand'
 
-const bearStore = (set, get) => ({
+const createBearSlice = (set, get) => ({
     bears: 1,
     eatsFish: () => set((prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0}))
   })
 
-  const fishStore = (set, get) => ({
+  const createFishSlice = (set, get) => ({
     fishes: 10
   })
 
 const useStore = create( (set, get) => ({
-    ...bearStore(set, get),
-    ...fishStore(set, get)
+    ...createBearSlice(set, get),
+    ...createFishSlice(set, get)
 }))
 
 function App() {
@@ -603,10 +603,10 @@ export default App;
 
 ```
  
-Here for example, you will see that the the bearStore will have access to the fishStore. 
-Obiously you can write theses specific stores in separate files. 
-Export (with export default "nameofyourstore") and import it in useStore (with import "nameofyourstore" from "pathofyourstore".
-In the same way, you can write useStore in its own file, export and import it in your component.
+Here for example, you will see that the the bear slice will have access to the fish slice. 
+Obiously you can write theses slices in separate files. 
+Export (with export default "nameofyourslice") and import it in the store (with import "nameofyourslice" from "pathofyourslice".
+In the same way, you can write your store in its own file, export and import it in your component.
 I wrote this tutorial thanks to dai-shi : https://github.com/pmndrs/zustand/issues/497
 
   
