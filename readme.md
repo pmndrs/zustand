@@ -565,8 +565,7 @@ const useStore = create(
 ## set function multiline
   
 In case, you want to do a complex operation in the store with the set function, you can write it multiline with brackets and a return.
-It is better to use previous state with set than get() to avoid mutating and be sure its reactive.
-  
+
   ```jsx
 eatsHoney: () => {
   set(state => {
