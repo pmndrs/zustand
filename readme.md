@@ -559,7 +559,26 @@ const useStore = create(
   ),
 )
 ```
-
+  
+  
+  
+## set function multiline
+  
+In case, you want to do a complex operation in the store with the set function, you can write it multiline with brackets and a return.
+It is better to use previous state with set than get() to avoid mutating and be sure its reactive.
+  
+  ```jsx
+eatsHoney: () => {
+  set(state => {
+    let updatedTree = state.trees.find(t => t.honey);
+    if (!updatedTree) return;
+    updatedTree.honey = false;
+    let updatedTrees = state.trees.map(t => t.id === updatedTree.id ? updatedTree : t);
+    return { trees: updatedTrees };
+  });
+}
+```
+  
 ## Testing
 
 For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
