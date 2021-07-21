@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Highlight, { defaultProps } from 'prism-react-renderer'
 import { CopyButton } from './CopyButton'
 import 'prismjs'
@@ -6,6 +6,21 @@ import 'prismjs/components/prism-jsx.min'
 import 'prismjs/themes/prism-okaidia.css'
 
 function CodePreview({ code, ...props }) {
+  // There's an issue with preview mount with the current `prism-react-renderer`
+  // Fixes https://github.com/pmndrs/zustand/pull/503#issuecomment-884536093
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    return () => {
+      setMounted(false)
+    }
+  }, [])
+
+  if (!mounted) {
+    return <></>
+  }
+
   return (
     <Highlight {...defaultProps} className="language-jsx" code={code} language="jsx" theme={undefined}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
