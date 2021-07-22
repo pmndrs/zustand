@@ -563,9 +563,11 @@ const useStore = create(
 ## Best practices
   
 * Splitting the store into seperate slices 
+  
 You may wonder how to organize your code for better maintenance : [Wiki page](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
   
 * Flux inspired practice 
+  
 Recommended usage for this unopinionated library : [Wiki page](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
   
 ## Testing
