@@ -6,7 +6,7 @@
   "main": "./cjs/index.cjs",
   "module": "./esm/index.mjs",
   "type": "commonjs",
-  "types": "index.d.ts",
+  "types": "./cjs/index.d.ts",
   "files": [
     "**"
   ],
