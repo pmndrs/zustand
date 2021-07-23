@@ -525,7 +525,7 @@ const Component = () => {
   ```
 </details>
 
-## TypeScript
+## Typing your store and `combine` middleware
 
 ```tsx
 // You can use `type`
@@ -562,9 +562,9 @@ const useStore = create(
   
 ## Best practices
   
-* You may wonder how to organize your code for better maintenance : [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
+* You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
   
-* Recommended usage for this unopinionated library : [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
+* Recommended usage for this unopinionated library: [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
   
 ## Testing
 
