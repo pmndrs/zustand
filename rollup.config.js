@@ -69,7 +69,7 @@ export default function (args) {
     c = c.slice('config-'.length)
     return [
       createCommonJSConfig(`src/${c}.ts`, `dist/cjs/${c}.cjs`),
-      createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
+      createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
     ]
   }
   return [
