@@ -1,5 +1,5 @@
 import React from 'react'
-import { cleanup, render } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import create from '../src/index'
 import createContext from '../src/context'
 
@@ -11,10 +11,11 @@ type CounterState = {
 it('creates and uses context store', async () => {
   const { Provider, useStore } = createContext<CounterState>()
 
-  const store = create<CounterState>((set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  }))
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
 
   function Counter() {
     const { count, inc } = useStore()
@@ -23,7 +24,7 @@ it('creates and uses context store', async () => {
   }
 
   const { findByText } = render(
-    <Provider initialStore={store}>
+    <Provider createStore={createStore}>
       <Counter />
     </Provider>
   )
@@ -34,10 +35,11 @@ it('creates and uses context store', async () => {
 it('uses context store with selectors', async () => {
   const { Provider, useStore } = createContext<CounterState>()
 
-  const store = create<CounterState>((set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  }))
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
 
   function Counter() {
     const count = useStore((state) => state.count)
@@ -47,7 +49,7 @@ it('uses context store with selectors', async () => {
   }
 
   const { findByText } = render(
-    <Provider initialStore={store}>
+    <Provider createStore={createStore}>
       <Counter />
     </Provider>
   )
@@ -58,10 +60,11 @@ it('uses context store with selectors', async () => {
 it('uses context store api', async () => {
   const { Provider, useStoreApi } = createContext<CounterState>()
 
-  const store = create<CounterState>((set) => ({
-    count: 0,
-    inc: () => set((state) => ({ count: state.count + 1 })),
-  }))
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
 
   function Counter() {
     const storeApi = useStoreApi()
@@ -72,22 +75,22 @@ it('uses context store api', async () => {
           () => setCount(storeApi.getState().count),
           (state) => state.count
         ),
-      []
+      [storeApi]
     )
     React.useEffect(() => {
       storeApi.setState({ count: storeApi.getState().count + 1 })
-    }, [])
+    }, [storeApi])
     React.useEffect(() => {
       if (count === 1) {
         storeApi.destroy()
         storeApi.setState({ count: storeApi.getState().count + 1 })
       }
-    }, [count])
+    }, [storeApi, count])
     return <div>count: {count * 1}</div>
   }
 
   const { findByText } = render(
-    <Provider initialStore={store}>
+    <Provider createStore={createStore}>
       <Counter />
     </Provider>
   )

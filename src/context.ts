@@ -3,10 +3,16 @@ import {
   createElement,
   createContext as reactCreateContext,
   useContext,
+  useMemo,
   useRef,
 } from 'react'
-import { UseStore } from 'zustand'
-import { EqualityChecker, State, StateSelector } from './vanilla'
+import { EqualityChecker, UseStore } from 'zustand'
+import { State, StateSelector } from './vanilla'
+
+export interface UseContextStore<T extends State> {
+  (): T
+  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+}
 
 function createContext<TState extends State>() {
   const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
@@ -15,15 +21,28 @@ function createContext<TState extends State>() {
 
   const Provider = ({
     initialStore,
+    createStore,
     children,
   }: {
-    initialStore: UseStore<TState>
+    /**
+     * @deprecated
+     */
+    initialStore?: UseStore<TState>
+    createStore: () => UseStore<TState>
     children: ReactNode
   }) => {
     const storeRef = useRef<UseStore<TState>>()
 
     if (!storeRef.current) {
-      storeRef.current = initialStore
+      if (initialStore) {
+        console.warn(
+          'Provider initialStore is deprecated and will be removed in the next version.'
+        )
+        if (!createStore) {
+          createStore = () => initialStore
+        }
+      }
+      storeRef.current = createStore()
     }
 
     return createElement(
@@ -33,9 +52,9 @@ function createContext<TState extends State>() {
     )
   }
 
-  const useStore = <StateSlice>(
+  const useStore: UseContextStore<TState> = <StateSlice>(
     selector?: StateSelector<TState, StateSlice>,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
+    equalityFn = Object.is
   ) => {
     // ZustandContext value is guaranteed to be stable.
     const useProviderStore = useContext(ZustandContext)
@@ -58,12 +77,15 @@ function createContext<TState extends State>() {
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
-    return {
-      getState: useProviderStore.getState,
-      setState: useProviderStore.setState,
-      subscribe: useProviderStore.subscribe,
-      destroy: useProviderStore.destroy,
-    }
+    return useMemo(
+      () => ({
+        getState: useProviderStore.getState,
+        setState: useProviderStore.setState,
+        subscribe: useProviderStore.subscribe,
+        destroy: useProviderStore.destroy,
+      }),
+      [useProviderStore]
+    )
   }
 
   return {

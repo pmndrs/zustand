@@ -8,17 +8,17 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
-A small, fast and scaleable bearbones state-management solution. Has a comfy api based on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit and redux-like.
+A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy api based on hooks, isn't boilerplatey or opinionated.
 
 Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
 ```bash
-npm install zustand
+npm install zustand # or yarn add zustand
 ```
 
-### First create a store
+## First create a store
 
 Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function *merges* state.
 
@@ -32,7 +32,7 @@ const useStore = create(set => ({
 }))
 ```
 
-### Then bind your components, and that's it!
+## Then bind your components, and that's it!
 
 Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
@@ -48,12 +48,18 @@ function Controls() {
 }
 ```
 
-#### Why zustand over react-redux?
+### Why zustand over redux?
 
 * Simple and un-opinionated
 * Makes hooks the primary means of consuming state
 * Doesn't wrap your app in context providers
 * [Can inform components transiently (without causing render)](#transient-updates-for-often-occuring-state-changes)
+
+### Why zustand over context?
+
+* Less boilerplate
+* Renders components only on changes
+* Centralized, action-based state management
 
 ---
 
@@ -76,16 +82,7 @@ const nuts = useStore(state => state.nuts)
 const honey = useStore(state => state.honey)
 ```
 
-For more control over re-rendering, you may provide an alternative equality function on the second argument.
-
-```jsx
-const treats = useStore(
-  state => state.treats,
-  (oldTreats, newTreats) => compare(oldTreats, newTreats)
-)
-```
-
-For instance, if you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
 
 ```jsx
 import shallow from 'zustand/shallow'
@@ -100,13 +97,13 @@ const [nuts, honey] = useStore(state => [state.nuts, state.honey], shallow)
 const treats = useStore(state => Object.keys(state.treats), shallow)
 ```
 
-## Fetching from multiple stores
-
-Since you can create as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
+For more control over re-rendering, you may provide any custom equality function.
 
 ```jsx
-const currentBear = useCredentialsStore(state => state.currentBear)
-const bear = useBearStore(state => state.bears[currentBear])
+const treats = useStore(
+  state => state.treats,
+  (oldTreats, newTreats) => compare(oldTreats, newTreats)
+)
 ```
 
 ## Memoizing selectors
@@ -221,6 +218,8 @@ import vanillaStore from './vanillaStore'
 const useStore = create(vanillaStore)
 ```
 
+:warning: Note that middlewares that modify `set` or `get` are not applied to `getState` and `setState`.
+
 ## Transient updates (for often occuring state-changes)
 
 The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
@@ -247,13 +246,13 @@ import produce from 'immer'
 
 const useStore = create(set => ({
   lush: { forest: { contains: { a: "bear" } } },
-  set: fn => set(produce(fn)),
+  clearForest: () => set(produce(state => {
+    state.lush.forest.contains = null
+  }))
 }))
 
-const set = useStore(state => state.set)
-set(state => {
-  state.lush.forest.contains = null
-})
+const clearForest = useStore(state => state.clearForest)
+clearForest();
 ```
 
 ## Middleware
@@ -269,7 +268,12 @@ const log = config => (set, get, api) => config(args => {
 }, get, api)
 
 // Turn the set method into an immer proxy
-const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
+const immer = config => (set, get, api) => config((partial, replace) => {
+  const nextState = typeof partial === 'function'
+      ? produce(partial)
+      : partial
+  return set(nextState, replace)
+}, get, api)
 
 const useStore = create(
   log(
@@ -310,17 +314,14 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 import { State, StateCreator } from 'zustand'
 import produce, { Draft } from 'immer'
 
-// Immer V8 or lower
-const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-): StateCreator<T> => (set, get, api) =>
-  config((fn) => set(produce(fn) as (state: T) => T), get, api)
-
-// Immer V9
-const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-): StateCreator<T> => (set, get, api) =>
-  config((fn) => set(produce<T>(fn)), get, api)
+const immer = <T extends State>(config: StateCreator<T>): StateCreator<T> => 
+  (set, get, api) => config((partial, replace) => {
+    const nextState =
+      typeof partial === 'function'
+        ? produce(partial as (state: T) => T)
+        : partial as T
+    return set(nextState, replace)
+  }, get, api)
 ```
 
 </details>
@@ -456,10 +457,10 @@ import createContext from 'zustand/context'
 
 const { Provider, useStore } = createContext()
 
-const store = create(...)
+const createStore = () => create(...)
 
 const App = () => (
-  <Provider initialStore={store}>
+  <Provider createStore={createStore}>
     ...
   </Provider>
 )
@@ -470,6 +471,59 @@ const Component = () => {
   ...
 }
 ```
+<details>
+  <summary>createContext usage in real components</summary>
+
+  ```jsx
+  import create from "zustand";
+  import createContext from "zustand/context";
+
+  // Best practice: You can move the below createContext() and createStore to a separate file(store.js) and import the Provider, useStore here/wherever you need.
+
+  const { Provider, useStore } = createContext();
+
+  const createStore = () =>
+    create((set) => ({
+      bears: 0,
+      increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+      removeAllBears: () => set({ bears: 0 })
+    }));
+
+  const Button = () => {
+    return (
+        {/** store() - This will create a store for each time using the Button component instead of using one store for all components **/}
+      <Provider createStore={createStore}> 
+        <ButtonChild />
+      </Provider>
+    );
+  };
+
+  const ButtonChild = () => {
+    const state = useStore();
+    return (
+      <div>
+        {state.bears}
+        <button
+          onClick={() => {
+            state.increasePopulation();
+          }}
+        >
+          +
+        </button>
+      </div>
+    );
+  };
+
+  export default function App() {
+    return (
+      <div className="App">
+        <Button />
+        <Button />
+      </div>
+    );
+  }
+  ```
+</details>
 
 ## TypeScript
 
@@ -513,3 +567,7 @@ For information regarding testing with Zustand, visit the dedicated [Wiki page](
 ## 3rd-Party Libraries
 
 Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/3rd-Party-Libraries).
+
+## Comparison with other libraries
+
+- [Difference between zustand and valtio](https://github.com/pmndrs/zustand/wiki/Difference-between-zustand-and-valtio)
