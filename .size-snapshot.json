@@ -1,5 +1,10 @@
 {
   "index.js": {
+    "bundled": 4681,
+    "minified": 1888,
+    "gzipped": 846
+  },
+  "index.mjs": {
     "bundled": 3986,
     "minified": 1610,
     "gzipped": 785,
@@ -14,103 +19,9 @@
     }
   },
   "vanilla.js": {
-    "bundled": 1345,
-    "minified": 440,
-    "gzipped": 284,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
-  },
-  "middleware.js": {
-    "bundled": 6679,
-    "minified": 3385,
-    "gzipped": 1483,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 1072
-      }
-    }
-  },
-  "shallow.js": {
-    "bundled": 534,
-    "minified": 334,
-    "gzipped": 212,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
-  },
-  "context.js": {
-    "bundled": 1509,
-    "minified": 836,
-    "gzipped": 420,
-    "treeshaked": {
-      "rollup": {
-        "code": 14,
-        "import_statements": 14
-      },
-      "webpack": {
-        "code": 998
-      }
-    }
-  },
-  "context.cjs": {
-    "bundled": 1854,
-    "minified": 935,
-    "gzipped": 466
-  },
-  "shallow.cjs": {
-    "bundled": 619,
-    "minified": 401,
-    "gzipped": 251
-  },
-  "vanilla.cjs": {
     "bundled": 1797,
     "minified": 631,
     "gzipped": 350
-  },
-  "context.mjs": {
-    "bundled": 1509,
-    "minified": 836,
-    "gzipped": 420,
-    "treeshaked": {
-      "rollup": {
-        "code": 14,
-        "import_statements": 14
-      },
-      "webpack": {
-        "code": 998
-      }
-    }
-  },
-  "shallow.mjs": {
-    "bundled": 534,
-    "minified": 334,
-    "gzipped": 212,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
   },
   "vanilla.mjs": {
     "bundled": 1345,
@@ -126,7 +37,7 @@
       }
     }
   },
-  "middleware.cjs": {
+  "middleware.js": {
     "bundled": 8221,
     "minified": 3675,
     "gzipped": 1508
@@ -145,22 +56,41 @@
       }
     }
   },
-  "index.cjs": {
-    "bundled": 4681,
-    "minified": 1888,
-    "gzipped": 846
+  "shallow.js": {
+    "bundled": 619,
+    "minified": 401,
+    "gzipped": 251
   },
-  "index.mjs": {
-    "bundled": 3986,
-    "minified": 1610,
-    "gzipped": 785,
+  "shallow.mjs": {
+    "bundled": 534,
+    "minified": 334,
+    "gzipped": 212,
     "treeshaked": {
       "rollup": {
-        "code": 124,
+        "code": 0,
+        "import_statements": 0
+      },
+      "webpack": {
+        "code": 951
+      }
+    }
+  },
+  "context.js": {
+    "bundled": 1854,
+    "minified": 935,
+    "gzipped": 466
+  },
+  "context.mjs": {
+    "bundled": 1509,
+    "minified": 836,
+    "gzipped": 420,
+    "treeshaked": {
+      "rollup": {
+        "code": 14,
         "import_statements": 14
       },
       "webpack": {
-        "code": 1144
+        "code": 998
       }
     }
   }
