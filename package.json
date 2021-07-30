@@ -5,7 +5,6 @@
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
   "module": "./esm/index.js",
-  "type": "commonjs",
   "types": "./index.d.ts",
   "files": [
     "**"
