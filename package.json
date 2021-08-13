@@ -3,9 +3,9 @@
   "private": true,
   "version": "3.5.7",
   "description": "🐻 Bear necessities for state management in React",
-  "main": "index.js",
-  "module": "esm/index.js",
-  "types": "index.d.ts",
+  "main": "./index.js",
+  "module": "./esm/index.js",
+  "types": "./index.d.ts",
   "files": [
     "**"
   ],
@@ -60,7 +60,7 @@
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
+    "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\" && shx cp package.json dist/esm && shx echo '{\"type\":\"module\"}' > dist/esm/package.json && json -I -f dist/esm/package.json"
   },
   "prettier": {
     "semi": false,

@@ -1,5 +1,11 @@
 {
   "packages": ["dist"],
-  "sandboxes": ["new", "react-typescript-react-ts"],
+  "sandboxes": [
+    "new",
+    "react-typescript-react-ts",
+    "simple-react-browserify-x9yni",
+    "simple-snowpack-react-o1gmx",
+    "react-parcel-onewf"
+  ],
   "node": "12"
 }
