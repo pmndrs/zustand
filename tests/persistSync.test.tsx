@@ -164,7 +164,7 @@ describe('persist middleware with sync configuration', () => {
           state: { count: 42 },
           version: 12,
         }),
-      setItem: (_: string, value: string) => {},
+      setItem: (_: string, _value: string) => {},
     }
 
     const useStore = create(
