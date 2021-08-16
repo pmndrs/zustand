@@ -12,33 +12,73 @@
     "plugin:import/errors",
     "plugin:import/warnings"
   ],
-  "plugins": ["@typescript-eslint", "react", "prettier", "react-hooks", "import", "jest"],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "prettier",
+    "react-hooks",
+    "import",
+    "jest"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
-    },
-    "rules": {
-      "curly": ["warn", "multi-line", "consistent"],
-      "no-console": "off",
-      "no-empty-pattern": "warn",
-      "no-duplicate-imports": "error",
-      "import/no-unresolved": ["error", { "commonjs": true, "amd": true }],
-      "import/export": "error",
-      "import/named": "off",
-      "import/namespace": "off",
-      "import/default": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
-      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
-      "@typescript-eslint/no-use-before-define": "off",
-      "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "jest/consistent-test-it": ["error", { "fn": "it", "withinDescribe": "it" }]
     }
+  },
+  "rules": {
+    "curly": ["warn", "multi-line", "consistent"],
+    "no-console": "off",
+    "import/no-unresolved": ["error", { "commonjs": true, "amd": true }],
+    "import/export": "error",
+    "@typescript-eslint/no-duplicate-imports": ["error"],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "jest/consistent-test-it": [
+      "error",
+      { "fn": "it", "withinDescribe": "it" }
+    ],
+    "import/order": [
+      "error",
+      {
+        "alphabetize": { "order": "asc", "caseInsensitive": true },
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "object"
+        ],
+        "newlines-between": "never",
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin"]
+      }
+    ],
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ]
   },
   "settings": {
     "react": {

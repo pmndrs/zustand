@@ -1,7 +1,7 @@
-import React from 'react'
+import { Component as ClassComponent, useEffect, useState } from 'react'
 import { render } from '@testing-library/react'
-import create from '../src/index'
 import createContext from '../src/context'
+import create from '../src/index'
 
 type CounterState = {
   count: number
@@ -19,7 +19,7 @@ it('creates and uses context store', async () => {
 
   function Counter() {
     const { count, inc } = useStore()
-    React.useEffect(inc, [inc])
+    useEffect(inc, [inc])
     return <div>count: {count * 1}</div>
   }
 
@@ -44,7 +44,7 @@ it('uses context store with selectors', async () => {
   function Counter() {
     const count = useStore((state) => state.count)
     const inc = useStore((state) => state.inc)
-    React.useEffect(inc, [inc])
+    useEffect(inc, [inc])
     return <div>count: {count * 1}</div>
   }
 
@@ -68,8 +68,8 @@ it('uses context store api', async () => {
 
   function Counter() {
     const storeApi = useStoreApi()
-    const [count, setCount] = React.useState(0)
-    React.useEffect(
+    const [count, setCount] = useState(0)
+    useEffect(
       () =>
         storeApi.subscribe(
           () => setCount(storeApi.getState().count),
@@ -77,10 +77,10 @@ it('uses context store api', async () => {
         ),
       [storeApi]
     )
-    React.useEffect(() => {
+    useEffect(() => {
       storeApi.setState({ count: storeApi.getState().count + 1 })
     }, [storeApi])
-    React.useEffect(() => {
+    useEffect(() => {
       if (count === 1) {
         storeApi.destroy()
         storeApi.setState({ count: storeApi.getState().count + 1 })
@@ -101,7 +101,7 @@ it('uses context store api', async () => {
 it('throws error when not using provider', async () => {
   console.error = jest.fn()
 
-  class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+  class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
     constructor(props: {}) {
       super(props)
       this.state = { hasError: false }
