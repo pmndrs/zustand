@@ -3,6 +3,7 @@
     "target": "esnext",
     "strict": true,
     "jsx": "preserve",
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "baseUrl": ".",
