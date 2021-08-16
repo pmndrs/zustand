@@ -1,5 +1,10 @@
 {
   "index.js": {
+    "bundled": 4684,
+    "minified": 1888,
+    "gzipped": 846
+  },
+  "index.mjs": {
     "bundled": 3993,
     "minified": 1614,
     "gzipped": 786,
@@ -14,6 +19,11 @@
     }
   },
   "vanilla.js": {
+    "bundled": 1800,
+    "minified": 631,
+    "gzipped": 350
+  },
+  "vanilla.mjs": {
     "bundled": 1352,
     "minified": 444,
     "gzipped": 288,
@@ -28,6 +38,11 @@
     }
   },
   "middleware.js": {
+    "bundled": 8221,
+    "minified": 3675,
+    "gzipped": 1508
+  },
+  "middleware.mjs": {
     "bundled": 6679,
     "minified": 3385,
     "gzipped": 1483,
@@ -42,6 +57,11 @@
     }
   },
   "shallow.js": {
+    "bundled": 622,
+    "minified": 401,
+    "gzipped": 251
+  },
+  "shallow.mjs": {
     "bundled": 541,
     "minified": 338,
     "gzipped": 217,
@@ -56,6 +76,11 @@
     }
   },
   "context.js": {
+    "bundled": 1857,
+    "minified": 935,
+    "gzipped": 466
+  },
+  "context.mjs": {
     "bundled": 1516,
     "minified": 840,
     "gzipped": 418,
