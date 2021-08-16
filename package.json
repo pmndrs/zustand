@@ -4,7 +4,6 @@
   "version": "3.5.8",
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
-  "module": "./index.mjs",
   "types": "./index.d.ts",
   "files": [
     "**"
