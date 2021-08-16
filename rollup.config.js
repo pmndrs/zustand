@@ -27,8 +27,6 @@ function getEsbuild(target) {
     minify: false,
     target,
     tsconfig: path.resolve('./tsconfig.json'),
-    allowSyntheticDefaultImports: true,
-    module: 'esnext',
   })
 }
 
