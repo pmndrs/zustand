@@ -4,7 +4,6 @@
   "version": "3.5.8",
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
-  "module": "./esm/index.js",
   "types": "./index.d.ts",
   "files": [
     "**"
@@ -13,32 +12,32 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./index.d.ts",
-      "module": "./esm/index.js",
-      "import": "./esm/index.js",
+      "module": "./index.mjs",
+      "import": "./index.mjs",
       "default": "./index.js"
     },
     "./vanilla": {
       "types": "./vanilla.d.ts",
-      "module": "./esm/vanilla.js",
-      "import": "./esm/vanilla.js",
+      "module": "./vanilla.mjs",
+      "import": "./vanilla.mjs",
       "default": "./vanilla.js"
     },
     "./middleware": {
       "types": "./middleware.d.ts",
-      "module": "./esm/middleware.js",
-      "import": "./esm/middleware.js",
+      "module": "./middleware.mjs",
+      "import": "./middleware.mjs",
       "default": "./middleware.js"
     },
     "./shallow": {
       "types": "./shallow.d.ts",
-      "module": "./esm/shallow.js",
-      "import": "./esm/shallow.js",
+      "module": "./shallow.mjs",
+      "import": "./shallow.mjs",
       "default": "./shallow.js"
     },
     "./context": {
       "types": "./context.d.ts",
-      "module": "./esm/context.js",
-      "import": "./esm/context.js",
+      "module": "./context.mjs",
+      "import": "./context.mjs",
       "default": "./context.js"
     }
   },
@@ -60,7 +59,7 @@
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\" && shx cp package.json dist/esm && shx echo '{\"type\":\"module\"}' > dist/esm/package.json && json -I -f dist/esm/package.json"
+    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "prettier": {
     "semi": false,
