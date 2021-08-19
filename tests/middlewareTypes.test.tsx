@@ -1,8 +1,8 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, { UseStore } from '../src'
+import { NamedSet, devtools, persist } from '../src/middleware'
 import { State, StateCreator } from '../src/vanilla'
-import { devtools, NamedSet, persist } from '../src/middleware'
 
 type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
 type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
@@ -66,6 +66,7 @@ it('should have correct type when creating store with devtool', () => {
 
     return <></>
   }
+  TestComponent
 })
 
 it('should have correct type when creating store with devtool and immer', () => {
@@ -94,6 +95,7 @@ it('should have correct type when creating store with devtool and immer', () => 
 
     return <></>
   }
+  TestComponent
 })
 
 it('should have correct type when creating store with devtool and persist', () => {
@@ -126,6 +128,7 @@ it('should have correct type when creating store with devtool and persist', () =
 
     return <></>
   }
+  TestComponent
 })
 
 it('should have correct type when creating store without middleware', () => {
@@ -144,6 +147,7 @@ it('should have correct type when creating store without middleware', () => {
 
     return <></>
   }
+  TestComponent
 })
 
 it('should have correct type when creating store with persist', () => {
@@ -174,6 +178,7 @@ it('should have correct type when creating store with persist', () => {
 
     return <></>
   }
+  TestComponent
 })
 
 it('should have correct type when creating store with immer', () => {
@@ -198,6 +203,7 @@ it('should have correct type when creating store with immer', () => {
 
     return <></>
   }
+  TestComponent
 })
 
 it('should have correct type when creating store with devtool, persist and immer', () => {
@@ -231,4 +237,5 @@ it('should have correct type when creating store with devtool, persist and immer
 
     return <></>
   }
+  TestComponent
 })

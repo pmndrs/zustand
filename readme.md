@@ -318,7 +318,7 @@ const immer = <T extends State>(config: StateCreator<T>): StateCreator<T> =>
   (set, get, api) => config((partial, replace) => {
     const nextState =
       typeof partial === 'function'
-        ? produce(partial as (state: T) => T)
+        ? produce(partial as (state: Draft<T>) => T)
         : partial as T
     return set(nextState, replace)
   }, get, api)
@@ -525,7 +525,7 @@ const Component = () => {
   ```
 </details>
 
-## TypeScript
+## Typing your store and `combine` middleware
 
 ```tsx
 // You can use `type`
@@ -559,7 +559,13 @@ const useStore = create(
   ),
 )
 ```
-
+  
+## Best practices
+  
+* You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
+  
+* Recommended usage for this unopinionated library: [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
+  
 ## Testing
 
 For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).

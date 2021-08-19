@@ -1,7 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import {
+  Component as ClassComponent,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
-import create, { StateSelector, EqualityChecker, SetState } from '../src/index'
+import ReactDOM from 'react-dom'
+import create, { EqualityChecker, SetState, StateSelector } from '../src/index'
 
 it('creates a store hook and api object', () => {
   let params
@@ -39,7 +44,7 @@ it('uses the store with no args', async () => {
 
   function Counter() {
     const { count, inc } = useStore()
-    React.useEffect(inc, [inc])
+    useEffect(inc, [inc])
     return <div>count: {count}</div>
   }
 
@@ -57,7 +62,7 @@ it('uses the store with selectors', async () => {
   function Counter() {
     const count = useStore((s) => s.count)
     const inc = useStore((s) => s.inc)
-    React.useEffect(inc, [inc])
+    useEffect(inc, [inc])
     return <div>count: {count}</div>
   }
 
@@ -137,7 +142,7 @@ it('re-renders with useLayoutEffect', async () => {
 
   function Component() {
     const { state } = useStore()
-    React.useLayoutEffect(() => {
+    useLayoutEffect(() => {
       useStore.setState({ state: true })
     }, [])
     return <>{`${state}`}</>
@@ -158,7 +163,7 @@ it('can batch updates', async () => {
 
   function Counter() {
     const { count, inc } = useStore()
-    React.useEffect(() => {
+    useEffect(() => {
       ReactDOM.unstable_batchedUpdates(() => {
         inc()
         inc()
@@ -280,7 +285,7 @@ it('can throw an error in selector', async () => {
     // @ts-expect-error This function is supposed to throw an error
     s.value.toUpperCase()
 
-  class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+  class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
     constructor(props: {}) {
       super(props)
       this.state = { hasError: false }
@@ -325,7 +330,7 @@ it('can throw an error in equality checker', async () => {
     // @ts-expect-error This function is supposed to throw an error
     a.value.trim() === b.value?.trim()
 
-  class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+  class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
     constructor(props: {}) {
       super(props)
       this.state = { hasError: false }
@@ -523,15 +528,13 @@ it('ensures the correct subscriber is removed on unmount', async () => {
   }
 
   function CountWithInitialIncrement() {
-    React.useLayoutEffect(increment, [])
+    useLayoutEffect(increment, [])
     return <Count />
   }
 
   function Component() {
-    const [Counter, setCounter] = React.useState(
-      () => CountWithInitialIncrement
-    )
-    React.useLayoutEffect(() => {
+    const [Counter, setCounter] = useState(() => CountWithInitialIncrement)
+    useLayoutEffect(() => {
       setCounter(() => Count)
     }, [])
     return (

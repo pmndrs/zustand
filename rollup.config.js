@@ -37,7 +37,13 @@ function createDeclarationConfig(input, output) {
       dir: output,
     },
     external,
-    plugins: [typescript({ declaration: true, outDir: output })],
+    plugins: [
+      typescript({
+        declaration: true,
+        emitDeclarationOnly: true,
+        outDir: output,
+      }),
+    ],
   }
 }
 
@@ -69,12 +75,12 @@ export default function (args) {
     c = c.slice('config-'.length)
     return [
       createCommonJSConfig(`src/${c}.ts`, `dist/${c}.js`),
-      createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
+      createESMConfig(`src/${c}.ts`, `dist/${c}.mjs`),
     ]
   }
   return [
     createDeclarationConfig('src/index.ts', 'dist'),
     createCommonJSConfig('src/index.ts', 'dist/index.js'),
-    createESMConfig('src/index.ts', 'dist/esm/index.js'),
+    createESMConfig('src/index.ts', 'dist/index.mjs'),
   ]
 }

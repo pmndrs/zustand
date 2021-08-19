@@ -1,8 +1,13 @@
 {
   "index.js": {
-    "bundled": 2766,
-    "minified": 1001,
-    "gzipped": 514,
+    "bundled": 3417,
+    "minified": 1233,
+    "gzipped": 584
+  },
+  "index.mjs": {
+    "bundled": 2773,
+    "minified": 1005,
+    "gzipped": 517,
     "treeshaked": {
       "rollup": {
         "code": 14,
@@ -14,9 +19,14 @@
     }
   },
   "vanilla.js": {
-    "bundled": 1345,
-    "minified": 440,
-    "gzipped": 284,
+    "bundled": 1800,
+    "minified": 631,
+    "gzipped": 350
+  },
+  "vanilla.mjs": {
+    "bundled": 1352,
+    "minified": 444,
+    "gzipped": 288,
     "treeshaked": {
       "rollup": {
         "code": 0,
@@ -28,6 +38,11 @@
     }
   },
   "middleware.js": {
+    "bundled": 8221,
+    "minified": 3675,
+    "gzipped": 1508
+  },
+  "middleware.mjs": {
     "bundled": 6679,
     "minified": 3385,
     "gzipped": 1483,
@@ -42,9 +57,14 @@
     }
   },
   "shallow.js": {
-    "bundled": 534,
-    "minified": 334,
-    "gzipped": 212,
+    "bundled": 622,
+    "minified": 401,
+    "gzipped": 251
+  },
+  "shallow.mjs": {
+    "bundled": 541,
+    "minified": 338,
+    "gzipped": 217,
     "treeshaked": {
       "rollup": {
         "code": 0,
@@ -56,9 +76,14 @@
     }
   },
   "context.js": {
-    "bundled": 1509,
-    "minified": 836,
-    "gzipped": 420,
+    "bundled": 1857,
+    "minified": 935,
+    "gzipped": 466
+  },
+  "context.mjs": {
+    "bundled": 1516,
+    "minified": 840,
+    "gzipped": 418,
     "treeshaked": {
       "rollup": {
         "code": 14,

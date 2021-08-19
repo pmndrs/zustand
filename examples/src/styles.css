@@ -159,7 +159,7 @@ body {
   cursor: pointer;
 }
 
-.code-container code[class*='language-'] {
+.code-container pre[class*='language-'] {
   margin-top: -50px;
   display: inline-block;
   width: auto !important;
@@ -170,7 +170,6 @@ body {
   white-space: pre-wrap !important;
   pointer-events: all;
 }
-
 
 @media only screen and (max-width: 700px) {
   .main > .code {
@@ -188,10 +187,10 @@ body {
     bottom: 0;
     margin-bottom: -60px;
   }
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem;
     padding: 20px 50px 70px 20px;
-    border-radius: 10px  10px 0 0 !important;
+    border-radius: 10px 10px 0 0 !important;
   }
   .counter {
     top: -100px;
@@ -199,33 +198,29 @@ body {
   }
 }
 
-
-
 @media only screen and (max-width: 600px) {
   .code-container {
     width: 100%;
   }
 
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem !important;
     padding: 20px 20px 70px;
     width: 100% !important;
   }
-  
+
   .counter {
     top: 70px;
     right: 20px;
   }
-
 }
 
 @media only screen and (max-height: 600px) {
-
   .code-container {
     bottom: 0;
     margin-bottom: -60px;
   }
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem;
     padding: 20px 20px 70px;
   }
@@ -238,22 +233,17 @@ body {
   }
 }
 @media only screen and (max-width: 600px) {
-
   .counter {
     top: -160px;
     right: 20px;
   }
 }
 
-
-
-
-
-@media only screen and (max-width: 430px)  {
+@media only screen and (max-width: 430px) {
   .code-container {
     margin-bottom: -60px;
   }
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.6rem;
     padding: 20px 20px 70px;
   }
@@ -265,7 +255,7 @@ body {
     right: 20px;
   }
 }
-@media only screen and (max-height: 480px)  {
+@media only screen and (max-height: 480px) {
   .counter {
     transform: scale(0.8);
     transform-origin: bottom right;
@@ -276,32 +266,29 @@ body {
 }
 
 @media only screen and (max-height: 500px) {
-  .code-container > code[class*='language-'] {
+  .code-container > pre[class*='language-'] {
     font-size: 0.5rem !important;
   }
 
   .counter {
     top: 40px;
     right: 20px;
-    }
+  }
 }
 
 @media only screen and (max-height: 500px) and (min-width: 600px) {
   .counter {
     top: 40px;
     right: -80px;
-    }
+  }
 }
 
-@media only screen and (max-height:360px) and (min-width: 600px) {
+@media only screen and (max-height: 360px) and (min-width: 600px) {
   .counter {
     top: 50px;
     right: -80px;
-    }
+  }
 }
-
-
-
 
 .bear {
   top: 12.5%;
@@ -327,8 +314,6 @@ body {
   height: 105% !important;
   background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/3n-p-leaves2.png');
 }
-
-
 
 span.header-left {
   font-weight: 700;
@@ -363,7 +348,7 @@ span.header-left {
     z-index: 1000;
     margin-left: 0;
   }
-  code[class*='language-'] {
+  pre[class*='language-'] {
     font-size: 0.7rem !important;
   }
 }
@@ -391,7 +376,6 @@ a.top-right {
   top: 40px;
   right: 40px;
   z-index: 1000;
-
 }
 
 a.bottom-left {
@@ -444,7 +428,7 @@ a.bottom-right {
 }
 
 @media only screen and (max-width: 500px) {
-  code[class*='language-'] {
+  pre[class*='language-'] {
     font-size: 0.6rem !important;
   }
   span.header-left {
@@ -468,4 +452,25 @@ a.bottom-right {
   a.bottom-right {
     right: 20px;
   }
+}
+
+.copy-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  box-shadow: none;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: sans-serif;
+  line-height: 1;
+  pointer-events: all;
+  margin: 10px;
+  padding: 5px 10px;
+  width: auto;
+  border-radius: 5px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #f8f9fa;
+  cursor: pointer;
 }

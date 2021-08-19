@@ -14,8 +14,8 @@ import createImpl, {
   State,
   StateCreator,
   StateSelector,
-  Subscribe,
   StoreApi,
+  Subscribe,
 } from './vanilla'
 export * from './vanilla'
 

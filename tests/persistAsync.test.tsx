@@ -1,5 +1,4 @@
-import React from 'react'
-import { act, cleanup, render } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
@@ -211,7 +210,7 @@ describe('persist middleware with async configuration', () => {
           state: { count: 42 },
           version: 12,
         }),
-      setItem: (_: string, value: string) => {},
+      setItem: (_: string, _value: string) => {},
     }
 
     const useStore = create(

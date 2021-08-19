@@ -1,16 +1,16 @@
 import create, {
+  Destroy,
+  EqualityChecker,
+  GetState,
+  PartialState,
+  SetState,
   State,
+  StateCreator,
   StateListener,
   StateSelector,
-  PartialState,
-  EqualityChecker,
-  StateCreator,
-  SetState,
-  GetState,
-  Subscribe,
-  Destroy,
-  UseStore,
   StoreApi,
+  Subscribe,
+  UseStore,
 } from '../src/index'
 
 it('can use exposed types', () => {
