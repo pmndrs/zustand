@@ -43,9 +43,9 @@ interface ITestStateProps {
 it('should have correct type when creating store with devtool', () => {
   const createStoreWithDevtool = <T extends State>(
     createState: StateCreator<T>,
-    prefix = 'prefix'
+    options = { name: 'prefix' }
   ): UseStore<T> & ISelectors<T> => {
-    return createSelectorHooks(create(devtools(createState, prefix)))
+    return createSelectorHooks(create(devtools(createState, options)))
   }
 
   const testDevtoolStore = createStoreWithDevtool<ITestStateProps>(
@@ -57,7 +57,7 @@ it('should have correct type when creating store with devtool', () => {
         })
       },
     }),
-    'test'
+    { name: 'test' }
   )
 
   const TestComponent = (): JSX.Element => {
@@ -72,9 +72,9 @@ it('should have correct type when creating store with devtool', () => {
 it('should have correct type when creating store with devtool and immer', () => {
   const createStoreWithImmer = <T extends State>(
     createState: TImmerConfig<T>,
-    prefix = 'prefix'
+    options = { name: 'prefix' }
   ): UseStore<T> & ISelectors<T> => {
-    return createSelectorHooks(create(devtools(immer(createState), prefix)))
+    return createSelectorHooks(create(devtools(immer(createState), options)))
   }
 
   const testImmerStore = createStoreWithImmer<ITestStateProps>(
@@ -86,7 +86,7 @@ it('should have correct type when creating store with devtool and immer', () => 
         })
       },
     }),
-    'test'
+    { name: 'test' }
   )
 
   const TestComponent = (): JSX.Element => {
@@ -101,11 +101,11 @@ it('should have correct type when creating store with devtool and immer', () => 
 it('should have correct type when creating store with devtool and persist', () => {
   const createStoreWithPersist = <T extends State>(
     createState: StateCreator<T>,
-    prefix = 'prefix',
+    options = { name: 'prefix' },
     persistName = 'persist'
   ): UseStore<T> & ISelectors<T> => {
     return createSelectorHooks(
-      create(devtools(persist(createState, { name: persistName }), prefix))
+      create(devtools(persist(createState, { name: persistName }), options))
     )
   }
 
@@ -118,7 +118,7 @@ it('should have correct type when creating store with devtool and persist', () =
         })
       },
     }),
-    'test',
+    { name: 'test' },
     'persist'
   )
 
@@ -209,12 +209,12 @@ it('should have correct type when creating store with immer', () => {
 it('should have correct type when creating store with devtool, persist and immer', () => {
   const createStoreWithPersistAndImmer = <T extends State>(
     createState: TImmerConfig<T>,
-    prefix = 'prefix',
+    options = { name: 'prefix' },
     persistName = 'persist'
   ): UseStore<T> & ISelectors<T> => {
     return createSelectorHooks(
       create(
-        devtools(persist(immer(createState), { name: persistName }), prefix)
+        devtools(persist(immer(createState), { name: persistName }), options)
       )
     )
   }
@@ -228,7 +228,7 @@ it('should have correct type when creating store with devtool, persist and immer
         })
       },
     }),
-    'test'
+    { name: 'test' }
   )
 
   const TestComponent = (): JSX.Element => {
