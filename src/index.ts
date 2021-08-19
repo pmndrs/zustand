@@ -1,11 +1,10 @@
 import {
-  useMemo,
   // @ts-ignore
   unstable_createMutableSource as createMutableSource,
+  useMemo,
   // @ts-ignore
   unstable_useMutableSource as useMutableSource,
 } from 'react'
-
 import createImpl, {
   Destroy,
   EqualityChecker,
