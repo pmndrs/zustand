@@ -1,5 +1,6 @@
 import {
   Component as ClassComponent,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useState,
@@ -441,7 +442,7 @@ it('only calls selectors when necessary', async () => {
 
   function Component() {
     useStore((s) => (inlineSelectorCallCount++, s.b))
-    useStore(React.useCallback((s) => (callbackSelectorCallCount++, s.b), []))
+    useStore(useCallback((s) => (callbackSelectorCallCount++, s.b), []))
     useStore(staticSelector)
     return (
       <>
