@@ -1,8 +1,8 @@
+/// <reference types="react/next" />
+
 import {
-  // @ts-ignore
   unstable_createMutableSource as createMutableSource,
   useMemo,
-  // @ts-ignore
   unstable_useMutableSource as useMutableSource,
 } from 'react'
 import createImpl, {
@@ -34,6 +34,8 @@ export default function create<TState extends State>(
     typeof createState === 'function' ? createImpl(createState) : createState
 
   const source = createMutableSource(api, () => api.getState())
+  const subscribe = (api: StoreApi<TState>, callback: () => void) =>
+    api.subscribe(callback)
 
   const FUNCTION_SYMBOL = Symbol()
   const functionMap = new WeakMap<Function, { [FUNCTION_SYMBOL]: Function }>()
@@ -44,7 +46,7 @@ export default function create<TState extends State>(
   ) => {
     const getSnapshot = useMemo(() => {
       let lastSlice: StateSlice | undefined
-      return () => {
+      return (api: StoreApi<TState>) => {
         let slice = lastSlice
         try {
           slice = selector(api.getState())
@@ -69,12 +71,12 @@ export default function create<TState extends State>(
         return slice
       }
     }, [selector, equalityFn])
-    const snapshot = useMutableSource(source, getSnapshot, api.subscribe)
+    const snapshot = useMutableSource(source, getSnapshot, subscribe)
     if (
       snapshot &&
       (snapshot as { [FUNCTION_SYMBOL]: unknown })[FUNCTION_SYMBOL]
     ) {
-      return snapshot[FUNCTION_SYMBOL]
+      return (snapshot as { [FUNCTION_SYMBOL]: unknown })[FUNCTION_SYMBOL]
     }
     return snapshot
   }

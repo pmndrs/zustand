@@ -459,14 +459,14 @@ it('only calls selectors when necessary', async () => {
   await findByText('static: 1')
 
   rerender(<Component />)
-  await findByText('inline: 3')
-  await findByText('callback: 2')
-  await findByText('static: 2')
+  await findByText('inline: 2')
+  await findByText('callback: 1')
+  await findByText('static: 1')
 
   act(() => setState({ a: 1, b: 1 }))
-  await findByText('inline: 5')
-  await findByText('callback: 3')
-  await findByText('static: 3')
+  await findByText('inline: 4')
+  await findByText('callback: 2')
+  await findByText('static: 2')
 })
 
 it('ensures parent components subscribe before children', async () => {
