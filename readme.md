@@ -444,7 +444,11 @@ const useStore = create(devtools(store))
 const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
-devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
+devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.  
+  
+Name store: `devtools(store, {name: "MyStore"})`, which will be prefixed to your actions.  
+Serialize options: `devtools(store, { serialize: { options: true } })`.  
+  
 devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
 
 ## React context
