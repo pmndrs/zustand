@@ -46,24 +46,26 @@ export type NamedSet<T extends State> = {
 export const devtools =
   <S extends State>(
     fn: (set: NamedSet<S>, get: GetState<S>, api: StoreApi<S>) => S,
-    options?: {
-      name?: string
-      serialize?: {
-        options:
-          | boolean
-          | {
-              date?: boolean
-              regex?: boolean
-              undefined?: boolean
-              nan?: boolean
-              infinity?: boolean
-              error?: boolean
-              symbol?: boolean
-              map?: boolean
-              set?: boolean
-            }
-      }
-    }
+    options?:
+      | string
+      | {
+          name?: string
+          serialize?: {
+            options:
+              | boolean
+              | {
+                  date?: boolean
+                  regex?: boolean
+                  undefined?: boolean
+                  nan?: boolean
+                  infinity?: boolean
+                  error?: boolean
+                  symbol?: boolean
+                  map?: boolean
+                  set?: boolean
+                }
+          }
+        }
   ) =>
   (
     set: SetState<S>,
@@ -108,6 +110,7 @@ export const devtools =
         savedSetState(state, replace)
         api.devtools.send(api.devtools.prefix + 'setState', api.getState())
       }
+      options = typeof options === 'string' ? { name: options } : options
       api.devtools = extension.connect({ ...options })
       api.devtools.prefix = options?.name ? `${options.name} > ` : ''
       api.devtools.subscribe((message: any) => {
