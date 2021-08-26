@@ -56,9 +56,9 @@
     }
   },
   "middleware.js": {
-    "bundled": 6679,
-    "minified": 3385,
-    "gzipped": 1483,
+    "bundled": 6805,
+    "minified": 3456,
+    "gzipped": 1507,
     "treeshaked": {
       "rollup": {
         "code": 0,
@@ -70,9 +70,9 @@
     }
   },
   "middleware.mjs": {
-    "bundled": 6732,
-    "minified": 3424,
-    "gzipped": 1491,
+    "bundled": 6805,
+    "minified": 3456,
+    "gzipped": 1507,
     "treeshaked": {
       "rollup": {
         "code": 0,
