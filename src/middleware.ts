@@ -46,7 +46,26 @@ export type NamedSet<T extends State> = {
 export const devtools =
   <S extends State>(
     fn: (set: NamedSet<S>, get: GetState<S>, api: StoreApi<S>) => S,
-    prefix?: string
+    options?:
+      | string
+      | {
+          name?: string
+          serialize?: {
+            options:
+              | boolean
+              | {
+                  date?: boolean
+                  regex?: boolean
+                  undefined?: boolean
+                  nan?: boolean
+                  infinity?: boolean
+                  error?: boolean
+                  symbol?: boolean
+                  map?: boolean
+                  set?: boolean
+                }
+          }
+        }
   ) =>
   (
     set: SetState<S>,
@@ -91,8 +110,9 @@ export const devtools =
         savedSetState(state, replace)
         api.devtools.send(api.devtools.prefix + 'setState', api.getState())
       }
-      api.devtools = extension.connect({ name: prefix })
-      api.devtools.prefix = prefix ? `${prefix} > ` : ''
+      options = typeof options === 'string' ? { name: options } : options
+      api.devtools = extension.connect({ ...options })
+      api.devtools.prefix = options?.name ? `${options.name} > ` : ''
       api.devtools.subscribe((message: any) => {
         if (message.type === 'DISPATCH' && message.state) {
           const ignoreState =
@@ -247,7 +267,7 @@ const toThenable =
           return this as Thenable<any>
         },
       }
-    } catch (e) {
+    } catch (e: any) {
       return {
         then(_onFulfilled) {
           return this as Thenable<any>

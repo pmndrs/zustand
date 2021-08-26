@@ -38,14 +38,14 @@
     }
   },
   "middleware.js": {
-    "bundled": 8221,
-    "minified": 3675,
-    "gzipped": 1508
+    "bundled": 8244,
+    "minified": 3700,
+    "gzipped": 1512
   },
   "middleware.mjs": {
-    "bundled": 6679,
-    "minified": 3385,
-    "gzipped": 1483,
+    "bundled": 6732,
+    "minified": 3424,
+    "gzipped": 1491,
     "treeshaked": {
       "rollup": {
         "code": 0,
