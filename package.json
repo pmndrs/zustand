@@ -12,32 +12,32 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./index.d.ts",
-      "module": "./index.mjs",
-      "import": "./index.mjs",
+      "module": "./esm/index.js",
+      "import": "./esm/index.mjs",
       "default": "./index.js"
     },
     "./vanilla": {
       "types": "./vanilla.d.ts",
-      "module": "./vanilla.mjs",
-      "import": "./vanilla.mjs",
+      "module": "./esm/vanilla.js",
+      "import": "./esm/vanilla.mjs",
       "default": "./vanilla.js"
     },
     "./middleware": {
       "types": "./middleware.d.ts",
-      "module": "./middleware.mjs",
-      "import": "./middleware.mjs",
+      "module": "./esm/middleware.js",
+      "import": "./esm/middleware.mjs",
       "default": "./middleware.js"
     },
     "./shallow": {
       "types": "./shallow.d.ts",
-      "module": "./shallow.mjs",
-      "import": "./shallow.mjs",
+      "module": "./esm/shallow.js",
+      "import": "./esm/shallow.mjs",
       "default": "./shallow.js"
     },
     "./context": {
       "types": "./context.d.ts",
-      "module": "./context.mjs",
-      "import": "./context.mjs",
+      "module": "./esm/context.js",
+      "import": "./esm/context.mjs",
       "default": "./context.js"
     }
   },
@@ -59,7 +59,7 @@
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
+    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp dist/*.d.ts dist/esm && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "prettier": {
     "semi": false,

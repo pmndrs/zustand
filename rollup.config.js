@@ -75,12 +75,14 @@ export default function (args) {
     c = c.slice('config-'.length)
     return [
       createCommonJSConfig(`src/${c}.ts`, `dist/${c}.js`),
-      createESMConfig(`src/${c}.ts`, `dist/${c}.mjs`),
+      createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
+      createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
     ]
   }
   return [
     createDeclarationConfig('src/index.ts', 'dist'),
     createCommonJSConfig('src/index.ts', 'dist/index.js'),
-    createESMConfig('src/index.ts', 'dist/index.mjs'),
+    createESMConfig('src/index.ts', 'dist/esm/index.mjs'),
+    createESMConfig('src/index.ts', 'dist/esm/index.js'),
   ]
 }
