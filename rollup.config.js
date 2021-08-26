@@ -4,6 +4,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import esbuild from 'rollup-plugin-esbuild'
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
+
 const createBabelConfig = require('./babel.config')
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
