@@ -59,7 +59,7 @@
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\" && shx cp dist/*.d.ts dist/esm && touch dist/esm/package.json && echo '{\"type\":\"module\"}' > dist/esm/package.json && json -I -f dist/esm/package.json"
+    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\" && shx cp dist/*.d.ts dist/esm"
   },
   "prettier": {
     "semi": false,
