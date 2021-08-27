@@ -1,17 +1,8 @@
 {
   "index.js": {
-    "bundled": 3993,
-    "minified": 1614,
-    "gzipped": 786,
-    "treeshaked": {
-      "rollup": {
-        "code": 124,
-        "import_statements": 14
-      },
-      "webpack": {
-        "code": 1144
-      }
-    }
+    "bundled": 4684,
+    "minified": 1888,
+    "gzipped": 846
   },
   "index.mjs": {
     "bundled": 3993,
@@ -28,18 +19,9 @@
     }
   },
   "vanilla.js": {
-    "bundled": 1352,
-    "minified": 444,
-    "gzipped": 288,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
+    "bundled": 1800,
+    "minified": 631,
+    "gzipped": 350
   },
   "vanilla.mjs": {
     "bundled": 1352,
@@ -56,18 +38,9 @@
     }
   },
   "middleware.js": {
-    "bundled": 6805,
-    "minified": 3456,
-    "gzipped": 1507,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 1072
-      }
-    }
+    "bundled": 8368,
+    "minified": 3738,
+    "gzipped": 1531
   },
   "middleware.mjs": {
     "bundled": 6805,
@@ -84,18 +57,9 @@
     }
   },
   "shallow.js": {
-    "bundled": 541,
-    "minified": 338,
-    "gzipped": 217,
-    "treeshaked": {
-      "rollup": {
-        "code": 0,
-        "import_statements": 0
-      },
-      "webpack": {
-        "code": 951
-      }
-    }
+    "bundled": 622,
+    "minified": 401,
+    "gzipped": 251
   },
   "shallow.mjs": {
     "bundled": 541,
@@ -112,18 +76,9 @@
     }
   },
   "context.js": {
-    "bundled": 1516,
-    "minified": 840,
-    "gzipped": 418,
-    "treeshaked": {
-      "rollup": {
-        "code": 14,
-        "import_statements": 14
-      },
-      "webpack": {
-        "code": 998
-      }
-    }
+    "bundled": 1857,
+    "minified": 935,
+    "gzipped": 466
   },
   "context.mjs": {
     "bundled": 1516,
