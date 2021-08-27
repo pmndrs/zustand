@@ -8,17 +8,9 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "zustand": [
-        "./src/index.ts"
-      ]
+      "zustand": ["./src/index.ts"]
     }
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
