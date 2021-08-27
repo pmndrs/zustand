@@ -1,11 +1,11 @@
 import path from 'path'
-import babel from '@rollup/plugin-babel'
+import babelPlugin from '@rollup/plugin-babel'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import esbuild from 'rollup-plugin-esbuild'
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
-
 const createBabelConfig = require('./babel.config')
+
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
 
@@ -63,7 +63,7 @@ function createCommonJSConfig(input, output) {
     external,
     plugins: [
       resolve({ extensions }),
-      babel(getBabelOptions({ ie: 11 })),
+      babelPlugin(getBabelOptions({ ie: 11 })),
       sizeSnapshot(),
     ],
   }
