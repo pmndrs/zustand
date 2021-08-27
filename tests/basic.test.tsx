@@ -481,7 +481,7 @@ it('ensures parent components subscribe before children', async () => {
   }
 
   function Child({ id }: Props) {
-    const text = useStore((s) => s.children[id].text)
+    const text = useStore((s) => s.children[id]?.text)
     return <div>{text}</div>
   }
 
