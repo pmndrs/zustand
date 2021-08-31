@@ -43,5 +43,19 @@ export default function create<TState extends State>(
 
   Object.assign(useStore, api)
 
+  // For backward compatibility (No TS types for this)
+  useStore[Symbol.iterator] = function () {
+    console.warn(
+      '[useStore, api] = create() is deprecated and will be removed in v4'
+    )
+    const items = [useStore, api]
+    return {
+      next() {
+        const done = items.length <= 0
+        return { value: items.shift(), done }
+      },
+    }
+  }
+
   return useStore
 }
