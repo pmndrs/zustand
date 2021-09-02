@@ -8,14 +8,14 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
-A small, fast and scaleable bearbones state-management solution using simplified flux principles. Has a comfy api based on hooks, isn't boilerplatey or opinionated.
+A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy api based on hooks, isn't boilerplatey or opinionated.
 
 Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
 ```bash
-npm install zustand
+npm install zustand # or yarn add zustand
 ```
 
 ## First create a store
@@ -48,12 +48,18 @@ function Controls() {
 }
 ```
 
-### Why zustand over react-redux?
+### Why zustand over redux?
 
 * Simple and un-opinionated
 * Makes hooks the primary means of consuming state
 * Doesn't wrap your app in context providers
 * [Can inform components transiently (without causing render)](#transient-updates-for-often-occuring-state-changes)
+
+### Why zustand over context?
+
+* Less boilerplate
+* Renders components only on changes
+* Centralized, action-based state management
 
 ---
 
@@ -98,15 +104,6 @@ const treats = useStore(
   state => state.treats,
   (oldTreats, newTreats) => compare(oldTreats, newTreats)
 )
-```
-
-## Fetching from multiple stores
-
-You can make as many stores as you like, forwarding results to succeeding selectors is as natural as it gets. But nonetheless the recommended approach would be to unify state into a single store, as it scales better.
-
-```jsx
-const currentBear = useCredentialsStore(state => state.currentBear)
-const bear = useBearStore(state => state.bears[currentBear])
 ```
 
 ## Memoizing selectors
@@ -249,13 +246,13 @@ import produce from 'immer'
 
 const useStore = create(set => ({
   lush: { forest: { contains: { a: "bear" } } },
-  set: fn => set(produce(fn)),
+  clearForest: () => set(produce(state => {
+    state.lush.forest.contains = null
+  }))
 }))
 
-const set = useStore(state => state.set)
-set(state => {
-  state.lush.forest.contains = null
-})
+const clearForest = useStore(state => state.clearForest)
+clearForest();
 ```
 
 ## Middleware
@@ -271,7 +268,12 @@ const log = config => (set, get, api) => config(args => {
 }, get, api)
 
 // Turn the set method into an immer proxy
-const immer = config => (set, get, api) => config(fn => set(produce(fn)), get, api)
+const immer = config => (set, get, api) => config((partial, replace) => {
+  const nextState = typeof partial === 'function'
+      ? produce(partial)
+      : partial
+  return set(nextState, replace)
+}, get, api)
 
 const useStore = create(
   log(
@@ -312,17 +314,14 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 import { State, StateCreator } from 'zustand'
 import produce, { Draft } from 'immer'
 
-// Immer V8 or lower
-const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-): StateCreator<T> => (set, get, api) =>
-  config((fn) => set(produce(fn) as (state: T) => T), get, api)
-
-// Immer V9
-const immer = <T extends State>(
-  config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-): StateCreator<T> => (set, get, api) =>
-  config((fn) => set(produce<T>(fn)), get, api)
+const immer = <T extends State>(config: StateCreator<T>): StateCreator<T> => 
+  (set, get, api) => config((partial, replace) => {
+    const nextState =
+      typeof partial === 'function'
+        ? produce(partial as (state: Draft<T>) => T)
+        : partial as T
+    return set(nextState, replace)
+  }, get, api)
 ```
 
 </details>
@@ -445,7 +444,11 @@ const useStore = create(devtools(store))
 const useStore = create(devtools(redux(reducer, initialState)))
 ```
 
-devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
+devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.  
+  
+Name store: `devtools(store, {name: "MyStore"})`, which will be prefixed to your actions.  
+Serialize options: `devtools(store, { serialize: { options: true } })`.  
+  
 devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
 
 ## React context
@@ -461,7 +464,7 @@ const { Provider, useStore } = createContext()
 const createStore = () => create(...)
 
 const App = () => (
-  <Provider initialStore={createStore()}>
+  <Provider createStore={createStore}>
     ...
   </Provider>
 )
@@ -493,7 +496,7 @@ const Component = () => {
   const Button = () => {
     return (
         {/** store() - This will create a store for each time using the Button component instead of using one store for all components **/}
-      <Provider initialStore={createStore()}> 
+      <Provider createStore={createStore}> 
         <ButtonChild />
       </Provider>
     );
@@ -526,7 +529,7 @@ const Component = () => {
   ```
 </details>
 
-## TypeScript
+## Typing your store and `combine` middleware
 
 ```tsx
 // You can use `type`
@@ -560,7 +563,13 @@ const useStore = create(
   ),
 )
 ```
-
+  
+## Best practices
+  
+* You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
+  
+* Recommended usage for this unopinionated library: [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
+  
 ## Testing
 
 For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
@@ -568,3 +577,7 @@ For information regarding testing with Zustand, visit the dedicated [Wiki page](
 ## 3rd-Party Libraries
 
 Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/3rd-Party-Libraries).
+
+## Comparison with other libraries
+
+- [Difference between zustand and valtio](https://github.com/pmndrs/zustand/wiki/Difference-between-zustand-and-valtio)

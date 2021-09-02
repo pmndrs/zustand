@@ -4,7 +4,7 @@ import { Canvas, useFrame, useThree } from 'react-three-fiber'
 import { Plane, useAspect, useTextureLoader } from 'drei'
 import { EffectComposer, DepthOfField, Vignette } from 'react-postprocessing'
 import create from 'zustand'
-import PrismCode from 'react-prism'
+import CodePreview from './components/CodePreview'
 import 'prismjs'
 import 'prismjs/components/prism-jsx.min'
 import 'prismjs/themes/prism-okaidia.css'
@@ -110,7 +110,7 @@ export default function App() {
       <div className="main">
         <div className="code">
           <div className="code-container">
-            <PrismCode className="language-jsx" children={code} />
+            <CodePreview code={code} />
             <Counter />
           </div>
         </div>

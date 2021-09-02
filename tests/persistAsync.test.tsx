@@ -1,5 +1,4 @@
-import React from 'react'
-import { act, cleanup, render } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 import create from '../src/index'
 import { persist } from '../src/middleware'
 
@@ -211,7 +210,7 @@ describe('persist middleware with async configuration', () => {
           state: { count: 42 },
           version: 12,
         }),
-      setItem: (_: string, value: string) => {},
+      setItem: (_: string, _value: string) => {},
     }
 
     const useStore = create(
@@ -232,7 +231,7 @@ describe('persist middleware with async configuration', () => {
 
     await findByText('count: 0')
     expect(console.error).toHaveBeenCalled()
-    expect(onRehydrateStorageSpy).toBeCalledWith(undefined, undefined)
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
   })
 
   it('can throw migrate error', async () => {
@@ -272,5 +271,119 @@ describe('persist middleware with async configuration', () => {
       undefined,
       new Error('migrate error')
     )
+  })
+
+  it('gives the merged state to onRehydrateStorage', async () => {
+    const onRehydrateStorageSpy = jest.fn()
+
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: { count: 1 },
+          version: 0,
+        }),
+      setItem: () => {},
+    }
+
+    const unstorableMethod = () => {}
+
+    const useStore = create(
+      persist(() => ({ count: 0, unstorableMethod }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 0')
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { count: 1, unstorableMethod },
+      undefined
+    )
+  })
+
+  it('can custom merge the stored state', async () => {
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: {
+            count: 1,
+            actions: {},
+          },
+          version: 0,
+        }),
+      setItem: () => {},
+    }
+
+    const unstorableMethod = () => {}
+
+    const useStore = create(
+      persist(() => ({ count: 0, actions: { unstorableMethod } }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        merge: (persistedState, currentState) => {
+          delete persistedState.actions
+
+          return {
+            ...currentState,
+            ...persistedState,
+          }
+        },
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 1')
+    expect(useStore.getState()).toEqual({
+      count: 1,
+      actions: {
+        unstorableMethod,
+      },
+    })
+  })
+
+  it("can merge the state when the storage item doesn't have a version", async () => {
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: {
+            count: 1,
+          },
+        }),
+      setItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+        deserialize: (str) => JSON.parse(str),
+      })
+    )
+
+    function Counter() {
+      const { count } = useStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(<Counter />)
+
+    await findByText('count: 1')
+    expect(useStore.getState()).toEqual({
+      count: 1,
+    })
   })
 })
