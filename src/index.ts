@@ -1,5 +1,5 @@
 // @ts-ignore
-import { useSyncExternalStoreExtra } from 'use-sync-external-store'
+import { useSyncExternalStoreExtra } from 'use-sync-external-store/extra'
 import createImpl, {
   Destroy,
   EqualityChecker,
@@ -29,7 +29,7 @@ export default function create<TState extends State>(
     typeof createState === 'function' ? createImpl(createState) : createState
 
   const useStore: any = <StateSlice>(
-    selector?: StateSelector<TState, StateSlice>,
+    selector: StateSelector<TState, StateSlice> = api.getState as any,
     equalityFn?: EqualityChecker<StateSlice>
   ) => {
     const slice = useSyncExternalStoreExtra(

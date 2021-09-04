@@ -119,7 +119,7 @@
     ]
   },
   "dependencies": {
-    "use-sync-external-store": "^0.0.0-experimental-45898dacb2-20210828"
+    "use-sync-external-store": "^0.0.0-experimental-1314299c7-20210901"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
