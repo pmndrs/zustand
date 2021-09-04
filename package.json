@@ -153,8 +153,8 @@
     "json": "^11.0.0",
     "lint-staged": "^11.1.2",
     "prettier": "^2.3.2",
-    "react": "alpha",
-    "react-dom": "alpha",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "rollup": "^2.56.3",
     "rollup-plugin-esbuild": "^4.5.0",
     "rollup-plugin-size-snapshot": "^0.12.0",
@@ -162,7 +162,7 @@
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
-    "react": "alpha"
+    "react": ">=16.8"
   },
   "peerDependenciesMeta": {
     "react": {
