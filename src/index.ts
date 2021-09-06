@@ -47,15 +47,15 @@ export default function create<TState extends State>(
         if (lastSnapshot === undefined || !Object.is(lastSnapshot, snapshot)) {
           try {
             slice = selector(snapshot)
-            if (lastSlice !== undefined && equalityFn(lastSlice, slice)) {
-              slice = lastSlice
-            } else {
+            if (lastSlice === undefined || !equalityFn(lastSlice, slice)) {
               lastSlice = slice
+            } else {
+              slice = lastSlice
             }
+            lastSnapshot = snapshot
           } catch (error) {
             setErr(error)
           }
-          lastSnapshot = snapshot
         }
         return slice
       }
