@@ -51,15 +51,14 @@
     "build:shallow": "rollup -c --config-shallow",
     "build:context": "rollup -c --config-context",
     "postbuild": "yarn copy",
-    "eslint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx}' 'tests/**/*.{js,ts,jsx,tsx}'",
-    "eslint-examples": "eslint --fix 'examples/src/**/*.{js,ts,jsx,tsx}'",
-    "eslint:ci": "eslint 'src/**/*.{js,ts,jsx,tsx}' 'tests/**/*.{js,ts,jsx,tsx}'",
+    "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
+    "eslint:ci": "eslint '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "prepare": "yarn build",
     "pretest": "tsc --noEmit",
     "test": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp dist/*.d.ts dist/esm && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
+    "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "prettier": {
     "semi": false,
