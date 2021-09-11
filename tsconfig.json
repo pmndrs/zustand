@@ -3,9 +3,9 @@
     "target": "esnext",
     "strict": true,
     "jsx": "react-jsx",
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
       "zustand": ["./src/index.ts"]
