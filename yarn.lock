@@ -6944,10 +6944,10 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-sync-external-store@^0.0.0-experimental-1314299c7-20210901:
-  version "0.0.0-experimental-1314299c7-20210901"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-0.0.0-experimental-1314299c7-20210901.tgz#813df01533d654913463becb4baf21d012630b41"
-  integrity sha512-Iu5x3XZTSw/ORhEu0AUvQc05cLBc7UV8tXiP1zuXJlxEF5dYV+Dmz3YFJHWcb8L+7aBTUIhCfat/qvQNf5LdKw==
+use-sync-external-store@^0.0.0-experimental-fd5e01c2e-20210913:
+  version "0.0.0-experimental-fd5e01c2e-20210913"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-0.0.0-experimental-fd5e01c2e-20210913.tgz#fa6d821e6f710fe9a75926a87a2214882fb56bbd"
+  integrity sha512-yVlkhz9/tba6Poz3mhx2c48OFv/pINgnDajaLy7Y7fcX6nkA1g2Bq3pxYKMX1DwnvZicXvDFwJT65jO8tbb5sQ==
 
 use@^3.1.0:
   version "3.1.1"
