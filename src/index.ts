@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 // @ts-ignore
 import { useSyncExternalStore } from 'use-sync-external-store'
 import createImpl, {
@@ -33,11 +33,6 @@ export default function create<TState extends State>(
     selector: StateSelector<TState, StateSlice> = api.getState as any,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
-    const [err, setErr] = useState<unknown>(null)
-    if (err) {
-      setErr(null)
-      throw err
-    }
     const getSnapshot = useMemo(() => {
       let lastSnapshot: TState | undefined
       let lastSlice: StateSlice | undefined
@@ -45,17 +40,13 @@ export default function create<TState extends State>(
         let slice = lastSlice
         const snapshot = api.getState()
         if (lastSnapshot === undefined || !Object.is(lastSnapshot, snapshot)) {
-          try {
-            slice = selector(snapshot)
-            if (lastSlice === undefined || !equalityFn(lastSlice, slice)) {
-              lastSlice = slice
-            } else {
-              slice = lastSlice
-            }
-            lastSnapshot = snapshot
-          } catch (error) {
-            setErr(error)
+          slice = selector(snapshot)
+          if (lastSlice === undefined || !equalityFn(lastSlice, slice)) {
+            lastSlice = slice
+          } else {
+            slice = lastSlice
           }
+          lastSnapshot = snapshot
         }
         return slice
       }
