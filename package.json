@@ -1,7 +1,10 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "3.5.10",
+  "version": "4.0.0-alpha.2",
+  "publishConfig": {
+    "tag": "alpha"
+  },
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -102,6 +105,9 @@
       "src/**/*.{js,ts,tsx}",
       "tests/**/*.{js,ts,tsx}"
     ]
+  },
+  "dependencies": {
+    "use-sync-external-store": "^0.0.0-experimental-fd5e01c2e-20210913"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

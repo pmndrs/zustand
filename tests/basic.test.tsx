@@ -4,7 +4,7 @@ import {
   useLayoutEffect,
   useState,
 } from 'react'
-import { act, fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import create, { EqualityChecker, SetState, StateSelector } from '../src/index'
 
@@ -150,7 +150,9 @@ it('re-renders with useLayoutEffect', async () => {
 
   const container = document.createElement('div')
   ReactDOM.render(<Component />, container)
-  expect(container.innerHTML).toBe('true')
+  waitFor(() => {
+    expect(container.innerHTML).toBe('true')
+  })
   ReactDOM.unmountComponentAtNode(container)
 })
 
@@ -197,14 +199,14 @@ it('can update the selector', async () => {
 
 it('can update the equality checker', async () => {
   type State = { value: number }
-  type Props = { equalityFn: EqualityChecker<number> }
+  type Props = { equalityFn: EqualityChecker<State> }
   const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
-  const selector: StateSelector<State, number> = (s) => s.value
+  const selector: StateSelector<State, State> = (s) => s
 
   let renderCount = 0
   function Component({ equalityFn }: Props) {
-    const value = useStore(selector, equalityFn)
+    const { value } = useStore(selector, equalityFn)
     return (
       <div>
         renderCount: {++renderCount}, value: {value}
