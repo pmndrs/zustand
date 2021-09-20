@@ -7,6 +7,8 @@ import {
   StoreApi,
 } from './vanilla'
 
+const DEVTOOLS = Symbol()
+
 export const redux =
   <S extends State, A extends { type: unknown }>(
     reducer: (state: S, action: A) => S,
@@ -107,8 +109,11 @@ export const devtools =
         state: PartialState<S, K1, K2, K3, K4>,
         replace?: boolean
       ) => {
-        savedSetState(state, replace)
-        api.devtools.send(api.devtools.prefix + 'setState', api.getState())
+        const newState = api.getState()
+        if (state !== newState) {
+          savedSetState(state, replace)
+          api.devtools.send(api.devtools.prefix + 'setState', api.getState())
+        }
       }
       options = typeof options === 'string' ? { name: options } : options
       api.devtools = extension.connect({ ...options })
@@ -118,10 +123,12 @@ export const devtools =
           const ignoreState =
             message.payload.type === 'JUMP_TO_ACTION' ||
             message.payload.type === 'JUMP_TO_STATE'
+          const newState = api.getState()
+          ;(newState as any)[DEVTOOLS] = JSON.parse(message.state)
           if (!api.dispatch && !ignoreState) {
-            api.setState(JSON.parse(message.state))
+            api.setState(newState)
           } else {
-            savedSetState(JSON.parse(message.state))
+            savedSetState(newState)
           }
         } else if (
           message.type === 'DISPATCH' &&
@@ -138,7 +145,7 @@ export const devtools =
 
           computedStates.forEach(
             ({ state }: { state: PartialState<S> }, index: number) => {
-              const action = actions[index] || api.devtools.prefix + 'setState'
+              const action = actions[index] || 'No action found'
 
               if (index === 0) {
                 api.devtools.init(state)
