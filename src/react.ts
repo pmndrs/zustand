@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useSyncExternalStore } from 'use-sync-external-store'
-import createApi, {
+import createStore, {
   Destroy,
   EqualityChecker,
   GetState,
@@ -44,7 +44,7 @@ export function useStore<TState extends State, StateSlice>(
   return useSyncExternalStore(api.subscribe, getSnapshot)
 }
 
-export interface UseStore<T extends State> {
+export interface UseBoundStore<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
   setState: SetState<T>
@@ -55,14 +55,14 @@ export interface UseStore<T extends State> {
 
 export default function create<TState extends State>(
   createState: StateCreator<TState> | StoreApi<TState>
-): UseStore<TState> {
+): UseBoundStore<TState> {
   const api: StoreApi<TState> =
-    typeof createState === 'function' ? createApi(createState) : createState
+    typeof createState === 'function' ? createStore(createState) : createState
 
-  const useStoreImpl: any = (selector?: any, equalityFn?: any) =>
+  const useBoundStore: any = (selector?: any, equalityFn?: any) =>
     useStore(api, selector, equalityFn)
 
-  Object.assign(useStoreImpl, api)
+  Object.assign(useBoundStore, api)
 
-  return useStoreImpl
+  return useBoundStore
 }

@@ -6,8 +6,13 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { EqualityChecker, UseStore } from 'zustand'
-import { State, StateSelector } from './vanilla'
+import {
+  EqualityChecker,
+  State,
+  StateSelector,
+  StoreApi,
+  useStore,
+} from 'zustand'
 
 export interface UseContextStore<T extends State> {
   (): T
@@ -15,33 +20,20 @@ export interface UseContextStore<T extends State> {
 }
 
 function createContext<TState extends State>() {
-  const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
+  const ZustandContext = reactCreateContext<StoreApi<TState> | undefined>(
     undefined
   )
 
   const Provider = ({
-    initialStore,
     createStore,
     children,
   }: {
-    /**
-     * @deprecated
-     */
-    initialStore?: UseStore<TState>
-    createStore: () => UseStore<TState>
+    createStore: () => StoreApi<TState>
     children: ReactNode
   }) => {
-    const storeRef = useRef<UseStore<TState>>()
+    const storeRef = useRef<StoreApi<TState>>()
 
     if (!storeRef.current) {
-      if (initialStore) {
-        console.warn(
-          'Provider initialStore is deprecated and will be removed in the next version.'
-        )
-        if (!createStore) {
-          createStore = () => initialStore
-        }
-      }
       storeRef.current = createStore()
     }
 
@@ -52,45 +44,44 @@ function createContext<TState extends State>() {
     )
   }
 
-  const useStore: UseContextStore<TState> = <StateSlice>(
+  const useBoundStore: UseContextStore<TState> = <StateSlice>(
     selector?: StateSelector<TState, StateSlice>,
     equalityFn = Object.is
   ) => {
-    // ZustandContext value is guaranteed to be stable.
-    const useProviderStore = useContext(ZustandContext)
-    if (!useProviderStore) {
+    const store = useContext(ZustandContext)
+    if (!store) {
       throw new Error(
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
-    return useProviderStore(
+    return useStore(
+      store,
       selector as StateSelector<TState, StateSlice>,
       equalityFn
     )
   }
 
   const useStoreApi = () => {
-    // ZustandContext value is guaranteed to be stable.
-    const useProviderStore = useContext(ZustandContext)
-    if (!useProviderStore) {
+    const store = useContext(ZustandContext)
+    if (!store) {
       throw new Error(
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
     return useMemo(
       () => ({
-        getState: useProviderStore.getState,
-        setState: useProviderStore.setState,
-        subscribe: useProviderStore.subscribe,
-        destroy: useProviderStore.destroy,
+        getState: store.getState,
+        setState: store.setState,
+        subscribe: store.subscribe,
+        destroy: store.destroy,
       }),
-      [useProviderStore]
+      [store]
     )
   }
 
   return {
     Provider,
-    useStore,
+    useStore: useBoundStore,
     useStoreApi,
   }
 }

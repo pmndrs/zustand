@@ -48,7 +48,7 @@ export type StateCreator<T extends State, CustomSetState = SetState<T>> = (
   api: StoreApi<T>
 ) => T
 
-export default function createApi<TState extends State>(
+export default function createStore<TState extends State>(
   createState: StateCreator<TState>
 ): StoreApi<TState> {
   let state: TState
