@@ -122,7 +122,7 @@
     ]
   },
   "dependencies": {
-    "use-sync-external-store": "^0.0.0-experimental-fd5e01c2e-20210913"
+    "use-sync-external-store": "^0.0.0-experimental-b1a1cb116-20210924"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -138,6 +138,7 @@
     "@types/jest": "^27.0.1",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
+    "@types/use-sync-external-store": "^0.0.0",
     "@typescript-eslint/eslint-plugin": "^4.29.3",
     "@typescript-eslint/parser": "^4.29.3",
     "concurrently": "^6.2.1",

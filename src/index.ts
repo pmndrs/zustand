@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-// @ts-ignore
 import { useSyncExternalStore } from 'use-sync-external-store'
 import createImpl, {
   Destroy,

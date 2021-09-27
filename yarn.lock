@@ -1440,6 +1440,11 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
+"@types/use-sync-external-store@^0.0.0":
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.0.tgz#ec2ebe41a1288e3d5d80aacc4a4c2873db4aafa8"
+  integrity sha512-dtA1bGSTAyPAcged3AjG9r3BOUzznqgpZkK8HnVrlOOkZunfKnqJikykxUg3xOrBvgGbROLNptpJLflqp8KvkQ==
+
 "@types/yargs-parser@*":
   version "20.2.1"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-20.2.1.tgz#3b9ce2489919d9e4fea439b76916abc34b2df129"
@@ -6944,10 +6949,10 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-sync-external-store@^0.0.0-experimental-fd5e01c2e-20210913:
-  version "0.0.0-experimental-fd5e01c2e-20210913"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-0.0.0-experimental-fd5e01c2e-20210913.tgz#fa6d821e6f710fe9a75926a87a2214882fb56bbd"
-  integrity sha512-yVlkhz9/tba6Poz3mhx2c48OFv/pINgnDajaLy7Y7fcX6nkA1g2Bq3pxYKMX1DwnvZicXvDFwJT65jO8tbb5sQ==
+use-sync-external-store@^0.0.0-experimental-b1a1cb116-20210924:
+  version "0.0.0-experimental-b1a1cb116-20210924"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-0.0.0-experimental-b1a1cb116-20210924.tgz#9506e0fae23522c106e36d8a3bce6ad9c2859903"
+  integrity sha512-KMaJzMIlHucOIRFgKcDZdztIjweJxqs6IurFaw61zo17BWQrc6jmZwHX/IpslT7dNqL3xkI/soK2SOGaLPX8LQ==
 
 use@^3.1.0:
   version "3.1.1"
