@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useSyncExternalStore } from 'use-sync-external-store'
-import {
+import createApi, {
   Destroy,
   EqualityChecker,
   GetState,
@@ -10,8 +10,39 @@ import {
   StateSelector,
   StoreApi,
   Subscribe,
-  create as createImpl,
 } from './vanilla'
+
+export function useStore<T extends State>(api: StoreApi<T>): T
+export function useStore<T extends State, U>(
+  api: StoreApi<T>,
+  selector: StateSelector<T, U>,
+  equalityFn?: EqualityChecker<U>
+): U
+export function useStore<TState extends State, StateSlice>(
+  api: StoreApi<TState>,
+  selector: StateSelector<TState, StateSlice> = api.getState as any,
+  equalityFn: EqualityChecker<StateSlice> = Object.is
+) {
+  const getSnapshot = useMemo(() => {
+    let lastSnapshot: TState | undefined
+    let lastSlice: StateSlice | undefined
+    return () => {
+      let slice = lastSlice
+      const snapshot = api.getState()
+      if (lastSnapshot === undefined || !Object.is(lastSnapshot, snapshot)) {
+        slice = selector(snapshot)
+        if (lastSlice === undefined || !equalityFn(lastSlice, slice)) {
+          lastSlice = slice
+        } else {
+          slice = lastSlice
+        }
+        lastSnapshot = snapshot
+      }
+      return slice
+    }
+  }, [api, selector, equalityFn])
+  return useSyncExternalStore(api.subscribe, getSnapshot)
+}
 
 export interface UseStore<T extends State> {
   (): T
@@ -22,38 +53,16 @@ export interface UseStore<T extends State> {
   destroy: Destroy
 }
 
-export function create<TState extends State>(
+export default function create<TState extends State>(
   createState: StateCreator<TState> | StoreApi<TState>
 ): UseStore<TState> {
   const api: StoreApi<TState> =
-    typeof createState === 'function' ? createImpl(createState) : createState
+    typeof createState === 'function' ? createApi(createState) : createState
 
-  const useStore: any = <StateSlice>(
-    selector: StateSelector<TState, StateSlice> = api.getState as any,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
-  ) => {
-    const getSnapshot = useMemo(() => {
-      let lastSnapshot: TState | undefined
-      let lastSlice: StateSlice | undefined
-      return () => {
-        let slice = lastSlice
-        const snapshot = api.getState()
-        if (lastSnapshot === undefined || !Object.is(lastSnapshot, snapshot)) {
-          slice = selector(snapshot)
-          if (lastSlice === undefined || !equalityFn(lastSlice, slice)) {
-            lastSlice = slice
-          } else {
-            slice = lastSlice
-          }
-          lastSnapshot = snapshot
-        }
-        return slice
-      }
-    }, [selector, equalityFn])
-    return useSyncExternalStore(api.subscribe, getSnapshot)
-  }
+  const useStoreImpl: any = (selector?: any, equalityFn?: any) =>
+    useStore(api, selector, equalityFn)
 
-  Object.assign(useStore, api)
+  Object.assign(useStoreImpl, api)
 
-  return useStore
+  return useStoreImpl
 }

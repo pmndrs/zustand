@@ -13,4 +13,4 @@ export {
   StateCreator,
 } from './vanilla'
 
-export { UseStore, create as default } from './react'
+export { UseStore, default } from './react'
