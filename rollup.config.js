@@ -3,7 +3,6 @@ import babelPlugin from '@rollup/plugin-babel'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import esbuild from 'rollup-plugin-esbuild'
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
 const createBabelConfig = require('./babel.config')
 
 const extensions = ['.js', '.ts', '.tsx']
@@ -52,7 +51,7 @@ function createESMConfig(input, output) {
     input,
     output: { file: output, format: 'esm' },
     external,
-    plugins: [resolve({ extensions }), getEsbuild('node12'), sizeSnapshot()],
+    plugins: [resolve({ extensions }), getEsbuild('node12')],
   }
 }
 
@@ -64,7 +63,6 @@ function createCommonJSConfig(input, output) {
     plugins: [
       resolve({ extensions }),
       babelPlugin(getBabelOptions({ ie: 11 })),
-      sizeSnapshot(),
     ],
   }
 }
