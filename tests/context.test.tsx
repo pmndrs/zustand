@@ -1,7 +1,7 @@
 import { Component as ClassComponent, useEffect, useState } from 'react'
 import { render } from '@testing-library/react'
-import createContext from '../src/context'
-import create from '../src/index'
+import create from 'zustand'
+import createContext from 'zustand/context'
 
 type CounterState = {
   count: number

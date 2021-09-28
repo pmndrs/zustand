@@ -1,8 +1,8 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { UseStore } from '../src'
-import { NamedSet, devtools, persist } from '../src/middleware'
-import { State, StateCreator } from '../src/vanilla'
+import create, { UseStore } from 'zustand'
+import { NamedSet, devtools, persist } from 'zustand/middleware'
+import { State, StateCreator } from 'zustand/vanilla'
 
 type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
 type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
