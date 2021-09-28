@@ -84,7 +84,8 @@
     "rootDir": ".",
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
-      "^zustand$": "<rootDir>/src/index.ts"
+      "^zustand$": "<rootDir>/src/index.ts",
+      "^zustand/(.*)$": "<rootDir>/src/$1.ts"
     },
     "modulePathIgnorePatterns": [
       "dist"

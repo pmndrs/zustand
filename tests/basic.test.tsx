@@ -6,7 +6,7 @@ import {
 } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import ReactDOM from 'react-dom'
-import create, { EqualityChecker, SetState, StateSelector } from '../src/index'
+import create, { EqualityChecker, SetState, StateSelector } from 'zustand'
 
 it('creates a store hook and api object', () => {
   let params

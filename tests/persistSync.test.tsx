@@ -1,5 +1,5 @@
-import create from '../src/index'
-import { persist } from '../src/middleware'
+import create from 'zustand'
+import { persist } from 'zustand/middleware'
 
 const createPersistantStore = (initialValue: string | null) => {
   let state = initialValue
