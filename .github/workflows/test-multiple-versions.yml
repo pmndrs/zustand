@@ -43,7 +43,7 @@ jobs:
       - name: Patch for React 16
         if: ${{ startsWith(matrix.react, '16.') }}
         run: |
-          sed -i~ '1s/^/import React from "react";/' tests/*.tsx tests/*/*.tsx
+          sed -i~ '1s/^/import React from "react";/' tests/*.tsx
           sed -i~ 's/automatic/classic/' babel.config.js
       - name: Test ${{ matrix.react }}
         run: |
