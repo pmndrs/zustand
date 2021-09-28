@@ -11,7 +11,7 @@ import create, {
   StoreApi,
   Subscribe,
   UseStore,
-} from '../src/index'
+} from 'zustand'
 
 it('can use exposed types', () => {
   interface ExampleState {

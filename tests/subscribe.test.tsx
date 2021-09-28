@@ -1,4 +1,4 @@
-import create from '../src/index'
+import create from 'zustand'
 
 describe('subscribe()', () => {
   it('should not be called if new state identity is the same', () => {
