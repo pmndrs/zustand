@@ -38,6 +38,7 @@ jobs:
             testing: alpha
           - react: 17.0.0
             testing: alpha
+          - testing: alpha # FIXME excluding alpha entirely temporarily
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
