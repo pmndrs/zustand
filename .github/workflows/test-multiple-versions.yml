@@ -32,6 +32,12 @@ jobs:
           - 17.0.0
           - 18.0.0-alpha-05726d72c-20210927
           - 0.0.0-experimental-05726d72c-20210927
+        testing: ['default', 'alpha']
+        exclude:
+          - react: 16.8.0
+            testing: alpha
+          - react: 17.0.0
+            testing: alpha
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -40,6 +46,9 @@ jobs:
           cache: yarn
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
+      - name: Install alpha testing-library
+        if: ${{ matrix.testing == 'alpha' }}
+        run: yarn add -D @testing-library/react@alpha
       - name: Patch for React 16
         if: ${{ startsWith(matrix.react, '16.') }}
         run: |
