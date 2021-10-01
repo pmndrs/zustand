@@ -19,11 +19,29 @@
       "import": "./esm/index.mjs",
       "default": "./index.js"
     },
-    "./*": {
-      "types": "./*.d.ts",
-      "module": "./esm/*.js",
-      "import": "./esm/*.mjs",
-      "default": "./*.js"
+    "./vanilla": {
+      "types": "./vanilla.d.ts",
+      "module": "./esm/vanilla.js",
+      "import": "./esm/vanilla.mjs",
+      "default": "./vanilla.js"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "module": "./esm/middleware.js",
+      "import": "./esm/middleware.mjs",
+      "default": "./middleware.js"
+    },
+    "./shallow": {
+      "types": "./shallow.d.ts",
+      "module": "./esm/shallow.js",
+      "import": "./esm/shallow.mjs",
+      "default": "./shallow.js"
+    },
+    "./context": {
+      "types": "./context.d.ts",
+      "module": "./esm/context.js",
+      "import": "./esm/context.mjs",
+      "default": "./context.js"
     }
   },
   "sideEffects": false,
@@ -46,7 +64,7 @@
     "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=12.7.0"
   },
   "prettier": {
     "semi": false,
@@ -122,30 +140,30 @@
     "@rollup/plugin-typescript": "^8.2.5",
     "@testing-library/react": "^12.1.1",
     "@types/jest": "^27.0.2",
-    "@types/react": "^17.0.24",
+    "@types/react": "^17.0.26",
     "@types/react-dom": "^17.0.9",
     "@types/use-sync-external-store": "^0.0.0",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
     "concurrently": "^6.2.2",
-    "esbuild": "^0.13.2",
+    "esbuild": "^0.13.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.24.2",
-    "eslint-plugin-jest": "^24.4.2",
+    "eslint-plugin-jest": "^24.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.26.0",
+    "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^7.0.2",
     "immer": "^9.0.6",
-    "jest": "^27.2.3",
+    "jest": "^27.2.4",
     "json": "^11.0.0",
     "lint-staged": "^11.1.2",
     "prettier": "^2.4.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "rollup": "^2.57.0",
+    "rollup": "^2.58.0",
     "rollup-plugin-esbuild": "^4.5.0",
     "shx": "^0.3.3",
     "typescript": "^4.4.3"
