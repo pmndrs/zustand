@@ -16,11 +16,29 @@
       "import": "./esm/index.mjs",
       "default": "./index.js"
     },
-    "./*": {
-      "types": "./*.d.ts",
-      "module": "./esm/*.js",
-      "import": "./esm/*.mjs",
-      "default": "./*.js"
+    "./vanilla": {
+      "types": "./vanilla.d.ts",
+      "module": "./esm/vanilla.js",
+      "import": "./esm/vanilla.mjs",
+      "default": "./vanilla.js"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "module": "./esm/middleware.js",
+      "import": "./esm/middleware.mjs",
+      "default": "./middleware.js"
+    },
+    "./shallow": {
+      "types": "./shallow.d.ts",
+      "module": "./esm/shallow.js",
+      "import": "./esm/shallow.mjs",
+      "default": "./shallow.js"
+    },
+    "./context": {
+      "types": "./context.d.ts",
+      "module": "./esm/context.js",
+      "import": "./esm/context.mjs",
+      "default": "./context.js"
     }
   },
   "sideEffects": false,
@@ -43,7 +61,7 @@
     "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=12.7.0"
   },
   "prettier": {
     "semi": false,
