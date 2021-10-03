@@ -8,6 +8,11 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import create, { EqualityChecker, SetState, StateSelector } from 'zustand'
 
+const consoleError = console.error
+afterEach(() => {
+  console.error = consoleError
+})
+
 it('creates a store hook and api object', () => {
   let params
   const result = create((...args) => {
@@ -277,7 +282,7 @@ it('can call useStore with progressively more arguments', async () => {
 
 it('can throw an error in selector', async () => {
   console.error = jest.fn()
-  type State = { value?: string }
+  type State = { value: string | number }
 
   const initialState: State = { value: 'foo' }
   const useStore = create<State>(() => initialState)
@@ -311,16 +316,15 @@ it('can throw an error in selector', async () => {
   )
   await findByText('no error')
 
-  delete initialState.value
   act(() => {
-    setState({})
+    setState({ value: 123 })
   })
   await findByText('errored')
 })
 
 it('can throw an error in equality checker', async () => {
   console.error = jest.fn()
-  type State = { value?: string }
+  type State = { value: string | number }
 
   const initialState: State = { value: 'foo' }
   const useStore = create(() => initialState)
@@ -328,7 +332,7 @@ it('can throw an error in equality checker', async () => {
   const selector: StateSelector<State, State> = (s) => s
   const equalityFn: EqualityChecker<State> = (a, b) =>
     // @ts-expect-error This function is supposed to throw an error
-    a.value.trim() === b.value?.trim()
+    a.value.trim() === b.value.trim()
 
   class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
     constructor(props: {}) {
@@ -355,9 +359,8 @@ it('can throw an error in equality checker', async () => {
   )
   await findByText('no error')
 
-  delete initialState.value
   act(() => {
-    setState({})
+    setState({ value: 123 })
   })
   await findByText('errored')
 })
