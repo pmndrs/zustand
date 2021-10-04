@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/react'
+import { act, render, waitFor } from '@testing-library/react'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -100,10 +100,12 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(<Counter />)
 
     await findByText('count: 0')
-    expect(onRehydrateStorageSpy).toBeCalledWith(
-      undefined,
-      new Error('getItem error')
-    )
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith(
+        undefined,
+        new Error('getItem error')
+      )
+    })
   })
 
   it('can persist state', async () => {
@@ -131,7 +133,9 @@ describe('persist middleware with async configuration', () => {
 
     const { findByText } = render(<Counter />)
     await findByText('count: 0')
-    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    })
 
     // Write something to the store
     act(() => useStore.setState({ count: 42 }))
@@ -154,7 +158,9 @@ describe('persist middleware with async configuration', () => {
 
     const { findByText: findByText2 } = render(<Counter2 />)
     await findByText2('count: 42')
-    expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
+    })
   })
 
   it('can migrate persisted state', async () => {
@@ -230,8 +236,10 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(<Counter />)
 
     await findByText('count: 0')
-    expect(console.error).toHaveBeenCalled()
-    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    await waitFor(() => {
+      expect(console.error).toHaveBeenCalled()
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    })
   })
 
   it('can throw migrate error', async () => {
@@ -267,10 +275,12 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(<Counter />)
 
     await findByText('count: 0')
-    expect(onRehydrateStorageSpy).toBeCalledWith(
-      undefined,
-      new Error('migrate error')
-    )
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith(
+        undefined,
+        new Error('migrate error')
+      )
+    })
   })
 
   it('gives the merged state to onRehydrateStorage', async () => {
@@ -303,10 +313,12 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(<Counter />)
 
     await findByText('count: 0')
-    expect(onRehydrateStorageSpy).toBeCalledWith(
-      { count: 1, unstorableMethod },
-      undefined
-    )
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith(
+        { count: 1, unstorableMethod },
+        undefined
+      )
+    })
   })
 
   it('can custom merge the stored state', async () => {
