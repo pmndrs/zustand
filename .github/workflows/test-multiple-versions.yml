@@ -1,0 +1,58 @@
+name: Test Multiple Versions
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - name: Test Build # we don't have any other workflows to test build
+        run: yarn build
+      - name: Test Default
+        run: yarn test:ci
+
+  test_matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        react:
+          - 16.8.0
+          - 17.0.0
+          - 18.0.0-alpha-f2c381131-20211004
+          - 0.0.0-experimental-f2c381131-20211004
+        testing: [default, alpha]
+        exclude:
+          - { react: 16.8.0, testing: alpha }
+          - { react: 17.0.0, testing: alpha }
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - name: Install alpha testing-library
+        if: ${{ matrix.testing == 'alpha' }}
+        run: yarn add -D @testing-library/react@alpha
+      - name: Patch for React 16
+        if: ${{ startsWith(matrix.react, '16.') }}
+        run: |
+          sed -i~ '1s/^/import React from "react";/' tests/*.tsx
+          sed -i~ 's/automatic/classic/' babel.config.js
+      - name: Test ${{ matrix.react }}
+        run: |
+          yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
+          yarn test:ci

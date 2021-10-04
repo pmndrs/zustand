@@ -1,0 +1,24 @@
+name: Lint and Type
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - run: cd examples && yarn install --frozen-lockfile --check-files
+      - name: Lint
+        run: yarn eslint:ci
+      - name: Type
+        run: yarn pretest
