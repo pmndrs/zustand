@@ -1,5 +1,4 @@
-import { useMemo } from 'react'
-import { useSyncExternalStore } from 'use-sync-external-store'
+import { useSyncExternalStoreExtra } from 'use-sync-external-store/extra'
 import createStore, {
   Destroy,
   EqualityChecker,
@@ -23,25 +22,13 @@ export function useStore<TState extends State, StateSlice>(
   selector: StateSelector<TState, StateSlice> = api.getState as any,
   equalityFn: EqualityChecker<StateSlice> = Object.is
 ) {
-  const getSnapshot = useMemo(() => {
-    let lastSnapshot: TState | undefined
-    let lastSlice: StateSlice | undefined
-    return () => {
-      let slice = lastSlice
-      const snapshot = api.getState()
-      if (lastSnapshot === undefined || !Object.is(lastSnapshot, snapshot)) {
-        slice = selector(snapshot)
-        if (lastSlice === undefined || !equalityFn(lastSlice, slice)) {
-          lastSlice = slice
-        } else {
-          slice = lastSlice
-        }
-        lastSnapshot = snapshot
-      }
-      return slice
-    }
-  }, [api, selector, equalityFn])
-  return useSyncExternalStore(api.subscribe, getSnapshot)
+  return useSyncExternalStoreExtra(
+    api.subscribe,
+    api.getState,
+    null,
+    selector,
+    equalityFn
+  )
 }
 
 export interface UseBoundStore<T extends State> {
