@@ -301,4 +301,68 @@ describe('persist middleware with sync configuration', () => {
       count: 1,
     })
   })
+
+  it('can filter the persisted value', () => {
+    const setItemSpy = jest.fn()
+
+    const storage = {
+      getItem: () => '',
+      setItem: setItemSpy,
+    }
+
+    const useStore = create(
+      persist(
+        () => ({
+          object: {
+            first: '0',
+            second: '1',
+          },
+          array: [
+            {
+              value: '0',
+            },
+            {
+              value: '1',
+            },
+            {
+              value: '2',
+            },
+          ],
+        }),
+        {
+          name: 'test-storage',
+          getStorage: () => storage,
+          partialize: (state) => {
+            return {
+              object: {
+                first: state.object.first,
+              },
+              array: state.array.filter((e) => e.value !== '1'),
+            }
+          },
+        }
+      )
+    )
+
+    useStore.setState({})
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: {
+          object: {
+            first: '0',
+          },
+          array: [
+            {
+              value: '0',
+            },
+            {
+              value: '2',
+            },
+          ],
+        },
+        version: 0,
+      })
+    )
+  })
 })
