@@ -15,8 +15,23 @@ Don't disregard it because it's cute. It has quite the claws, lots of time was s
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 
 ```bash
-npm install zustand # or yarn add zustand
+npm install zustand@npm:@abraaoz/zustand # or yarn add zustand@npm:@abraaoz/zustand
 ```
+
+## Fork motivation
+
+This is a fork of https://github.com/pmndrs/zustand. This fork allows you to import the following TypeScript definitions:
+
+```jsx
+import {
+  Combine,
+  DeepPartial,
+  StorageValue,
+  PersistOptions,
+} from 'zustand/middleware'
+```
+
+To publish a new version at npm, run `npm version (x.y.z)-with-types`, `yarn build`, `cd dist` then `npm publish --access public`.
 
 ## First create a store
 
