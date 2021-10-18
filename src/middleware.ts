@@ -162,7 +162,7 @@ export const devtools =
     return initialState
   }
 
-export type Combine<T, U> = Omit<T, keyof U> & U
+type Combine<T, U> = Omit<T, keyof U> & U
 export const combine =
   <PrimaryState extends State, SecondaryState extends State>(
     initialState: PrimaryState,
@@ -183,14 +183,14 @@ export const combine =
       )
     )
 
-export type DeepPartial<T extends Object> = {
+type DeepPartial<T extends Object> = {
   [P in keyof T]?: DeepPartial<T[P]>
 }
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
 }
-export type StorageValue<S> = { state: DeepPartial<S>; version?: number }
+type StorageValue<S> = { state: DeepPartial<S>; version?: number }
 export type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
   /** Name of the storage (must be unique) */
   name: string
