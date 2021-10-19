@@ -21,18 +21,6 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
-/**
- * @deprecated Please use UseBoundStore instead
- */
-export interface UseStore<T extends State> {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-  setState: SetState<T>
-  getState: GetState<T>
-  subscribe: Subscribe<T>
-  destroy: Destroy
-}
-
 export interface UseBoundStore<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
