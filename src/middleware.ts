@@ -228,18 +228,6 @@ export type PersistOptions<
     str: string
   ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
   /**
-   * Prevent some items from being stored.
-   *
-   * @deprecated This options is deprecated and will be removed in the next version. Please use the `partialize` option instead.
-   */
-  blacklist?: (keyof S)[]
-  /**
-   * Only store the listed properties.
-   *
-   * @deprecated This options is deprecated and will be removed in the next version. Please use the `partialize` option instead.
-   */
-  whitelist?: (keyof S)[]
-  /**
    * Filter the persisted value.
    *
    * @params state The state's value
@@ -315,8 +303,6 @@ export const persist =
       getStorage = () => localStorage,
       serialize = JSON.stringify as (state: StorageValue<S>) => string,
       deserialize = JSON.parse as (str: string) => StorageValue<Partial<S>>,
-      blacklist,
-      whitelist,
       partialize = (state: S) => state,
       onRehydrateStorage,
       version = 0,
@@ -326,14 +312,6 @@ export const persist =
         ...persistedState,
       }),
     } = options || {}
-
-    if (blacklist || whitelist) {
-      console.warn(
-        `The ${
-          blacklist ? 'blacklist' : 'whitelist'
-        } option is deprecated and will be removed in the next version. Please use the 'partialize' option instead.`
-      )
-    }
 
     let storage: StateStorage | undefined
 
@@ -360,15 +338,6 @@ export const persist =
 
     const setItem = (): Thenable<void> => {
       const state = partialize({ ...get() })
-
-      if (whitelist) {
-        ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
-          !whitelist.includes(key) && delete state[key]
-        })
-      }
-      if (blacklist) {
-        blacklist.forEach((key) => delete state[key])
-      }
 
       let errorInSync: Error | undefined
       const thenable = thenableSerialize({ state, version })
