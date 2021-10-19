@@ -191,7 +191,10 @@ export type StateStorage = {
   setItem: (name: string, value: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
-type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
+export type PersistOptions<
+  S,
+  PersistedState extends Partial<S> = Partial<S>
+> = {
   /** Name of the storage (must be unique) */
   name: string
   /**
