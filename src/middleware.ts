@@ -112,7 +112,9 @@ export const devtools =
         const newState = api.getState()
         if (state !== newState) {
           savedSetState(state, replace)
-          api.devtools.send(api.devtools.prefix + 'setState', api.getState())
+          if (state !== (newState as any)[DEVTOOLS]) {
+            api.devtools.send(api.devtools.prefix + 'setState', api.getState())
+          }
         }
       }
       options = typeof options === 'string' ? { name: options } : options
@@ -120,13 +122,16 @@ export const devtools =
       api.devtools.prefix = options?.name ? `${options.name} > ` : ''
       api.devtools.subscribe((message: any) => {
         if (message.type === 'DISPATCH' && message.state) {
-          const ignoreState =
+          const jumpState =
             message.payload.type === 'JUMP_TO_ACTION' ||
             message.payload.type === 'JUMP_TO_STATE'
           const newState = api.getState()
           ;(newState as any)[DEVTOOLS] = JSON.parse(message.state)
-          if (!api.dispatch && !ignoreState) {
+
+          if (!api.dispatch && !jumpState) {
             api.setState(newState)
+          } else if (jumpState) {
+            api.setState((newState as any)[DEVTOOLS])
           } else {
             savedSetState(newState)
           }
@@ -191,7 +196,10 @@ export type StateStorage = {
   setItem: (name: string, value: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
-type PersistOptions<S, PersistedState extends Partial<S> = Partial<S>> = {
+export type PersistOptions<
+  S,
+  PersistedState extends Partial<S> = Partial<S>
+> = {
   /** Name of the storage (must be unique) */
   name: string
   /**
