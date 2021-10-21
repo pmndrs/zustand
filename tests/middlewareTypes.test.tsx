@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, { UseStore } from 'zustand'
-import { NamedSet, devtools, persist } from 'zustand/middleware'
+import { NamedSet, devtools, persist, redux } from 'zustand/middleware'
 import { State, StateCreator } from 'zustand/vanilla'
 
 type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
@@ -234,6 +234,30 @@ it('should have correct type when creating store with devtool, persist and immer
   const TestComponent = (): JSX.Element => {
     testPersistImmerStore.use.testKey()
     testPersistImmerStore.use.setTestKey()
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should have correct type when creating store with redux', () => {
+  const useStore = create(
+    redux<{ count: number }, { type: 'INC' }>(
+      (state, action) => {
+        switch (action.type) {
+          case 'INC':
+            return { ...state, count: state.count + 1 }
+          default:
+            return state
+        }
+      },
+      { count: 0 }
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().dispatch({ type: 'INC' })
+    useStore.dispatch({ type: 'INC' })
 
     return <></>
   }

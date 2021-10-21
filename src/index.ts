@@ -33,15 +33,15 @@ export interface UseStore<
 
 export default function create<
   TState extends State,
-  CustomSetState extends SetState<TState> = SetState<TState>,
-  CustomGetState extends GetState<TState> = GetState<TState>,
+  CustomSetState = SetState<TState>,
+  CustomGetState = GetState<TState>,
   CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
 >(
   createState:
     | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
     | CustomStoreApi
-): UseStore<TState, CustomStoreApi> {
-  const api: StoreApi<TState> =
+): UseStore<TState, CustomStoreApi> & CustomStoreApi {
+  const api: CustomStoreApi =
     typeof createState === 'function' ? createImpl(createState) : createState
 
   const useStore: any = <StateSlice>(

@@ -15,9 +15,9 @@ export const redux =
     initial: S
   ) =>
   (
-    set: SetState<S>,
-    get: GetState<S>,
-    api: StoreApi<S> & {
+    set: SetState<S & { dispatch: (a: A) => A }>,
+    get: GetState<S & { dispatch: (a: A) => A }>,
+    api: StoreApi<S & { dispatch: (a: A) => A }> & {
       dispatch: (a: A) => A
       devtools?: any
     }

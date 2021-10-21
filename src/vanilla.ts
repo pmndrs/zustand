@@ -46,13 +46,13 @@ export type StateCreator<
   T extends State,
   CustomSetState = SetState<T>,
   CustomGetState = GetState<T>,
-  CustomStoreApi = StoreApi<T>
+  CustomStoreApi extends StoreApi<T> = StoreApi<T>
 > = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
 
 export default function create<
   TState extends State,
-  CustomSetState extends SetState<TState> = SetState<TState>,
-  CustomGetState extends GetState<TState> = GetState<TState>,
+  CustomSetState = SetState<TState>,
+  CustomGetState = GetState<TState>,
   CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
 >(
   createState: StateCreator<
@@ -121,9 +121,9 @@ export default function create<
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
   state = createState(
-    setState as CustomSetState,
-    getState as CustomGetState,
-    api as CustomStoreApi
+    setState as unknown as CustomSetState,
+    getState as unknown as CustomGetState,
+    api as unknown as CustomStoreApi
   )
-  return api as CustomStoreApi
+  return api as unknown as CustomStoreApi
 }
