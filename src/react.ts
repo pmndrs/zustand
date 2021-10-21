@@ -1,6 +1,5 @@
 import { useSyncExternalStoreExtra } from 'use-sync-external-store/extra'
 import createStore, {
-  Destroy,
   EqualityChecker,
   GetState,
   SetState,
@@ -8,7 +7,6 @@ import createStore, {
   StateCreator,
   StateSelector,
   StoreApi,
-  Subscribe,
 } from './vanilla'
 
 export function useStore<T extends State>(api: StoreApi<T>): T
@@ -31,19 +29,25 @@ export function useStore<TState extends State, StateSlice>(
   )
 }
 
-export interface UseBoundStore<T extends State> {
+export type UseBoundStore<
+  T extends State,
+  CustomStoreApi extends StoreApi<T> = StoreApi<T>
+> = {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-  setState: SetState<T>
-  getState: GetState<T>
-  subscribe: Subscribe<T>
-  destroy: Destroy
-}
+} & CustomStoreApi
 
-export default function create<TState extends State>(
-  createState: StateCreator<TState> | StoreApi<TState>
-): UseBoundStore<TState> {
-  const api: StoreApi<TState> =
+export default function create<
+  TState extends State,
+  CustomSetState = SetState<TState>,
+  CustomGetState = GetState<TState>,
+  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+>(
+  createState:
+    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
+    | CustomStoreApi
+): UseBoundStore<TState, CustomStoreApi> {
+  const api: CustomStoreApi =
     typeof createState === 'function' ? createStore(createState) : createState
 
   const useBoundStore: any = (selector?: any, equalityFn?: any) =>
