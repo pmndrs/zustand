@@ -44,9 +44,9 @@ export interface StoreApi<T extends State> {
 }
 export type StateCreator<
   T extends State,
-  CustomSetState extends SetState<T> = SetState<T>,
-  CustomGetState extends GetState<T> = GetState<T>,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
+  CustomSetState = SetState<T>,
+  CustomGetState = GetState<T>,
+  CustomStoreApi = StoreApi<T>
 > = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
 
 export default function create<
