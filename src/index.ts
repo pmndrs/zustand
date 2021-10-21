@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
 import createImpl, {
-  Destroy,
   EqualityChecker,
   GetState,
   SetState,
@@ -8,7 +7,6 @@ import createImpl, {
   StateCreator,
   StateSelector,
   StoreApi,
-  Subscribe,
 } from './vanilla'
 export * from './vanilla'
 
@@ -21,19 +19,25 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
-export interface UseStore<T extends State> {
+export type UseStore<
+  T extends State,
+  CustomStoreApi extends StoreApi<T> = StoreApi<T>
+> = {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-  setState: SetState<T>
-  getState: GetState<T>
-  subscribe: Subscribe<T>
-  destroy: Destroy
-}
+} & CustomStoreApi
 
-export default function create<TState extends State>(
-  createState: StateCreator<TState> | StoreApi<TState>
-): UseStore<TState> {
-  const api: StoreApi<TState> =
+export default function create<
+  TState extends State,
+  CustomSetState = SetState<TState>,
+  CustomGetState = GetState<TState>,
+  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+>(
+  createState:
+    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
+    | CustomStoreApi
+): UseStore<TState, CustomStoreApi> {
+  const api: CustomStoreApi =
     typeof createState === 'function' ? createImpl(createState) : createState
 
   const useStore: any = <StateSlice>(
