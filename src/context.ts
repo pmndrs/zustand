@@ -6,7 +6,7 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { EqualityChecker, UseBoundStore, State, StateSelector } from 'zustand'
+import { EqualityChecker, State, StateSelector, UseBoundStore } from 'zustand'
 
 export interface UseContextStore<T extends State> {
   (): T
