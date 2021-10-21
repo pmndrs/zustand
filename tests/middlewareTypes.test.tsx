@@ -1,7 +1,14 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, { UseBoundStore } from 'zustand'
-import { NamedSet, combine, devtools, persist, redux } from 'zustand/middleware'
+import {
+  NamedSet,
+  combine,
+  devtools,
+  persist,
+  redux,
+  subscribeWithSelector,
+} from 'zustand/middleware'
 import { State, StateCreator } from 'zustand/vanilla'
 
 type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
@@ -304,6 +311,90 @@ it('should combine devtools and combine', () => {
     useStore().inc()
     useStore.getState().count
     useStore.getState().inc()
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine subscribeWithSelector and combine', () => {
+  const useStore = create(
+    subscribeWithSelector(
+      combine({ count: 1 }, (set, get) => ({
+        inc: () => set({ count: get().count + 1 }, false, 'inc'),
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools and subscribeWithSelector', () => {
+  const useStore = create(
+    devtools(
+      subscribeWithSelector<
+        {
+          count: number
+          inc: () => void
+        },
+        NamedSet<{
+          count: number
+          inc: () => void
+        }>
+      >((set, get) => ({
+        count: 1,
+        inc: () => set({ count: get().count + 1 }, false, 'inc'),
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools, subscribeWithSelector and combine', () => {
+  const useStore = create(
+    devtools(
+      subscribeWithSelector(
+        combine({ count: 1 }, (set, get) => ({
+          inc: () => set({ count: get().count + 1 }, false, 'inc'),
+        }))
+      )
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
 
     return <></>
   }

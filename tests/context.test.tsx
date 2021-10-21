@@ -1,7 +1,8 @@
 import { Component as ClassComponent, useEffect, useState } from 'react'
 import { render } from '@testing-library/react'
-import create from 'zustand'
+import create, { StoreApi } from 'zustand'
 import createContext from 'zustand/context'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 const consoleError = console.error
 afterEach(() => {
@@ -63,13 +64,23 @@ it('uses context store with selectors', async () => {
 })
 
 it('uses context store api', async () => {
-  const { Provider, useStoreApi } = createContext<CounterState>()
+  const { Provider, useStoreApi: useStoreApiOrig } =
+    createContext<CounterState>()
 
   const createStore = () =>
-    create<CounterState>((set) => ({
-      count: 0,
-      inc: () => set((state) => ({ count: state.count + 1 })),
-    }))
+    create(
+      subscribeWithSelector<{ count: number; inc: () => void }>((set) => ({
+        count: 0,
+        inc: () => set((state) => ({ count: state.count + 1 })),
+      }))
+    )
+
+  const useStoreApi = useStoreApiOrig as () => Omit<
+    StoreApi<CounterState>,
+    'subscribe'
+  > & {
+    subscribe: ReturnType<typeof createStore>['subscribe']
+  }
 
   function Counter() {
     const storeApi = useStoreApi()
@@ -77,8 +88,8 @@ it('uses context store api', async () => {
     useEffect(
       () =>
         storeApi.subscribe(
-          () => setCount(storeApi.getState().count),
-          (state) => state.count
+          (state) => state.count,
+          () => setCount(storeApi.getState().count)
         ),
       [storeApi]
     )

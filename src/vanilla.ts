@@ -16,6 +16,9 @@ export type StateListener<T> = (state: T, previousState: T) => void
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export interface Subscribe<T extends State> {
   (listener: StateListener<T>): () => void
+  /**
+   * @deprecated Please use `subscribeWithSelector` middleware
+   */
   <StateSlice>(
     listener: StateSliceListener<StateSlice>,
     selector?: StateSelector<T, StateSlice>,
@@ -88,6 +91,7 @@ export default function create<
     selector: StateSelector<TState, StateSlice> = getState as any,
     equalityFn: EqualityChecker<StateSlice> = Object.is
   ) => {
+    console.warn('[DEPRECATED] Please use `subscribeWithSelector` middleware')
     let currentSlice: StateSlice = selector(state)
     function listenerToAdd() {
       const nextSlice = selector(state)

@@ -1,10 +1,15 @@
 import {
+  EqualityChecker,
   GetState,
   PartialState,
   SetState,
   State,
   StateCreator,
+  StateListener,
+  StateSelector,
+  StateSliceListener,
   StoreApi,
+  Subscribe,
 } from './vanilla'
 
 const DEVTOOLS = Symbol()
@@ -191,6 +196,104 @@ export const devtools =
     }
     return initialState
   }
+
+type SubscribeWithSelector<T extends State> = {
+  (listener: StateListener<T>): () => void
+  <StateSlice>(
+    selector: StateSelector<T, StateSlice>,
+    listener: StateSliceListener<StateSlice>,
+    options?: {
+      equalityFn?: EqualityChecker<StateSlice>
+      fireImmediately?: boolean
+    }
+  ): () => void
+}
+
+export function subscribeWithSelector<S extends State>(
+  fn: (
+    set: SetState<S>,
+    get: GetState<S>,
+    api: Omit<StoreApi<S>, 'subscribe'> & {
+      subscribe: SubscribeWithSelector<S>
+      subscribeWithSelectorEnabled: true
+    }
+  ) => S
+): (
+  set: SetState<S>,
+  get: GetState<S>,
+  api: Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+) => S
+
+export function subscribeWithSelector<
+  S extends State,
+  CustomSetState extends SetState<S>
+>(
+  fn: (
+    set: CustomSetState,
+    get: GetState<S>,
+    api: Omit<StoreApi<S>, 'subscribe'> & {
+      subscribe: SubscribeWithSelector<S>
+      subscribeWithSelectorEnabled: true
+    }
+  ) => S
+): (
+  set: CustomSetState,
+  get: GetState<S>,
+  api: Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+) => S
+
+export function subscribeWithSelector<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+>(
+  fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
+): (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
+
+export function subscribeWithSelector<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+>(fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S) {
+  return (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
+    const origSubscribe = api.subscribe as Subscribe<S>
+    api.subscribe = ((selector: any, optListener: any, options: any) => {
+      let listener: StateListener<S> = selector // if no selector
+      if (optListener) {
+        const equalityFn = options?.equalityFn || Object.is
+        let currentSlice = selector(api.getState())
+        listener = (state) => {
+          const nextSlice = selector(state)
+          if (!equalityFn(currentSlice, nextSlice)) {
+            const previousSlice = currentSlice
+            optListener((currentSlice = nextSlice), previousSlice)
+          }
+        }
+        if (options?.fireImmediately) {
+          optListener(currentSlice, currentSlice)
+        }
+      }
+      return origSubscribe(listener)
+    }) as SubscribeWithSelector<S>
+    api.subscribeWithSelectorEnabled = true
+    const initialState = fn(set, get, api)
+    return initialState
+  }
+}
 
 type Combine<T, U> = Omit<T, keyof U> & U
 export const combine =
