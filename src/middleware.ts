@@ -17,7 +17,7 @@ export const redux =
     CustomGetState extends GetState<S>,
     CustomStoreApi extends StoreApi<S> & {
       dispatch: (a: A) => A
-      devtools: any
+      devtools?: any
     }
   >(
     reducer: (state: S, action: A) => S,
@@ -60,7 +60,7 @@ export const devtools =
       dispatch?: unknown
       devtools?: any
     },
-    InnerCustomSetState extends NamedSet<S>,
+    InnerCustomSetState extends OuterCustomSetState & NamedSet<S>,
     InnerCustomGetState extends OuterCustomGetState,
     InnerCustomStoreApi extends OuterCustomStoreApi & {
       setState: NamedSet<S>
@@ -206,9 +206,9 @@ export const combine =
     OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
     OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
     OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
-    InnerCustomSetState extends SetState<PrimaryState>,
-    InnerCustomGetState extends GetState<PrimaryState>,
-    InnerCustomStoreApi extends OuterCustomStoreApi
+    InnerCustomSetState extends OuterCustomSetState & SetState<PrimaryState>,
+    InnerCustomGetState extends OuterCustomGetState & GetState<PrimaryState>,
+    InnerCustomStoreApi extends OuterCustomStoreApi & StoreApi<PrimaryState>
   >(
     initialState: PrimaryState,
     create: (
@@ -226,8 +226,8 @@ export const combine =
       {},
       initialState,
       create(
-        set as unknown as InnerCustomSetState,
-        get as unknown as InnerCustomGetState,
+        set as InnerCustomSetState,
+        get as InnerCustomGetState,
         api as InnerCustomStoreApi
       )
     ) as Combine<PrimaryState, SecondaryState>
