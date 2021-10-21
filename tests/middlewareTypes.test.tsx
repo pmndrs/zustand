@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { UseStore } from 'zustand'
+import create, { UseBoundStore } from 'zustand'
 import { NamedSet, combine, devtools, persist, redux } from 'zustand/middleware'
 import { State, StateCreator } from 'zustand/vanilla'
 
@@ -21,7 +21,7 @@ const immer = <T extends State>(
   }
 }
 
-const createSelectorHooks = <T extends State>(store: UseStore<T>) => {
+const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
   const storeAsSelectors = store as unknown as ISelectors<T>
   storeAsSelectors.use = {} as ISelectors<T>['use']
 
@@ -32,7 +32,7 @@ const createSelectorHooks = <T extends State>(store: UseStore<T>) => {
     storeAsSelectors.use[storeKey] = () => store(selector)
   })
 
-  return store as UseStore<T> & ISelectors<T>
+  return store as UseBoundStore<T> & ISelectors<T>
 }
 
 interface ITestStateProps {
@@ -44,7 +44,7 @@ it('should have correct type when creating store with devtool', () => {
   const createStoreWithDevtool = <T extends State>(
     createState: StateCreator<T>,
     options = { name: 'prefix' }
-  ): UseStore<T> & ISelectors<T> => {
+  ): UseBoundStore<T> & ISelectors<T> => {
     return createSelectorHooks(create(devtools(createState, options)))
   }
 
@@ -73,7 +73,7 @@ it('should have correct type when creating store with devtool and immer', () => 
   const createStoreWithImmer = <T extends State>(
     createState: TImmerConfig<T>,
     options = { name: 'prefix' }
-  ): UseStore<T> & ISelectors<T> => {
+  ): UseBoundStore<T> & ISelectors<T> => {
     return createSelectorHooks(create(devtools(immer(createState), options)))
   }
 
@@ -103,7 +103,7 @@ it('should have correct type when creating store with devtool and persist', () =
     createState: StateCreator<T>,
     options = { name: 'prefix' },
     persistName = 'persist'
-  ): UseStore<T> & ISelectors<T> => {
+  ): UseBoundStore<T> & ISelectors<T> => {
     return createSelectorHooks(
       create(devtools(persist(createState, { name: persistName }), options))
     )
@@ -154,7 +154,7 @@ it('should have correct type when creating store with persist', () => {
   const createStoreWithPersist = <T extends State>(
     createState: StateCreator<T>,
     persistName = 'persist'
-  ): UseStore<T> & ISelectors<T> => {
+  ): UseBoundStore<T> & ISelectors<T> => {
     return createSelectorHooks(
       create(persist(createState, { name: persistName }))
     )
@@ -184,7 +184,7 @@ it('should have correct type when creating store with persist', () => {
 it('should have correct type when creating store with immer', () => {
   const createStoreWithImmer = <T extends State>(
     createState: TImmerConfig<T>
-  ): UseStore<T> & ISelectors<T> => {
+  ): UseBoundStore<T> & ISelectors<T> => {
     return createSelectorHooks(create(immer(createState)))
   }
 
@@ -211,7 +211,7 @@ it('should have correct type when creating store with devtool, persist and immer
     createState: TImmerConfig<T>,
     options = { name: 'prefix' },
     persistName = 'persist'
-  ): UseStore<T> & ISelectors<T> => {
+  ): UseBoundStore<T> & ISelectors<T> => {
     return createSelectorHooks(
       create(
         devtools(persist(immer(createState), { name: persistName }), options)

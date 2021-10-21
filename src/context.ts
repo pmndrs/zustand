@@ -6,7 +6,7 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { EqualityChecker, UseStore } from 'zustand'
+import { EqualityChecker, UseBoundStore } from 'zustand'
 import { State, StateSelector } from './vanilla'
 
 export interface UseContextStore<T extends State> {
@@ -15,7 +15,7 @@ export interface UseContextStore<T extends State> {
 }
 
 function createContext<TState extends State>() {
-  const ZustandContext = reactCreateContext<UseStore<TState> | undefined>(
+  const ZustandContext = reactCreateContext<UseBoundStore<TState> | undefined>(
     undefined
   )
 
@@ -27,11 +27,11 @@ function createContext<TState extends State>() {
     /**
      * @deprecated
      */
-    initialStore?: UseStore<TState>
-    createStore: () => UseStore<TState>
+    initialStore?: UseBoundStore<TState>
+    createStore: () => UseBoundStore<TState>
     children: ReactNode
   }) => {
-    const storeRef = useRef<UseStore<TState>>()
+    const storeRef = useRef<UseBoundStore<TState>>()
 
     if (!storeRef.current) {
       if (initialStore) {

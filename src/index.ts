@@ -19,7 +19,18 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
+/**
+ * @deprecated Please use UseBoundStore instead
+ */
 export type UseStore<
+  T extends State,
+  CustomStoreApi extends StoreApi<T> = StoreApi<T>
+> = {
+  (): T
+  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+} & CustomStoreApi
+
+export type UseBoundStore<
   T extends State,
   CustomStoreApi extends StoreApi<T> = StoreApi<T>
 > = {
@@ -36,7 +47,7 @@ export default function create<
   createState:
     | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
     | CustomStoreApi
-): UseStore<TState, CustomStoreApi> {
+): UseBoundStore<TState, CustomStoreApi> {
   const api: CustomStoreApi =
     typeof createState === 'function' ? createImpl(createState) : createState
 
