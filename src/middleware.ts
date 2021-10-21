@@ -50,7 +50,10 @@ export const devtools =
     S extends State,
     OuterCustomSetState extends SetState<S>,
     OuterCustomGetState extends GetState<S>,
-    OuterCustomStoreApi extends StoreApi<S>,
+    OuterCustomStoreApi extends StoreApi<S> & {
+      dispatch?: unknown
+      devtools: any
+    },
     InnerCustomSetState extends OuterCustomSetState & NamedSet<S>,
     InnerCustomGetState extends OuterCustomGetState,
     InnerCustomStoreApi extends OuterCustomStoreApi & {
@@ -86,10 +89,7 @@ export const devtools =
   (
     set: OuterCustomSetState,
     get: OuterCustomGetState,
-    api: OuterCustomStoreApi & {
-      dispatch?: unknown
-      devtools?: any
-    }
+    api: OuterCustomStoreApi
   ): S => {
     let extension
     try {

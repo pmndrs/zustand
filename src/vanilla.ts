@@ -51,9 +51,9 @@ export type StateCreator<
 
 export default function create<
   TState extends State,
-  CustomSetState extends SetState<TState> = SetState<TState>,
-  CustomGetState extends GetState<TState> = GetState<TState>,
-  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+  CustomSetState extends SetState<TState> = any,
+  CustomGetState extends GetState<TState> = any,
+  CustomStoreApi extends StoreApi<TState> = any
 >(
   createState: StateCreator<
     TState,
