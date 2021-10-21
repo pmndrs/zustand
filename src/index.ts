@@ -33,9 +33,9 @@ export interface UseStore<
 
 export default function create<
   TState extends State,
-  CustomSetState extends SetState<TState>,
-  CustomGetState extends GetState<TState>,
-  CustomStoreApi extends StoreApi<TState>
+  CustomSetState extends SetState<TState> = SetState<TState>,
+  CustomGetState extends GetState<TState> = GetState<TState>,
+  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
 >(
   createState:
     | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
