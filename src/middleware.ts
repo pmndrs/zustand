@@ -197,15 +197,16 @@ export const combine =
   <
     PrimaryState extends State,
     SecondaryState extends State,
-    InnerCustomSetState extends SetState<PrimaryState>,
+    OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
+    OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
+    OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
+    InnerCustomSetState extends OuterCustomSetState extends NamedSet<
+      Combine<PrimaryState, SecondaryState>
+    >
+      ? NamedSet<PrimaryState>
+      : SetState<PrimaryState>,
     InnerCustomGetState extends GetState<PrimaryState>,
-    InnerCustomStoreApi extends StoreApi<PrimaryState>,
-    OuterCustomSetState extends InnerCustomSetState &
-      SetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomGetState extends InnerCustomGetState &
-      GetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomStoreApi extends InnerCustomStoreApi &
-      StoreApi<Combine<PrimaryState, SecondaryState>>
+    InnerCustomStoreApi extends StoreApi<PrimaryState>
   >(
     initialState: PrimaryState,
     create: (
@@ -223,9 +224,9 @@ export const combine =
       {},
       initialState,
       create(
-        set as InnerCustomSetState,
-        get as InnerCustomGetState,
-        api as InnerCustomStoreApi
+        set as unknown as InnerCustomSetState,
+        get as unknown as InnerCustomGetState,
+        api as unknown as InnerCustomStoreApi
       )
     ) as Combine<PrimaryState, SecondaryState>
 

@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, { UseStore } from 'zustand'
-import { NamedSet, devtools, persist, redux } from 'zustand/middleware'
+import { NamedSet, combine, devtools, persist, redux } from 'zustand/middleware'
 import { State, StateCreator } from 'zustand/vanilla'
 
 type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
@@ -284,6 +284,26 @@ it('should combine devtools and redux', () => {
   const TestComponent = (): JSX.Element => {
     useStore().dispatch({ type: 'INC' })
     useStore.dispatch({ type: 'INC' })
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools and combine', () => {
+  const useStore = create(
+    devtools(
+      combine({ count: 1 }, (set, get) => ({
+        inc: () => set({ count: get().count + 1 }, false, 'inc'),
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
 
     return <></>
   }
