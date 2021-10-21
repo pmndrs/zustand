@@ -51,7 +51,7 @@ export const devtools =
     OuterCustomSetState extends SetState<S>,
     OuterCustomGetState extends GetState<S>,
     OuterCustomStoreApi extends StoreApi<S> & {
-      dispatch?: unknown
+      dispatch?: any
       devtools?: any
     },
     InnerCustomSetState extends OuterCustomSetState & NamedSet<S>,
