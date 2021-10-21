@@ -25,10 +25,6 @@ export type UseStore<
 > = {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-  setState: CustomStoreApi['setState']
-  getState: CustomStoreApi['getState']
-  subscribe: CustomStoreApi['subscribe']
-  destroy: CustomStoreApi['destroy']
 } & CustomStoreApi
 
 export default function create<
