@@ -177,25 +177,40 @@ const useStore = create(() => ({ paw: true, snout: true, fur: true }))
 const paw = useStore.getState().paw
 // Listening to all changes, fires synchronously on every change
 const unsub1 = useStore.subscribe(console.log)
-// Listening to selected changes, in this case when "paw" changes
-const unsub2 = useStore.subscribe(console.log, state => state.paw)
-// Subscribe also supports an optional equality function
-const unsub3 = useStore.subscribe(console.log, state => [state.paw, state.fur], shallow)
-// Subscribe also exposes the previous value
-const unsub4 = useStore.subscribe((paw, previousPaw) => console.log(paw, previousPaw), state => state.paw)
 // Updating state, will trigger listeners
 useStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
-unsub2()
-unsub3()
-unsub4()
 // Destroying the store (removing all listeners)
 useStore.destroy()
 
 // You can of course use the hook as you always would
 function Component() {
   const paw = useStore(state => state.paw)
+```
+
+### Using subscribe with selector
+
+If you need to subscribe with selector,
+`subscribeWithSelector` middleware will help.
+
+With this middleware `subscribe` accepts an additional signature:
+```ts
+subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubscribe
+```
+
+```js
+import { subscribeWithSelector } from 'zustand/middleware'
+const useStore = create(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
+
+// Listening to selected changes, in this case when "paw" changes
+const unsub2 = useStore.subscribe(state => state.paw, console.log)
+// Subscribe also exposes the previous value
+const unsub3 = useStore.subscribe(state => state.paw, (paw, previousPaw) => console.log(paw, previousPaw))
+// Subscribe also supports an optional equality function
+const unsub4 = useStore.subscribe(state => [state.paw, state.fur], console.log, { equalityFn: shallow })
+// Subscribe and fire immediately
+const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmediately: true })
 ```
 
 ## Using zustand without React
