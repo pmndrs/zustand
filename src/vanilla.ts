@@ -42,15 +42,26 @@ export interface StoreApi<T extends State> {
   subscribe: Subscribe<T>
   destroy: Destroy
 }
-export type StateCreator<T extends State, CustomSetState = SetState<T>> = (
-  set: CustomSetState,
-  get: GetState<T>,
-  api: StoreApi<T>
-) => T
+export type StateCreator<
+  T extends State,
+  CustomSetState = SetState<T>,
+  CustomGetState = GetState<T>,
+  CustomStoreApi extends StoreApi<T> = StoreApi<T>
+> = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
 
-export default function create<TState extends State>(
-  createState: StateCreator<TState>
-): StoreApi<TState> {
+export default function create<
+  TState extends State,
+  CustomSetState = SetState<TState>,
+  CustomGetState = GetState<TState>,
+  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+>(
+  createState: StateCreator<
+    TState,
+    CustomSetState,
+    CustomGetState,
+    CustomStoreApi
+  >
+): CustomStoreApi {
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
 
@@ -109,6 +120,10 @@ export default function create<TState extends State>(
 
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  state = createState(setState, getState, api)
-  return api
+  state = createState(
+    setState as unknown as CustomSetState,
+    getState as unknown as CustomGetState,
+    api as unknown as CustomStoreApi
+  )
+  return api as unknown as CustomStoreApi
 }
