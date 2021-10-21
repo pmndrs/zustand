@@ -192,7 +192,12 @@ function Component() {
 ### Using subscribe with selector
 
 If you need to subscribe with selector,
-you need to use `subscribeWithSelector` middleware. (since v3.6.0)
+`subscribeWithSelector` middleware will help.
+
+With this middleware `subscribe` accepts an additional signature:
+```ts
+subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubscribe
+```
 
 ```js
 import { subscribeWithSelector } from 'zustand/middleware'
