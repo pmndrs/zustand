@@ -10,23 +10,17 @@ import {
 const DEVTOOLS = Symbol()
 
 export const redux =
-  <
-    S extends State,
-    A extends { type: unknown },
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S> & {
-      dispatch: (a: A) => A
-      devtools?: any
-    }
-  >(
+  <S extends State, A extends { type: unknown }>(
     reducer: (state: S, action: A) => S,
     initial: S
   ) =>
   (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: CustomStoreApi
+    set: SetState<S>,
+    get: GetState<S>,
+    api: StoreApi<S> & {
+      dispatch: (a: A) => A
+      devtools?: any
+    }
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
       set((state: S) => reducer(state, action))
