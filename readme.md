@@ -175,7 +175,7 @@ const useStore = create(() => ({ paw: true, snout: true, fur: true }))
 
 // Getting non-reactive fresh state
 const paw = useStore.getState().paw
-// Listening to all changes, fires on every change
+// Listening to all changes, fires synchronously on every change
 const unsub1 = useStore.subscribe(console.log)
 // Listening to selected changes, in this case when "paw" changes
 const unsub2 = useStore.subscribe(console.log, state => state.paw)
