@@ -263,3 +263,29 @@ it('should have correct type when creating store with redux', () => {
   }
   TestComponent
 })
+
+it('should combine devtools and redux', () => {
+  const useStore = create(
+    devtools(
+      redux<{ count: number }, { type: 'INC' }>(
+        (state, action) => {
+          switch (action.type) {
+            case 'INC':
+              return { ...state, count: state.count + 1 }
+            default:
+              return state
+          }
+        },
+        { count: 0 }
+      )
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().dispatch({ type: 'INC' })
+    useStore.dispatch({ type: 'INC' })
+
+    return <></>
+  }
+  TestComponent
+})

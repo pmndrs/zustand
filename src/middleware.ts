@@ -48,16 +48,16 @@ export type NamedSet<T extends State> = {
 export const devtools =
   <
     S extends State,
-    OuterCustomSetState extends SetState<S>,
-    OuterCustomGetState extends GetState<S>,
-    OuterCustomStoreApi extends StoreApi<S> & {
+    InnerCustomSetState extends NamedSet<S>,
+    InnerCustomGetState extends GetState<S>,
+    InnerCustomStoreApi extends StoreApi<S> & {
+      setState: NamedSet<S>
+    },
+    OuterCustomSetState extends InnerCustomSetState & SetState<S>,
+    OuterCustomGetState extends InnerCustomGetState,
+    OuterCustomStoreApi extends InnerCustomStoreApi & {
       dispatch?: unknown
       devtools: any
-    },
-    InnerCustomSetState extends OuterCustomSetState & NamedSet<S>,
-    InnerCustomGetState extends OuterCustomGetState,
-    InnerCustomStoreApi extends OuterCustomStoreApi & {
-      setState: NamedSet<S>
     }
   >(
     fn: (
@@ -197,12 +197,15 @@ export const combine =
   <
     PrimaryState extends State,
     SecondaryState extends State,
-    OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
-    InnerCustomSetState extends OuterCustomSetState & SetState<PrimaryState>,
-    InnerCustomGetState extends OuterCustomGetState & GetState<PrimaryState>,
-    InnerCustomStoreApi extends OuterCustomStoreApi & StoreApi<PrimaryState>
+    InnerCustomSetState extends SetState<PrimaryState>,
+    InnerCustomGetState extends GetState<PrimaryState>,
+    InnerCustomStoreApi extends StoreApi<PrimaryState>,
+    OuterCustomSetState extends InnerCustomSetState &
+      SetState<Combine<PrimaryState, SecondaryState>>,
+    OuterCustomGetState extends InnerCustomGetState &
+      GetState<Combine<PrimaryState, SecondaryState>>,
+    OuterCustomStoreApi extends InnerCustomStoreApi &
+      StoreApi<Combine<PrimaryState, SecondaryState>>
   >(
     initialState: PrimaryState,
     create: (
