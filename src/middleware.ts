@@ -54,16 +54,16 @@ export type NamedSet<T extends State> = {
 export const devtools =
   <
     S extends State,
-    InnerCustomSetState extends NamedSet<S>,
-    InnerCustomGetState extends GetState<S>,
-    InnerCustomStoreApi extends StoreApi<S> & {
-      setState: NamedSet<S>
-    },
     OuterCustomSetState extends SetState<S>,
-    OuterCustomGetState extends InnerCustomGetState,
-    OuterCustomStoreApi extends InnerCustomStoreApi & {
+    OuterCustomGetState extends GetState<S>,
+    OuterCustomStoreApi extends StoreApi<S> & {
       dispatch?: unknown
       devtools?: any
+    },
+    InnerCustomSetState extends OuterCustomSetState & NamedSet<S>,
+    InnerCustomGetState extends OuterCustomGetState,
+    InnerCustomStoreApi extends OuterCustomStoreApi & {
+      setState: NamedSet<S>
     }
   >(
     fn: (
@@ -112,7 +112,11 @@ export const devtools =
         console.warn('Please install/enable Redux devtools extension')
       }
       api.devtools = null
-      return fn(set as unknown as InnerCustomSetState, get, api)
+      return fn(
+        set as unknown as InnerCustomSetState,
+        get as InnerCustomGetState,
+        api as InnerCustomStoreApi
+      )
     }
     const namedSet: NamedSet<S> = (state, replace, name) => {
       set(state, replace)
@@ -120,7 +124,11 @@ export const devtools =
         api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
-    const initialState = fn(namedSet as InnerCustomSetState, get, api)
+    const initialState = fn(
+      namedSet as InnerCustomSetState,
+      get as InnerCustomGetState,
+      api as InnerCustomStoreApi
+    )
     if (!api.devtools) {
       const savedSetState = api.setState
       api.setState = <
@@ -195,15 +203,12 @@ export const combine =
   <
     PrimaryState extends State,
     SecondaryState extends State,
-    InnerCustomSetState extends SetState<PrimaryState>,
-    InnerCustomGetState extends GetState<PrimaryState>,
-    InnerCustomStoreApi extends StoreApi<PrimaryState>,
-    OuterCustomSetState extends InnerCustomSetState &
-      SetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomGetState extends InnerCustomGetState &
-      GetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomStoreApi extends InnerCustomStoreApi &
-      StoreApi<Combine<PrimaryState, SecondaryState>>
+    OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
+    OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
+    OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
+    InnerCustomSetState extends OuterCustomSetState & SetState<PrimaryState>,
+    InnerCustomGetState extends OuterCustomGetState & GetState<PrimaryState>,
+    InnerCustomStoreApi extends OuterCustomStoreApi & StoreApi<PrimaryState>
   >(
     initialState: PrimaryState,
     create: (
@@ -217,10 +222,15 @@ export const combine =
     get: OuterCustomGetState,
     api: OuterCustomStoreApi
   ) =>
-    Object.assign({}, initialState, create(set, get, api)) as Combine<
-      PrimaryState,
-      SecondaryState
-    >
+    Object.assign(
+      {},
+      initialState,
+      create(
+        set as InnerCustomSetState,
+        get as InnerCustomGetState,
+        api as InnerCustomStoreApi
+      )
+    ) as Combine<PrimaryState, SecondaryState>
 
 type DeepPartial<T extends Object> = {
   [P in keyof T]?: DeepPartial<T[P]>
