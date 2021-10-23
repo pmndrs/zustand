@@ -153,10 +153,7 @@ export const devtools =
       api.devtools.subscribe((message: any) => {
         if (message.type === 'ACTION' && message.payload) {
           try {
-            const newState = JSON.parse(message.payload)
-            if (newState) {
-              api.setState(newState)
-            }
+            api.setState(JSON.parse(message.payload))
           } catch (e) {
             console.error(
               'please dispatch a serializable value that JSON.parse() support\n',
