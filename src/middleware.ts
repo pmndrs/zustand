@@ -151,7 +151,19 @@ export const devtools =
       api.devtools = extension.connect({ ...options })
       api.devtools.prefix = options?.name ? `${options.name} > ` : ''
       api.devtools.subscribe((message: any) => {
-        if (message.type === 'DISPATCH' && message.state) {
+        if (message.type === 'ACTION' && message.payload) {
+          try {
+            const newState = JSON.parse(message.payload)
+            if (newState) {
+              api.setState(newState)
+            }
+          } catch (e) {
+            console.error(
+              'please dispatch a serializable value that JSON.parse() support\n',
+              e
+            )
+          }
+        } else if (message.type === 'DISPATCH' && message.state) {
           const jumpState =
             message.payload.type === 'JUMP_TO_ACTION' ||
             message.payload.type === 'JUMP_TO_STATE'
