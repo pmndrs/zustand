@@ -1,6 +1,13 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { UseBoundStore } from 'zustand'
+import create, {
+  GetState,
+  SetState,
+  State,
+  StateCreator,
+  StoreApi,
+  UseBoundStore,
+} from 'zustand'
 import {
   NamedSet,
   combine,
@@ -9,10 +16,17 @@ import {
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
-import { State, StateCreator } from 'zustand/vanilla'
 
-type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
-type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
+type TImmerConfigFn<T extends State> = (
+  fn: (draft: Draft<T>) => void,
+  replace?: boolean
+) => void
+type TImmerConfig<
+  T extends State,
+  CustomSetState = TImmerConfigFn<T>,
+  CustomGetState = GetState<T>,
+  CustomStoreApi extends StoreApi<T> = StoreApi<T>
+> = StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi>
 
 interface ISelectors<T> {
   use: {
@@ -20,15 +34,25 @@ interface ISelectors<T> {
   }
 }
 
-const immer = <T extends State>(
-  config: TImmerConfig<T>
-): StateCreator<T, NamedSet<T>> => {
+const immer = <
+  T extends State,
+  CustomSetState extends SetState<T>,
+  CustomGetState extends GetState<T>,
+  CustomStoreApi extends StoreApi<T>
+>(
+  config: TImmerConfig<T, TImmerConfigFn<T>, CustomGetState, CustomStoreApi>
+): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> => {
   return (set, get, api) => {
-    return config((fn) => set(produce<T>(fn)), get, api)
+    return config((fn, replace) => set(produce<T>(fn), replace), get, api)
   }
 }
 
-const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
+const createSelectorHooks = <
+  T extends State,
+  TUseBoundStore extends UseBoundStore<T> = UseBoundStore<T>
+>(
+  store: TUseBoundStore
+) => {
   const storeAsSelectors = store as unknown as ISelectors<T>
   storeAsSelectors.use = {} as ISelectors<T>['use']
 
@@ -39,7 +63,7 @@ const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
     storeAsSelectors.use[storeKey] = () => store(selector)
   })
 
-  return store as UseBoundStore<T> & ISelectors<T>
+  return store as TUseBoundStore & ISelectors<T>
 }
 
 interface ITestStateProps {
