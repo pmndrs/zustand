@@ -1,12 +1,6 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, {
-  GetState,
-  State,
-  StateCreator,
-  StoreApi,
-  UseBoundStore,
-} from 'zustand'
+import create, { State, StateCreator, UseBoundStore } from 'zustand'
 import {
   NamedSet,
   combine,
@@ -20,12 +14,7 @@ type TImmerConfigFn<T extends State> = (
   partial: ((draft: Draft<T>) => void) | T,
   replace?: boolean
 ) => void
-type TImmerConfig<
-  T extends State,
-  CustomSetState = TImmerConfigFn<T>,
-  CustomGetState = GetState<T>,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
-> = StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi>
+type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
 
 interface ISelectors<T> {
   use: {
@@ -272,6 +261,29 @@ it('should have correct type when creating store with devtool, persist and immer
   TestComponent
 })
 
+it('should have correct type when creating store with devtools', () => {
+  const useStore = create<ITestStateProps>(
+    devtools((set) => ({
+      testKey: 'test',
+      setTestKey: (testKey: string) => {
+        set((state) => ({
+          testKey: state.testKey + testKey,
+        }))
+      },
+    }))
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().testKey
+    useStore().setTestKey('')
+    useStore.getState().testKey
+    useStore.getState().setTestKey('')
+
+    return <></>
+  }
+  TestComponent
+})
+
 it('should have correct type when creating store with redux', () => {
   const useStore = create(
     redux<{ count: number }, { type: 'INC' }>(
@@ -290,6 +302,31 @@ it('should have correct type when creating store with redux', () => {
   const TestComponent = (): JSX.Element => {
     useStore().dispatch({ type: 'INC' })
     useStore.dispatch({ type: 'INC' })
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools and immer', () => {
+  const useStore = create<ITestStateProps>(
+    devtools(
+      immer((set) => ({
+        testKey: 'test',
+        setTestKey: (testKey: string) => {
+          set((state) => {
+            state.testKey = testKey
+          })
+        },
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().testKey
+    useStore().setTestKey('')
+    useStore.getState().testKey
+    useStore.getState().setTestKey('')
 
     return <></>
   }
@@ -346,7 +383,9 @@ it('should combine subscribeWithSelector and combine', () => {
   const useStore = create(
     subscribeWithSelector(
       combine({ count: 1 }, (set, get) => ({
-        inc: () => set({ count: get().count + 1 }, false, 'inc'),
+        inc: () => set({ count: get().count + 1 }, false),
+        // FIXME hope this to fail // @ts-expect-error
+        incInvalid: () => set({ count: get().count + 1 }, false, 'inc'),
       }))
     )
   )
