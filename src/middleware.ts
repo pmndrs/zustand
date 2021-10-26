@@ -59,7 +59,7 @@ export type NamedSet<T extends State> = {
   ): void
 }
 
-type IsNamedSet<T> = T extends (...args: any[]) => void
+type IsNamedSet<T> = T extends NamedSet<State>
   ? [any, boolean, string] extends Parameters<T>
     ? T
     : never
