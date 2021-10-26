@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { UseBoundStore } from 'zustand'
+import create, { State, StateCreator, UseBoundStore } from 'zustand'
 import {
   NamedSet,
   combine,
@@ -9,7 +9,6 @@ import {
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
-import { State, StateCreator } from 'zustand/vanilla'
 
 type TImmerConfigFn<T extends State> = (
   fn: ((draft: Draft<T>) => void) | T,
@@ -38,7 +37,12 @@ const immer =
       api
     )
 
-const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
+const createSelectorHooks = <
+  T extends State,
+  TUseBoundStore extends UseBoundStore<T> = UseBoundStore<T>
+>(
+  store: TUseBoundStore
+) => {
   const storeAsSelectors = store as unknown as ISelectors<T>
   storeAsSelectors.use = {} as ISelectors<T>['use']
 
@@ -49,7 +53,7 @@ const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
     storeAsSelectors.use[storeKey] = () => store(selector)
   })
 
-  return store as UseBoundStore<T> & ISelectors<T>
+  return store as TUseBoundStore & ISelectors<T>
 }
 
 interface ITestStateProps {
