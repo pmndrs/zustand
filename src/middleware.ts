@@ -14,6 +14,15 @@ import {
 
 const DEVTOOLS = Symbol()
 
+type DevtoolsType = {
+  prefix: string
+  subscribe: (dispatch: any) => () => void
+  unsubscribe: () => void
+  send: (action: string, state: any) => void
+  init: (state: any) => void
+  error: (payload: any) => void
+}
+
 export const redux =
   <S extends State, A extends { type: unknown }>(
     reducer: (state: S, action: A) => S,
@@ -24,7 +33,7 @@ export const redux =
     get: GetState<S & { dispatch: (a: A) => A }>,
     api: StoreApi<S & { dispatch: (a: A) => A }> & {
       dispatch: (a: A) => A
-      devtools?: any
+      devtools?: DevtoolsType
     }
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
@@ -50,20 +59,24 @@ export type NamedSet<T extends State> = {
   ): void
 }
 
+type IsNamedSet<T> = T extends (...args: any[]) => void
+  ? [any, boolean, string] extends Parameters<T>
+    ? T
+    : never
+  : never
+
 export const devtools =
   <
     S extends State,
     InnerCustomSetState extends NamedSet<S>,
     InnerCustomGetState extends GetState<S>,
     InnerCustomStoreApi extends StoreApi<S> & {
-      setState: NamedSet<S>
-    },
-    OuterCustomSetState extends InnerCustomSetState & SetState<S>,
-    OuterCustomGetState extends InnerCustomGetState,
-    OuterCustomStoreApi extends InnerCustomStoreApi & {
       dispatch?: unknown
-      devtools: any
-    }
+      devtools?: DevtoolsType
+    },
+    OuterCustomSetState extends SetState<S>,
+    OuterCustomGetState extends InnerCustomGetState,
+    OuterCustomStoreApi extends InnerCustomStoreApi
   >(
     fn: (
       set: InnerCustomSetState,
@@ -110,7 +123,7 @@ export const devtools =
       ) {
         console.warn('Please install/enable Redux devtools extension')
       }
-      api.devtools = null
+      delete api.devtools
       return fn(
         set as unknown as InnerCustomSetState,
         get as InnerCustomGetState,
@@ -119,7 +132,7 @@ export const devtools =
     }
     const namedSet: NamedSet<S> = (state, replace, name) => {
       set(state, replace)
-      if (!api.dispatch) {
+      if (!api.dispatch && api.devtools) {
         api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
@@ -142,15 +155,15 @@ export const devtools =
         const newState = api.getState()
         if (state !== newState) {
           savedSetState(state, replace)
-          if (state !== (newState as any)[DEVTOOLS]) {
+          if (state !== (newState as any)[DEVTOOLS] && api.devtools) {
             api.devtools.send(api.devtools.prefix + 'setState', api.getState())
           }
         }
       }
       options = typeof options === 'string' ? { name: options } : options
-      api.devtools = extension.connect({ ...options })
-      api.devtools.prefix = options?.name ? `${options.name} > ` : ''
-      api.devtools.subscribe((message: any) => {
+      const connection = (api.devtools = extension.connect({ ...options }))
+      connection.prefix = options?.name ? `${options.name} > ` : ''
+      connection.subscribe((message: any) => {
         if (message.type === 'DISPATCH' && message.state) {
           const jumpState =
             message.payload.type === 'JUMP_TO_ACTION' ||
@@ -169,7 +182,7 @@ export const devtools =
           message.type === 'DISPATCH' &&
           message.payload?.type === 'COMMIT'
         ) {
-          api.devtools.init(api.getState())
+          connection.init(api.getState())
         } else if (
           message.type === 'DISPATCH' &&
           message.payload?.type === 'IMPORT_STATE'
@@ -183,16 +196,16 @@ export const devtools =
               const action = actions[index] || 'No action found'
 
               if (index === 0) {
-                api.devtools.init(state)
+                connection.init(state)
               } else {
                 savedSetState(state)
-                api.devtools.send(action, api.getState())
+                connection.send(action, api.getState())
               }
             }
           )
         }
       })
-      api.devtools.init(initialState)
+      connection.init(initialState)
     }
     return initialState
   }
@@ -303,9 +316,7 @@ export const combine =
     OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
     OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
     OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
-    InnerCustomSetState extends OuterCustomSetState extends NamedSet<
-      Combine<PrimaryState, SecondaryState>
-    >
+    InnerCustomSetState extends OuterCustomSetState extends IsNamedSet<OuterCustomSetState>
       ? NamedSet<PrimaryState>
       : SetState<PrimaryState>,
     InnerCustomGetState extends GetState<PrimaryState>,
