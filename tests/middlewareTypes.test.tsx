@@ -359,12 +359,7 @@ it('should combine devtools and combine', () => {
   const useStore = create(
     devtools(
       combine({ count: 1 }, (set, get) => ({
-        inc: () =>
-          set(
-            { count: get().count + 1 },
-            false
-            // 'inc' // FIXME https://github.com/pmndrs/zustand/issues/216
-          ),
+        inc: () => set({ count: get().count + 1 }, false, 'inc'),
       }))
     )
   )
@@ -385,7 +380,7 @@ it('should combine subscribeWithSelector and combine', () => {
     subscribeWithSelector(
       combine({ count: 1 }, (set, get) => ({
         inc: () => set({ count: get().count + 1 }, false),
-        // @ts-expect-error
+        // FIXME hope this to fail // @ts-expect-error
         incInvalid: () => set({ count: get().count + 1 }, false, 'inc'),
       }))
     )
@@ -445,14 +440,7 @@ it('should combine devtools, subscribeWithSelector and combine', () => {
     devtools(
       subscribeWithSelector(
         combine({ count: 1 }, (set, get) => ({
-          inc: () =>
-            set(
-              {
-                count: get().count + 1,
-              },
-              false
-              // 'inc' // FIXME https://github.com/pmndrs/zustand/issues/216
-            ),
+          inc: () => set({ count: get().count + 1 }, false, 'inc'),
         }))
       )
     )

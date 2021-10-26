@@ -59,12 +59,6 @@ export type NamedSet<T extends State> = {
   ): void
 }
 
-type IsNamedSet<T> = T extends NamedSet<State>
-  ? [any, boolean, string] extends Parameters<T>
-    ? T
-    : never
-  : never
-
 export const devtools =
   <
     S extends State,
@@ -309,40 +303,57 @@ export function subscribeWithSelector<
 }
 
 type Combine<T, U> = Omit<T, keyof U> & U
-export const combine =
-  <
-    PrimaryState extends State,
-    SecondaryState extends State,
-    OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
-    InnerCustomSetState extends OuterCustomSetState extends IsNamedSet<OuterCustomSetState>
-      ? NamedSet<PrimaryState>
-      : SetState<PrimaryState>,
-    InnerCustomGetState extends GetState<PrimaryState>,
-    InnerCustomStoreApi extends StoreApi<PrimaryState>
-  >(
-    initialState: PrimaryState,
-    create: (
-      set: InnerCustomSetState,
-      get: InnerCustomGetState,
-      api: InnerCustomStoreApi
-    ) => SecondaryState
+
+export function combine<
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: NamedSet<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+): (
+  set: NamedSet<Combine<PrimaryState, SecondaryState>>,
+  get: GetState<Combine<PrimaryState, SecondaryState>>,
+  api: StoreApi<Combine<PrimaryState, SecondaryState>>
+) => Combine<PrimaryState, SecondaryState>
+
+export function combine<
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: SetState<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+): (
+  set: SetState<Combine<PrimaryState, SecondaryState>>,
+  get: GetState<Combine<PrimaryState, SecondaryState>>,
+  api: StoreApi<Combine<PrimaryState, SecondaryState>>
+) => Combine<PrimaryState, SecondaryState>
+
+export function combine<
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: SetState<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+) {
+  return (
+    set: SetState<Combine<PrimaryState, SecondaryState>>,
+    get: GetState<Combine<PrimaryState, SecondaryState>>,
+    api: StoreApi<Combine<PrimaryState, SecondaryState>>
   ) =>
-  (
-    set: OuterCustomSetState,
-    get: OuterCustomGetState,
-    api: OuterCustomStoreApi
-  ) =>
-    Object.assign(
-      {},
-      initialState,
-      create(
-        set as unknown as InnerCustomSetState,
-        get as unknown as InnerCustomGetState,
-        api as unknown as InnerCustomStoreApi
-      )
-    ) as Combine<PrimaryState, SecondaryState>
+    Object.assign({}, initialState, create(set as any, get as any, api as any))
+}
 
 type DeepPartial<T extends Object> = {
   [P in keyof T]?: DeepPartial<T[P]>
