@@ -2,7 +2,6 @@ import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, {
   GetState,
-  SetState,
   State,
   StateCreator,
   StoreApi,
@@ -18,7 +17,7 @@ import {
 } from 'zustand/middleware'
 
 type TImmerConfigFn<T extends State> = (
-  fn: (draft: Draft<T>) => void,
+  partial: ((draft: Draft<T>) => void) | T,
   replace?: boolean
 ) => void
 type TImmerConfig<
@@ -34,18 +33,20 @@ interface ISelectors<T> {
   }
 }
 
-const immer = <
-  T extends State,
-  CustomSetState extends SetState<T>,
-  CustomGetState extends GetState<T>,
-  CustomStoreApi extends StoreApi<T>
->(
-  config: TImmerConfig<T, TImmerConfigFn<T>, CustomGetState, CustomStoreApi>
-): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> => {
-  return (set, get, api) => {
-    return config((fn, replace) => set(produce<T>(fn), replace), get, api)
-  }
-}
+const immer =
+  <T extends State>(config: TImmerConfig<T>): StateCreator<T> =>
+  (set, get, api) =>
+    config(
+      (partial, replace) => {
+        const nextState =
+          typeof partial === 'function'
+            ? produce(partial as (state: Draft<T>) => T)
+            : (partial as T)
+        return set(nextState, replace)
+      },
+      get,
+      api
+    )
 
 const createSelectorHooks = <
   T extends State,
