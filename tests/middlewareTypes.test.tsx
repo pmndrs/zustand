@@ -11,7 +11,7 @@ import {
 } from 'zustand/middleware'
 
 type TImmerConfigFn<T extends State> = (
-  fn: ((draft: Draft<T>) => void) | T,
+  partial: ((draft: Draft<T>) => void) | T,
   replace?: boolean
 ) => void
 type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
