@@ -1,4 +1,5 @@
 import create from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 describe('subscribe()', () => {
   it('should not be called if new state identity is the same', () => {
@@ -24,9 +25,11 @@ describe('subscribe()', () => {
   it('should not be called when state slice is the same', () => {
     const spy = jest.fn()
     const initialState = { value: 1, other: 'a' }
-    const { setState, subscribe } = create(() => initialState)
+    const { setState, subscribe } = create(
+      subscribeWithSelector(() => initialState)
+    )
 
-    subscribe(spy, (s) => s.value)
+    subscribe((s) => s.value, spy)
     setState({ other: 'b' })
     expect(spy).not.toHaveBeenCalled()
   })
@@ -34,9 +37,11 @@ describe('subscribe()', () => {
   it('should be called when state slice changes', () => {
     const spy = jest.fn()
     const initialState = { value: 1, other: 'a' }
-    const { setState, subscribe } = create(() => initialState)
+    const { setState, subscribe } = create(
+      subscribeWithSelector(() => initialState)
+    )
 
-    subscribe(spy, (s) => s.value)
+    subscribe((s) => s.value, spy)
     setState({ value: initialState.value + 1 })
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(initialState.value + 1, initialState.value)
@@ -45,9 +50,11 @@ describe('subscribe()', () => {
   it('should not be called when equality checker returns true', () => {
     const spy = jest.fn()
     const initialState = { value: 1, other: 'a' }
-    const { setState, subscribe } = create(() => initialState)
+    const { setState, subscribe } = create(
+      subscribeWithSelector(() => initialState)
+    )
 
-    subscribe(spy, undefined, () => true)
+    subscribe((s) => s, spy, { equalityFn: () => true })
     setState({ value: initialState.value + 2 })
     expect(spy).not.toHaveBeenCalled()
   })
@@ -55,13 +62,11 @@ describe('subscribe()', () => {
   it('should be called when equality checker returns false', () => {
     const spy = jest.fn()
     const initialState = { value: 1, other: 'a' }
-    const { setState, subscribe } = create(() => initialState)
-
-    subscribe(
-      spy,
-      (s) => s.value,
-      () => false
+    const { setState, subscribe } = create(
+      subscribeWithSelector(() => initialState)
     )
+
+    subscribe((s) => s.value, spy, { equalityFn: () => false })
     setState({ value: initialState.value + 2 })
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(initialState.value + 2, initialState.value)
@@ -70,9 +75,11 @@ describe('subscribe()', () => {
   it('should unsubscribe correctly', () => {
     const spy = jest.fn()
     const initialState = { value: 1, other: 'a' }
-    const { setState, subscribe } = create(() => initialState)
+    const { setState, subscribe } = create(
+      subscribeWithSelector(() => initialState)
+    )
 
-    const unsub = subscribe(spy, (s) => s.value)
+    const unsub = subscribe((s) => s.value, spy)
 
     setState({ value: initialState.value + 1 })
     unsub()
@@ -85,7 +92,9 @@ describe('subscribe()', () => {
   it('should keep consistent behavior with equality check', () => {
     const spy = jest.fn()
     const initialState = { value: 1, other: 'a' }
-    const { getState, setState, subscribe } = create(() => initialState)
+    const { getState, setState, subscribe } = create(
+      subscribeWithSelector(() => initialState)
+    )
 
     const isRoughEqual = (x: number, y: number) => Math.abs(x - y) < 1
     setState({ value: 0 })
@@ -100,7 +109,7 @@ describe('subscribe()', () => {
       spy(s.value, prevValue)
       prevValue = s.value
     })
-    const unsub2 = subscribe(spy2, (s) => s.value, isRoughEqual)
+    const unsub2 = subscribe((s) => s.value, spy2, { equalityFn: isRoughEqual })
     setState({ value: 0.5 })
     setState({ value: 1 })
     unsub()

@@ -1,13 +1,27 @@
 import {
+  EqualityChecker,
   GetState,
   PartialState,
   SetState,
   State,
   StateCreator,
+  StateListener,
+  StateSelector,
+  StateSliceListener,
   StoreApi,
+  Subscribe,
 } from './vanilla'
 
 const DEVTOOLS = Symbol()
+
+type DevtoolsType = {
+  prefix: string
+  subscribe: (dispatch: any) => () => void
+  unsubscribe: () => void
+  send: (action: string, state: any) => void
+  init: (state: any) => void
+  error: (payload: any) => void
+}
 
 export const redux =
   <S extends State, A extends { type: unknown }>(
@@ -19,7 +33,7 @@ export const redux =
     get: GetState<S & { dispatch: (a: A) => A }>,
     api: StoreApi<S & { dispatch: (a: A) => A }> & {
       dispatch: (a: A) => A
-      devtools?: any
+      devtools?: DevtoolsType
     }
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
@@ -51,14 +65,12 @@ export const devtools =
     InnerCustomSetState extends NamedSet<S>,
     InnerCustomGetState extends GetState<S>,
     InnerCustomStoreApi extends StoreApi<S> & {
-      setState: NamedSet<S>
-    },
-    OuterCustomSetState extends InnerCustomSetState & SetState<S>,
-    OuterCustomGetState extends InnerCustomGetState,
-    OuterCustomStoreApi extends InnerCustomStoreApi & {
       dispatch?: unknown
-      devtools: any
-    }
+      devtools?: DevtoolsType
+    },
+    OuterCustomSetState extends SetState<S>,
+    OuterCustomGetState extends InnerCustomGetState,
+    OuterCustomStoreApi extends InnerCustomStoreApi
   >(
     fn: (
       set: InnerCustomSetState,
@@ -105,7 +117,7 @@ export const devtools =
       ) {
         console.warn('Please install/enable Redux devtools extension')
       }
-      api.devtools = null
+      delete api.devtools
       return fn(
         set as unknown as InnerCustomSetState,
         get as InnerCustomGetState,
@@ -114,7 +126,7 @@ export const devtools =
     }
     const namedSet: NamedSet<S> = (state, replace, name) => {
       set(state, replace)
-      if (!api.dispatch) {
+      if (!api.dispatch && api.devtools) {
         api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
@@ -137,16 +149,25 @@ export const devtools =
         const newState = api.getState()
         if (state !== newState) {
           savedSetState(state, replace)
-          if (state !== (newState as any)[DEVTOOLS]) {
+          if (state !== (newState as any)[DEVTOOLS] && api.devtools) {
             api.devtools.send(api.devtools.prefix + 'setState', api.getState())
           }
         }
       }
       options = typeof options === 'string' ? { name: options } : options
-      api.devtools = extension.connect({ ...options })
-      api.devtools.prefix = options?.name ? `${options.name} > ` : ''
-      api.devtools.subscribe((message: any) => {
-        if (message.type === 'DISPATCH' && message.state) {
+      const connection = (api.devtools = extension.connect({ ...options }))
+      connection.prefix = options?.name ? `${options.name} > ` : ''
+      connection.subscribe((message: any) => {
+        if (message.type === 'ACTION' && message.payload) {
+          try {
+            api.setState(JSON.parse(message.payload))
+          } catch (e) {
+            console.error(
+              'please dispatch a serializable value that JSON.parse() support\n',
+              e
+            )
+          }
+        } else if (message.type === 'DISPATCH' && message.state) {
           const jumpState =
             message.payload.type === 'JUMP_TO_ACTION' ||
             message.payload.type === 'JUMP_TO_STATE'
@@ -164,7 +185,7 @@ export const devtools =
           message.type === 'DISPATCH' &&
           message.payload?.type === 'COMMIT'
         ) {
-          api.devtools.init(api.getState())
+          connection.init(api.getState())
         } else if (
           message.type === 'DISPATCH' &&
           message.payload?.type === 'IMPORT_STATE'
@@ -178,57 +199,170 @@ export const devtools =
               const action = actions[index] || 'No action found'
 
               if (index === 0) {
-                api.devtools.init(state)
+                connection.init(state)
               } else {
                 savedSetState(state)
-                api.devtools.send(action, api.getState())
+                connection.send(action, api.getState())
               }
             }
           )
         }
       })
-      api.devtools.init(initialState)
+      connection.init(initialState)
     }
     return initialState
   }
 
+type SubscribeWithSelector<T extends State> = {
+  (listener: StateListener<T>): () => void
+  <StateSlice>(
+    selector: StateSelector<T, StateSlice>,
+    listener: StateSliceListener<StateSlice>,
+    options?: {
+      equalityFn?: EqualityChecker<StateSlice>
+      fireImmediately?: boolean
+    }
+  ): () => void
+}
+
+export function subscribeWithSelector<S extends State>(
+  fn: (
+    set: SetState<S>,
+    get: GetState<S>,
+    api: Omit<StoreApi<S>, 'subscribe'> & {
+      subscribe: SubscribeWithSelector<S>
+      subscribeWithSelectorEnabled: true
+    }
+  ) => S
+): (
+  set: SetState<S>,
+  get: GetState<S>,
+  api: Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+) => S
+
+export function subscribeWithSelector<
+  S extends State,
+  CustomSetState extends SetState<S>
+>(
+  fn: (
+    set: CustomSetState,
+    get: GetState<S>,
+    api: Omit<StoreApi<S>, 'subscribe'> & {
+      subscribe: SubscribeWithSelector<S>
+      subscribeWithSelectorEnabled: true
+    }
+  ) => S
+): (
+  set: CustomSetState,
+  get: GetState<S>,
+  api: Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+) => S
+
+export function subscribeWithSelector<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+>(
+  fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
+): (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
+
+export function subscribeWithSelector<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends Omit<StoreApi<S>, 'subscribe'> & {
+    subscribe: SubscribeWithSelector<S>
+    subscribeWithSelectorEnabled: true
+  }
+>(fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S) {
+  return (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
+    const origSubscribe = api.subscribe as Subscribe<S>
+    api.subscribe = ((selector: any, optListener: any, options: any) => {
+      let listener: StateListener<S> = selector // if no selector
+      if (optListener) {
+        const equalityFn = options?.equalityFn || Object.is
+        let currentSlice = selector(api.getState())
+        listener = (state) => {
+          const nextSlice = selector(state)
+          if (!equalityFn(currentSlice, nextSlice)) {
+            const previousSlice = currentSlice
+            optListener((currentSlice = nextSlice), previousSlice)
+          }
+        }
+        if (options?.fireImmediately) {
+          optListener(currentSlice, currentSlice)
+        }
+      }
+      return origSubscribe(listener)
+    }) as SubscribeWithSelector<S>
+    api.subscribeWithSelectorEnabled = true
+    const initialState = fn(set, get, api)
+    return initialState
+  }
+}
+
 type Combine<T, U> = Omit<T, keyof U> & U
-export const combine =
-  <
-    PrimaryState extends State,
-    SecondaryState extends State,
-    OuterCustomSetState extends SetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomGetState extends GetState<Combine<PrimaryState, SecondaryState>>,
-    OuterCustomStoreApi extends StoreApi<Combine<PrimaryState, SecondaryState>>,
-    InnerCustomSetState extends OuterCustomSetState extends NamedSet<
-      Combine<PrimaryState, SecondaryState>
-    >
-      ? NamedSet<PrimaryState>
-      : SetState<PrimaryState>,
-    InnerCustomGetState extends GetState<PrimaryState>,
-    InnerCustomStoreApi extends StoreApi<PrimaryState>
-  >(
-    initialState: PrimaryState,
-    create: (
-      set: InnerCustomSetState,
-      get: InnerCustomGetState,
-      api: InnerCustomStoreApi
-    ) => SecondaryState
+
+export function combine<
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: NamedSet<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+): (
+  set: NamedSet<Combine<PrimaryState, SecondaryState>>,
+  get: GetState<Combine<PrimaryState, SecondaryState>>,
+  api: StoreApi<Combine<PrimaryState, SecondaryState>>
+) => Combine<PrimaryState, SecondaryState>
+
+export function combine<
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: SetState<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+): (
+  set: SetState<Combine<PrimaryState, SecondaryState>>,
+  get: GetState<Combine<PrimaryState, SecondaryState>>,
+  api: StoreApi<Combine<PrimaryState, SecondaryState>>
+) => Combine<PrimaryState, SecondaryState>
+
+export function combine<
+  PrimaryState extends State,
+  SecondaryState extends State
+>(
+  initialState: PrimaryState,
+  create: (
+    set: SetState<PrimaryState>,
+    get: GetState<PrimaryState>,
+    api: StoreApi<PrimaryState>
+  ) => SecondaryState
+) {
+  return (
+    set: SetState<Combine<PrimaryState, SecondaryState>>,
+    get: GetState<Combine<PrimaryState, SecondaryState>>,
+    api: StoreApi<Combine<PrimaryState, SecondaryState>>
   ) =>
-  (
-    set: OuterCustomSetState,
-    get: OuterCustomGetState,
-    api: OuterCustomStoreApi
-  ) =>
-    Object.assign(
-      {},
-      initialState,
-      create(
-        set as unknown as InnerCustomSetState,
-        get as unknown as InnerCustomGetState,
-        api as unknown as InnerCustomStoreApi
-      )
-    ) as Combine<PrimaryState, SecondaryState>
+    Object.assign({}, initialState, create(set as any, get as any, api as any))
+}
 
 type DeepPartial<T extends Object> = {
   [P in keyof T]?: DeepPartial<T[P]>
