@@ -10,7 +10,7 @@ import create, {
   StateSelector,
   StoreApi,
   Subscribe,
-  UseStore,
+  UseBoundStore,
 } from 'zustand'
 
 it('can use exposed types', () => {
@@ -83,7 +83,7 @@ it('can use exposed types', () => {
     _destroy: Destroy,
     _equalityFn: EqualityChecker<ExampleState>,
     _stateCreator: StateCreator<ExampleState>,
-    _useStore: UseStore<ExampleState>
+    _useStore: UseBoundStore<ExampleState>
   ) {
     expect(true).toBeTruthy()
   }
