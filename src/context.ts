@@ -19,8 +19,11 @@ export interface UseContextStore<T extends State> {
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 }
 
-function createContext<TState extends State>() {
-  const ZustandContext = reactCreateContext<StoreApi<TState> | undefined>(
+function createContext<
+  TState extends State,
+  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+>() {
+  const ZustandContext = reactCreateContext<CustomStoreApi | undefined>(
     undefined
   )
 
@@ -28,10 +31,10 @@ function createContext<TState extends State>() {
     createStore,
     children,
   }: {
-    createStore: () => StoreApi<TState>
+    createStore: () => CustomStoreApi
     children: ReactNode
   }) => {
-    const storeRef = useRef<StoreApi<TState>>()
+    const storeRef = useRef<CustomStoreApi>()
 
     if (!storeRef.current) {
       storeRef.current = createStore()
@@ -61,7 +64,12 @@ function createContext<TState extends State>() {
     )
   }
 
-  const useStoreApi = () => {
+  const useStoreApi = (): {
+    getState: CustomStoreApi['getState']
+    setState: CustomStoreApi['setState']
+    subscribe: CustomStoreApi['subscribe']
+    destroy: CustomStoreApi['destroy']
+  } => {
     const store = useContext(ZustandContext)
     if (!store) {
       throw new Error(

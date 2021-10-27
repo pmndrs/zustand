@@ -1,10 +1,19 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { UseBoundStore } from 'zustand'
-import { NamedSet, combine, devtools, persist, redux } from 'zustand/middleware'
-import { State, StateCreator } from 'zustand/vanilla'
+import create, { State, StateCreator, UseBoundStore } from 'zustand'
+import {
+  NamedSet,
+  combine,
+  devtools,
+  persist,
+  redux,
+  subscribeWithSelector,
+} from 'zustand/middleware'
 
-type TImmerConfigFn<T extends State> = (fn: (draft: Draft<T>) => void) => void
+type TImmerConfigFn<T extends State> = (
+  partial: ((draft: Draft<T>) => void) | T,
+  replace?: boolean
+) => void
 type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
 
 interface ISelectors<T> {
@@ -13,15 +22,27 @@ interface ISelectors<T> {
   }
 }
 
-const immer = <T extends State>(
-  config: TImmerConfig<T>
-): StateCreator<T, NamedSet<T>> => {
-  return (set, get, api) => {
-    return config((fn) => set(produce<T>(fn)), get, api)
-  }
-}
+const immer =
+  <T extends State>(config: TImmerConfig<T>): StateCreator<T> =>
+  (set, get, api) =>
+    config(
+      (partial, replace) => {
+        const nextState =
+          typeof partial === 'function'
+            ? produce(partial as (state: Draft<T>) => T)
+            : (partial as T)
+        return set(nextState, replace)
+      },
+      get,
+      api
+    )
 
-const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
+const createSelectorHooks = <
+  T extends State,
+  TUseBoundStore extends UseBoundStore<T> = UseBoundStore<T>
+>(
+  store: TUseBoundStore
+) => {
   const storeAsSelectors = store as unknown as ISelectors<T>
   storeAsSelectors.use = {} as ISelectors<T>['use']
 
@@ -32,7 +53,7 @@ const createSelectorHooks = <T extends State>(store: UseBoundStore<T>) => {
     storeAsSelectors.use[storeKey] = () => store(selector)
   })
 
-  return store as UseBoundStore<T> & ISelectors<T>
+  return store as TUseBoundStore & ISelectors<T>
 }
 
 interface ITestStateProps {
@@ -240,6 +261,29 @@ it('should have correct type when creating store with devtool, persist and immer
   TestComponent
 })
 
+it('should have correct type when creating store with devtools', () => {
+  const useStore = create<ITestStateProps>(
+    devtools((set) => ({
+      testKey: 'test',
+      setTestKey: (testKey: string) => {
+        set((state) => ({
+          testKey: state.testKey + testKey,
+        }))
+      },
+    }))
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().testKey
+    useStore().setTestKey('')
+    useStore.getState().testKey
+    useStore.getState().setTestKey('')
+
+    return <></>
+  }
+  TestComponent
+})
+
 it('should have correct type when creating store with redux', () => {
   const useStore = create(
     redux<{ count: number }, { type: 'INC' }>(
@@ -258,6 +302,31 @@ it('should have correct type when creating store with redux', () => {
   const TestComponent = (): JSX.Element => {
     useStore().dispatch({ type: 'INC' })
     useStore.dispatch({ type: 'INC' })
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools and immer', () => {
+  const useStore = create<ITestStateProps>(
+    devtools(
+      immer((set) => ({
+        testKey: 'test',
+        setTestKey: (testKey: string) => {
+          set((state) => {
+            state.testKey = testKey
+          })
+        },
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().testKey
+    useStore().setTestKey('')
+    useStore.getState().testKey
+    useStore.getState().setTestKey('')
 
     return <></>
   }
@@ -304,6 +373,92 @@ it('should combine devtools and combine', () => {
     useStore().inc()
     useStore.getState().count
     useStore.getState().inc()
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine subscribeWithSelector and combine', () => {
+  const useStore = create(
+    subscribeWithSelector(
+      combine({ count: 1 }, (set, get) => ({
+        inc: () => set({ count: get().count + 1 }, false),
+        // FIXME hope this to fail // @ts-expect-error
+        incInvalid: () => set({ count: get().count + 1 }, false, 'inc'),
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools and subscribeWithSelector', () => {
+  const useStore = create(
+    devtools(
+      subscribeWithSelector<
+        {
+          count: number
+          inc: () => void
+        },
+        NamedSet<{
+          count: number
+          inc: () => void
+        }>
+      >((set, get) => ({
+        count: 1,
+        inc: () => set({ count: get().count + 1 }, false, 'inc'),
+      }))
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
+
+    return <></>
+  }
+  TestComponent
+})
+
+it('should combine devtools, subscribeWithSelector and combine', () => {
+  const useStore = create(
+    devtools(
+      subscribeWithSelector(
+        combine({ count: 1 }, (set, get) => ({
+          inc: () => set({ count: get().count + 1 }, false, 'inc'),
+        }))
+      )
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
 
     return <></>
   }
