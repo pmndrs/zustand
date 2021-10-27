@@ -247,8 +247,7 @@ function Component() {
   const scratchRef = useRef(useStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
   useEffect(() => useStore.subscribe(
-    scratches => (scratchRef.current = scratches),
-    state => state.scratches
+    state => (scratchRef.current = state.scratches)
   ), [])
 ```
 

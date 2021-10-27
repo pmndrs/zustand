@@ -6,16 +6,18 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { EqualityChecker, UseBoundStore } from 'zustand'
-import { State, StateSelector } from './vanilla'
+import { EqualityChecker, State, StateSelector, UseBoundStore } from 'zustand'
 
 export interface UseContextStore<T extends State> {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 }
 
-function createContext<TState extends State>() {
-  const ZustandContext = reactCreateContext<UseBoundStore<TState> | undefined>(
+function createContext<
+  TState extends State,
+  TUseBoundStore extends UseBoundStore<TState> = UseBoundStore<TState>
+>() {
+  const ZustandContext = reactCreateContext<TUseBoundStore | undefined>(
     undefined
   )
 
@@ -27,11 +29,11 @@ function createContext<TState extends State>() {
     /**
      * @deprecated
      */
-    initialStore?: UseBoundStore<TState>
-    createStore: () => UseBoundStore<TState>
+    initialStore?: TUseBoundStore
+    createStore: () => TUseBoundStore
     children: ReactNode
   }) => {
-    const storeRef = useRef<UseBoundStore<TState>>()
+    const storeRef = useRef<TUseBoundStore>()
 
     if (!storeRef.current) {
       if (initialStore) {
@@ -69,7 +71,12 @@ function createContext<TState extends State>() {
     )
   }
 
-  const useStoreApi = () => {
+  const useStoreApi = (): {
+    getState: TUseBoundStore['getState']
+    setState: TUseBoundStore['setState']
+    subscribe: TUseBoundStore['subscribe']
+    destroy: TUseBoundStore['destroy']
+  } => {
     // ZustandContext value is guaranteed to be stable.
     const useProviderStore = useContext(ZustandContext)
     if (!useProviderStore) {
