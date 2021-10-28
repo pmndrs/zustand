@@ -464,3 +464,39 @@ it('should combine devtools, subscribeWithSelector and combine', () => {
   }
   TestComponent
 })
+
+it('should combine devtools, subscribeWithSelector, persist and immer (#616)', () => {
+  const useStore = create(
+    devtools(
+      subscribeWithSelector(
+        persist(
+          immer<{
+            count: number
+            inc: () => void
+          }>((set, get) => ({
+            count: 0,
+            inc: () =>
+              set((state) => {
+                state.count = get().count + 1
+              }),
+          })),
+          { name: 'name' }
+        )
+      )
+    )
+  )
+
+  const TestComponent = (): JSX.Element => {
+    useStore().count
+    useStore().inc()
+    useStore.getState().count
+    useStore.getState().inc()
+    useStore.subscribe(
+      (state) => state.count,
+      (count) => console.log(count * 2)
+    )
+
+    return <></>
+  }
+  TestComponent
+})
