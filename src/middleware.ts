@@ -213,8 +213,7 @@ export const devtools =
     return initialState
   }
 
-type SubscribeWithSelector<T extends State> = {
-  (listener: StateListener<T>): () => void
+type SubscribeWithSelector<T extends State> = Subscribe<T> & {
   <StateSlice>(
     selector: StateSelector<T, StateSlice>,
     listener: StateSliceListener<StateSlice>,
