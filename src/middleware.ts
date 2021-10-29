@@ -23,6 +23,14 @@ type DevtoolsType = {
   error: (payload: any) => void
 }
 
+export type StoreApiWithRedux<
+  T extends State,
+  A extends { type: unknown }
+> = StoreApi<T & { dispatch: (a: A) => A }> & {
+  dispatch: (a: A) => A
+  devtools?: DevtoolsType
+}
+
 export const redux =
   <S extends State, A extends { type: unknown }>(
     reducer: (state: S, action: A) => S,
@@ -31,10 +39,7 @@ export const redux =
   (
     set: SetState<S & { dispatch: (a: A) => A }>,
     get: GetState<S & { dispatch: (a: A) => A }>,
-    api: StoreApi<S & { dispatch: (a: A) => A }> & {
-      dispatch: (a: A) => A
-      devtools?: DevtoolsType
-    }
+    api: StoreApiWithRedux<S, A>
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
       set((state: S) => reducer(state, action))
@@ -59,24 +64,18 @@ export type NamedSet<T extends State> = {
   ): void
 }
 
+export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
+  devtools?: DevtoolsType
+}
+
 export const devtools =
   <
     S extends State,
-    InnerCustomSetState extends NamedSet<S>,
-    InnerCustomGetState extends GetState<S>,
-    InnerCustomStoreApi extends StoreApi<S> & {
-      dispatch?: unknown
-      devtools?: DevtoolsType
-    },
-    OuterCustomSetState extends SetState<S>,
-    OuterCustomGetState extends InnerCustomGetState,
-    OuterCustomStoreApi extends InnerCustomStoreApi
+    CustomSetState extends SetState<S>,
+    CustomGetState extends GetState<S>,
+    CustomStoreApi extends StoreApiWithDevtools<S>
   >(
-    fn: (
-      set: InnerCustomSetState,
-      get: InnerCustomGetState,
-      api: InnerCustomStoreApi
-    ) => S,
+    fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
     options?:
       | string
       | {
@@ -99,9 +98,9 @@ export const devtools =
         }
   ) =>
   (
-    set: OuterCustomSetState,
-    get: OuterCustomGetState,
-    api: OuterCustomStoreApi
+    set: CustomSetState,
+    get: CustomGetState,
+    api: CustomStoreApi & { dispatch?: unknown }
   ): S => {
     let extension
     try {
@@ -118,11 +117,7 @@ export const devtools =
         console.warn('Please install/enable Redux devtools extension')
       }
       delete api.devtools
-      return fn(
-        set as unknown as InnerCustomSetState,
-        get as InnerCustomGetState,
-        api as InnerCustomStoreApi
-      )
+      return fn(set, get, api)
     }
     const namedSet: NamedSet<S> = (state, replace, name) => {
       set(state, replace)
@@ -130,11 +125,7 @@ export const devtools =
         api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
-    const initialState = fn(
-      namedSet as InnerCustomSetState,
-      get as InnerCustomGetState,
-      api as InnerCustomStoreApi
-    )
+    const initialState = fn(namedSet, get, api)
     if (!api.devtools) {
       const savedSetState = api.setState
       api.setState = <
@@ -213,79 +204,35 @@ export const devtools =
     return initialState
   }
 
-type SubscribeWithSelector<T extends State> = {
-  (listener: StateListener<T>): () => void
-  <StateSlice>(
-    selector: StateSelector<T, StateSlice>,
-    listener: StateSliceListener<StateSlice>,
-    options?: {
-      equalityFn?: EqualityChecker<StateSlice>
-      fireImmediately?: boolean
-    }
-  ): () => void
+export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
+  StoreApi<T>,
+  'subscribe'
+> & {
+  subscribe: {
+    (listener: StateListener<T>): () => void
+    <StateSlice>(
+      selector: StateSelector<T, StateSlice>,
+      listener: StateSliceListener<StateSlice>,
+      options?: {
+        equalityFn?: EqualityChecker<StateSlice>
+        fireImmediately?: boolean
+      }
+    ): () => void
+  }
+  // Note: This will be removed in v4
+  subscribeWithSelectorEnabled: true
 }
 
-export function subscribeWithSelector<S extends State>(
-  fn: (
-    set: SetState<S>,
-    get: GetState<S>,
-    api: Omit<StoreApi<S>, 'subscribe'> & {
-      subscribe: SubscribeWithSelector<S>
-      subscribeWithSelectorEnabled: true
-    }
-  ) => S
-): (
-  set: SetState<S>,
-  get: GetState<S>,
-  api: Omit<StoreApi<S>, 'subscribe'> & {
-    subscribe: SubscribeWithSelector<S>
-    subscribeWithSelectorEnabled: true
-  }
-) => S
-
-export function subscribeWithSelector<
-  S extends State,
-  CustomSetState extends SetState<S>
->(
-  fn: (
-    set: CustomSetState,
-    get: GetState<S>,
-    api: Omit<StoreApi<S>, 'subscribe'> & {
-      subscribe: SubscribeWithSelector<S>
-      subscribeWithSelectorEnabled: true
-    }
-  ) => S
-): (
-  set: CustomSetState,
-  get: GetState<S>,
-  api: Omit<StoreApi<S>, 'subscribe'> & {
-    subscribe: SubscribeWithSelector<S>
-    subscribeWithSelectorEnabled: true
-  }
-) => S
-
-export function subscribeWithSelector<
-  S extends State,
-  CustomSetState extends SetState<S>,
-  CustomGetState extends GetState<S>,
-  CustomStoreApi extends Omit<StoreApi<S>, 'subscribe'> & {
-    subscribe: SubscribeWithSelector<S>
-    subscribeWithSelectorEnabled: true
-  }
->(
-  fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
-): (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
-
-export function subscribeWithSelector<
-  S extends State,
-  CustomSetState extends SetState<S>,
-  CustomGetState extends GetState<S>,
-  CustomStoreApi extends Omit<StoreApi<S>, 'subscribe'> & {
-    subscribe: SubscribeWithSelector<S>
-    subscribeWithSelectorEnabled: true
-  }
->(fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S) {
-  return (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
+export const subscribeWithSelector =
+  <
+    S extends State,
+    CustomSetState extends SetState<S>,
+    CustomGetState extends GetState<S>,
+    CustomStoreApi extends StoreApiWithSubscribeWithSelector<S>
+  >(
+    fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
+  ) =>
+  (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
     const origSubscribe = api.subscribe as Subscribe<S>
     api.subscribe = ((selector: any, optListener: any, options: any) => {
       let listener: StateListener<S> = selector // if no selector
@@ -304,65 +251,35 @@ export function subscribeWithSelector<
         }
       }
       return origSubscribe(listener)
-    }) as SubscribeWithSelector<S>
+    }) as any
+    // Note: This will be removed in v4
     api.subscribeWithSelectorEnabled = true
     const initialState = fn(set, get, api)
     return initialState
   }
-}
 
 type Combine<T, U> = Omit<T, keyof U> & U
 
-export function combine<
-  PrimaryState extends State,
-  SecondaryState extends State
->(
-  initialState: PrimaryState,
-  create: (
-    set: NamedSet<PrimaryState>,
-    get: GetState<PrimaryState>,
-    api: StoreApi<PrimaryState>
-  ) => SecondaryState
-): (
-  set: NamedSet<Combine<PrimaryState, SecondaryState>>,
-  get: GetState<Combine<PrimaryState, SecondaryState>>,
-  api: StoreApi<Combine<PrimaryState, SecondaryState>>
-) => Combine<PrimaryState, SecondaryState>
-
-export function combine<
-  PrimaryState extends State,
-  SecondaryState extends State
->(
-  initialState: PrimaryState,
-  create: (
-    set: SetState<PrimaryState>,
-    get: GetState<PrimaryState>,
-    api: StoreApi<PrimaryState>
-  ) => SecondaryState
-): (
-  set: SetState<Combine<PrimaryState, SecondaryState>>,
-  get: GetState<Combine<PrimaryState, SecondaryState>>,
-  api: StoreApi<Combine<PrimaryState, SecondaryState>>
-) => Combine<PrimaryState, SecondaryState>
-
-export function combine<
-  PrimaryState extends State,
-  SecondaryState extends State
->(
-  initialState: PrimaryState,
-  create: (
-    set: SetState<PrimaryState>,
-    get: GetState<PrimaryState>,
-    api: StoreApi<PrimaryState>
-  ) => SecondaryState
-) {
-  return (
+export const combine =
+  <PrimaryState extends State, SecondaryState extends State>(
+    initialState: PrimaryState,
+    create: (
+      // Note: NamedSet added for convenience
+      set: SetState<PrimaryState> & NamedSet<PrimaryState>,
+      get: GetState<PrimaryState>,
+      api: StoreApi<PrimaryState>
+    ) => SecondaryState
+  ) =>
+  (
     set: SetState<Combine<PrimaryState, SecondaryState>>,
     get: GetState<Combine<PrimaryState, SecondaryState>>,
     api: StoreApi<Combine<PrimaryState, SecondaryState>>
   ) =>
-    Object.assign({}, initialState, create(set as any, get as any, api as any))
-}
+    Object.assign(
+      {},
+      initialState,
+      create(set as any, get as any, api as any)
+    ) as Combine<PrimaryState, SecondaryState>
 
 type DeepPartial<T extends Object> = {
   [P in keyof T]?: DeepPartial<T[P]>

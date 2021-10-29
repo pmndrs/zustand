@@ -1,8 +1,14 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { State, StateCreator, UseBoundStore } from 'zustand'
+import create, {
+  GetState,
+  SetState,
+  State,
+  StateCreator,
+  UseBoundStore,
+} from 'zustand'
 import {
-  NamedSet,
+  StoreApiWithSubscribeWithSelector,
   combine,
   devtools,
   persist,
@@ -384,8 +390,6 @@ it('should combine subscribeWithSelector and combine', () => {
     subscribeWithSelector(
       combine({ count: 1 }, (set, get) => ({
         inc: () => set({ count: get().count + 1 }, false),
-        // FIXME hope this to fail // @ts-expect-error
-        incInvalid: () => set({ count: get().count + 1 }, false, 'inc'),
       }))
     )
   )
@@ -406,18 +410,18 @@ it('should combine subscribeWithSelector and combine', () => {
 })
 
 it('should combine devtools and subscribeWithSelector', () => {
-  const useStore = create(
+  type MyState = {
+    count: number
+    inc: () => void
+  }
+  const useStore = create<
+    MyState,
+    SetState<MyState>,
+    GetState<MyState>,
+    StoreApiWithSubscribeWithSelector<MyState>
+  >(
     devtools(
-      subscribeWithSelector<
-        {
-          count: number
-          inc: () => void
-        },
-        NamedSet<{
-          count: number
-          inc: () => void
-        }>
-      >((set, get) => ({
+      subscribeWithSelector((set, get) => ({
         count: 1,
         inc: () => set({ count: get().count + 1 }, false, 'inc'),
       }))
@@ -466,14 +470,20 @@ it('should combine devtools, subscribeWithSelector and combine', () => {
 })
 
 it('should combine devtools, subscribeWithSelector, persist and immer (#616)', () => {
-  const useStore = create(
+  type MyState = {
+    count: number
+    inc: () => void
+  }
+  const useStore = create<
+    MyState,
+    SetState<MyState>,
+    GetState<MyState>,
+    StoreApiWithSubscribeWithSelector<MyState>
+  >(
     devtools(
       subscribeWithSelector(
         persist(
-          immer<{
-            count: number
-            inc: () => void
-          }>((set, get) => ({
+          immer((set, get) => ({
             count: 0,
             inc: () =>
               set((state) => {
