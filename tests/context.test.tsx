@@ -1,10 +1,10 @@
 import { Component as ClassComponent, useEffect, useState } from 'react'
 import { render } from '@testing-library/react'
-import create, { SetState, GetState } from 'zustand'
+import create, { GetState, SetState } from 'zustand'
 import createContext from 'zustand/context'
 import {
-  subscribeWithSelector,
   StoreApiWithSubscribeWithSelector,
+  subscribeWithSelector,
 } from 'zustand/middleware'
 
 const consoleError = console.error
