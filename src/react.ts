@@ -1,5 +1,6 @@
 import { useDebugValue } from 'react'
-import { useSyncExternalStoreExtra } from 'use-sync-external-store/extra'
+// @ts-ignore
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import createStore, {
   EqualityChecker,
   GetState,
@@ -21,7 +22,7 @@ export function useStore<TState extends State, StateSlice>(
   selector: StateSelector<TState, StateSlice> = api.getState as any,
   equalityFn: EqualityChecker<StateSlice> = Object.is
 ) {
-  const slice = useSyncExternalStoreExtra(
+  const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
     null,
