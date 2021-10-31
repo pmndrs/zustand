@@ -216,7 +216,7 @@ export type StoreApiWithSubscribeWithSelector<T extends State> = StoreApi<T> & {
     ): () => void
   }
   // Note: required for type inference. can we avoid this?
-  subscribeWithSelectorEnabled: true
+  _subscribeWithSelectorEnabled: undefined
 }
 
 export const subscribeWithSelector =
@@ -248,7 +248,6 @@ export const subscribeWithSelector =
       }
       return origSubscribe(listener)
     }) as any
-    api.subscribeWithSelectorEnabled = true
     const initialState = fn(set, get, api)
     return initialState
   }
