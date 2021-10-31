@@ -485,3 +485,33 @@ describe('counter state spec (quadruple middleware)', () => {
     TestComponent
   })
 })
+
+describe('more complex state spec with subscribeWithSelector', () => {
+  it('#619', () => {
+    type MyState = {
+      foo: boolean | string
+    }
+    const useStore = create<
+      MyState,
+      SetState<MyState>,
+      GetState<MyState>,
+      StoreApiWithSubscribeWithSelector<MyState>
+    >(
+      subscribeWithSelector(() => ({
+        // Note: It complains without type assertion.
+        foo: true as boolean | string,
+      }))
+    )
+    const TestComponent = () => {
+      useStore((s) => s.foo)
+      useStore().foo
+      useStore.getState().foo
+      useStore.subscribe(
+        (state) => state.foo,
+        (foo) => console.log(foo)
+      )
+      return <></>
+    }
+    TestComponent
+  })
+})
