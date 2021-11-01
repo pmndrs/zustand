@@ -2,6 +2,7 @@ import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, { GetState, SetState, State, StateCreator } from 'zustand'
 import {
+  StoreApiWithPersist,
   StoreApiWithSubscribeWithSelector,
   combine,
   devtools,
@@ -174,7 +175,12 @@ describe('counter state spec (single middleware)', () => {
   })
 
   it('persist', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithPersist<CounterState>
+    >(
       persist(
         (set, get) => ({
           count: 1,
@@ -326,7 +332,12 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & persist', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithPersist<CounterState>
+    >(
       devtools(
         persist(
           (set, get) => ({
@@ -354,7 +365,12 @@ describe('counter state spec (double middleware)', () => {
 
 describe('counter state spec (triple middleware)', () => {
   it('devtools & persist & immer', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithPersist<CounterState>
+    >(
       devtools(
         persist(
           immer((set, get) => ({
@@ -413,7 +429,8 @@ describe('counter state spec (triple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
+      StoreApiWithSubscribeWithSelector<CounterState> &
+        StoreApiWithPersist<CounterState>
     >(
       devtools(
         subscribeWithSelector(
@@ -451,7 +468,8 @@ describe('counter state spec (quadruple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
+      StoreApiWithSubscribeWithSelector<CounterState> &
+        StoreApiWithPersist<CounterState>
     >(
       devtools(
         subscribeWithSelector(

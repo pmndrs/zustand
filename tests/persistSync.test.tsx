@@ -12,12 +12,17 @@ const createPersistantStore = (initialValue: string | null) => {
     setItemSpy(name, newState)
     state = newState
   }
+  const removeItem = (name: string) => {
+    removeItemSpy(name)
+    state = null
+  }
 
   const getItemSpy = jest.fn()
   const setItemSpy = jest.fn()
+  const removeItemSpy = jest.fn()
 
   return {
-    storage: { getItem, setItem },
+    storage: { getItem, setItem, removeItem },
     getItemSpy,
     setItemSpy,
   }
@@ -37,6 +42,7 @@ describe('persist middleware with sync configuration', () => {
           version: 0,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const onRehydrateStorageSpy = jest.fn()
@@ -67,6 +73,7 @@ describe('persist middleware with sync configuration', () => {
         throw new Error('getItem error')
       },
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const spy = jest.fn()
@@ -131,6 +138,7 @@ describe('persist middleware with sync configuration', () => {
           version: 12,
         }),
       setItem: setItemSpy,
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -165,6 +173,7 @@ describe('persist middleware with sync configuration', () => {
           version: 12,
         }),
       setItem: (_: string, _value: string) => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -191,6 +200,7 @@ describe('persist middleware with sync configuration', () => {
           version: 12,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -222,6 +232,7 @@ describe('persist middleware with sync configuration', () => {
           version: 0,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const unstorableMethod = () => {}
@@ -251,6 +262,7 @@ describe('persist middleware with sync configuration', () => {
           version: 0,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const unstorableMethod = () => {}
@@ -287,6 +299,7 @@ describe('persist middleware with sync configuration', () => {
           },
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -308,6 +321,7 @@ describe('persist middleware with sync configuration', () => {
     const storage = {
       getItem: () => '',
       setItem: setItemSpy,
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -364,5 +378,132 @@ describe('persist middleware with sync configuration', () => {
         version: 0,
       })
     )
+  })
+
+  it('can change the options through the api', () => {
+    const setItemSpy = jest.fn()
+
+    const storage = {
+      getItem: () => null,
+      setItem: setItemSpy,
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    useStore.setState({})
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      '{"state":{"count":0},"version":0}'
+    )
+
+    useStore.persist.setOptions({
+      name: 'test-storage-2',
+      partialize: (state) =>
+        Object.fromEntries(
+          Object.entries(state).filter(([key]) => key !== 'count')
+        ),
+    })
+    useStore.setState({})
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage-2',
+      '{"state":{},"version":0}'
+    )
+  })
+
+  it('can clear the storage through the api', () => {
+    const removeItemSpy = jest.fn()
+
+    const storage = {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: removeItemSpy,
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    useStore.persist.clearStorage()
+    expect(removeItemSpy).toBeCalledWith('test-storage')
+  })
+
+  it('can manually rehydrate through the api', () => {
+    const storageValue = '{"state":{"count":1},"version":0}'
+
+    const storage = {
+      getItem: () => '',
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    storage.getItem = () => storageValue
+    useStore.persist.rehydrate()
+    expect(useStore.getState()).toEqual({
+      count: 1,
+    })
+  })
+
+  it('can check if the store has been hydrated through the api', async () => {
+    const storage = {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    expect(useStore.persist.hasHydrated()).toBe(true)
+
+    await useStore.persist.rehydrate()
+    expect(useStore.persist.hasHydrated()).toBe(true)
+  })
+
+  it('can wait for hydration through the api', async () => {
+    const storageValue = '{"state":{"count":1},"version":0}'
+
+    const onHydrateSpy1 = jest.fn()
+    const onHydrateSpy2 = jest.fn()
+
+    const storage = {
+      getItem: () => '',
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    useStore.persist.onHydrate(onHydrateSpy1)
+    useStore.persist.onHydrate(onHydrateSpy2)
+
+    storage.getItem = () => storageValue
+    await useStore.persist.rehydrate()
+    expect(onHydrateSpy1).toBeCalledWith({ count: 1 })
+    expect(onHydrateSpy2).toBeCalledWith({ count: 1 })
   })
 })
