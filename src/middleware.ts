@@ -286,6 +286,7 @@ type DeepPartial<T extends Object> = {
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
+  // Note: This will be required in v4
   removeItem?: (name: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
