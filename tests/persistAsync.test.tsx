@@ -14,13 +14,20 @@ const createPersistantStore = (initialValue: string | null) => {
     state = newState
   }
 
+  const removeItem = async (name: string) => {
+    removeItemSpy(name)
+    state = null
+  }
+
   const getItemSpy = jest.fn()
   const setItemSpy = jest.fn()
+  const removeItemSpy = jest.fn()
 
   return {
-    storage: { getItem, setItem },
+    storage: { getItem, setItem, removeItem },
     getItemSpy,
     setItemSpy,
+    removeItemSpy,
   }
 }
 
@@ -39,6 +46,7 @@ describe('persist middleware with async configuration', () => {
           version: 0,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -82,6 +90,7 @@ describe('persist middleware with async configuration', () => {
         throw new Error('getItem error')
       },
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -175,6 +184,7 @@ describe('persist middleware with async configuration', () => {
           version: 12,
         }),
       setItem: setItemSpy,
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -217,6 +227,7 @@ describe('persist middleware with async configuration', () => {
           version: 12,
         }),
       setItem: (_: string, _value: string) => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -253,6 +264,7 @@ describe('persist middleware with async configuration', () => {
           version: 12,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -293,6 +305,7 @@ describe('persist middleware with async configuration', () => {
           version: 0,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const unstorableMethod = () => {}
@@ -332,6 +345,7 @@ describe('persist middleware with async configuration', () => {
           version: 0,
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const unstorableMethod = () => {}
@@ -376,6 +390,7 @@ describe('persist middleware with async configuration', () => {
           },
         }),
       setItem: () => {},
+      removeItem: () => {},
     }
 
     const useStore = create(
@@ -397,5 +412,49 @@ describe('persist middleware with async configuration', () => {
     expect(useStore.getState()).toEqual({
       count: 1,
     })
+  })
+
+  it('can manually rehydrate through the api', async () => {
+    const storageValue = '{"state":{"count":1},"version":0}'
+
+    const storage = {
+      getItem: async () => '',
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+
+    storage.getItem = async () => storageValue
+    await useStore.persist.rehydrate()
+    expect(useStore.getState()).toEqual({
+      count: 1,
+    })
+  })
+
+  it('can check if the store has been hydrated through the api', async () => {
+    const storage = {
+      getItem: async () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+    expect(useStore.persist.hasHydrated()).toBe(false)
+    await new Promise((resolve) => useStore.persist.onHydrate(resolve))
+    expect(useStore.persist.hasHydrated()).toBe(true)
+
+    await useStore.persist.rehydrate()
+    expect(useStore.persist.hasHydrated()).toBe(true)
   })
 })
