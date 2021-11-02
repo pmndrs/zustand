@@ -14,7 +14,7 @@ export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
-export interface Subscribe<T extends State> {
+export type Subscribe<T extends State> = {
   (listener: StateListener<T>): () => void
   /**
    * @deprecated Please use `subscribeWithSelector` middleware
@@ -39,7 +39,7 @@ export type SetState<T extends State> = {
 }
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
-export interface StoreApi<T extends State> {
+export type StoreApi<T extends State> = {
   setState: SetState<T>
   getState: GetState<T>
   subscribe: Subscribe<T>
