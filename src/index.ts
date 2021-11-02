@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import {
+  useDebugValue,
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+} from 'react'
 import createImpl, {
   EqualityChecker,
   GetState,
@@ -116,9 +122,11 @@ export default function create<
       return unsubscribe
     }, [])
 
-    return hasNewStateSlice
+    const sliceToReturn = hasNewStateSlice
       ? (newStateSlice as StateSlice)
       : currentSliceRef.current
+    useDebugValue(sliceToReturn)
+    return sliceToReturn
   }
 
   Object.assign(useStore, api)
