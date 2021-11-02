@@ -459,12 +459,12 @@ export const persist =
 
     if (!storage) {
       return config(
-        (...args) => {
+        ((...args) => {
           console.warn(
             `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
           )
           set(...args)
-        },
+        }) as CustomSetState,
         get,
         api
       )
@@ -510,10 +510,10 @@ export const persist =
     }
 
     const configResult = config(
-      (...args) => {
+      ((...args) => {
         set(...args)
         void setItem()
-      },
+      }) as CustomSetState,
       get,
       api
     )

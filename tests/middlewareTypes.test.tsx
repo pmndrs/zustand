@@ -1,6 +1,12 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import create, { GetState, SetState, State, StateCreator } from 'zustand'
+import create, {
+  GetState,
+  SetState,
+  State,
+  StateCreator,
+  StoreApi,
+} from 'zustand'
 import {
   StoreApiWithPersist,
   StoreApiWithSubscribeWithSelector,
@@ -18,7 +24,14 @@ type TImmerConfigFn<T extends State> = (
 type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
 
 const immer =
-  <T extends State>(config: TImmerConfig<T>): StateCreator<T> =>
+  <
+    T extends State,
+    CustomSetState extends SetState<T>,
+    CustomGetState extends GetState<T>,
+    CustomStoreApi extends StoreApi<T>
+  >(
+    config: TImmerConfig<T>
+  ): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> =>
   (set, get, api) =>
     config(
       (partial, replace) => {
