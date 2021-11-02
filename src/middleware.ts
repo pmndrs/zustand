@@ -4,7 +4,6 @@ import {
   PartialState,
   SetState,
   State,
-  StateCreator,
   StateListener,
   StateSelector,
   StateSliceListener,
@@ -287,6 +286,8 @@ type DeepPartial<T extends Object> = {
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
+  // Note: This will be required in v4
+  removeItem?: (name: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
 export type PersistOptions<
@@ -360,6 +361,15 @@ export type PersistOptions<
    */
   merge?: (persistedState: any, currentState: S) => S
 }
+export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
+  persist: {
+    setOptions: (options: Partial<PersistOptions<S>>) => void
+    clearStorage: () => void
+    rehydrate: () => Promise<void>
+    hasHydrated: () => boolean
+    onHydrate: (fn: (state: S) => void) => void
+  }
+}
 
 interface Thenable<Value> {
   then<V>(
@@ -401,72 +411,88 @@ const toThenable =
   }
 
 export const persist =
-  <S extends State>(config: StateCreator<S>, options: PersistOptions<S>) =>
-  (set: SetState<S>, get: GetState<S>, api: StoreApi<S>): S => {
-    const {
-      name,
-      getStorage = () => localStorage,
-      serialize = JSON.stringify as (state: StorageValue<S>) => string,
-      deserialize = JSON.parse as (str: string) => StorageValue<Partial<S>>,
-      blacklist,
-      whitelist,
-      partialize = (state: S) => state,
-      onRehydrateStorage,
-      version = 0,
-      migrate,
-      merge = (persistedState: any, currentState: S) => ({
+  <
+    S extends State,
+    CustomSetState extends SetState<S>,
+    CustomGetState extends GetState<S>,
+    CustomStoreApi extends StoreApiWithPersist<S>
+  >(
+    config: (
+      set: CustomSetState,
+      get: CustomGetState,
+      api: CustomStoreApi
+    ) => S,
+    baseOptions: PersistOptions<S>
+  ) =>
+  (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
+    let options = {
+      getStorage: () => localStorage,
+      serialize: JSON.stringify as (state: StorageValue<S>) => string,
+      deserialize: JSON.parse as (str: string) => StorageValue<Partial<S>>,
+      partialize: (state: S) => state,
+      version: 0,
+      merge: (persistedState: any, currentState: S) => ({
         ...currentState,
         ...persistedState,
       }),
-    } = options || {}
+      ...baseOptions,
+    }
 
-    if (blacklist || whitelist) {
+    if (options.blacklist || options.whitelist) {
       console.warn(
         `The ${
-          blacklist ? 'blacklist' : 'whitelist'
+          options.blacklist ? 'blacklist' : 'whitelist'
         } option is deprecated and will be removed in the next version. Please use the 'partialize' option instead.`
       )
     }
 
+    let hasHydrated = false
+    const onHydrateCallbacks: Parameters<
+      StoreApiWithPersist<S>['persist']['onHydrate']
+    >[0][] = []
     let storage: StateStorage | undefined
 
     try {
-      storage = getStorage()
+      storage = options.getStorage()
     } catch (e) {
       // prevent error if the storage is not defined (e.g. when server side rendering a page)
     }
 
     if (!storage) {
       return config(
-        (...args) => {
+        ((...args) => {
           console.warn(
-            `Persist middleware: unable to update ${name}, the given storage is currently unavailable.`
+            `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
           )
           set(...args)
-        },
+        }) as CustomSetState,
         get,
         api
       )
+    } else if (!storage.removeItem) {
+      console.warn(
+        `[zustand persist middleware] The given storage for item '${options.name}' does not contain a 'removeItem' method, which will be required in v4.`
+      )
     }
 
-    const thenableSerialize = toThenable(serialize)
+    const thenableSerialize = toThenable(options.serialize)
 
     const setItem = (): Thenable<void> => {
-      const state = partialize({ ...get() })
+      const state = options.partialize({ ...get() })
 
-      if (whitelist) {
+      if (options.whitelist) {
         ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
-          !whitelist.includes(key) && delete state[key]
+          !options.whitelist?.includes(key) && delete state[key]
         })
       }
-      if (blacklist) {
-        blacklist.forEach((key) => delete state[key])
+      if (options.blacklist) {
+        options.blacklist.forEach((key) => delete state[key])
       }
 
       let errorInSync: Error | undefined
-      const thenable = thenableSerialize({ state, version })
+      const thenable = thenableSerialize({ state, version: options.version })
         .then((serializedValue) =>
-          (storage as StateStorage).setItem(name, serializedValue)
+          (storage as StateStorage).setItem(options.name, serializedValue)
         )
         .catch((e) => {
           errorInSync = e
@@ -485,60 +511,93 @@ export const persist =
     }
 
     const configResult = config(
-      (...args) => {
+      ((...args) => {
         set(...args)
         void setItem()
-      },
+      }) as CustomSetState,
       get,
       api
     )
-
-    // rehydrate initial state with existing stored state
 
     // a workaround to solve the issue of not storing rehydrated state in sync storage
     // the set(state) value would be later overridden with initial state by create()
     // to avoid this, we merge the state from localStorage into the initial state.
     let stateFromStorage: S | undefined
-    const postRehydrationCallback = onRehydrateStorage?.(get()) || undefined
-    // bind is used to avoid `TypeError: Illegal invocation` error
-    toThenable(storage.getItem.bind(storage))(name)
-      .then((storageValue) => {
-        if (storageValue) {
-          return deserialize(storageValue)
-        }
-      })
-      .then((deserializedStorageValue) => {
-        if (deserializedStorageValue) {
-          if (
-            typeof deserializedStorageValue.version === 'number' &&
-            deserializedStorageValue.version !== version
-          ) {
-            if (migrate) {
-              return migrate(
-                deserializedStorageValue.state,
-                deserializedStorageValue.version
-              )
-            }
-            console.error(
-              `State loaded from storage couldn't be migrated since no migrate function was provided`
-            )
-          } else {
-            return deserializedStorageValue.state
-          }
-        }
-      })
-      .then((migratedState) => {
-        stateFromStorage = merge(migratedState as S, configResult)
 
-        set(stateFromStorage as S, true)
-        return setItem()
-      })
-      .then(() => {
-        postRehydrationCallback?.(stateFromStorage, undefined)
-      })
-      .catch((e: Error) => {
-        postRehydrationCallback?.(undefined, e)
-      })
+    // rehydrate initial state with existing stored state
+    const hydrate = () => {
+      if (!storage) return
+
+      hasHydrated = false
+
+      const postRehydrationCallback =
+        options.onRehydrateStorage?.(get()) || undefined
+
+      // bind is used to avoid `TypeError: Illegal invocation` error
+      return toThenable(storage.getItem.bind(storage))(options.name)
+        .then((storageValue) => {
+          if (storageValue) {
+            return options.deserialize(storageValue)
+          }
+        })
+        .then((deserializedStorageValue) => {
+          if (deserializedStorageValue) {
+            if (
+              typeof deserializedStorageValue.version === 'number' &&
+              deserializedStorageValue.version !== options.version
+            ) {
+              if (options.migrate) {
+                return options.migrate(
+                  deserializedStorageValue.state,
+                  deserializedStorageValue.version
+                )
+              }
+              console.error(
+                `State loaded from storage couldn't be migrated since no migrate function was provided`
+              )
+            } else {
+              return deserializedStorageValue.state
+            }
+          }
+        })
+        .then((migratedState) => {
+          stateFromStorage = options.merge(migratedState as S, configResult)
+
+          set(stateFromStorage as S, true)
+          return setItem()
+        })
+        .then(() => {
+          postRehydrationCallback?.(stateFromStorage, undefined)
+          hasHydrated = true
+          onHydrateCallbacks.forEach((cb) => cb(stateFromStorage as S))
+        })
+        .catch((e: Error) => {
+          postRehydrationCallback?.(undefined, e)
+        })
+    }
+
+    api.persist = {
+      setOptions: (newOptions) => {
+        options = {
+          ...options,
+          ...newOptions,
+        }
+
+        if (newOptions.getStorage) {
+          storage = newOptions.getStorage()
+        }
+      },
+      clearStorage: () => {
+        storage?.removeItem?.(options.name)
+      },
+      rehydrate: () => hydrate() as Promise<void>,
+      hasHydrated: () => hasHydrated,
+      onHydrate: (cb) => {
+        onHydrateCallbacks.push(cb)
+      },
+    }
+
+    hydrate()
 
     return stateFromStorage || configResult
   }
