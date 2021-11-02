@@ -126,7 +126,7 @@
     ]
   },
   "dependencies": {
-    "use-sync-external-store": "1.0.0-alpha-6bce0355c-20211031"
+    "use-sync-external-store": "1.0.0-alpha-5cccacd13-20211101"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
