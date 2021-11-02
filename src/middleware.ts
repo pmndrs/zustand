@@ -361,7 +361,7 @@ export type PersistOptions<
   merge?: (persistedState: any, currentState: S) => S
 }
 
-interface Thenable<Value> {
+type Thenable<Value> = {
   then<V>(
     onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
   ): Thenable<V>
