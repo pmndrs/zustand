@@ -31,7 +31,7 @@ export type SetState<T extends State> = {
 }
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
-export interface StoreApi<T extends State> {
+export type StoreApi<T extends State> = {
   setState: SetState<T>
   getState: GetState<T>
   subscribe: Subscribe<T>

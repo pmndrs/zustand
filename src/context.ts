@@ -8,7 +8,7 @@ import {
 } from 'react'
 import { EqualityChecker, State, StateSelector, UseBoundStore } from 'zustand'
 
-export interface UseContextStore<T extends State> {
+export type UseContextStore<T extends State> = {
   (): T
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 }
