@@ -1409,10 +1409,10 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
-"@types/use-sync-external-store@^0.0.0":
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.0.tgz#ec2ebe41a1288e3d5d80aacc4a4c2873db4aafa8"
-  integrity sha512-dtA1bGSTAyPAcged3AjG9r3BOUzznqgpZkK8HnVrlOOkZunfKnqJikykxUg3xOrBvgGbROLNptpJLflqp8KvkQ==
+"@types/use-sync-external-store@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.2.tgz#8341da05beb7dc3b6339eaa8a1b1e8a6e3472175"
+  integrity sha512-gHIGn4QNww3pIUE97gshEqGP+aFpFAg3hQvdD9JHKqlnM+l0Q86gMAyQ0ZjibXj8QY+HaKP8cpIgxHgXt9zPQQ==
 
 "@types/yargs-parser@*":
   version "20.2.1"

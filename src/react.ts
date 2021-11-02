@@ -1,5 +1,4 @@
 import { useDebugValue } from 'react'
-// @ts-ignore
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import createStore, {
   EqualityChecker,
