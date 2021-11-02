@@ -371,7 +371,7 @@ export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
   }
 }
 
-interface Thenable<Value> {
+type Thenable<Value> = {
   then<V>(
     onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
   ): Thenable<V>
