@@ -286,8 +286,7 @@ type DeepPartial<T extends Object> = {
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
-  // Note: This will be required in v4
-  removeItem?: (name: string) => void | Promise<void>
+  removeItem: (name: string) => void | Promise<void>
 }
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
 export type PersistOptions<
@@ -449,10 +448,6 @@ export const persist =
         get,
         api
       )
-    } else if (!storage.removeItem) {
-      console.warn(
-        `[zustand persist middleware] The given storage for item '${options.name}' does not contain a 'removeItem' method, which will be required in v4.`
-      )
     }
 
     const thenableSerialize = toThenable(options.serialize)
@@ -559,7 +554,7 @@ export const persist =
         }
       },
       clearStorage: () => {
-        storage?.removeItem?.(options.name)
+        storage?.removeItem(options.name)
       },
       rehydrate: () => hydrate() as Promise<void>,
       hasHydrated: () => hasHydrated,
