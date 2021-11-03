@@ -545,4 +545,45 @@ describe('more complex state spec with subscribeWithSelector', () => {
     }
     TestComponent
   })
+
+  it('#632', () => {
+    type MyState = {
+      count: number
+      obj: {
+        prop: string
+      }
+      inc: () => void
+    }
+    const useStore = create<
+      MyState,
+      SetState<MyState>,
+      GetState<MyState>,
+      StoreApiWithSubscribeWithSelector<MyState> & StoreApiWithPersist<MyState>
+    >(
+      subscribeWithSelector(
+        persist(
+          (set, get) => ({
+            count: 0,
+            obj: { prop: 'foo' },
+            inc: () => set({ count: get().count + 1 }, false),
+          }),
+          { name: 'name' }
+        )
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.count) * 2
+      useStore((s) => s.inc)()
+      useStore().count * 2
+      useStore().inc()
+      useStore.getState().count * 2
+      useStore.getState().inc()
+      useStore.subscribe(
+        (state) => state.count,
+        (count) => console.log(count * 2)
+      )
+      return <></>
+    }
+    TestComponent
+  })
 })
