@@ -529,7 +529,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
       StoreApiWithSubscribeWithSelector<MyState>
     >(
       subscribeWithSelector(() => ({
-        // Note: It complains without type assertion.
+        // NOTE: It complains without type assertion.
         foo: true as boolean | string,
       }))
     )
@@ -550,16 +550,18 @@ describe('more complex state spec with subscribeWithSelector', () => {
     type MyState = {
       foo: boolean
     }
-    const useStore = create<
-      MyState,
-      SetState<MyState>,
-      GetState<MyState>,
-      StoreApiWithSubscribeWithSelector<MyState> & StoreApiWithPersist<MyState>
-    >(
+    const useStore = create(
       subscribeWithSelector(
-        persist(
+        // NOTE: Adding type annotation to inner middleware works too
+        persist<
+          MyState,
+          SetState<MyState>,
+          GetState<MyState>,
+          StoreApiWithSubscribeWithSelector<MyState> &
+            StoreApiWithPersist<MyState>
+        >(
           () => ({
-            foo: true as boolean,
+            foo: true,
           }),
           { name: 'name' }
         )
