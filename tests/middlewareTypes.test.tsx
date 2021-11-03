@@ -518,20 +518,26 @@ describe('counter state spec (quadruple middleware)', () => {
 })
 
 describe('more complex state spec with subscribeWithSelector', () => {
-  it('#619', () => {
+  it('#619, #632', () => {
     type MyState = {
-      foo: boolean | string
+      foo: boolean
     }
-    const useStore = create<
-      MyState,
-      SetState<MyState>,
-      GetState<MyState>,
-      StoreApiWithSubscribeWithSelector<MyState>
-    >(
-      subscribeWithSelector(() => ({
-        // NOTE: It complains without type assertion.
-        foo: true as boolean | string,
-      }))
+    const useStore = create(
+      subscribeWithSelector(
+        // NOTE: Adding type annotation to inner middleware works.
+        persist<
+          MyState,
+          SetState<MyState>,
+          GetState<MyState>,
+          StoreApiWithSubscribeWithSelector<MyState> &
+            StoreApiWithPersist<MyState>
+        >(
+          () => ({
+            foo: true,
+          }),
+          { name: 'name' }
+        )
+      )
     )
     const TestComponent = () => {
       useStore((s) => s.foo)
@@ -560,42 +566,8 @@ describe('more complex state spec with subscribeWithSelector', () => {
         () =>
           ({
             foo: 1,
-            // NOTE: Asserting the entire state works.
+            // NOTE: Asserting the entire state works too.
           } as MyState)
-      )
-    )
-    const TestComponent = () => {
-      useStore((s) => s.foo)
-      useStore().foo
-      useStore.getState().foo
-      useStore.subscribe(
-        (state) => state.foo,
-        (foo) => console.log(foo)
-      )
-      return <></>
-    }
-    TestComponent
-  })
-
-  it('#632', () => {
-    type MyState = {
-      foo: boolean
-    }
-    const useStore = create(
-      subscribeWithSelector(
-        // NOTE: Adding type annotation to inner middleware works.
-        persist<
-          MyState,
-          SetState<MyState>,
-          GetState<MyState>,
-          StoreApiWithSubscribeWithSelector<MyState> &
-            StoreApiWithPersist<MyState>
-        >(
-          () => ({
-            foo: true,
-          }),
-          { name: 'name' }
-        )
       )
     )
     const TestComponent = () => {
