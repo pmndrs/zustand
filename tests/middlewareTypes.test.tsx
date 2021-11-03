@@ -17,12 +17,6 @@ import {
   subscribeWithSelector,
 } from 'zustand/middleware'
 
-type TImmerConfigFn<T extends State> = (
-  partial: ((draft: Draft<T>) => void) | T,
-  replace?: boolean
-) => void
-type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
-
 const immer =
   <
     T extends State,
@@ -30,7 +24,12 @@ const immer =
     CustomGetState extends GetState<T>,
     CustomStoreApi extends StoreApi<T>
   >(
-    config: TImmerConfig<T>
+    config: StateCreator<
+      T,
+      (partial: ((draft: Draft<T>) => void) | T, replace?: boolean) => void,
+      CustomGetState,
+      CustomStoreApi
+    >
   ): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> =>
   (set, get, api) =>
     config(
