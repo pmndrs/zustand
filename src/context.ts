@@ -99,6 +99,7 @@ function createContext<
     Provider,
     useStore,
     useStoreApi,
+    Context: ZustandContext,
   }
 }
 
