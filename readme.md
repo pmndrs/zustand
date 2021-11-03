@@ -318,26 +318,15 @@ const useStore = createStore(set => ({
 
 export default useStore
 ```
+
 For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
 </details>
 
 <details>
 <summary>How to type immer middleware in TypeScript</summary>
 
-```ts
-import { State, StateCreator } from 'zustand'
-import produce, { Draft } from 'immer'
-
-const immer = <T extends State>(config: StateCreator<T>): StateCreator<T> => 
-  (set, get, api) => config((partial, replace) => {
-    const nextState =
-      typeof partial === 'function'
-        ? produce(partial as (state: Draft<T>) => T)
-        : partial as T
-    return set(nextState, replace)
-  }, get, api)
-```
-
+There is a reference implementation in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx) with some use cases.
+You can use any simplified variant based on your requirement.
 </details>
 
 ## Persist middleware
@@ -609,6 +598,8 @@ const useStore = create(
   ),
 )
 ```
+
+Typing with multiple middleware might require some TypeScript knowledge. Refer some working examples in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
   
 ## Best practices
   
