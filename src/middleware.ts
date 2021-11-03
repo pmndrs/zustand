@@ -64,8 +64,6 @@ export type NamedSet<T extends State> = {
 
 export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   setState: NamedSet<T>
-  // Note: required for type inference. can we avoid this?
-  _devtoolsEnabled: undefined
   devtools?: DevtoolsType
 }
 
@@ -221,8 +219,6 @@ export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
       }
     ): () => void
   }
-  // Note: This will be removed in v4
-  subscribeWithSelectorEnabled: true
 }
 
 export const subscribeWithSelector =
@@ -259,8 +255,6 @@ export const subscribeWithSelector =
       }
       return origSubscribe(listener)
     }) as any
-    // Note: This will be removed in v4
-    api.subscribeWithSelectorEnabled = true
     const initialState = fn(set, get, api as CustomStoreApi)
     return initialState
   }
