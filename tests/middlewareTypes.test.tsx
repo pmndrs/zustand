@@ -145,13 +145,10 @@ describe('counter state spec (single middleware)', () => {
       GetState<CounterState>,
       StoreApiWithSubscribeWithSelector<CounterState>
     >(
-      devtools(
-        subscribeWithSelector((set, get) => ({
-          count: 1,
-          inc: () => set({ count: get().count + 1 }, false, 'inc'),
-        })),
-        { name: 'prefix' }
-      )
+      subscribeWithSelector((set, get) => ({
+        count: 1,
+        inc: () => set({ count: get().count + 1 }, false),
+      }))
     )
     const TestComponent = () => {
       useStore((s) => s.count) * 2
