@@ -548,11 +548,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
 
   it('#632', () => {
     type MyState = {
-      count: number
-      obj: {
-        prop: string
-      }
-      inc: () => void
+      foo: boolean
     }
     const useStore = create<
       MyState,
@@ -562,25 +558,20 @@ describe('more complex state spec with subscribeWithSelector', () => {
     >(
       subscribeWithSelector(
         persist(
-          (set, get) => ({
-            count: 0,
-            obj: { prop: 'foo' },
-            inc: () => set({ count: get().count + 1 }, false),
+          () => ({
+            foo: true as boolean,
           }),
           { name: 'name' }
         )
       )
     )
     const TestComponent = () => {
-      useStore((s) => s.count) * 2
-      useStore((s) => s.inc)()
-      useStore().count * 2
-      useStore().inc()
-      useStore.getState().count * 2
-      useStore.getState().inc()
+      useStore((s) => s.foo)
+      useStore().foo
+      useStore.getState().foo
       useStore.subscribe(
-        (state) => state.count,
-        (count) => console.log(count * 2)
+        (state) => state.foo,
+        (foo) => console.log(foo)
       )
       return <></>
     }
