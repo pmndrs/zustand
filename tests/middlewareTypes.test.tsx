@@ -546,13 +546,44 @@ describe('more complex state spec with subscribeWithSelector', () => {
     TestComponent
   })
 
+  it('#631', () => {
+    type MyState = {
+      foo: number | null
+    }
+    const useStore = create<
+      MyState,
+      SetState<MyState>,
+      GetState<MyState>,
+      StoreApiWithSubscribeWithSelector<MyState>
+    >(
+      subscribeWithSelector(
+        () =>
+          ({
+            foo: 1,
+            // NOTE: Asserting the entire state works.
+          } as MyState)
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.foo)
+      useStore().foo
+      useStore.getState().foo
+      useStore.subscribe(
+        (state) => state.foo,
+        (foo) => console.log(foo)
+      )
+      return <></>
+    }
+    TestComponent
+  })
+
   it('#632', () => {
     type MyState = {
       foo: boolean
     }
     const useStore = create(
       subscribeWithSelector(
-        // NOTE: Adding type annotation to inner middleware works too
+        // NOTE: Adding type annotation to inner middleware works.
         persist<
           MyState,
           SetState<MyState>,
