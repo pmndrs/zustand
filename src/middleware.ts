@@ -206,7 +206,7 @@ export const devtools =
 
 export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   StoreApi<T>,
-  'subscribe'
+  'subscribe' // FIXME remove omit in v4
 > & {
   subscribe: {
     (listener: StateListener<T>): () => void
@@ -233,7 +233,7 @@ export const subscribeWithSelector =
   (
     set: CustomSetState,
     get: CustomGetState,
-    api: Omit<CustomStoreApi, 'subscribe'> &
+    api: Omit<CustomStoreApi, 'subscribe'> & // FIXME remove omit in v4
       StoreApiWithSubscribeWithSelector<S>
   ): S => {
     const origSubscribe = api.subscribe as Subscribe<S>
@@ -255,7 +255,11 @@ export const subscribeWithSelector =
       }
       return origSubscribe(listener)
     }) as any
-    const initialState = fn(set, get, api as CustomStoreApi)
+    const initialState = fn(
+      set,
+      get,
+      api as CustomStoreApi // FIXME can remove in v4?
+    )
     return initialState
   }
 

@@ -368,8 +368,7 @@ describe('counter state spec (double middleware)', () => {
         persist(
           (set, get) => ({
             count: 1,
-            inc: () =>
-              set({ count: get().count + 1 }, false /* TODO , 'inc' */),
+            inc: () => set({ count: get().count + 1 }, false, 'inc'),
           }),
           { name: 'count' }
         ),
