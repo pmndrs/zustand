@@ -63,11 +63,10 @@ export type NamedSet<T extends State> = {
   ): void
 }
 
-export type StoreApiWithDevtools<T extends State> = Omit<
-  StoreApi<T>,
-  'setState'
-> & {
-  setState: SetState<T> | NamedSet<T>
+export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
+  setState: NamedSet<T>
+  // Note: required for type inference. can we avoid this?
+  _devtoolsEnabled: undefined
   devtools?: DevtoolsType
 }
 

@@ -220,7 +220,12 @@ describe('counter state spec (single middleware)', () => {
 
 describe('counter state spec (double middleware)', () => {
   it('devtools & immer', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithDevtools<CounterState>
+    >(
       devtools(
         immer((set, get) => ({
           count: 0,
@@ -324,7 +329,8 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
+      StoreApiWithSubscribeWithSelector<CounterState> &
+        StoreApiWithDevtools<CounterState>
     >(
       devtools(
         subscribeWithSelector((set, get) => ({
@@ -356,7 +362,7 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState>
+      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
     >(
       devtools(
         persist(
@@ -390,7 +396,7 @@ describe('counter state spec (triple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState>
+      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
     >(
       devtools(
         persist(
@@ -453,7 +459,8 @@ describe('counter state spec (triple middleware)', () => {
       SetState<CounterState>,
       GetState<CounterState>,
       StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState>
+        StoreApiWithPersist<CounterState> &
+        StoreApiWithDevtools<CounterState>
     >(
       devtools(
         subscribeWithSelector(
@@ -493,7 +500,8 @@ describe('counter state spec (quadruple middleware)', () => {
       SetState<CounterState>,
       GetState<CounterState>,
       StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState>
+        StoreApiWithPersist<CounterState> &
+        StoreApiWithDevtools<CounterState>
     >(
       devtools(
         subscribeWithSelector(
