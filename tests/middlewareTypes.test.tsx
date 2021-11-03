@@ -566,8 +566,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
         () =>
           ({
             foo: 1,
-            // NOTE: Asserting the entire state works too.
-          } as MyState)
+          } as MyState) // NOTE: Asserting the entire state works too.
       )
     )
     const TestComponent = () => {
