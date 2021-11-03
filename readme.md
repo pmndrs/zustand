@@ -609,6 +609,8 @@ const useStore = create(
   ),
 )
 ```
+
+Typing with multiple middleware is a bit of pain. Refer some working examples in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
   
 ## Best practices
   
