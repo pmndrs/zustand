@@ -63,7 +63,11 @@ export type NamedSet<T extends State> = {
   ): void
 }
 
-export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
+export type StoreApiWithDevtools<T extends State> = Omit<
+  StoreApi<T>,
+  'setState'
+> & {
+  setState: SetState<T> | NamedSet<T>
   devtools?: DevtoolsType
 }
 
@@ -124,6 +128,7 @@ export const devtools =
         api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
+    api.setState = namedSet
     const initialState = fn(namedSet, get, api)
     if (!api.devtools) {
       const savedSetState = api.setState

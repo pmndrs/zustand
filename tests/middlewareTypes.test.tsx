@@ -8,6 +8,7 @@ import create, {
   StoreApi,
 } from 'zustand'
 import {
+  StoreApiWithDevtools,
   StoreApiWithPersist,
   StoreApiWithSubscribeWithSelector,
   combine,
@@ -117,7 +118,12 @@ describe('counter state spec (single middleware)', () => {
   })
 
   it('devtools', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithDevtools<CounterState>
+    >(
       devtools(
         (set, get) => ({
           count: 0,
@@ -133,6 +139,7 @@ describe('counter state spec (single middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -236,6 +243,7 @@ describe('counter state spec (double middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -263,6 +271,7 @@ describe('counter state spec (double middleware)', () => {
       useStore((s) => s.dispatch)({ type: 'INC' })
       useStore().dispatch({ type: 'INC' })
       useStore.dispatch({ type: 'INC' })
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -284,6 +293,7 @@ describe('counter state spec (double middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -339,6 +349,7 @@ describe('counter state spec (double middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -370,6 +381,7 @@ describe('counter state spec (double middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -405,6 +417,7 @@ describe('counter state spec (triple middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -432,6 +445,7 @@ describe('counter state spec (triple middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -469,6 +483,7 @@ describe('counter state spec (triple middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -511,6 +526,7 @@ describe('counter state spec (quadruple middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
