@@ -106,23 +106,6 @@ const treats = useStore(
 )
 ```
 
-## Memoizing selectors
-
-It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
-
-```jsx
-const fruit = useStore(useCallback(state => state.fruits[id], [id]))
-```
-
-If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
-
-```jsx
-const selector = state => state.berries
-
-function Component() {
-  const berries = useStore(selector)
-```
-
 ## Overwriting state
 
 The `set` function has a second argument, `false` by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
