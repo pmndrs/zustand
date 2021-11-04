@@ -27,7 +27,6 @@ export type StoreApiWithRedux<
   A extends { type: unknown }
 > = StoreApi<T & { dispatch: (a: A) => A }> & {
   dispatch: (a: A) => A
-  devtools?: DevtoolsType
 }
 
 export const redux =
@@ -38,7 +37,7 @@ export const redux =
   (
     set: SetState<S & { dispatch: (a: A) => A }>,
     get: GetState<S & { dispatch: (a: A) => A }>,
-    api: StoreApiWithRedux<S, A>
+    api: StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
       set((state: S) => reducer(state, action))
@@ -64,6 +63,7 @@ export type NamedSet<T extends State> = {
 }
 
 export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
+  setState: NamedSet<T>
   devtools?: DevtoolsType
 }
 
@@ -72,7 +72,7 @@ export const devtools =
     S extends State,
     CustomSetState extends SetState<S>,
     CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApiWithDevtools<S>
+    CustomStoreApi extends StoreApi<S>
   >(
     fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
     options?:
@@ -99,7 +99,7 @@ export const devtools =
   (
     set: CustomSetState,
     get: CustomGetState,
-    api: CustomStoreApi & { dispatch?: unknown }
+    api: CustomStoreApi & StoreApiWithDevtools<S> & { dispatch?: unknown }
   ): S => {
     let extension
     try {
@@ -124,6 +124,7 @@ export const devtools =
         api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
+    api.setState = namedSet
     const initialState = fn(namedSet, get, api)
     if (!api.devtools) {
       const savedSetState = api.setState
@@ -214,8 +215,6 @@ export type StoreApiWithSubscribeWithSelector<T extends State> = StoreApi<T> & {
       }
     ): () => void
   }
-  // Note: required for type inference. can we avoid this?
-  _subscribeWithSelectorEnabled: undefined
 }
 
 export const subscribeWithSelector =
@@ -223,11 +222,15 @@ export const subscribeWithSelector =
     S extends State,
     CustomSetState extends SetState<S>,
     CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApiWithSubscribeWithSelector<S>
+    CustomStoreApi extends StoreApi<S>
   >(
     fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
   ) =>
-  (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
+  (
+    set: CustomSetState,
+    get: CustomGetState,
+    api: CustomStoreApi & StoreApiWithSubscribeWithSelector<S>
+  ): S => {
     const origSubscribe = api.subscribe as Subscribe<S>
     api.subscribe = ((selector: any, optListener: any, options: any) => {
       let listener: StateListener<S> = selector // if no selector
@@ -409,7 +412,7 @@ export const persist =
     S extends State,
     CustomSetState extends SetState<S>,
     CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApiWithPersist<S>
+    CustomStoreApi extends StoreApi<S>
   >(
     config: (
       set: CustomSetState,
@@ -418,7 +421,11 @@ export const persist =
     ) => S,
     baseOptions: PersistOptions<S>
   ) =>
-  (set: CustomSetState, get: CustomGetState, api: CustomStoreApi): S => {
+  (
+    set: CustomSetState,
+    get: CustomGetState,
+    api: CustomStoreApi & StoreApiWithPersist<S>
+  ): S => {
     let options = {
       getStorage: () => localStorage,
       serialize: JSON.stringify as (state: StorageValue<S>) => string,
