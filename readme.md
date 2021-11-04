@@ -439,7 +439,33 @@ devtools will only log actions from each separated store unlike in a typical *co
 
 ## React context
 
-The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the store is a hook, passing it as a normal context value may violate rules of hooks. To avoid misusage, a special `createContext` is provided.
+The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the normal store is a hook, passing it as a normal context value may violate rules of hooks.
+
+The flexible method available since v4 is to use vanilla store.
+
+```jsx
+import { createContext, useContext } from 'react'
+import { createStore, useStore } from 'zustand'
+
+const store = createStore(...) // vanilla store without hooks
+
+const StoreContext = createContext()
+
+const App = () => (
+  <StoreContext.Provider value={store}>
+    ...
+  </StoreContext.Provider>
+)
+
+const Component = () => {
+  const store = useContext(StoreContext)
+  const slice = useStore(store, selector)
+  ...
+}
+```
+
+Alternatively, a special `createContext` is provided since v3.5,
+which avoid misusing the store hook.
 
 ```jsx
 import create from 'zustand'
@@ -461,6 +487,7 @@ const Component = () => {
   ...
 }
 ```
+
 <details>
   <summary>createContext usage in real components</summary>
 
