@@ -8,6 +8,7 @@ import create, {
   StoreApi,
 } from 'zustand'
 import {
+  StoreApiWithDevtools,
   StoreApiWithPersist,
   StoreApiWithSubscribeWithSelector,
   combine,
@@ -17,12 +18,6 @@ import {
   subscribeWithSelector,
 } from 'zustand/middleware'
 
-type TImmerConfigFn<T extends State> = (
-  partial: ((draft: Draft<T>) => void) | T,
-  replace?: boolean
-) => void
-type TImmerConfig<T extends State> = StateCreator<T, TImmerConfigFn<T>>
-
 const immer =
   <
     T extends State,
@@ -30,7 +25,12 @@ const immer =
     CustomGetState extends GetState<T>,
     CustomStoreApi extends StoreApi<T>
   >(
-    config: TImmerConfig<T>
+    config: StateCreator<
+      T,
+      (partial: ((draft: Draft<T>) => void) | T, replace?: boolean) => void,
+      CustomGetState,
+      CustomStoreApi
+    >
   ): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> =>
   (set, get, api) =>
     config(
@@ -117,7 +117,12 @@ describe('counter state spec (single middleware)', () => {
   })
 
   it('devtools', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithDevtools<CounterState>
+    >(
       devtools(
         (set, get) => ({
           count: 0,
@@ -133,6 +138,7 @@ describe('counter state spec (single middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -145,13 +151,10 @@ describe('counter state spec (single middleware)', () => {
       GetState<CounterState>,
       StoreApiWithSubscribeWithSelector<CounterState>
     >(
-      devtools(
-        subscribeWithSelector((set, get) => ({
-          count: 1,
-          inc: () => set({ count: get().count + 1 }, false, 'inc'),
-        })),
-        { name: 'prefix' }
-      )
+      subscribeWithSelector((set, get) => ({
+        count: 1,
+        inc: () => set({ count: get().count + 1 }, false),
+      }))
     )
     const TestComponent = () => {
       useStore((s) => s.count) * 2
@@ -217,7 +220,12 @@ describe('counter state spec (single middleware)', () => {
 
 describe('counter state spec (double middleware)', () => {
   it('devtools & immer', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<
+      CounterState,
+      SetState<CounterState>,
+      GetState<CounterState>,
+      StoreApiWithDevtools<CounterState>
+    >(
       devtools(
         immer((set, get) => ({
           count: 0,
@@ -236,6 +244,7 @@ describe('counter state spec (double middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -263,6 +272,7 @@ describe('counter state spec (double middleware)', () => {
       useStore((s) => s.dispatch)({ type: 'INC' })
       useStore().dispatch({ type: 'INC' })
       useStore.dispatch({ type: 'INC' })
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -284,6 +294,7 @@ describe('counter state spec (double middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -318,7 +329,8 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
+      StoreApiWithSubscribeWithSelector<CounterState> &
+        StoreApiWithDevtools<CounterState>
     >(
       devtools(
         subscribeWithSelector((set, get) => ({
@@ -339,6 +351,7 @@ describe('counter state spec (double middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -349,14 +362,13 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState>
+      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
     >(
       devtools(
         persist(
           (set, get) => ({
             count: 1,
-            inc: () =>
-              set({ count: get().count + 1 }, false /* TODO , 'inc' */),
+            inc: () => set({ count: get().count + 1 }, false, 'inc'),
           }),
           { name: 'count' }
         ),
@@ -370,6 +382,7 @@ describe('counter state spec (double middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -382,7 +395,7 @@ describe('counter state spec (triple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState>
+      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
     >(
       devtools(
         persist(
@@ -405,6 +418,7 @@ describe('counter state spec (triple middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -432,6 +446,7 @@ describe('counter state spec (triple middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -443,7 +458,8 @@ describe('counter state spec (triple middleware)', () => {
       SetState<CounterState>,
       GetState<CounterState>,
       StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState>
+        StoreApiWithPersist<CounterState> &
+        StoreApiWithDevtools<CounterState>
     >(
       devtools(
         subscribeWithSelector(
@@ -469,6 +485,7 @@ describe('counter state spec (triple middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -482,7 +499,8 @@ describe('counter state spec (quadruple middleware)', () => {
       SetState<CounterState>,
       GetState<CounterState>,
       StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState>
+        StoreApiWithPersist<CounterState> &
+        StoreApiWithDevtools<CounterState>
     >(
       devtools(
         subscribeWithSelector(
@@ -511,6 +529,7 @@ describe('counter state spec (quadruple middleware)', () => {
         (state) => state.count,
         (count) => console.log(count * 2)
       )
+      useStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
     TestComponent
@@ -518,9 +537,43 @@ describe('counter state spec (quadruple middleware)', () => {
 })
 
 describe('more complex state spec with subscribeWithSelector', () => {
-  it('#619', () => {
+  it('#619, #632', () => {
     type MyState = {
-      foo: boolean | string
+      foo: boolean
+    }
+    const useStore = create(
+      subscribeWithSelector(
+        // NOTE: Adding type annotation to inner middleware works.
+        persist<
+          MyState,
+          SetState<MyState>,
+          GetState<MyState>,
+          StoreApiWithSubscribeWithSelector<MyState> &
+            StoreApiWithPersist<MyState>
+        >(
+          () => ({
+            foo: true,
+          }),
+          { name: 'name' }
+        )
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.foo)
+      useStore().foo
+      useStore.getState().foo
+      useStore.subscribe(
+        (state) => state.foo,
+        (foo) => console.log(foo)
+      )
+      return <></>
+    }
+    TestComponent
+  })
+
+  it('#631', () => {
+    type MyState = {
+      foo: number | null
     }
     const useStore = create<
       MyState,
@@ -528,10 +581,12 @@ describe('more complex state spec with subscribeWithSelector', () => {
       GetState<MyState>,
       StoreApiWithSubscribeWithSelector<MyState>
     >(
-      subscribeWithSelector(() => ({
-        // Note: It complains without type assertion.
-        foo: true as boolean | string,
-      }))
+      subscribeWithSelector(
+        () =>
+          ({
+            foo: 1,
+          } as MyState) // NOTE: Asserting the entire state works too.
+      )
     )
     const TestComponent = () => {
       useStore((s) => s.foo)
