@@ -368,7 +368,7 @@ export type PersistOptions<
   merge?: (persistedState: any, currentState: S) => S
 }
 export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
-  persist: {
+  persist?: {
     setOptions: (options: Partial<PersistOptions<S>>) => void
     clearStorage: () => void
     rehydrate: () => Promise<void>
@@ -458,7 +458,7 @@ export const persist =
 
     let hasHydrated = false
     const onHydrateCallbacks: Parameters<
-      StoreApiWithPersist<S>['persist']['onHydrate']
+      Exclude<StoreApiWithPersist<S>['persist'], undefined>['onHydrate']
     >[0][] = []
     let storage: StateStorage | undefined
 
