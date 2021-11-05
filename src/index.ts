@@ -44,7 +44,7 @@ export type UseBoundStore<
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 } & CustomStoreApi
 
-export default function create<
+function create<
   TState extends State,
   CustomSetState,
   CustomGetState,
@@ -55,13 +55,13 @@ export default function create<
     | CustomStoreApi
 ): UseBoundStore<TState, CustomStoreApi>
 
-export default function create<TState extends State>(
+function create<TState extends State>(
   createState:
     | StateCreator<TState, SetState<TState>, GetState<TState>, any>
     | StoreApi<TState>
 ): UseBoundStore<TState, StoreApi<TState>>
 
-export default function create<
+function create<
   TState extends State,
   CustomSetState,
   CustomGetState,
@@ -175,3 +175,5 @@ export default function create<
 
   return useStore
 }
+
+export default create
