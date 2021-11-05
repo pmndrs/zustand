@@ -46,9 +46,26 @@ export type UseBoundStore<
 
 export default function create<
   TState extends State,
-  CustomSetState = SetState<TState>,
-  CustomGetState = GetState<TState>,
-  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+  CustomSetState,
+  CustomGetState,
+  CustomStoreApi extends StoreApi<TState>
+>(
+  createState:
+    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
+    | CustomStoreApi
+): UseBoundStore<TState, CustomStoreApi>
+
+export default function create<TState extends State>(
+  createState:
+    | StateCreator<TState, SetState<TState>, GetState<TState>, any>
+    | StoreApi<TState>
+): UseBoundStore<TState, StoreApi<TState>>
+
+export default function create<
+  TState extends State,
+  CustomSetState,
+  CustomGetState,
+  CustomStoreApi extends StoreApi<TState>
 >(
   createState:
     | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
