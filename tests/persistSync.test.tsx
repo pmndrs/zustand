@@ -479,11 +479,14 @@ describe('persist middleware with sync configuration', () => {
     expect(useStore.persist.hasHydrated()).toBe(true)
   })
 
-  it('can wait for hydration through the api', async () => {
-    const storageValue = '{"state":{"count":1},"version":0}'
+  it('can wait for rehydration through the api', async () => {
+    const storageValue1 = '{"state":{"count":1},"version":0}'
+    const storageValue2 = '{"state":{"count":2},"version":0}'
 
     const onHydrateSpy1 = jest.fn()
     const onHydrateSpy2 = jest.fn()
+    const onFinishHydrationSpy1 = jest.fn()
+    const onFinishHydrationSpy2 = jest.fn()
 
     const storage = {
       getItem: () => '',
@@ -498,12 +501,29 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    useStore.persist.onHydrate(onHydrateSpy1)
+    const hydrateUnsub1 = useStore.persist.onHydrate(onHydrateSpy1)
     useStore.persist.onHydrate(onHydrateSpy2)
 
-    storage.getItem = () => storageValue
+    const finishHydrationUnsub1 = useStore.persist.onFinishHydration(
+      onFinishHydrationSpy1
+    )
+    useStore.persist.onFinishHydration(onFinishHydrationSpy2)
+
+    storage.getItem = () => storageValue1
     await useStore.persist.rehydrate()
-    expect(onHydrateSpy1).toBeCalledWith({ count: 1 })
+    expect(onHydrateSpy1).toBeCalledWith({ count: 0 })
+    expect(onHydrateSpy2).toBeCalledWith({ count: 0 })
+    expect(onFinishHydrationSpy1).toBeCalledWith({ count: 1 })
+    expect(onFinishHydrationSpy2).toBeCalledWith({ count: 1 })
+
+    hydrateUnsub1()
+    finishHydrationUnsub1()
+
+    storage.getItem = () => storageValue2
+    await useStore.persist.rehydrate()
+    expect(onHydrateSpy1).not.toBeCalledTimes(2)
     expect(onHydrateSpy2).toBeCalledWith({ count: 1 })
+    expect(onFinishHydrationSpy1).not.toBeCalledTimes(2)
+    expect(onFinishHydrationSpy2).toBeCalledWith({ count: 2 })
   })
 })
