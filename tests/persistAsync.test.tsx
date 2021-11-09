@@ -451,7 +451,7 @@ describe('persist middleware with async configuration', () => {
       })
     )
     expect(useStore.persist.hasHydrated()).toBe(false)
-    await new Promise((resolve) => useStore.persist.onHydrate(resolve))
+    await new Promise((resolve) => useStore.persist.onFinishHydration(resolve))
     expect(useStore.persist.hasHydrated()).toBe(true)
 
     await useStore.persist.rehydrate()
