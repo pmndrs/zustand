@@ -212,6 +212,29 @@ describe('counter state spec (single middleware)', () => {
       useStore().inc()
       useStore.getState().count * 2
       useStore.getState().inc()
+      useStore.persist.hasHydrated()
+      return <></>
+    }
+    TestComponent
+  })
+
+  it('persist without custom api (#638)', () => {
+    const useStore = create<CounterState>(
+      persist(
+        (set, get) => ({
+          count: 1,
+          inc: () => set({ count: get().count + 1 }, false),
+        }),
+        { name: 'prefix' }
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.count) * 2
+      useStore((s) => s.inc)()
+      useStore().count * 2
+      useStore().inc()
+      useStore.getState().count * 2
+      useStore.getState().inc()
       return <></>
     }
     TestComponent
@@ -383,6 +406,7 @@ describe('counter state spec (double middleware)', () => {
       useStore.getState().count * 2
       useStore.getState().inc()
       useStore.setState({ count: 0 }, false, 'reset')
+      useStore.persist.hasHydrated()
       return <></>
     }
     TestComponent
@@ -419,6 +443,7 @@ describe('counter state spec (triple middleware)', () => {
       useStore.getState().count * 2
       useStore.getState().inc()
       useStore.setState({ count: 0 }, false, 'reset')
+      useStore.persist.hasHydrated()
       return <></>
     }
     TestComponent
@@ -486,6 +511,7 @@ describe('counter state spec (triple middleware)', () => {
         (count) => console.log(count * 2)
       )
       useStore.setState({ count: 0 }, false, 'reset')
+      useStore.persist.hasHydrated()
       return <></>
     }
     TestComponent
@@ -530,6 +556,7 @@ describe('counter state spec (quadruple middleware)', () => {
         (count) => console.log(count * 2)
       )
       useStore.setState({ count: 0 }, false, 'reset')
+      useStore.persist.hasHydrated()
       return <></>
     }
     TestComponent
@@ -566,6 +593,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
         (state) => state.foo,
         (foo) => console.log(foo)
       )
+      useStore.persist.hasHydrated()
       return <></>
     }
     TestComponent
