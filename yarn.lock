@@ -1409,10 +1409,10 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
-"@types/use-sync-external-store@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.2.tgz#8341da05beb7dc3b6339eaa8a1b1e8a6e3472175"
-  integrity sha512-gHIGn4QNww3pIUE97gshEqGP+aFpFAg3hQvdD9JHKqlnM+l0Q86gMAyQ0ZjibXj8QY+HaKP8cpIgxHgXt9zPQQ==
+"@types/use-sync-external-store@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.3.tgz#b6725d5f4af24ace33b36fafd295136e75509f43"
+  integrity sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==
 
 "@types/yargs-parser@*":
   version "20.2.1"
@@ -4873,10 +4873,10 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-use-sync-external-store@1.0.0-alpha-5cccacd13-20211101:
-  version "1.0.0-alpha-5cccacd13-20211101"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-alpha-5cccacd13-20211101.tgz#f8833884764e1445291c67e6364a5965c74c75e7"
-  integrity sha512-fHBWZJfojgj5xQ+63annym0vZ4tTtJlEAjzhnSdk6B2ptnPeV2OoGSk91kcpchbbaH1JororN4xXDgJ0A4ar2A==
+use-sync-external-store@1.0.0-alpha-327d5c484-20211106:
+  version "1.0.0-alpha-327d5c484-20211106"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-alpha-327d5c484-20211106.tgz#5fc66fa4f2063cca6d5200d3752fcfc37a828ace"
+  integrity sha512-aooJ6dp3B6nxob2CZl58yr1gNQhxq3Rj4yBDsP7ue6RmZ9+S7Z30RP4j5986Mpa3pMmmUjKEb34FqxuiphO1Uw==
 
 v8-compile-cache@^2.0.3:
   version "2.3.0"
