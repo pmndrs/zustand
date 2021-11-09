@@ -30,8 +30,8 @@ jobs:
         react:
           - 16.8.0
           - 17.0.0
-          - 18.0.0-alpha-255221c86-20211103
-          - 0.0.0-experimental-255221c86-20211103
+          - 18.0.0-alpha-327d5c484-20211106
+          - 0.0.0-experimental-327d5c484-20211106
         testing: [default, alpha]
         exclude:
           - { react: 16.8.0, testing: alpha }

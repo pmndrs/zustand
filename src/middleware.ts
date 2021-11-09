@@ -358,13 +358,15 @@ export type PersistOptions<
    */
   merge?: (persistedState: any, currentState: S) => S
 }
+type PersistListener<S> = (state: S) => void
 export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
   persist: {
     setOptions: (options: Partial<PersistOptions<S>>) => void
     clearStorage: () => void
     rehydrate: () => Promise<void>
     hasHydrated: () => boolean
-    onHydrate: (fn: (state: S) => void) => void
+    onHydrate: (fn: PersistListener<S>) => () => void
+    onFinishHydration: (fn: PersistListener<S>) => () => void
   }
 }
 
@@ -448,9 +450,8 @@ export const persist =
     }
 
     let hasHydrated = false
-    const onHydrateCallbacks: Parameters<
-      StoreApiWithPersist<S>['persist']['onHydrate']
-    >[0][] = []
+    const hydrationListeners = new Set<PersistListener<S>>()
+    const finishHydrationListeners = new Set<PersistListener<S>>()
     let storage: StateStorage | undefined
 
     try {
@@ -530,6 +531,7 @@ export const persist =
       if (!storage) return
 
       hasHydrated = false
+      hydrationListeners.forEach((cb) => cb(get()))
 
       const postRehydrationCallback =
         options.onRehydrateStorage?.(get()) || undefined
@@ -570,7 +572,7 @@ export const persist =
         .then(() => {
           postRehydrationCallback?.(stateFromStorage, undefined)
           hasHydrated = true
-          onHydrateCallbacks.forEach((cb) => cb(stateFromStorage as S))
+          finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
         })
         .catch((e: Error) => {
           postRehydrationCallback?.(undefined, e)
@@ -594,7 +596,18 @@ export const persist =
       rehydrate: () => hydrate() as Promise<void>,
       hasHydrated: () => hasHydrated,
       onHydrate: (cb) => {
-        onHydrateCallbacks.push(cb)
+        hydrationListeners.add(cb)
+
+        return () => {
+          hydrationListeners.delete(cb)
+        }
+      },
+      onFinishHydration: (cb) => {
+        finishHydrationListeners.add(cb)
+
+        return () => {
+          finishHydrationListeners.delete(cb)
+        }
       },
     }
 

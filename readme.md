@@ -213,6 +213,30 @@ const unsub4 = useStore.subscribe(state => [state.paw, state.fur], console.log, 
 const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmediately: true })
 ```
 
+<details>
+<summary>How to type store with `subscribeWithSelector` in TypeScript</summary>
+
+```ts
+import create, { GetState, SetState } from 'zustand'
+import { StoreApiWithSubscribeWithSelector } from 'zustand/middleware'
+
+type BearState = {
+  paw: boolean
+  snout: boolean
+  fur: boolean
+}
+const useStore = create<
+  BearState,
+  SetState<BearState>,
+  GetState<BearState>,
+  StoreApiWithSubscribeWithSelector<BearState>
+>(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
+```
+
+For more complex typing with multiple middlewares,
+Please refer [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
+</details>
+
 ## Using zustand without React
 
 Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
