@@ -52,11 +52,29 @@ export type StateCreator<
   CustomStoreApi extends StoreApi<T> = StoreApi<T>
 > = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
 
-export default function createStore<
+function createStore<
   TState extends State,
-  CustomSetState = SetState<TState>,
-  CustomGetState = GetState<TState>,
-  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
+  CustomSetState,
+  CustomGetState,
+  CustomStoreApi extends StoreApi<TState>
+>(
+  createState: StateCreator<
+    TState,
+    CustomSetState,
+    CustomGetState,
+    CustomStoreApi
+  >
+): CustomStoreApi
+
+function createStore<TState extends State>(
+  createState: StateCreator<TState, SetState<TState>, GetState<TState>, any>
+): StoreApi<TState>
+
+function createStore<
+  TState extends State,
+  CustomSetState,
+  CustomGetState,
+  CustomStoreApi extends StoreApi<TState>
 >(
   createState: StateCreator<
     TState,
@@ -131,3 +149,5 @@ export default function createStore<
   )
   return api as unknown as CustomStoreApi
 }
+
+export default createStore
