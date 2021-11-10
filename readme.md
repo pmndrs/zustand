@@ -368,46 +368,12 @@ export const useStore = create(persist(
   }),
   {
     name: "food-storage", // unique name
-    getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
+    getStorage: () => sessionStorage, // (optional) by default, 'localStorage' is used
   }
 ))
 ```
 
-<details>
-<summary>How to use custom storage engines</summary>
-
-You can use other storage methods outside of `localStorage` and `sessionStorage` by defining your own `StateStorage`. A custom `StateStorage` object also allows you to write middlware for the persisted store when getting or setting store data.
-
-```tsx
-import create from "zustand"
-import { persist, StateStorage } from "zustand/middleware"
-import { get, set } from 'idb-keyval' // can use anything: IndexedDB, Ionic Storage, etc.
-
-// Custom storage object
-const storage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    console.log(name, "has been retrieved");
-    return await get(name) || null
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    console.log(name, "with value", value, "has been saved");
-    set(name, value)
-  }
-}
-
-export const useStore = create(persist(
-  (set, get) => ({
-    fishes: 0,
-    addAFish: () => set({ fishes: get().fishes + 1 })
-  }),
-  {
-    name: "food-storage", // unique name
-    getStorage: () => storage,
-  }
-))
-```
-
-</details>
+[See the full documentation for this middleware.](https://github.com/pmndrs/zustand/wiki/Persisting-the-store's-data)
 
 ## Can't live without redux-like reducers and action types?
 
