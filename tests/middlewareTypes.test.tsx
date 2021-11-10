@@ -628,4 +628,35 @@ describe('more complex state spec with subscribeWithSelector', () => {
     }
     TestComponent
   })
+
+  it('#650', () => {
+    type MyState = {
+      token: string | undefined
+      authenticated: boolean
+      authenticate: (username: string, password: string) => Promise<void>
+    }
+    const useStore = create<MyState>(
+      persist(
+        (set) =>
+          ({
+            token: undefined,
+            authenticated: false,
+            authenticate: async (_username, _password) => {
+              set({ authenticated: true })
+            },
+          } as MyState),
+        { name: 'auth-store' }
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.authenticated)
+      useStore((s) => s.authenticate)('u', 'p')
+      useStore().authenticated
+      useStore().authenticate('u', 'p')
+      useStore.getState().authenticated
+      useStore.getState().authenticate('u', 'p')
+      return <></>
+    }
+    TestComponent
+  })
 })
