@@ -18,21 +18,15 @@ import {
   subscribeWithSelector,
 } from 'zustand/middleware'
 
-const immer =
-  <
-    T extends State,
-    CustomSetState extends SetState<T>,
-    CustomGetState extends GetState<T>,
-    CustomStoreApi extends StoreApi<T>
-  >(
-    config: StateCreator<
-      T,
-      (partial: ((draft: Draft<T>) => void) | T, replace?: boolean) => void,
-      CustomGetState,
-      CustomStoreApi
-    >
-  ): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> =>
-  (set, get, api) =>
+const immer = <T extends State, CustomStateCreator extends StateCreator<T>>(
+  config: StateCreator<
+    T,
+    (partial: ((draft: Draft<T>) => void) | T, replace?: boolean) => void,
+    Parameters<CustomStateCreator>[1],
+    Parameters<CustomStateCreator>[2]
+  >
+): CustomStateCreator =>
+  ((set: SetState<T>, get: GetState<T>, api: StoreApi<T>) =>
     config(
       (partial, replace) => {
         const nextState =
@@ -43,7 +37,7 @@ const immer =
       },
       get,
       api
-    )
+    )) as any // can we avoid any?
 
 type CounterState = {
   count: number

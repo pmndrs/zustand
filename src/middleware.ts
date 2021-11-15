@@ -76,11 +76,12 @@ export const devtools = <
   S extends State,
   CustomStateCreator extends StateCreator<S>
 >(
-  fn: (
-    set: NamedSet<S>,
-    get: Parameters<CustomStateCreator>[1],
-    api: Parameters<CustomStateCreator>[2]
-  ) => S,
+  fn: StateCreator<
+    S,
+    NamedSet<S>,
+    Parameters<CustomStateCreator>[1],
+    Parameters<CustomStateCreator>[2]
+  >,
   options?:
     | string
     | {
