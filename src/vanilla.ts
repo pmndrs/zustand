@@ -5,15 +5,9 @@ interface Store<T extends UnknownState>
   { getState: 
       () => T
   , setState:
-      <Nt extends O.Partial<T>>
+      <Nt extends (R extends true ? T : O.Partial<T>), R extends boolean>
         ( nextStateOrUpdater: Nt | ((state: T) => Nt)
-        , shouldReplace?:
-            ( Nt extends () => unknown
-              ? F.Call<Nt>
-              : Nt
-            ) extends T
-              ? boolean
-              : false
+        , shouldReplace?: R
         ) =>
           void
   , subscribe:
