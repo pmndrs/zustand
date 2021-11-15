@@ -435,7 +435,7 @@ export const persist = <
     StoreApi<ReturnType<CustomStateCreator>> &
       StoreApiWithPersist<ReturnType<CustomStateCreator>>
   > =>
-  ((set: SetState<S>, get: GetState<S>, api: StoreApi<S>) => {
+  ((set: SetState<S>, get: GetState<S>, api: StoreApiWithPersist<S>) => {
     let options = {
       getStorage: () => localStorage,
       serialize: JSON.stringify as (state: StorageValue<S>) => string,
@@ -587,7 +587,7 @@ export const persist = <
         })
     }
 
-    ;(api as StoreApiWithPersist<S>).persist = {
+    api.persist = {
       setOptions: (newOptions) => {
         options = {
           ...options,
