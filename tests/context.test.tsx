@@ -1,6 +1,6 @@
 import { Component as ClassComponent, useEffect, useState } from 'react'
 import { render } from '@testing-library/react'
-import create, { GetState, SetState } from 'zustand'
+import create from 'zustand'
 import createContext from 'zustand/context'
 import {
   StoreApiWithSubscribeWithSelector,
@@ -68,12 +68,7 @@ it('uses context store with selectors', async () => {
 
 it('uses context store api', async () => {
   const createStore = () =>
-    create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
-    >(
+    create<CounterState, StoreApiWithSubscribeWithSelector<CounterState>>(
       subscribeWithSelector((set) => ({
         count: 0,
         inc: () => set((state) => ({ count: state.count + 1 })),
