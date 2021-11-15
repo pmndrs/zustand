@@ -7,8 +7,7 @@ import {
 } from 'react'
 import createImpl, {
   EqualityChecker,
-  GetState,
-  SetState,
+  PhantomCustomStoreApi,
   State,
   StateCreator,
   StateSelector,
@@ -44,35 +43,24 @@ export type UseBoundStore<
   <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
 } & CustomStoreApi
 
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
+function create<TState extends State, CustomStoreApi extends StoreApi<TState>>(
   createState:
-    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
+    | (StateCreator<TState> & PhantomCustomStoreApi<CustomStoreApi>)
     | CustomStoreApi
 ): UseBoundStore<TState, CustomStoreApi>
 
 function create<TState extends State>(
-  createState:
-    | StateCreator<TState, SetState<TState>, GetState<TState>, any>
-    | StoreApi<TState>
+  createState: StateCreator<TState> | StoreApi<TState>
 ): UseBoundStore<TState, StoreApi<TState>>
 
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
+function create<TState extends State, CustomStoreApi extends StoreApi<TState>>(
   createState:
-    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
+    | (StateCreator<TState> & PhantomCustomStoreApi<CustomStoreApi>)
     | CustomStoreApi
-): UseBoundStore<TState, CustomStoreApi> {
-  const api: CustomStoreApi =
+) {
+  const api = (
     typeof createState === 'function' ? createImpl(createState) : createState
+  ) as CustomStoreApi
 
   const useStore: any = <StateSlice>(
     selector: StateSelector<TState, StateSlice> = api.getState as any,

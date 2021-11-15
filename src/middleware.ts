@@ -2,8 +2,10 @@ import {
   EqualityChecker,
   GetState,
   PartialState,
+  PhantomCustomStoreApi,
   SetState,
   State,
+  StateCreator,
   StateListener,
   StateSelector,
   StateSliceListener,
@@ -33,20 +35,25 @@ export const redux =
   <S extends State, A extends { type: unknown }>(
     reducer: (state: S, action: A) => S,
     initial: S
-  ) =>
-  (
-    set: SetState<S & { dispatch: (a: A) => A }>,
-    get: GetState<S & { dispatch: (a: A) => A }>,
-    api: StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
-  ): S & { dispatch: (a: A) => A } => {
-    api.dispatch = (action: A) => {
+  ): StateCreator<S & { dispatch: (a: A) => A }> &
+    PhantomCustomStoreApi<
+      StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
+    > =>
+  (set, get, api) => {
+    const apiWithRedux = api as StoreApiWithRedux<S, A> & {
+      devtools?: DevtoolsType
+    }
+    apiWithRedux.dispatch = (action: A) => {
       set((state: S) => reducer(state, action))
-      if (api.devtools) {
-        api.devtools.send(api.devtools.prefix + action.type, get())
+      if (apiWithRedux.devtools) {
+        apiWithRedux.devtools.send(
+          apiWithRedux.devtools.prefix + action.type,
+          get()
+        )
       }
       return action
     }
-    return { dispatch: api.dispatch, ...initial }
+    return { dispatch: apiWithRedux.dispatch, ...initial }
   }
 
 export type NamedSet<T extends State> = {
@@ -67,40 +74,44 @@ export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   devtools?: DevtoolsType
 }
 
-export const devtools =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
-    options?:
-      | string
-      | {
-          name?: string
-          serialize?: {
-            options:
-              | boolean
-              | {
-                  date?: boolean
-                  regex?: boolean
-                  undefined?: boolean
-                  nan?: boolean
-                  infinity?: boolean
-                  error?: boolean
-                  symbol?: boolean
-                  map?: boolean
-                  set?: boolean
-                }
-          }
+export const devtools = <
+  S extends State,
+  CustomStateCreator extends StateCreator<S>
+>(
+  fn: (
+    set: NamedSet<S>,
+    get: Parameters<CustomStateCreator>[1],
+    api: Parameters<CustomStateCreator>[2]
+  ) => S,
+  options?:
+    | string
+    | {
+        name?: string
+        serialize?: {
+          options:
+            | boolean
+            | {
+                date?: boolean
+                regex?: boolean
+                undefined?: boolean
+                nan?: boolean
+                infinity?: boolean
+                error?: boolean
+                symbol?: boolean
+                map?: boolean
+                set?: boolean
+              }
         }
-  ) =>
-  (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: CustomStoreApi & StoreApiWithDevtools<S> & { dispatch?: unknown }
-  ): S => {
+      }
+): CustomStateCreator &
+  PhantomCustomStoreApi<
+    StoreApi<ReturnType<CustomStateCreator>> &
+      StoreApiWithDevtools<ReturnType<CustomStateCreator>>
+  > =>
+  ((set: SetState<S>, get: GetState<S>, api: StoreApi<S>) => {
+    const apiWithDevtools = api as StoreApiWithDevtools<
+      ReturnType<CustomStateCreator>
+    > & { dispatch?: unknown }
     let extension
     try {
       extension =
@@ -115,18 +126,21 @@ export const devtools =
       ) {
         console.warn('Please install/enable Redux devtools extension')
       }
-      delete api.devtools
+      delete apiWithDevtools.devtools
       return fn(set, get, api)
     }
     const namedSet: NamedSet<S> = (state, replace, name) => {
       set(state, replace)
-      if (!api.dispatch && api.devtools) {
-        api.devtools.send(api.devtools.prefix + (name || 'action'), get())
+      if (!apiWithDevtools.dispatch && apiWithDevtools.devtools) {
+        apiWithDevtools.devtools.send(
+          apiWithDevtools.devtools.prefix + (name || 'action'),
+          get()
+        )
       }
     }
     api.setState = namedSet
     const initialState = fn(namedSet, get, api)
-    if (!api.devtools) {
+    if (!apiWithDevtools.devtools) {
       const savedSetState = api.setState
       api.setState = <
         K1 extends keyof S = keyof S,
@@ -140,13 +154,21 @@ export const devtools =
         const newState = api.getState()
         if (state !== newState) {
           savedSetState(state, replace)
-          if (state !== (newState as any)[DEVTOOLS] && api.devtools) {
-            api.devtools.send(api.devtools.prefix + 'setState', api.getState())
+          if (
+            state !== (newState as any)[DEVTOOLS] &&
+            apiWithDevtools.devtools
+          ) {
+            apiWithDevtools.devtools.send(
+              apiWithDevtools.devtools.prefix + 'setState',
+              api.getState()
+            )
           }
         }
       }
       options = typeof options === 'string' ? { name: options } : options
-      const connection = (api.devtools = extension.connect({ ...options }))
+      const connection = (apiWithDevtools.devtools = extension.connect({
+        ...options,
+      }))
       connection.prefix = options?.name ? `${options.name} > ` : ''
       connection.subscribe((message: any) => {
         if (message.type === 'ACTION' && message.payload) {
@@ -165,7 +187,7 @@ export const devtools =
           const newState = api.getState()
           ;(newState as any)[DEVTOOLS] = JSON.parse(message.state)
 
-          if (!api.dispatch && !jumpState) {
+          if (!apiWithDevtools.dispatch && !jumpState) {
             api.setState(newState)
           } else if (jumpState) {
             api.setState((newState as any)[DEVTOOLS])
@@ -202,7 +224,7 @@ export const devtools =
       connection.init(initialState)
     }
     return initialState
-  }
+  }) as any
 
 export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   StoreApi<T>,
@@ -221,21 +243,17 @@ export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   }
 }
 
-export const subscribeWithSelector =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
-  ) =>
-  (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: Omit<CustomStoreApi, 'subscribe'> & // FIXME remove omit in v4
+export const subscribeWithSelector = <
+  S extends State,
+  CustomStateCreator extends StateCreator<S>
+>(
+  fn: CustomStateCreator
+): CustomStateCreator &
+  PhantomCustomStoreApi<
+    Omit<StoreApi<ReturnType<CustomStateCreator>>, 'subscribe'> & // FIXME remove omit in v4
       StoreApiWithSubscribeWithSelector<S>
-  ): S => {
+  > =>
+  ((set: SetState<S>, get: GetState<S>, api: StoreApi<S>) => {
     const origSubscribe = api.subscribe as Subscribe<S>
     api.subscribe = ((selector: any, optListener: any, options: any) => {
       let listener: StateListener<S> = selector // if no selector
@@ -255,13 +273,9 @@ export const subscribeWithSelector =
       }
       return origSubscribe(listener)
     }) as any
-    const initialState = fn(
-      set,
-      get,
-      api as CustomStoreApi // FIXME can remove in v4?
-    )
+    const initialState = fn(set, get, api)
     return initialState
-  }
+  }) as any
 
 type Combine<T, U> = Omit<T, keyof U> & U
 
@@ -418,25 +432,18 @@ const toThenable =
     }
   }
 
-export const persist =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    config: (
-      set: CustomSetState,
-      get: CustomGetState,
-      api: CustomStoreApi
-    ) => S,
-    baseOptions: PersistOptions<S>
-  ) =>
-  (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: CustomStoreApi & StoreApiWithPersist<S>
-  ): S => {
+export const persist = <
+  S extends State,
+  CustomStateCreator extends StateCreator<S>
+>(
+  config: CustomStateCreator,
+  baseOptions: PersistOptions<S>
+): CustomStateCreator &
+  PhantomCustomStoreApi<
+    StoreApi<ReturnType<CustomStateCreator>> &
+      StoreApiWithPersist<ReturnType<CustomStateCreator>>
+  > =>
+  ((set: SetState<S>, get: GetState<S>, api: StoreApi<S>) => {
     let options = {
       getStorage: () => localStorage,
       serialize: JSON.stringify as (state: StorageValue<S>) => string,
@@ -471,12 +478,12 @@ export const persist =
 
     if (!storage) {
       return config(
-        ((...args) => {
+        (...args) => {
           console.warn(
             `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
           )
           set(...args)
-        }) as CustomSetState,
+        },
         get,
         api
       )
@@ -522,10 +529,10 @@ export const persist =
     }
 
     const configResult = config(
-      ((...args) => {
+      (...args) => {
         set(...args)
         void setItem()
-      }) as CustomSetState,
+      },
       get,
       api
     )
@@ -588,7 +595,7 @@ export const persist =
         })
     }
 
-    api.persist = {
+    ;(api as StoreApiWithPersist<S>).persist = {
       setOptions: (newOptions) => {
         options = {
           ...options,
@@ -623,4 +630,4 @@ export const persist =
     hydrate()
 
     return stateFromStorage || configResult
-  }
+  }) as any

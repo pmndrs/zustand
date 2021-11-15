@@ -52,37 +52,22 @@ export type StateCreator<
   CustomStoreApi extends StoreApi<T> = StoreApi<T>
 > = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
 
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState: StateCreator<
-    TState,
-    CustomSetState,
-    CustomGetState,
-    CustomStoreApi
-  >
+declare const $$api: unique symbol
+export type PhantomCustomStoreApi<CustomStoreApi> = {
+  [$$api]?: CustomStoreApi
+}
+
+function create<TState extends State, CustomStoreApi extends StoreApi<TState>>(
+  createState: StateCreator<TState> & PhantomCustomStoreApi<CustomStoreApi>
 ): CustomStoreApi
 
 function create<TState extends State>(
-  createState: StateCreator<TState, SetState<TState>, GetState<TState>, any>
+  createState: StateCreator<TState>
 ): StoreApi<TState>
 
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState: StateCreator<
-    TState,
-    CustomSetState,
-    CustomGetState,
-    CustomStoreApi
-  >
-): CustomStoreApi {
+function create<TState extends State, CustomStoreApi extends StoreApi<TState>>(
+  createState: StateCreator<TState> & PhantomCustomStoreApi<CustomStoreApi>
+) {
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
 
@@ -142,12 +127,8 @@ function create<
 
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  state = createState(
-    setState as unknown as CustomSetState,
-    getState as unknown as CustomGetState,
-    api as unknown as CustomStoreApi
-  )
-  return api as unknown as CustomStoreApi
+  state = createState(setState, getState, api)
+  return api
 }
 
 export default create
