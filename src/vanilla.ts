@@ -1,115 +1,218 @@
-export type State = object
-// types inspired by setState from React, see:
-// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
-export type PartialState<
-  T extends State,
-  K1 extends keyof T = keyof T,
-  K2 extends keyof T = K1,
-  K3 extends keyof T = K2,
-  K4 extends keyof T = K3
-> =
-  | (Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
-  | ((state: T) => Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
-export type StateSelector<T extends State, U> = (state: T) => U
-export type EqualityChecker<T> = (state: T, newState: T) => boolean
-export type StateListener<T> = (state: T, previousState: T) => void
-export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
-export type Subscribe<T extends State> = {
-  (listener: StateListener<T>): () => void
-}
+// ============================================================================
+// Types
 
-export type SetState<T extends State> = {
-  <
-    K1 extends keyof T,
-    K2 extends keyof T = K1,
-    K3 extends keyof T = K2,
-    K4 extends keyof T = K3
-  >(
-    partial: PartialState<T, K1, K2, K3, K4>,
-    replace?: boolean
-  ): void
-}
-export type GetState<T extends State> = () => T
-export type Destroy = () => void
-export type StoreApi<T extends State> = {
-  setState: SetState<T>
-  getState: GetState<T>
-  subscribe: Subscribe<T>
-  destroy: Destroy
-}
-export type StateCreator<
-  T extends State,
-  CustomSetState = SetState<T>,
-  CustomGetState = GetState<T>,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
-> = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
+interface Store<T extends UnknownState>
+  { getState: 
+      () => T
+  , setState:
+      <Nt extends O.Partial<T>>
+        ( nextStateOrUpdater: Nt | ((state: T) => Nt)
+        , shouldReplace?:
+            ( Nt extends () => unknown
+              ? F.Call<Nt>
+              : Nt
+            ) extends T
+              ? boolean
+              : false
+        ) =>
+          void
+  , subscribe:
+      { (listener: (state: T, previousState: T) => void):
+          () => void
 
-function createStore<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState: StateCreator<
-    TState,
-    CustomSetState,
-    CustomGetState,
-    CustomStoreApi
-  >
-): CustomStoreApi
+      , /** @deprecated Please use `subscribeWithSelector` middleware */
+        <U>
+          ( listener: (state: U, previousState: U) => void
+          , selector?: (state: T) => U
+          , equals?: (a: U, b: U) => boolean
+          ):
+            () => void
+      }
+  , destroy:
+      () => void
+  }
 
-function createStore<TState extends State>(
-  createState: StateCreator<TState, SetState<TState>, GetState<TState>, any>
-): StoreApi<TState>
+type UnknownState =
+  object;
 
-function createStore<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState: StateCreator<
-    TState,
-    CustomSetState,
-    CustomGetState,
-    CustomStoreApi
-  >
-): CustomStoreApi {
-  let state: TState
-  const listeners: Set<StateListener<TState>> = new Set()
+type Create =
+  <T extends UnknownState, S extends Store<T>>
+    ( stateInitializer: StateInitializer<T, S>
+    , phantomInitialState?: T
+    ) =>
+      S
 
-  const setState: SetState<TState> = (partial, replace) => {
-    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
-    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
-    const nextState =
-      typeof partial === 'function'
-        ? (partial as (state: TState) => TState)(state)
-        : partial
-    if (nextState !== state) {
-      const previousState = state
-      state = replace
-        ? (nextState as TState)
+type StateInitializer<T extends UnknownState, S extends Store<T>> =
+  & ( ( set: Store<T>["setState"] 
+      , get: Store<T>["getState"]
+      , store: Store<T>
+      ) =>
+        T
+    )
+  & TagStore<S>
+
+declare const $$store: unique symbol;
+type TagStore<S> = { [$$store]?: S }
+
+
+
+
+// ============================================================================
+// Implementation via Existential Types
+
+type EState = { __isState: true }
+type ESelectedState = { __isSelectedSelected: true }
+type EShouldReplaceState = boolean & { __isShouldReplaceState: true }
+
+interface EStore
+  { getState:
+      () => EState
+  , setState:
+      ( nextStateOrUpdater:
+          | E.Partial<EState>
+          | ((state: EState) => E.Partial<EState>)
+      , shouldReplace?: EShouldReplaceState
+      ) =>
+        void
+  , subscribe:
+      { ( listener: (state: EState, previousState: E.Previous<EState>) => void
+        ):
+          () => void
+
+      , ( listener: (state: ESelectedState, previousState: ESelectedState) => void
+        , selector: (state: EState) => ESelectedState
+        , equals?: (a: ESelectedState, b: ESelectedState) => boolean
+        ):
+          () => void
+      }
+  , destroy:
+      () => void
+  }
+
+type ECreate =
+  ( stateInitializer:
+    ( set: EStore["setState"]
+    , get: EStore["getState"]
+    , store: EStore
+    ) => EState
+  ) =>
+    EStore
+
+const createImpl: ECreate = stateInitializer => {
+  let state: EState;
+
+  type Listener = (state: EState, previousState: E.Previous<EState>) => void
+  let listeners: Set<Listener> = new Set();
+  const emit = (...a: F.Arguments<Listener>) =>
+    listeners.forEach(f => f(...a))
+
+  let store: EStore = {
+    getState: () => state,
+    setState: (nextStateOrUpdater, shouldReplace) => {
+      let nextState =
+        typeof nextStateOrUpdater === "function"
+          ? nextStateOrUpdater(state)
+          : nextStateOrUpdater
+
+      if (objectIs(nextState, state)) return;
+
+      let previousState = E.previous(state);
+      state = shouldReplace
+        ? nextState
         : Object.assign({}, state, nextState)
-      listeners.forEach((listener) => listener(state, previousState))
-    }
+
+      emit(state, previousState);
+    },
+    subscribe: (..._args: F.O2.Arguments<EStore["subscribe"]>) => {
+      let [_, _selector, _equals] = _args;
+      if (_selector || _equals) {
+        narrow(_args.length === 3)
+        let [listener] = _args;
+
+        console.warn("[DEPRECATED] Please use `subscribeWithSelector` middleware");
+        let selector = fallback(_selector, (x: EState) => x as unknown as ESelectedState);
+        let equals = fallback(_equals, objectIs);
+        
+        let currentSlice = selector(state)
+        const sliceListener = () => {
+          let nextSlice = selector(state)
+          if (equals(currentSlice, nextSlice)) return;
+
+          let previousSlice = E.previous(currentSlice)
+          currentSlice = nextSlice
+          listener(currentSlice, previousSlice)
+        }
+
+        listeners.add(sliceListener)
+        return () => listeners.delete(sliceListener)
+      }
+
+      narrow(_args.length === 1)
+      let [listener] = _args;
+
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
+    destroy: () => listeners.clear()
   }
+  state = stateInitializer(store.setState, store.getState, store);
+  return store;
+}
+const create = createImpl as Create
 
-  const getState: GetState<TState> = () => state
 
-  const subscribe: Subscribe<TState> = (listener: StateListener<TState>) => {
-    listeners.add(listener)
-    // Unsubscribe
-    return () => listeners.delete(listener)
-  }
 
-  const destroy: Destroy = () => listeners.clear()
-  const api = { setState, getState, subscribe, destroy }
-  state = createState(
-    setState as unknown as CustomSetState,
-    getState as unknown as CustomGetState,
-    api as unknown as CustomStoreApi
-  )
-  return api as unknown as CustomStoreApi
+
+// ============================================================================
+// Utilities
+
+const fallback = <T>(t: T | undefined, f: T) => (t || f) as T
+const objectIs = Object.is as (<T>(a: T, b: T) => boolean)
+function narrow<T extends boolean>(predicate: T): asserts predicate {}
+
+namespace E {
+  export type Partial<T> = T & { __isPartial: true }
+
+  export type Previous<T> = T & { __isPrevious: true };
+  export const previous = <T>(t: T) => t as Previous<T>
 }
 
-export default createStore
+namespace O {
+  export type Partial<T> =
+    { [K in keyof T]?: T[K] }
+}
+
+namespace F {
+  export type Call<T> =
+    T extends (...a: never[]) => infer R ? R : never
+
+  export type Arguments<T> =
+    T extends (...a: infer A) => unknown ? A : never
+
+  export namespace O2 {
+    export type Arguments<T> =
+      T extends {
+        (...a: infer A1): unknown 
+        (...a: infer A2): unknown 
+      }
+        ? A1 | A2
+        : never
+  }
+}
+
+namespace U {
+  export type Extract<T, U> =
+    T extends U ? T : never;
+}
+
+
+
+// ============================================================================
+// Exports
+
+export default create;
+export
+  { StateInitializer // create's argument
+  , Store // create's result
+  , UnknownState // Store's type-parameter's constraint
+  }
