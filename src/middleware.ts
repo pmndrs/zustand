@@ -4,6 +4,7 @@ import {
   PartialState,
   SetState,
   State,
+  StateCreator,
   StateListener,
   StateSelector,
   StateSliceListener,
@@ -418,21 +419,21 @@ const toThenable =
     }
   }
 
-export const persist =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    config: (
-      set: CustomSetState,
-      get: CustomGetState,
-      api: CustomStoreApi
-    ) => S,
-    baseOptions: PersistOptions<S>
-  ) =>
-  (
+export const persist = <
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>,
+  CustomStateCreator extends (
+    set: CustomSetState,
+    get: CustomGetState,
+    api: CustomStoreApi
+  ) => S
+>(
+  config: CustomStateCreator,
+  baseOptions: PersistOptions<S>
+) => {
+  const newConfig = (
     set: CustomSetState,
     get: CustomGetState,
     api: CustomStoreApi & StoreApiWithPersist<S>
@@ -624,3 +625,7 @@ export const persist =
 
     return stateFromStorage || configResult
   }
+  return newConfig as CustomStateCreator extends typeof newConfig
+    ? CustomStateCreator & typeof newConfig
+    : never
+}

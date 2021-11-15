@@ -8,7 +8,6 @@ import create, {
   StoreApi,
 } from 'zustand'
 import {
-  PersistOptions,
   StoreApiWithDevtools,
   StoreApiWithPersist,
   StoreApiWithSubscribeWithSelector,
@@ -569,16 +568,14 @@ describe('more complex state spec with subscribeWithSelector', () => {
     type MyState = {
       foo: boolean
     }
-    const useStore = create(
+    const useStore = create<
+      MyState,
+      SetState<MyState>,
+      GetState<MyState>,
+      StoreApiWithSubscribeWithSelector<MyState> & StoreApiWithPersist<MyState>
+    >(
       subscribeWithSelector(
-        // NOTE: Adding type annotation to inner middleware works.
-        persist<
-          MyState,
-          SetState<MyState>,
-          GetState<MyState>,
-          StoreApiWithSubscribeWithSelector<MyState> &
-            StoreApiWithPersist<MyState>
-        >(
+        persist(
           () => ({
             foo: true,
           }),
@@ -636,13 +633,8 @@ describe('more complex state spec with subscribeWithSelector', () => {
       authenticated: boolean
       authenticate: (username: string, password: string) => Promise<void>
     }
-    // NOTE: This is a simplified middleware type without persist api
-    type MyPersist = (
-      config: StateCreator<MyState>,
-      options: PersistOptions<MyState>
-    ) => StateCreator<MyState>
     const useStore = create<MyState>(
-      (persist as MyPersist)(
+      persist(
         (set) => ({
           token: undefined,
           authenticated: false,
