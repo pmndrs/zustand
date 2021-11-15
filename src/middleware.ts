@@ -10,7 +10,6 @@ import {
   StateSelector,
   StateSliceListener,
   StoreApi,
-  Subscribe,
 } from './vanilla'
 
 const DEVTOOLS = Symbol()
@@ -31,30 +30,29 @@ export type StoreApiWithRedux<
   dispatch: (a: A) => A
 }
 
-export const redux =
-  <S extends State, A extends { type: unknown }>(
-    reducer: (state: S, action: A) => S,
-    initial: S
-  ): StateCreator<S & { dispatch: (a: A) => A }> &
-    PhantomCustomStoreApi<
-      StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
-    > =>
-  (set, get, api) => {
-    const apiWithRedux = api as StoreApiWithRedux<S, A> & {
+export const redux = <S extends State, A extends { type: unknown }>(
+  reducer: (state: S, action: A) => S,
+  initial: S
+): StateCreator<S & { dispatch: (a: A) => A }> &
+  PhantomCustomStoreApi<
+    StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
+  > =>
+  ((
+    set: SetState<S>,
+    get: GetState<S>,
+    api: StoreApiWithRedux<S, A> & {
       devtools?: DevtoolsType
     }
-    apiWithRedux.dispatch = (action: A) => {
+  ) => {
+    api.dispatch = (action: A) => {
       set((state: S) => reducer(state, action))
-      if (apiWithRedux.devtools) {
-        apiWithRedux.devtools.send(
-          apiWithRedux.devtools.prefix + action.type,
-          get()
-        )
+      if (api.devtools) {
+        api.devtools.send(api.devtools.prefix + action.type, get())
       }
       return action
     }
-    return { dispatch: apiWithRedux.dispatch, ...initial }
-  }
+    return { dispatch: api.dispatch, ...initial }
+  }) as any // can we avoid any?
 
 export type NamedSet<T extends State> = {
   <
@@ -108,10 +106,13 @@ export const devtools = <
     StoreApi<ReturnType<CustomStateCreator>> &
       StoreApiWithDevtools<ReturnType<CustomStateCreator>>
   > =>
-  ((set: SetState<S>, get: GetState<S>, api: StoreApi<S>) => {
-    const apiWithDevtools = api as StoreApiWithDevtools<
-      ReturnType<CustomStateCreator>
-    > & { dispatch?: unknown }
+  ((
+    set: SetState<S>,
+    get: GetState<S>,
+    api: StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+    }
+  ) => {
     let extension
     try {
       extension =
@@ -126,21 +127,18 @@ export const devtools = <
       ) {
         console.warn('Please install/enable Redux devtools extension')
       }
-      delete apiWithDevtools.devtools
+      delete api.devtools
       return fn(set, get, api)
     }
     const namedSet: NamedSet<S> = (state, replace, name) => {
       set(state, replace)
-      if (!apiWithDevtools.dispatch && apiWithDevtools.devtools) {
-        apiWithDevtools.devtools.send(
-          apiWithDevtools.devtools.prefix + (name || 'action'),
-          get()
-        )
+      if (!api.dispatch && api.devtools) {
+        api.devtools.send(api.devtools.prefix + (name || 'action'), get())
       }
     }
     api.setState = namedSet
     const initialState = fn(namedSet, get, api)
-    if (!apiWithDevtools.devtools) {
+    if (!api.devtools) {
       const savedSetState = api.setState
       api.setState = <
         K1 extends keyof S = keyof S,
@@ -154,19 +152,13 @@ export const devtools = <
         const newState = api.getState()
         if (state !== newState) {
           savedSetState(state, replace)
-          if (
-            state !== (newState as any)[DEVTOOLS] &&
-            apiWithDevtools.devtools
-          ) {
-            apiWithDevtools.devtools.send(
-              apiWithDevtools.devtools.prefix + 'setState',
-              api.getState()
-            )
+          if (state !== (newState as any)[DEVTOOLS] && api.devtools) {
+            api.devtools.send(api.devtools.prefix + 'setState', api.getState())
           }
         }
       }
       options = typeof options === 'string' ? { name: options } : options
-      const connection = (apiWithDevtools.devtools = extension.connect({
+      const connection = (api.devtools = extension.connect({
         ...options,
       }))
       connection.prefix = options?.name ? `${options.name} > ` : ''
@@ -187,7 +179,7 @@ export const devtools = <
           const newState = api.getState()
           ;(newState as any)[DEVTOOLS] = JSON.parse(message.state)
 
-          if (!apiWithDevtools.dispatch && !jumpState) {
+          if (!api.dispatch && !jumpState) {
             api.setState(newState)
           } else if (jumpState) {
             api.setState((newState as any)[DEVTOOLS])
@@ -224,7 +216,7 @@ export const devtools = <
       connection.init(initialState)
     }
     return initialState
-  }) as any
+  }) as any // can we avoid any?
 
 export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   StoreApi<T>,
@@ -254,7 +246,7 @@ export const subscribeWithSelector = <
       StoreApiWithSubscribeWithSelector<S>
   > =>
   ((set: SetState<S>, get: GetState<S>, api: StoreApi<S>) => {
-    const origSubscribe = api.subscribe as Subscribe<S>
+    const origSubscribe = api.subscribe
     api.subscribe = ((selector: any, optListener: any, options: any) => {
       let listener: StateListener<S> = selector // if no selector
       if (optListener) {
@@ -275,7 +267,7 @@ export const subscribeWithSelector = <
     }) as any
     const initialState = fn(set, get, api)
     return initialState
-  }) as any
+  }) as any // can we avoid any?
 
 type Combine<T, U> = Omit<T, keyof U> & U
 
@@ -630,4 +622,4 @@ export const persist = <
     hydrate()
 
     return stateFromStorage || configResult
-  }) as any
+  }) as any // can we avoid any?
