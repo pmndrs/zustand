@@ -53,8 +53,8 @@ interface EStore
       () => EState
   , setState:
       ( nextStateOrUpdater:
-          | E.Partial<EState>
-          | ((state: EState) => E.Partial<EState>)
+          | O.Partial<EState>
+          | ((state: EState) => O.Partial<EState>)
       , shouldReplace?: EShouldReplaceState
       ) =>
         void
@@ -96,7 +96,7 @@ const createImpl: ECreate = stateInitializer => {
 
       let previousState = E.previous(state);
       state = shouldReplace
-        ? nextState
+        ? nextState as EState
         : Object.assign({}, state, nextState)
 
       emit(state, previousState);
@@ -121,8 +121,6 @@ const create = createImpl as Create
 const objectIs = Object.is as (<T>(a: T, b: T) => boolean)
 
 namespace E {
-  export type Partial<T> = T & { __isPartial: true }
-
   export type Previous<T> = T & { __isPrevious: true };
   export const previous = <T>(t: T) => t as Previous<T>
 }
