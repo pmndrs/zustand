@@ -11,17 +11,8 @@ interface Store<T extends UnknownState>
         ) =>
           void
   , subscribe:
-      { (listener: (state: T, previousState: T) => void):
-          () => void
-
-      , /** @deprecated Please use `subscribeWithSelector` middleware */
-        <U>
-          ( listener: (state: U, previousState: U) => void
-          , selector?: (state: T) => U
-          , equals?: (a: U, b: U) => boolean
-          ):
-            () => void
-      }
+      (listener: (state: T, previousState: T) => void) =>
+        () => void
   , destroy:
       () => void
   }
@@ -55,7 +46,6 @@ type TagStore<S> = { [$$store]?: S }
 // Implementation via Existential Types
 
 type EState = { __isState: true }
-type ESelectedState = { __isSelectedSelected: true }
 type EShouldReplaceState = boolean & { __isShouldReplaceState: true }
 
 interface EStore
@@ -69,16 +59,10 @@ interface EStore
       ) =>
         void
   , subscribe:
-      { ( listener: (state: EState, previousState: E.Previous<EState>) => void
-        ):
-          () => void
-
-      , ( listener: (state: ESelectedState, previousState: ESelectedState) => void
-        , selector: (state: EState) => ESelectedState
-        , equals?: (a: ESelectedState, b: ESelectedState) => boolean
-        ):
-          () => void
-      }
+      ( listener:
+          (state: EState, previousState: E.Previous<EState>) => void
+      ) =>
+        () => void
   , destroy:
       () => void
   }
@@ -117,33 +101,7 @@ const createImpl: ECreate = stateInitializer => {
 
       emit(state, previousState);
     },
-    subscribe: (..._args: F.O2.Arguments<EStore["subscribe"]>) => {
-      let [_, _selector, _equals] = _args;
-      if (_selector || _equals) {
-        narrow(_args.length === 3)
-        let [listener] = _args;
-
-        console.warn("[DEPRECATED] Please use `subscribeWithSelector` middleware");
-        let selector = fallback(_selector, (x: EState) => x as unknown as ESelectedState);
-        let equals = fallback(_equals, objectIs);
-        
-        let currentSlice = selector(state)
-        const sliceListener = () => {
-          let nextSlice = selector(state)
-          if (equals(currentSlice, nextSlice)) return;
-
-          let previousSlice = E.previous(currentSlice)
-          currentSlice = nextSlice
-          listener(currentSlice, previousSlice)
-        }
-
-        listeners.add(sliceListener)
-        return () => listeners.delete(sliceListener)
-      }
-
-      narrow(_args.length === 1)
-      let [listener] = _args;
-
+    subscribe: listener => {
       listeners.add(listener)
       return () => listeners.delete(listener)
     },
@@ -160,9 +118,7 @@ const create = createImpl as Create
 // ============================================================================
 // Utilities
 
-const fallback = <T>(t: T | undefined, f: T) => (t || f) as T
 const objectIs = Object.is as (<T>(a: T, b: T) => boolean)
-function narrow<T extends boolean>(predicate: T): asserts predicate {}
 
 namespace E {
   export type Partial<T> = T & { __isPartial: true }
@@ -182,23 +138,7 @@ namespace F {
 
   export type Arguments<T> =
     T extends (...a: infer A) => unknown ? A : never
-
-  export namespace O2 {
-    export type Arguments<T> =
-      T extends {
-        (...a: infer A1): unknown 
-        (...a: infer A2): unknown 
-      }
-        ? A1 | A2
-        : never
-  }
 }
-
-namespace U {
-  export type Extract<T, U> =
-    T extends U ? T : never;
-}
-
 
 
 // ============================================================================
