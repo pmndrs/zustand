@@ -8,6 +8,7 @@ import create, {
   StoreApi,
 } from 'zustand'
 import {
+  PersistOptions,
   StoreApiWithDevtools,
   StoreApiWithPersist,
   StoreApiWithSubscribeWithSelector,
@@ -624,6 +625,41 @@ describe('more complex state spec with subscribeWithSelector', () => {
         (state) => state.foo,
         (foo) => console.log(foo)
       )
+      return <></>
+    }
+    TestComponent
+  })
+
+  it('#650', () => {
+    type MyState = {
+      token: string | undefined
+      authenticated: boolean
+      authenticate: (username: string, password: string) => Promise<void>
+    }
+    // NOTE: This is a simplified middleware type without persist api
+    type MyPersist = (
+      config: StateCreator<MyState>,
+      options: PersistOptions<MyState>
+    ) => StateCreator<MyState>
+    const useStore = create<MyState>(
+      (persist as MyPersist)(
+        (set) => ({
+          token: undefined,
+          authenticated: false,
+          authenticate: async (_username, _password) => {
+            set({ authenticated: true })
+          },
+        }),
+        { name: 'auth-store' }
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.authenticated)
+      useStore((s) => s.authenticate)('u', 'p')
+      useStore().authenticated
+      useStore().authenticate('u', 'p')
+      useStore.getState().authenticated
+      useStore.getState().authenticate('u', 'p')
       return <></>
     }
     TestComponent
