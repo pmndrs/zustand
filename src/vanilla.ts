@@ -126,15 +126,21 @@ namespace E {
 }
 
 namespace O {
-  export type Partial<T> =
+  export type Unknown =
+    object;
+
+  export type Partial<T extends O.Unknown> =
     { [K in keyof T]?: T[K] }
 }
 
 namespace F {
-  export type Call<T> =
+  export type Unknown =
+    (...a: never[]) => unknown
+
+  export type Call<T extends F.Unknown> =
     T extends (...a: never[]) => infer R ? R : never
 
-  export type Arguments<T> =
+  export type Arguments<T extends F.Unknown> =
     T extends (...a: infer A) => unknown ? A : never
 }
 
