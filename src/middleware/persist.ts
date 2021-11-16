@@ -1,311 +1,353 @@
-import { GetState, SetState, State, StoreApi } from '../vanilla'
+import { StateInitializer, Store, UnknownState } from "../vanilla"
+import { thenablify, Thenable, emitter } from "./utils"
 
-type DeepPartial<T extends Object> = {
-  [P in keyof T]?: DeepPartial<T[P]>
-}
+// ============================================================================
+// Types
 
-export type StateStorage = {
-  getItem: (name: string) => string | null | Promise<string | null>
-  setItem: (name: string, value: string) => void | Promise<void>
-  removeItem: (name: string) => void | Promise<void>
-}
+type Persist =
+  <T extends UnknownState, U>
+    ( stateInitializer: StateInitializer<T, Store<T>>
+    , options: PersistOptions<T, U>
+    ) =>
+      StateInitializer<T, Store<T> & PersistStore<T, U>>
 
-type StorageValue<S> = { state: DeepPartial<S>; version?: number }
+interface PersistOptions<T extends UnknownState, U>
+  { /** Name of the storage (must be unique) */
+    name: string
+    
+    /**
+     * A function returning a storage.
+     * The storage must fit `window.localStorage`'s api (or an async version of it).
+     * For example the storage could be `AsyncStorage` from React Native.
+     *
+     * @default () => localStorage
+     */
+  , getStorage?: () => PersistentStorage
 
-export type PersistOptions<
-  S,
-  PersistedState extends Partial<S> = Partial<S>
-> = {
-  /** Name of the storage (must be unique) */
-  name: string
-  /**
-   * A function returning a storage.
-   * The storage must fit `window.localStorage`'s api (or an async version of it).
-   * For example the storage could be `AsyncStorage` from React Native.
-   *
-   * @default () => localStorage
-   */
-  getStorage?: () => StateStorage
-  /**
-   * Use a custom serializer.
-   * The returned string will be stored in the storage.
-   *
-   * @default JSON.stringify
-   */
-  serialize?: (state: StorageValue<S>) => string | Promise<string>
-  /**
-   * Use a custom deserializer.
-   * Must return an object matching StorageValue<State>
-   *
-   * @param str The storage's current value.
-   * @default JSON.parse
-   */
-  deserialize?: (
-    str: string
-  ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
-  /**
-   * Filter the persisted value.
-   *
-   * @params state The state's value
-   */
-  partialize?: (state: S) => DeepPartial<S>
-  /**
-   * A function returning another (optional) function.
-   * The main function will be called before the state rehydration.
-   * The returned function will be called after the state rehydration or when an error occurred.
-   */
-  onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
-  /**
-   * If the stored state's version mismatch the one specified here, the storage will not be used.
-   * This is useful when adding a breaking change to your store.
-   */
-  version?: number
-  /**
-   * A function to perform persisted state migration.
-   * This function will be called when persisted state versions mismatch with the one specified here.
-   */
-  migrate?: (persistedState: any, version: number) => S | Promise<S>
-  /**
-   * A function to perform custom hydration merges when combining the stored state with the current one.
-   * By default, this function does a shallow merge.
-   */
-  merge?: (persistedState: any, currentState: S) => S
-}
+    /**
+     * Use a custom serializer.
+     * The returned string will be stored in the storage.
+     *
+     * @default JSON.stringify
+     */
+    serialize?:
+      (storageValue: PersistentStorageValue<U>) => MaybePromise<string>
 
-type PersistListener<S> = (state: S) => void
+    /**
+     * Use a custom deserializer.
+     * Must return an object matching PersistentStorageValue<State>
+     *
+     * @param serializedString The storage's current value.
+     * @default JSON.parse
+     */
+    deserialize?:
+      (serializedString: string) => MaybePromise<PersistentStorageValue<T>>
 
-export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
-  persist: {
-    setOptions: (options: Partial<PersistOptions<S>>) => void
-    clearStorage: () => void
-    rehydrate: () => Promise<void>
-    hasHydrated: () => boolean
-    onHydrate: (fn: PersistListener<S>) => () => void
-    onFinishHydration: (fn: PersistListener<S>) => () => void
-  }
-}
+    /**
+     * Filter the persisted value.
+     *
+     * @param state The state's value
+     */
+    partialize?: (state: T) => U
+    
+    /**
+     * A function returning another (optional) function.
+     * The main function will be called before the state rehydration.
+     * The returned function will be called after the state rehydration or when an error occurred.
+     */
+    onRehydrateStorage?:
+      (state: T) =>
+        void | ((state?: T, error?: unknown) => void)
 
-type Thenable<Value> = {
-  then<V>(
-    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
-  ): Thenable<V>
-  catch<V>(
-    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>
-  ): Thenable<V>
-}
+    /**
+     * If the stored state's version mismatch the one specified here, the storage will not be used.
+     * This is useful when adding a breaking change to your store.
+     */
+    version?: number
 
-const toThenable =
-  <Result, Input>(
-    fn: (input: Input) => Result | Promise<Result> | Thenable<Result>
-  ) =>
-  (input: Input): Thenable<Result> => {
-    try {
-      const result = fn(input)
-      if (result instanceof Promise) {
-        return result as Thenable<Result>
-      }
-      return {
-        then(onFulfilled) {
-          return toThenable(onFulfilled)(result as Result)
-        },
-        catch(_onRejected) {
-          return this as Thenable<any>
-        },
-      }
-    } catch (e: any) {
-      return {
-        then(_onFulfilled) {
-          return this as Thenable<any>
-        },
-        catch(onRejected) {
-          return toThenable(onRejected)(e)
-        },
-      }
-    }
+    /**
+     * A function to perform persisted state migration.
+     * This function will be called when persisted state versions mismatch with the one specified here.
+     */
+    migrate?:
+      (persistedState: unknown, version: number) => MaybePromise<T>
+
+    /**
+     * A function to perform custom hydration merges when combining the stored state with the current one.
+     * By default, this function does a shallow merge.
+     */
+    merge?:
+      (persistedState: unknown, currentState: T) => T
   }
 
-export const persist =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    config: (
-      set: CustomSetState,
-      get: CustomGetState,
-      api: CustomStoreApi
-    ) => S,
-    baseOptions: PersistOptions<S>
-  ) =>
-  (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: CustomStoreApi & StoreApiWithPersist<S>
-  ): S => {
-    let options = {
-      getStorage: () => localStorage,
-      serialize: JSON.stringify as (state: StorageValue<S>) => string,
-      deserialize: JSON.parse as (str: string) => StorageValue<Partial<S>>,
-      partialize: (state: S) => state,
-      version: 0,
-      merge: (persistedState: any, currentState: S) => ({
-        ...currentState,
-        ...persistedState,
-      }),
-      ...baseOptions,
-    }
+interface PersistentStorage
+  { getItem: (name: string) => string | null | Promise<string | null>
+  , setItem: (name: string, value: string) => void | Promise<void>
+  , removeItem: (name: string) => void | Promise<void>
+  }
 
-    let hasHydrated = false
-    const hydrationListeners = new Set<PersistListener<S>>()
-    const finishHydrationListeners = new Set<PersistListener<S>>()
-    let storage: StateStorage | undefined
+interface PersistentStorageValue<T>
+  { state: T
+  , version?: number
+  }
 
-    try {
-      storage = options.getStorage()
-    } catch (e) {
-      // prevent error if the storage is not defined (e.g. when server side rendering a page)
-    }
-
-    if (!storage) {
-      return config(
-        ((...args) => {
-          console.warn(
-            `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
-          )
-          set(...args)
-        }) as CustomSetState,
-        get,
-        api
-      )
-    }
-
-    const thenableSerialize = toThenable(options.serialize)
-
-    const setItem = (): Thenable<void> => {
-      const state = options.partialize({ ...get() })
-
-      let errorInSync: Error | undefined
-      const thenable = thenableSerialize({ state, version: options.version })
-        .then((serializedValue) =>
-          (storage as StateStorage).setItem(options.name, serializedValue)
-        )
-        .catch((e) => {
-          errorInSync = e
-        })
-      if (errorInSync) {
-        throw errorInSync
+interface PersistStore<T extends UnknownState, U>
+  { persist:
+      { setOptions: (options: O.Partial<PersistOptions<T, U>>) => void
+      , clearStorage: () => void
+      , rehydrate: () => Thenable<void>
+      , hasHydrated: () => boolean
+      , onHydrate: (listener: (state: T) => void) => () => void
+      , onFinishHydration: (listener: (state: T) => void) => () => void
       }
-      return thenable
-    }
+  }
 
-    const savedSetState = api.setState
 
-    api.setState = (state, replace) => {
-      savedSetState(state, replace)
-      void setItem()
-    }
 
-    const configResult = config(
-      ((...args) => {
-        set(...args)
-        void setItem()
-      }) as CustomSetState,
-      get,
-      api
+
+// ============================================================================
+// Implementation
+
+type EState = { __isState: true }
+type ESelectedState = { __isSelectedState: true }
+type EPersistentStorageName = string & { __isPersistentStorageName: true }
+type EPersistentStorageValue =
+  { state: ESelectedState
+  , version?: number & { __isPersistentStorageValueVersion: true } 
+  }
+
+type EPersist =
+    ( stateInitializer: StateInitializer<EState, Store<EState>>
+    , options: EPersistOptions
+    ) =>
+    StateInitializer<EState, Store<EState> & EPersistStore>
+
+interface EPersistOptions
+  { name: EPersistentStorageName
+  , getStorage?: () => EPersistentStorage
+  , serialize?:
+      (storageValue: EPersistentStorageValue) =>
+        MaybePromise<E.Serialized<EPersistentStorageValue>>
+  , deserialize?:
+      (serializedString: E.Serialized<EPersistentStorageValue>) =>
+        MaybePromise<EPersistentStorageValue>
+  , partialize?: (state: EState) => ESelectedState
+  , onRehydrateStorage?:
+      (state: EState) =>
+        void | ((state?: EState, error?: unknown) => void)
+  , version?: EPersistentStorageValue["version"]
+    migrate?:
+      ( persistedState: EPersistentStorageValue["state"]
+      , version: EPersistentStorageValue["version"]
+      ) =>
+        MaybePromise<EPersistentStorageValue["state"]>
+    merge?:
+      ( persistedState: EPersistentStorageValue["state"]
+      , currentState: EState
+      ) =>
+        EState
+  }
+
+interface EPersistentStorage
+  { getItem: (name: EPersistentStorageName) =>
+      MaybePromise<E.Serialized<EPersistentStorageValue> | null>
+  , setItem:
+      ( name: EPersistentStorageName
+      , value: E.Serialized<EPersistentStorageValue>
+      ) =>
+        MaybePromise<void>
+  , removeItem: (name: EPersistentStorageName) => MaybePromise<void>
+  }
+
+interface EPersistStore
+  { persist:
+      { setOptions: (options: O.Partial<EPersistOptions>) => void
+      , clearStorage: () => void
+      , rehydrate: () => Thenable<void>
+      , hasHydrated: () => boolean
+      , onHydrate: (listener: (state: EState) => void) => () => void
+      , onFinishHydration: (listener: (state: EState) => void) => () => void
+      }
+  }
+
+const persistImpl: EPersist = (stateInitializer, _options) => (parentSet, parentGet, parentStore) => {
+  let options = { ...defaultOptions, ..._options }
+
+  let persistentStorage = tryElse(options.getStorage, () => undefined)
+  let persistentStorageGetItem = () =>
+    persistentStorage!.getItem(options.name)
+  let persistentStorageSetItem = (serializedState: E.Serialized<EPersistentStorageValue>) =>
+    persistentStorage!.setItem(options.name, serializedState)
+  let persistentStorageRemoveItem = () =>
+    persistentStorage!.removeItem(options.name)
+  
+  if (!persistentStorage) {
+    return stateInitializer(
+      (...a) => {
+        console.warn(messages.unableToUpdateItem(options.name))
+        parentSet(...a);
+      },
+      parentGet, 
+      update(parentStore, "setState", setState => (...a) => {
+        console.warn(messages.unableToUpdateItem(options.name))
+        setState(...a);
+      })
     )
-
-    // a workaround to solve the issue of not storing rehydrated state in sync storage
-    // the set(state) value would be later overridden with initial state by create()
-    // to avoid this, we merge the state from localStorage into the initial state.
-    let stateFromStorage: S | undefined
-
-    // rehydrate initial state with existing stored state
-    const hydrate = () => {
-      if (!storage) return
-
-      hasHydrated = false
-      hydrationListeners.forEach((cb) => cb(get()))
-
-      const postRehydrationCallback =
-        options.onRehydrateStorage?.(get()) || undefined
-
-      // bind is used to avoid `TypeError: Illegal invocation` error
-      return toThenable(storage.getItem.bind(storage))(options.name)
-        .then((storageValue) => {
-          if (storageValue) {
-            return options.deserialize(storageValue)
-          }
-        })
-        .then((deserializedStorageValue) => {
-          if (deserializedStorageValue) {
-            if (
-              typeof deserializedStorageValue.version === 'number' &&
-              deserializedStorageValue.version !== options.version
-            ) {
-              if (options.migrate) {
-                return options.migrate(
-                  deserializedStorageValue.state,
-                  deserializedStorageValue.version
-                )
-              }
-              console.error(
-                `State loaded from storage couldn't be migrated since no migrate function was provided`
-              )
-            } else {
-              return deserializedStorageValue.state
-            }
-          }
-        })
-        .then((migratedState) => {
-          stateFromStorage = options.merge(migratedState as S, configResult)
-
-          set(stateFromStorage as S, true)
-          return setItem()
-        })
-        .then(() => {
-          postRehydrationCallback?.(stateFromStorage, undefined)
-          hasHydrated = true
-          finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
-        })
-        .catch((e: Error) => {
-          postRehydrationCallback?.(undefined, e)
-        })
-    }
-
-    api.persist = {
-      setOptions: (newOptions) => {
-        options = {
-          ...options,
-          ...newOptions,
-        }
-
-        if (newOptions.getStorage) {
-          storage = newOptions.getStorage()
-        }
-      },
-      clearStorage: () => {
-        storage?.removeItem(options.name)
-      },
-      rehydrate: () => hydrate() as Promise<void>,
-      hasHydrated: () => hasHydrated,
-      onHydrate: (cb) => {
-        hydrationListeners.add(cb)
-
-        return () => {
-          hydrationListeners.delete(cb)
-        }
-      },
-      onFinishHydration: (cb) => {
-        finishHydrationListeners.add(cb)
-
-        return () => {
-          finishHydrationListeners.delete(cb)
-        }
-      },
-    }
-
-    hydrate()
-
-    return stateFromStorage || configResult
   }
+ 
+  const updatePersistentStorage = () =>
+    thenablify(options.serialize)({
+      state: options.partialize({ ...parentGet() }),
+      version: options.version
+    })
+    .then(persistentStorageSetItem)
+    .throw()
+  
+
+  let initialState = stateInitializer(
+    (...a) => {
+      parentSet(...a);
+      updatePersistentStorage();
+    },
+    parentGet, 
+    update(parentStore, "setState", setState => (...a) => {
+      setState(...a);
+      updatePersistentStorage();
+    })
+  )
+  let initialStateFromPersistentStorage: EState | undefined;
+
+  let hasHydrated = false
+  let hydrationEmitter = emitter(new Set<(state: EState) => void>())
+  let finishHydrationEmitter = emitter(new Set<(state: EState) => void>())
+
+  const hydrate = () => {
+    hasHydrated = false;
+    hydrationEmitter.emit(parentGet());
+    let postRehydrationCallback = options.onRehydrateStorage?.(parentGet()) || undefined
+
+    return thenablify(persistentStorageGetItem)()
+    .then(serialized => serialized !== null ? options.deserialize(serialized) : null)
+    .then(storageValue => {
+      if (storageValue === null) return storageValue;
+      if (storageValue.version === undefined) return storageValue.state;
+      if (storageValue.version === options.version) return storageValue.state;
+      if (!options.migrate) {
+        console.error(messages.couldNotMigrate())
+        return undefined;
+      }
+
+      return options.migrate(storageValue.state, storageValue.version)
+    })
+    .then(migratedState => {
+      initialStateFromPersistentStorage = options.merge(migratedState!, initialState)
+
+      parentSet(initialStateFromPersistentStorage, true)
+      return updatePersistentStorage();
+    })
+    .then(() => {
+      postRehydrationCallback?.(initialStateFromPersistentStorage)
+      hasHydrated = true
+      finishHydrationEmitter.emit(initialStateFromPersistentStorage!)
+    })
+    .catch(error => postRehydrationCallback?.(undefined, error))
+  }
+
+  (parentStore as Store<EState> & EPersistStore).persist = {
+    setOptions: (newOptions) => {
+      options = { ...options, ...newOptions }
+      if (options.getStorage) persistentStorage = options.getStorage()
+    },
+    clearStorage: persistentStorageRemoveItem,
+    rehydrate: hydrate,
+    hasHydrated: () => hasHydrated,
+    onHydrate: hydrationEmitter.subscribe,
+    onFinishHydration: finishHydrationEmitter.subscribe
+  }
+
+  hydrate();
+  return initialStateFromPersistentStorage || initialState;
+}
+const persist = persistImpl as Persist;
+
+type EPersistDefaultedOptions =
+  O.Required<O.ExcludeKey<EPersistOptions, "name" | "onRehydrateStorage" | "migrate">>
+
+const defaultOptions: EPersistDefaultedOptions = {
+  getStorage: (() => localStorage) as unknown as EPersistDefaultedOptions["getStorage"],
+  serialize: JSON.stringify as unknown as EPersistDefaultedOptions["serialize"],
+  deserialize: JSON.parse as unknown as EPersistDefaultedOptions["deserialize"],
+  partialize: (<T>(x: T) => x) as unknown as EPersistDefaultedOptions["partialize"],
+  version: 0 as EPersistDefaultedOptions["version"],
+  merge: (persistedState, currentState) => ({
+    ...currentState,
+    ...persistedState,
+  })
+}
+
+const messages = {
+  unableToUpdateItem: (name: EPersistentStorageName) =>
+    `[zustand persist middleware] Unable to update item '${name}', ` +
+    `the given storage is currently unavailable.`,
+  couldNotMigrate: () =>
+    `[zustand persist middleware] State loaded from storage couldn't be migrated ` +
+    `since no migrate function was provided`
+}
+
+
+
+
+// ============================================================================
+// Utilities
+
+const tryElse = <T, U>(result: () => T, fallback: (e: unknown) => U) => {
+  let r: T | U;
+  try { r = result() }
+  catch (e) { r = fallback(e) }
+  return r;
+}
+
+const update =
+  <T, K extends keyof T>(t: T, k: K, replacer: (original: T[K]) => T[K]) => {
+    let original = t[k];
+    Object.assign(t, { k: replacer(original) });
+    return t;
+  }
+
+
+type MaybePromise<T> =
+  T | Promise<T>
+
+namespace E {
+  export type Serialized<T> = { __serialized: T }
+}
+
+namespace O {
+  export type Unknown =
+    object;
+
+  export type Partial<T extends O.Unknown> =
+    { [K in keyof T]?: T[K] }
+
+  export type ExcludeKey<T extends O.Unknown, K extends keyof T> =
+    { [P in U.Exclude<keyof T, K>]: T[P]
+    }
+
+  export type Required<T> =
+    { [K in keyof T]-?: U.Exclude<T[K], undefined>
+    }
+}
+
+namespace U {
+  export type Exclude<T, U> =
+    T extends U ? never : T
+}
+
+
+
+
+// ============================================================================
+// Exports
+
+export default persist;
+export { PersistOptions, PersistStore }
