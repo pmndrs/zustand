@@ -1,5 +1,5 @@
-import { StoreInitializer, Store, UnknownState } from "../vanilla"
-import { thenablify, Thenable, emitter } from "./utils"
+import { StoreInitializer, Store, UnknownState } from '../vanilla'
+import { thenablify, Thenable, emitter } from './utils'
 
 // ============================================================================
 // Types
@@ -135,14 +135,14 @@ interface EPersistOptions
   , onRehydrateStorage?:
       (state: EState) =>
         void | ((state?: EState, error?: unknown) => void)
-  , version?: EPersistentStorageValue["version"]
+  , version?: EPersistentStorageValue['version']
     migrate?:
-      ( persistedState: EPersistentStorageValue["state"]
-      , version: EPersistentStorageValue["version"]
+      ( persistedState: EPersistentStorageValue['state']
+      , version: EPersistentStorageValue['version']
       ) =>
-        MaybePromise<EPersistentStorageValue["state"]>
+        MaybePromise<EPersistentStorageValue['state']>
     merge?:
-      ( persistedState: EPersistentStorageValue["state"]
+      ( persistedState: EPersistentStorageValue['state']
       , currentState: EState
       ) =>
         EState
@@ -185,12 +185,12 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
     return storeInitializer(
       (...a) => {
         console.warn(messages.unableToUpdateItem(options.name))
-        parentSet(...a);
+        parentSet(...a)
       },
       parentGet, 
-      update(parentStore, "setState", setState => (...a) => {
+      update(parentStore, 'setState', setState => (...a) => {
         console.warn(messages.unableToUpdateItem(options.name))
-        setState(...a);
+        setState(...a)
       })
     )
   }
@@ -206,35 +206,35 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
 
   let initialState = storeInitializer(
     (...a) => {
-      parentSet(...a);
-      updatePersistentStorage();
+      parentSet(...a)
+      updatePersistentStorage()
     },
     parentGet, 
-    update(parentStore, "setState", setState => (...a) => {
-      setState(...a);
-      updatePersistentStorage();
+    update(parentStore, 'setState', setState => (...a) => {
+      setState(...a)
+      updatePersistentStorage()
     })
   )
-  let initialStateFromPersistentStorage: EState | undefined;
+  let initialStateFromPersistentStorage: EState | undefined
 
   let hasHydrated = false
   let hydrationEmitter = emitter(new Set<(state: EState) => void>())
   let finishHydrationEmitter = emitter(new Set<(state: EState) => void>())
 
   const hydrate = () => {
-    hasHydrated = false;
-    hydrationEmitter.emit(parentGet());
+    hasHydrated = false
+    hydrationEmitter.emit(parentGet())
     let postRehydrationCallback = options.onRehydrateStorage?.(parentGet()) || undefined
 
     return thenablify(persistentStorageGetItem)()
     .then(serialized => serialized !== null ? options.deserialize(serialized) : null)
     .then(storageValue => {
-      if (storageValue === null) return storageValue;
-      if (storageValue.version === undefined) return storageValue.state;
-      if (storageValue.version === options.version) return storageValue.state;
+      if (storageValue === null) return storageValue
+      if (storageValue.version === undefined) return storageValue.state
+      if (storageValue.version === options.version) return storageValue.state
       if (!options.migrate) {
         console.error(messages.couldNotMigrate())
-        return undefined;
+        return undefined
       }
 
       return options.migrate(storageValue.state, storageValue.version)
@@ -243,7 +243,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
       initialStateFromPersistentStorage = options.merge(migratedState!, initialState)
 
       parentSet(initialStateFromPersistentStorage, true)
-      return updatePersistentStorage();
+      return updatePersistentStorage()
     })
     .then(() => {
       postRehydrationCallback?.(initialStateFromPersistentStorage)
@@ -265,20 +265,20 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
     onFinishHydration: finishHydrationEmitter.subscribe
   }
 
-  hydrate();
-  return initialStateFromPersistentStorage || initialState;
+  hydrate()
+  return initialStateFromPersistentStorage || initialState
 }
-const persist = persistImpl as Persist;
+const persist = persistImpl as Persist
 
 type EPersistDefaultedOptions =
-  O.Required<O.ExcludeKey<EPersistOptions, "name" | "onRehydrateStorage" | "migrate">>
+  O.Required<O.ExcludeKey<EPersistOptions, 'name' | 'onRehydrateStorage' | 'migrate'>>
 
 const defaultOptions: EPersistDefaultedOptions = {
-  getStorage: (() => localStorage) as unknown as EPersistDefaultedOptions["getStorage"],
-  serialize: JSON.stringify as unknown as EPersistDefaultedOptions["serialize"],
-  deserialize: JSON.parse as unknown as EPersistDefaultedOptions["deserialize"],
-  partialize: (<T>(x: T) => x) as unknown as EPersistDefaultedOptions["partialize"],
-  version: 0 as EPersistDefaultedOptions["version"],
+  getStorage: (() => localStorage) as unknown as EPersistDefaultedOptions['getStorage'],
+  serialize: JSON.stringify as unknown as EPersistDefaultedOptions['serialize'],
+  deserialize: JSON.parse as unknown as EPersistDefaultedOptions['deserialize'],
+  partialize: (<T>(x: T) => x) as unknown as EPersistDefaultedOptions['partialize'],
+  version: 0 as EPersistDefaultedOptions['version'],
   merge: (persistedState, currentState) => ({
     ...currentState,
     ...persistedState,
@@ -301,17 +301,17 @@ const messages = {
 // Utilities
 
 const tryElse = <T, U>(result: () => T, fallback: (e: unknown) => U) => {
-  let r: T | U;
+  let r: T | U
   try { r = result() }
   catch (e) { r = fallback(e) }
-  return r;
+  return r
 }
 
 const update =
   <T, K extends keyof T>(t: T, k: K, replacer: (original: T[K]) => T[K]) => {
-    let original = t[k];
-    Object.assign(t, { k: replacer(original) });
-    return t;
+    let original = t[k]
+    Object.assign(t, { k: replacer(original) })
+    return t
   }
 
 
@@ -324,7 +324,7 @@ namespace E {
 
 namespace O {
   export type Unknown =
-    object;
+    object
 
   export type Partial<T extends O.Unknown> =
     { [K in keyof T]?: T[K] }

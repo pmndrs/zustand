@@ -18,7 +18,7 @@ interface Store<T extends UnknownState>
   }
 
 type UnknownState =
-  object;
+  object
 
 type Create =
   <T extends UnknownState, S extends Store<T>>
@@ -28,15 +28,15 @@ type Create =
       S
 
 type StoreInitializer<T extends UnknownState, S extends Store<T>> =
-  & ( ( set: Store<T>["setState"] 
-      , get: Store<T>["getState"]
+  & ( ( set: Store<T>['setState'] 
+      , get: Store<T>['getState']
       , store: Store<T>
       ) =>
         T
     )
   & TagStore<S>
 
-declare const $$store: unique symbol;
+declare const $$store: unique symbol
 type TagStore<S> = { [$$store]?: S }
 
 
@@ -69,18 +69,18 @@ interface EStore
 
 type ECreate =
   ( storeInitializer:
-    ( set: EStore["setState"]
-    , get: EStore["getState"]
+    ( set: EStore['setState']
+    , get: EStore['getState']
     , store: EStore
     ) => EState
   ) =>
     EStore
 
 const createImpl: ECreate = storeInitializer => {
-  let state: EState;
+  let state: EState
 
   type Listener = (state: EState, previousState: E.Previous<EState>) => void
-  let listeners: Set<Listener> = new Set();
+  let listeners: Set<Listener> = new Set()
   const emit = (...a: F.Arguments<Listener>) =>
     listeners.forEach(f => f(...a))
 
@@ -88,18 +88,18 @@ const createImpl: ECreate = storeInitializer => {
     getState: () => state,
     setState: (nextStateOrUpdater, shouldReplace) => {
       let nextState =
-        typeof nextStateOrUpdater === "function"
+        typeof nextStateOrUpdater === 'function'
           ? nextStateOrUpdater(state)
           : nextStateOrUpdater
 
-      if (objectIs(nextState, state)) return;
+      if (objectIs(nextState, state)) return
 
-      let previousState = E.previous(state);
+      let previousState = E.previous(state)
       state = shouldReplace
         ? nextState as EState
         : Object.assign({}, state, nextState)
 
-      emit(state, previousState);
+      emit(state, previousState)
     },
     subscribe: listener => {
       listeners.add(listener)
@@ -107,8 +107,8 @@ const createImpl: ECreate = storeInitializer => {
     },
     destroy: () => listeners.clear()
   }
-  state = storeInitializer(store.setState, store.getState, store);
-  return store;
+  state = storeInitializer(store.setState, store.getState, store)
+  return store
 }
 const create = createImpl as Create
 
@@ -121,13 +121,13 @@ const create = createImpl as Create
 const objectIs = Object.is as (<T>(a: T, b: T) => boolean)
 
 namespace E {
-  export type Previous<T> = T & { __isPrevious: true };
+  export type Previous<T> = T & { __isPrevious: true }
   export const previous = <T>(t: T) => t as Previous<T>
 }
 
 namespace O {
   export type Unknown =
-    object;
+    object
 
   export type Partial<T extends O.Unknown> =
     { [K in keyof T]?: T[K] }
@@ -148,7 +148,7 @@ namespace F {
 // ============================================================================
 // Exports
 
-export default create;
+export default create
 export
   { StoreInitializer // create's argument
   , Store // create's result
