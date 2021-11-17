@@ -1,13 +1,3 @@
-export const emitter = <L extends (...a: never[]) => void>(listeners: Set<L>) => {
-  return ({
-    emit: (...a: Parameters<L>) => listeners.forEach(f => f(...a)),
-    subscribe: (listener: L) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
-    }
-  })
-}
-
 export interface Thenable<T>
   { then: <U>(onFulfilled: (value: T) => U | Promise<U> | Thenable<U>) =>
       Thenable<U>

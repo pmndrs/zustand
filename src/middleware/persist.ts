@@ -1,5 +1,5 @@
 import { StoreInitializer, Store, UnknownState } from '../vanilla'
-import { thenablify, Thenable, emitter } from './utils'
+import { thenablify, Thenable } from './utils'
 
 // ============================================================================
 // Types
@@ -261,8 +261,8 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
     clearStorage: persistentStorageRemoveItem,
     rehydrate: hydrate,
     hasHydrated: () => hasHydrated,
-    onHydrate: hydrationEmitter.subscribe,
-    onFinishHydration: finishHydrationEmitter.subscribe
+    onHydrate: hydrationEmitter.listen,
+    onFinishHydration: finishHydrationEmitter.listen
   }
 
   hydrate()
@@ -314,6 +314,15 @@ const update =
     return t
   }
 
+const emitter = <L extends (...a: never[]) => void>(listeners: Set<L>) => {
+  return ({
+    emit: (...a: Parameters<L>) => listeners.forEach(f => f(...a)),
+    listen: (listener: L) => {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    }
+  })
+}
 
 type MaybePromise<T> =
   T | Promise<T>
