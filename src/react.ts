@@ -1,81 +1,53 @@
 import { useDebugValue } from 'react'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
-import createStore, {
-  EqualityChecker,
-  GetState,
-  SetState,
-  State,
-  StateCreator,
-  StateSelector,
-  StoreApi,
-} from './vanilla'
+import createStore, { Store, UnknownState, StoreInitializer } from './vanilla'
 
-export function useStore<T extends State>(api: StoreApi<T>): T
-export function useStore<T extends State, U>(
-  api: StoreApi<T>,
-  selector: StateSelector<T, U>,
-  equalityFn?: EqualityChecker<U>
-): U
-export function useStore<TState extends State, StateSlice>(
-  api: StoreApi<TState>,
-  selector: StateSelector<TState, StateSlice> = api.getState as any,
-  equalityFn: EqualityChecker<StateSlice> = Object.is
-) {
-  const slice = useSyncExternalStoreWithSelector(
-    api.subscribe,
-    api.getState,
+type UseStore =
+  { <T extends UnknownState>
+      (store: Store<T>):
+        T
+
+  , <T extends UnknownState, U>
+      ( store: Store<T>
+      , selector: (state: T) => U
+      , equals?: (a: U, b: U) => boolean
+      ):
+        U
+  }
+
+export const useStore = ((store, selector, equals) => {
+  const selected = useSyncExternalStoreWithSelector(
+    store.subscribe,
+    store.getState,
     null,
     selector,
-    equalityFn
+    equals
   )
-  useDebugValue(slice)
-  return slice
+  useDebugValue(selected)
+
+  return selected
+}) as UseStore
+
+
+const create =
+  <T extends UnknownState, S extends Store<T>>
+    (storeOrInitializer: S | StoreInitializer<T, S>): UseBoundStore<T, S> => {
+
+  let store: S =
+    typeof storeOrInitializer == "function"
+      ? createStore(storeOrInitializer as StoreInitializer<T, S>)
+      : storeOrInitializer
+
+  return Object.assign(
+    ((selector, equals) => useStore(store, selector, equals)) as UseBoundStore<T, S>,
+    store
+  )
 }
 
-export type UseBoundStore<
-  T extends State,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
-> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-} & CustomStoreApi
-
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState:
-    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
-    | CustomStoreApi
-): UseBoundStore<TState, CustomStoreApi>
-
-function create<TState extends State>(
-  createState:
-    | StateCreator<TState, SetState<TState>, GetState<TState>, any>
-    | StoreApi<TState>
-): UseBoundStore<TState, StoreApi<TState>>
-
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState:
-    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
-    | CustomStoreApi
-): UseBoundStore<TState, CustomStoreApi> {
-  const api: CustomStoreApi =
-    typeof createState === 'function' ? createStore(createState) : createState
-
-  const useBoundStore: any = (selector?: any, equalityFn?: any) =>
-    useStore(api, selector, equalityFn)
-
-  Object.assign(useBoundStore, api)
-
-  return useBoundStore
-}
-
+type UseBoundStore<T extends UnknownState, S extends Store<T>> =
+  & { (): T
+    , <U>(selector: (state: T) => U, equals?: (a: U, b: U) => boolean): U
+    }
+  & S
+  
 export default create
