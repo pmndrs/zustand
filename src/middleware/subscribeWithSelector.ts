@@ -51,12 +51,12 @@ interface ESubscribeWithSelectorStore
 const subscribeWithSelectorImpl: ESubscribeWithSelector =
   storeInitializer =>
     (parentSet, parentGet, parentStore) => {
-   
-  type NewSubscribeArguments = 
-    F.O2.Arguments<(EStore & ESubscribeWithSelectorStore)['subscribe']>
 
   let parentSubscribe = parentStore.subscribe;
-  parentStore.subscribe = (...args: NewSubscribeArguments) => {
+  let updatedParentStore = parentStore as EStore & ESubscribeWithSelectorStore
+  type UpdatedSubscribeArguments = F.O2.Arguments<(typeof updatedParentStore)['subscribe']>;
+
+  updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
     if (!args[1]) {
       pseudoAssert(args.length === 1)
       return parentSubscribe(...args)
@@ -83,7 +83,7 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
     })
   }
 
-  return storeInitializer(parentSet, parentGet, parentStore)
+  return storeInitializer(parentSet, parentGet, updatedParentStore)
 }
 const subscribeWithSelector = subscribeWithSelectorImpl as SubscribeWithSelector
 
