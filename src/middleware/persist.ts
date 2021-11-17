@@ -5,11 +5,11 @@ import { thenablify, Thenable } from './utils'
 // Types
 
 type Persist =
-  <T extends UnknownState, U>
-    ( storeInitializer: StoreInitializer<T, Store<T>>
+  <T extends UnknownState, S extends Store<T>, U>
+    ( storeInitializer: StoreInitializer<T, S>
     , options: PersistOptions<T, U>
     ) =>
-      StoreInitializer<T, Store<T> & PersistStore<T, U>>
+      StoreInitializer<T, S & PersistStore<T, U>>
 
 interface PersistOptions<T extends UnknownState, U>
   { /** Name of the storage (must be unique) */
