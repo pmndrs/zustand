@@ -27,7 +27,7 @@ interface SubscribeWithSelectorStore<T extends UnknownState>
 
 type EState = { __isState: true }
 type ESelectedState = { __isSelectedState: true }
-type EStore = Store<EState>;
+type EStore = Store<EState>
 type ESubscribeWithSelector = 
   (storeInitializer: StoreInitializer<EState, EStore>) =>
     StoreInitializer<EState, EStore & ESubscribeWithSelectorStore>
@@ -52,9 +52,9 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
   storeInitializer =>
     (parentSet, parentGet, parentStore) => {
 
-  let parentSubscribe = parentStore.subscribe;
+  let parentSubscribe = parentStore.subscribe
   let updatedParentStore = parentStore as EStore & ESubscribeWithSelectorStore
-  type UpdatedSubscribeArguments = F.O2.Arguments<(typeof updatedParentStore)['subscribe']>;
+  type UpdatedSubscribeArguments = F.O2.Arguments<(typeof updatedParentStore)['subscribe']>
 
   updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
     if (!args[1]) {
@@ -63,23 +63,23 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
     }
   
     pseudoAssert(args.length === 3)
-    let [selector, listener, _options] = args;
+    let [selector, listener, _options] = args
     let { equalityFn: equals, fireImmediately } =
-      { equalityFn: objectIs, fireImmediately: false, ..._options };
+      { equalityFn: objectIs, fireImmediately: false, ..._options }
   
     let currentSelected = selector(parentGet())
-    let previousSelected = currentSelected as E.Previous<ESelectedState>;
-    const emit = () => listener(currentSelected, previousSelected);
+    let previousSelected = currentSelected as E.Previous<ESelectedState>
+    const emit = () => listener(currentSelected, previousSelected)
 
     if (fireImmediately) emit()
   
     return parentSubscribe(() => {
       let nextSelected = selector(parentGet())
-      if (equals(currentSelected, nextSelected)) return;
+      if (equals(currentSelected, nextSelected)) return
   
-      previousSelected = E.previous(currentSelected);
+      previousSelected = E.previous(currentSelected)
       currentSelected = nextSelected
-      emit();
+      emit()
     })
   }
 
@@ -92,7 +92,7 @@ const subscribeWithSelector = subscribeWithSelectorImpl as SubscribeWithSelector
 // Utilities
 
 namespace E {
-  export type Previous<T> = T & { __isPrevious: true };
+  export type Previous<T> = T & { __isPrevious: true }
   export const previous = <T>(t: T) => t as Previous<T>
 }
 
