@@ -349,5 +349,4 @@ namespace U {
 // ============================================================================
 // Exports
 
-export default persist;
-export { PersistOptions, PersistStore }
+export { persist, PersistOptions, PersistStore }
