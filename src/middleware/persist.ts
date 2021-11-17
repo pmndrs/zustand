@@ -1,4 +1,4 @@
-import { StateInitializer, Store, UnknownState } from "../vanilla"
+import { StoreInitializer, Store, UnknownState } from "../vanilla"
 import { thenablify, Thenable, emitter } from "./utils"
 
 // ============================================================================
@@ -6,10 +6,10 @@ import { thenablify, Thenable, emitter } from "./utils"
 
 type Persist =
   <T extends UnknownState, U>
-    ( stateInitializer: StateInitializer<T, Store<T>>
+    ( storeInitializer: StoreInitializer<T, Store<T>>
     , options: PersistOptions<T, U>
     ) =>
-      StateInitializer<T, Store<T> & PersistStore<T, U>>
+      StoreInitializer<T, Store<T> & PersistStore<T, U>>
 
 interface PersistOptions<T extends UnknownState, U>
   { /** Name of the storage (must be unique) */
@@ -117,10 +117,10 @@ type EPersistentStorageValue =
   }
 
 type EPersist =
-    ( stateInitializer: StateInitializer<EState, Store<EState>>
+    ( storeInitializer: StoreInitializer<EState, Store<EState>>
     , options: EPersistOptions
     ) =>
-    StateInitializer<EState, Store<EState> & EPersistStore>
+    StoreInitializer<EState, Store<EState> & EPersistStore>
 
 interface EPersistOptions
   { name: EPersistentStorageName
@@ -170,7 +170,7 @@ interface EPersistStore
       }
   }
 
-const persistImpl: EPersist = (stateInitializer, _options) => (parentSet, parentGet, parentStore) => {
+const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parentGet, parentStore) => {
   let options = { ...defaultOptions, ..._options }
 
   let persistentStorage = tryElse(options.getStorage, () => undefined)
@@ -182,7 +182,7 @@ const persistImpl: EPersist = (stateInitializer, _options) => (parentSet, parent
     persistentStorage!.removeItem(options.name)
   
   if (!persistentStorage) {
-    return stateInitializer(
+    return storeInitializer(
       (...a) => {
         console.warn(messages.unableToUpdateItem(options.name))
         parentSet(...a);
@@ -204,7 +204,7 @@ const persistImpl: EPersist = (stateInitializer, _options) => (parentSet, parent
     .throw()
   
 
-  let initialState = stateInitializer(
+  let initialState = storeInitializer(
     (...a) => {
       parentSet(...a);
       updatePersistentStorage();

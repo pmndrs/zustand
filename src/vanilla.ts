@@ -22,12 +22,12 @@ type UnknownState =
 
 type Create =
   <T extends UnknownState, S extends Store<T>>
-    ( stateInitializer: StateInitializer<T, S>
+    ( storeInitializer: StoreInitializer<T, S>
     , phantomInitialState?: T
     ) =>
       S
 
-type StateInitializer<T extends UnknownState, S extends Store<T>> =
+type StoreInitializer<T extends UnknownState, S extends Store<T>> =
   & ( ( set: Store<T>["setState"] 
       , get: Store<T>["getState"]
       , store: Store<T>
@@ -68,7 +68,7 @@ interface EStore
   }
 
 type ECreate =
-  ( stateInitializer:
+  ( storeInitializer:
     ( set: EStore["setState"]
     , get: EStore["getState"]
     , store: EStore
@@ -76,7 +76,7 @@ type ECreate =
   ) =>
     EStore
 
-const createImpl: ECreate = stateInitializer => {
+const createImpl: ECreate = storeInitializer => {
   let state: EState;
 
   type Listener = (state: EState, previousState: E.Previous<EState>) => void
@@ -107,7 +107,7 @@ const createImpl: ECreate = stateInitializer => {
     },
     destroy: () => listeners.clear()
   }
-  state = stateInitializer(store.setState, store.getState, store);
+  state = storeInitializer(store.setState, store.getState, store);
   return store;
 }
 const create = createImpl as Create
@@ -150,7 +150,7 @@ namespace F {
 
 export default create;
 export
-  { StateInitializer // create's argument
+  { StoreInitializer // create's argument
   , Store // create's result
   , UnknownState // Store's type-parameter's constraint
   }
