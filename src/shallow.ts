@@ -10,7 +10,7 @@ const shallow = <A, B>(_a: A, _b: B) => {
   let b = _b as WidenTo<B, A>;
   let aKeys = keys(a)
   let bKeys = keys(b)
-  let checkedKeys = new Set<keyof A | keyof B>();
+  let checkedKeys = new Set<(keyof A | keyof B) & string>();
   
   for (let k of aKeys) {
     if (!is(a[k], b[k])) return false;
