@@ -7,13 +7,9 @@ type Combine =
   <T extends UnknownState, U extends UnknownState>
     ( initialState: T
     , additionalStateCreator:
-        ( set: Store<T>['setState']
+        ( set: Store<O.Overwrite<T, U>>['setState']
         , get: Store<O.Overwrite<T, U>>['getState']
-        , store:
-            O.Overwrite<
-              Store<O.Overwrite<T, U>>,
-              { setState: Store<T>['setState'] }
-            >
+        , store: Store<O.Overwrite<T, U>>
         ) => U
     ) =>
       StoreInitializer<O.Overwrite<T, U>, Store<O.Overwrite<T, U>>>
