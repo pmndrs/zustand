@@ -28,13 +28,15 @@ type ReduxStore<A extends UnknownAction> =
 // ============================================================================
 // Implementation
 
-const redux: Redux = (reducer, initialState) => (parentSet, parentGet, parentStore) => {
+const redux: Redux = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
   type A = F.Arguments<typeof reducer>[1]
 
   let store = parentStore as typeof parentStore & ReduxStore<A>
   store.isReduxLike = true;
+
+  let parentSet = _parentSet as F.WidenArguments<typeof _parentSet>
   store.dispatch = a => {
-    parentSet(reducer(parentGet(), a), false)
+    parentSet(reducer(parentGet(), a), false, a)
     return a;
   }
 
@@ -50,6 +52,11 @@ namespace F {
 
   export type Arguments<T extends F.Unknown> =
     T extends (...a: infer A) => unknown ? A : never
+
+  export type WidenArguments<T extends F.Unknown> =
+    T extends (...a: infer A) => infer R
+      ? (...a: [...A, ...unknown[]]) => R
+      : never
 }
 
 // ============================================================================
