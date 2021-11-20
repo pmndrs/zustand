@@ -1,18 +1,29 @@
-import { StoreInitializer, Store, UnknownState } from '../vanilla'
+import { Store, UnknownState, StoreInitializer, TagStore } from '../vanilla'
 import { thenablify, Thenable } from './utils'
 
 // ============================================================================
 // Types
 
 type Persist =
-  <T extends UnknownState, S extends Store<T>, U>
-    ( storeInitializer: StoreInitializer<T, S>
+  < T extends UnknownState
+  , S extends Store<T>
+  , U = T
+  >
+    ( storeInitializer:
+      & ( ( set: (S & PersistStore<T>)['setState']
+          , get: (S & PersistStore<T>)['getState']
+          , store: S & PersistStore<T>
+          ) =>
+            T
+        )
+      & TagStore<S>
     , options: PersistOptions<T, U>
     ) =>
       StoreInitializer<T, S & PersistStore<T, U>>
 
 interface PersistOptions<T extends UnknownState, U>
-  { /** Name of the storage (must be unique) */
+  {
+    /** Name of the storage (must be unique) */
     name: string
     
     /**
@@ -22,7 +33,7 @@ interface PersistOptions<T extends UnknownState, U>
      *
      * @default () => localStorage
      */
-  , getStorage?: () => PersistentStorage
+    getStorage?: () => PersistentStorage
 
     /**
      * Use a custom serializer.
@@ -91,7 +102,7 @@ interface PersistentStorageValue<T>
   , version?: number
   }
 
-interface PersistStore<T extends UnknownState, U>
+interface PersistStore<T extends UnknownState, U = T>
   { persist:
       { setOptions: (options: O.Partial<PersistOptions<T, U>>) => void
       , clearStorage: () => void
@@ -184,12 +195,12 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
   if (!persistentStorage) {
     return storeInitializer(
       (...a) => {
-        console.warn(messages.unableToUpdateItem(options.name))
+        console.warn(messages.noPersistentStorage(options.name))
         parentSet(...a)
       },
       parentGet, 
       update(parentStore, 'setState', setState => (...a) => {
-        console.warn(messages.unableToUpdateItem(options.name))
+        console.warn(messages.noPersistentStorage(options.name))
         setState(...a)
       })
     )
@@ -286,7 +297,7 @@ const defaultOptions: EPersistDefaultedOptions = {
 }
 
 const messages = {
-  unableToUpdateItem: (name: EPersistentStorageName) =>
+  noPersistentStorage: (name: EPersistentStorageName) =>
     `[zustand persist middleware] Unable to update item '${name}', ` +
     `the given storage is currently unavailable.`,
   couldNotMigrate: () =>

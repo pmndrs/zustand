@@ -149,8 +149,4 @@ namespace F {
 // Exports
 
 export default create
-export
-  { StoreInitializer // create's argument
-  , Store // create's result
-  , UnknownState // Store's type-parameter's constraint
-  }
+export { Store, UnknownState, StoreInitializer, TagStore }
