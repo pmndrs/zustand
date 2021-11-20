@@ -1,37 +1,58 @@
-import { GetState, SetState, State, StoreApi } from '../vanilla'
+import { StoreInitializer, UnknownState, Store } from '../vanilla'
 
-type DevtoolsType = {
-  prefix: string
-  subscribe: (dispatch: any) => () => void
-  unsubscribe: () => void
-  send: (action: string, state: any) => void
-  init: (state: any) => void
-  error: (payload: any) => void
-}
+// ============================================================================
+// Types
 
-export type StoreApiWithRedux<
-  T extends State,
-  A extends { type: unknown }
-> = StoreApi<T & { dispatch: (a: A) => A }> & {
-  dispatch: (a: A) => A
-}
+type Redux =
+  < T extends UnknownState
+  , A extends UnknownAction
+  , S extends Store<T & ReduxState<A>>
+  >
+    ( reducer: (state: T, action: A) => T
+    , initialState: T
+    ) =>
+      & StoreInitializer<T & ReduxState<A>, S & ReduxStore<A>>
 
-export const redux =
-  <S extends State, A extends { type: unknown }>(
-    reducer: (state: S, action: A) => S,
-    initial: S
-  ) =>
-  (
-    set: SetState<S & { dispatch: (a: A) => A }>,
-    get: GetState<S & { dispatch: (a: A) => A }>,
-    api: StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
-  ): S & { dispatch: (a: A) => A } => {
-    api.dispatch = (action: A) => {
-      set((state: S) => reducer(state, action))
-      if (api.devtools) {
-        api.devtools.send(api.devtools.prefix + action.type, get())
-      }
-      return action
-    }
-    return { dispatch: api.dispatch, ...initial }
+type ReduxState<A extends UnknownAction> =
+  { dispatch: ReduxStore<A>['dispatch'] }
+
+type UnknownAction =
+  { type: unknown }
+
+type ReduxStore<A extends UnknownAction> =
+  { dispatch: (a: A) => A
+  , isReduxLike: true
   }
+
+
+// ============================================================================
+// Implementation
+
+const redux: Redux = (reducer, initialState) => (parentSet, parentGet, parentStore) => {
+  type A = F.Arguments<typeof reducer>[1]
+
+  let store = parentStore as typeof parentStore & ReduxStore<A>
+  store.isReduxLike = true;
+  store.dispatch = a => {
+    parentSet(reducer(parentGet(), a), false)
+    return a;
+  }
+
+  return { ...initialState, dispatch: store.dispatch }
+}
+
+// ============================================================================
+// Utilities
+
+namespace F {
+  export type Unknown =
+    (...a: never[]) => unknown
+
+  export type Arguments<T extends F.Unknown> =
+    T extends (...a: infer A) => unknown ? A : never
+}
+
+// ============================================================================
+// Exports
+
+export { redux, ReduxStore, UnknownAction }
