@@ -71,9 +71,7 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
     let previousSelected = currentSelected as E.Previous<ESelectedState>
     const emit = () => listener(currentSelected, previousSelected)
 
-    if (fireImmediately) emit()
-  
-    return parentSubscribe(() => {
+    let unsubscribe = parentSubscribe(() => {
       let nextSelected = selector(parentGet())
       if (equals(currentSelected, nextSelected)) return
   
@@ -81,6 +79,9 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
       currentSelected = nextSelected
       emit()
     })
+    if (fireImmediately) emit()
+
+    return unsubscribe
   }
 
   return storeInitializer(parentSet, parentGet, updatedParentStore)
