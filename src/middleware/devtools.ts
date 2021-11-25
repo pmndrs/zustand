@@ -68,7 +68,9 @@ export const devtools =
       extension =
         (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
         (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
-    } catch {}
+    } catch {
+      // ignored
+    }
 
     if (!extension) {
       if (
