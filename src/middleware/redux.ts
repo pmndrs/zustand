@@ -14,7 +14,7 @@ export type StoreApiWithRedux<
   T extends State,
   A extends { type: unknown }
 > = StoreApi<T & { dispatch: (a: A) => A }> & {
-  dispatch: (a: A) => A,
+  dispatch: (a: A) => A
   dispatchFromDevtools: boolean
 }
 
@@ -29,10 +29,10 @@ export const redux =
     api: StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
-      (set as NamedSet<S>)((state: S) => reducer(state, action), false, action)
+      ;(set as NamedSet<S>)((state: S) => reducer(state, action), false, action)
       return action
     }
     api.dispatchFromDevtools = true
-    
+
     return { dispatch: api.dispatch, ...initial }
   }

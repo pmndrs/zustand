@@ -80,14 +80,14 @@ export const devtools =
         dispatchFromDevtools?: boolean
       }
   ): S => {
-    let devtoolsOptions =
+    const devtoolsOptions =
       options === undefined
         ? { name: undefined }
         : typeof options === 'string'
         ? { name: options }
         : options
 
-    let extensionConnector =
+    const extensionConnector =
       (window as any).__REDUX_DEVTOOLS_EXTENSION__ ??
       (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
 
@@ -151,7 +151,7 @@ export const devtools =
           )
           didWarnAboutPrefix = true
         }
-        return '';
+        return ''
       },
       set: () => {
         if (!didWarnAboutPrefix) {
@@ -174,10 +174,10 @@ export const devtools =
       if (!isRecording) return
       extension!.send(
         nameOrAction === undefined
-          ? { type: devtoolsOptions.anonymousActionType ?? 'anonymous' } :
-        typeof nameOrAction === 'string'
-          ? { type: nameOrAction } :
-        nameOrAction,
+          ? { type: devtoolsOptions.anonymousActionType ?? 'anonymous' }
+          : typeof nameOrAction === 'string'
+          ? { type: nameOrAction }
+          : nameOrAction,
         get()
       )
     }
@@ -186,8 +186,8 @@ export const devtools =
       if (!replace) {
         set(state)
       } else {
-        let currentState = get()
-        for (let k in currentState) {
+        const currentState = get()
+        for (const k in currentState) {
           if (typeof currentState[k] === 'function') {
             ;(state as any)[k] = currentState[k]
           }
@@ -197,7 +197,7 @@ export const devtools =
       isRecording = true
     }
 
-    let initialState = fn(api.setState, get, api)
+    const initialState = fn(api.setState, get, api)
     extension!.init(initialState)
 
     extension!.subscribe((message: any) => {
@@ -229,8 +229,8 @@ export const devtools =
               })
 
             case 'IMPORT_STATE':
-              let { nextLiftedState } = message.payload
-              let lastComputedState =
+              const { nextLiftedState } = message.payload
+              const lastComputedState =
                 nextLiftedState.computedStates.at(-1)?.state
               if (!lastComputedState) return
               setStateFromDevtools(lastComputedState, true)
@@ -249,7 +249,6 @@ export const devtools =
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
-  let didParse = true
   try {
     parsed = JSON.parse(stringified)
   } catch (e) {
@@ -257,7 +256,6 @@ const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
       '[zustand devtools middleware] Could not parse the received json',
       e
     )
-    didParse = false
   }
-  if (didParse) f(parsed as T)
+  if (parsed !== undefined) f(parsed as T)
 }
