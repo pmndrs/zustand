@@ -6,6 +6,8 @@
     "es6": true
   },
   "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "prettier",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
@@ -29,6 +31,9 @@
     }
   },
   "rules": {
+    "eqeqeq": "error",
+    "no-var": "error",
+    "prefer-const": "error",
     "curly": ["warn", "multi-line", "consistent"],
     "no-console": "off",
     "import/no-unresolved": ["error", { "commonjs": true, "amd": true }],
@@ -107,6 +112,18 @@
       "files": ["src"],
       "parserOptions": {
         "project": "./tsconfig.json"
+      }
+    },
+    {
+      "files": ["tests/**/*.tsx"],
+      "env": {
+        "jest/globals": true
+      }
+    },
+    {
+      "files": ["./*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
       }
     }
   ]

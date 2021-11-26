@@ -1,4 +1,9 @@
-import { Component as ClassComponent, useEffect, useState } from 'react'
+import {
+  Component as ClassComponent,
+  ReactNode,
+  useEffect,
+  useState,
+} from 'react'
 import { render } from '@testing-library/react'
 import create, { GetState, SetState } from 'zustand'
 import createContext from 'zustand/context'
@@ -118,8 +123,11 @@ it('uses context store api', async () => {
 it('throws error when not using provider', async () => {
   console.error = jest.fn()
 
-  class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
-    constructor(props: {}) {
+  class ErrorBoundary extends ClassComponent<
+    { children?: ReactNode | undefined },
+    { hasError: boolean }
+  > {
+    constructor(props: { children?: ReactNode | undefined }) {
       super(props)
       this.state = { hasError: false }
     }

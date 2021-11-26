@@ -82,7 +82,7 @@ export const devtools =
   ): S => {
     const devtoolsOptions =
       options === undefined
-        ? { name: undefined }
+        ? { name: undefined, anonymousActionType: undefined }
         : typeof options === 'string'
         ? { name: options }
         : options
@@ -172,7 +172,7 @@ export const devtools =
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       set(state, replace)
       if (!isRecording) return
-      extension!.send(
+      extension.send(
         nameOrAction === undefined
           ? { type: devtoolsOptions.anonymousActionType ?? 'anonymous' }
           : typeof nameOrAction === 'string'
@@ -198,9 +198,9 @@ export const devtools =
     }
 
     const initialState = fn(api.setState, get, api)
-    extension!.init(initialState)
+    extension.init(initialState)
 
-    extension!.subscribe((message: any) => {
+    extension.subscribe((message: any) => {
       switch (message.type) {
         case 'ACTION':
           if (!api.dispatchFromDevtools) return
@@ -211,15 +211,15 @@ export const devtools =
           switch (message.payload.type) {
             case 'RESET':
               setStateFromDevtools(initialState, true)
-              return extension!.init(initialState)
+              return extension.init(initialState)
 
             case 'COMMIT':
-              return extension!.init(api.getState())
+              return extension.init(api.getState())
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
                 setStateFromDevtools(state, true)
-                extension!.init(state)
+                extension.init(state)
               })
 
             case 'JUMP_TO_STATE':
@@ -228,14 +228,15 @@ export const devtools =
                 setStateFromDevtools(state, true)
               })
 
-            case 'IMPORT_STATE':
+            case 'IMPORT_STATE': {
               const { nextLiftedState } = message.payload
               const lastComputedState =
                 nextLiftedState.computedStates.at(-1)?.state
               if (!lastComputedState) return
               setStateFromDevtools(lastComputedState, true)
-              extension!.send(null, nextLiftedState)
+              extension.send(null, nextLiftedState)
               return
+            }
 
             case 'PAUSE_RECORDING':
               return (isRecording = !isRecording)
