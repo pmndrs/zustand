@@ -181,19 +181,9 @@ export const devtools =
         get()
       )
     }
-    const setStateFromDevtools: SetState<S> = (state, replace) => {
+    const setStateFromDevtools: SetState<S> = (...a) => {
       isRecording = false
-      if (!replace) {
-        set(state)
-      } else {
-        const currentState = get()
-        for (const k in currentState) {
-          if (typeof currentState[k] === 'function') {
-            ;(state as any)[k] = currentState[k]
-          }
-        }
-        set(state, true)
-      }
+      set(...a)
       isRecording = true
     }
 
@@ -210,22 +200,22 @@ export const devtools =
         case 'DISPATCH':
           switch (message.payload.type) {
             case 'RESET':
-              setStateFromDevtools(initialState, true)
-              return extension.init(initialState)
+              setStateFromDevtools(initialState)
+              return extension.init(api.getState())
 
             case 'COMMIT':
               return extension.init(api.getState())
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
-                setStateFromDevtools(state, true)
-                extension.init(state)
+                setStateFromDevtools(state)
+                extension.init(api.getState())
               })
 
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
               return parseJsonThen<S>(message.state, (state) => {
-                setStateFromDevtools(state, true)
+                setStateFromDevtools(state)
               })
 
             case 'IMPORT_STATE': {
@@ -233,7 +223,7 @@ export const devtools =
               const lastComputedState =
                 nextLiftedState.computedStates.at(-1)?.state
               if (!lastComputedState) return
-              setStateFromDevtools(lastComputedState, true)
+              setStateFromDevtools(lastComputedState)
               extension.send(null, nextLiftedState)
               return
             }
