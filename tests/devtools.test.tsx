@@ -391,7 +391,7 @@ describe('when it receives an message of type...', () => {
       })
       expect(api.getState()).toStrictEqual({
         ...initialState,
-        ...(nextLiftedState.computedStates.slice(-1)[0]?.state,
+        ...nextLiftedState.computedStates.slice(-1)[0]?.state,
       })
       expect(extension.send).toHaveBeenLastCalledWith(null, nextLiftedState)
     })
