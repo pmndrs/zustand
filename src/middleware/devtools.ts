@@ -221,7 +221,7 @@ export const devtools =
             case 'IMPORT_STATE': {
               const { nextLiftedState } = message.payload
               const lastComputedState =
-                nextLiftedState.computedStates.at(-1)?.state
+                nextLiftedState.computedStates.slice(-1)[0]?.state
               if (!lastComputedState) return
               setStateFromDevtools(lastComputedState)
               extension.send(null, nextLiftedState)

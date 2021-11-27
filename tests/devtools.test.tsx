@@ -71,7 +71,6 @@ describe('If there is no extension installed...', () => {
 
     consoleWarn.mockRestore()
   })
-
 })
 
 describe('When state changes...', () => {
@@ -99,7 +98,7 @@ describe('when it receives an message of type...', () => {
       const api = create(devtools(() => initialState))
       const setState = jest.spyOn(api, 'setState')
 
-      extensionSubscriber!({
+      ;(extensionSubscriber as (message: any) => void)({
         type: 'ACTION',
         payload: '{ "type": "INCREMENT" }',
       })
@@ -114,7 +113,7 @@ describe('when it receives an message of type...', () => {
       api.dispatch = jest.fn()
       const setState = jest.spyOn(api, 'setState')
 
-      extensionSubscriber!({
+      ;(extensionSubscriber as (message: any) => void)({
         type: 'ACTION',
         payload: '{ "type": "INCREMENT" }',
       })
@@ -131,7 +130,7 @@ describe('when it receives an message of type...', () => {
       api.dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
 
-      extensionSubscriber!({
+      ;(extensionSubscriber as (message: any) => void)({
         type: 'ACTION',
         payload: '{ "type": "INCREMENT" }',
       })
@@ -151,7 +150,7 @@ describe('when it receives an message of type...', () => {
       console.error = jest.fn()
 
       expect(() => {
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'ACTION',
           payload: 'this.increment()',
         })
@@ -169,7 +168,7 @@ describe('when it receives an message of type...', () => {
       )
 
       expect(() => {
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'ACTION',
           payload: { name: 'increment', args: [] },
         })
@@ -201,7 +200,10 @@ describe('when it receives an message of type...', () => {
       api.setState({ count: 1 })
 
       extension.send.mockClear()
-      extensionSubscriber!({ type: 'DISPATCH', payload: { type: 'RESET' } })
+      ;(extensionSubscriber as (message: any) => void)({
+        type: 'DISPATCH',
+        payload: { type: 'RESET' },
+      })
 
       expect(api.getState()).toStrictEqual(initialState)
       expect(extension.init).toHaveBeenLastCalledWith(initialState)
@@ -215,7 +217,10 @@ describe('when it receives an message of type...', () => {
       const currentState = api.getState()
 
       extension.send.mockClear()
-      extensionSubscriber!({ type: 'DISPATCH', payload: { type: 'COMMIT' } })
+      ;(extensionSubscriber as (message: any) => void)({
+        type: 'DISPATCH',
+        payload: { type: 'COMMIT' },
+      })
 
       expect(extension.init).toHaveBeenLastCalledWith(currentState)
       expect(extension.send).not.toBeCalled()
@@ -223,12 +228,12 @@ describe('when it receives an message of type...', () => {
 
     describe('ROLLBACK...', () => {
       it('it updates state without recording and inits with `message.state`', () => {
-        const initialState = { count: 0, increment: () => {} } 
+        const initialState = { count: 0, increment: () => {} }
         const api = create(devtools(() => initialState))
         const newState = { foo: 'bar' }
 
         extension.send.mockClear()
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: JSON.stringify(newState),
@@ -237,7 +242,7 @@ describe('when it receives an message of type...', () => {
         expect(api.getState()).toStrictEqual({ ...initialState, ...newState })
         expect(extension.init).toHaveBeenLastCalledWith({
           ...initialState,
-          ...newState
+          ...newState,
         })
         expect(extension.send).not.toBeCalled()
       })
@@ -251,7 +256,7 @@ describe('when it receives an message of type...', () => {
 
         extension.init.mockClear()
         extension.send.mockClear()
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: 'foobar',
@@ -283,11 +288,11 @@ describe('when it receives an message of type...', () => {
         const newState = { foo: 'bar' }
 
         extension.send.mockClear()
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: JSON.stringify(newState),
-        })
+        }) 
         expect(api.getState()).toStrictEqual({ ...initialState, ...newState })
         expect(extension.send).not.toBeCalled()
       })
@@ -299,7 +304,7 @@ describe('when it receives an message of type...', () => {
         console.error = jest.fn()
 
         extension.send.mockClear()
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: 'foobar',
@@ -329,7 +334,7 @@ describe('when it receives an message of type...', () => {
         const newState = { foo: 'bar' }
 
         extension.send.mockClear()
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: JSON.stringify(newState),
@@ -346,7 +351,7 @@ describe('when it receives an message of type...', () => {
         console.error = jest.fn()
 
         extension.send.mockClear()
-        extensionSubscriber!({
+        ;(extensionSubscriber as (message: any) => void)({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: 'foobar',
@@ -377,7 +382,7 @@ describe('when it receives an message of type...', () => {
       }
 
       extension.send.mockClear()
-      extensionSubscriber!({
+      ;(extensionSubscriber as (message: any) => void)({
         type: 'DISPATCH',
         payload: {
           type: 'IMPORT_STATE',
@@ -386,7 +391,7 @@ describe('when it receives an message of type...', () => {
       })
       expect(api.getState()).toStrictEqual({
         ...initialState,
-        ...nextLiftedState.computedStates.at(-1)!.state,
+        ...(nextLiftedState.computedStates.slice(-1)[0]?.state,
       })
       expect(extension.send).toHaveBeenLastCalledWith(null, nextLiftedState)
     })
@@ -399,8 +404,7 @@ describe('when it receives an message of type...', () => {
         { type: 'increment' },
         { count: 1 }
       )
-
-      extensionSubscriber!({
+      ;(extensionSubscriber as (message: any) => void)({
         type: 'DISPATCH',
         payload: { type: 'PAUSE_RECORDING' },
       })
@@ -410,8 +414,7 @@ describe('when it receives an message of type...', () => {
         { type: 'increment' },
         { count: 1 }
       )
-
-      extensionSubscriber!({
+      ;(extensionSubscriber as (message: any) => void)({
         type: 'DISPATCH',
         payload: { type: 'PAUSE_RECORDING' },
       })
@@ -439,7 +442,7 @@ it('works with redux middleware', () => {
 
   api.dispatch({ type: 'INCREMENT' })
   api.dispatch({ type: 'INCREMENT' })
-  extensionSubscriber!({
+  ;(extensionSubscriber as (message: any) => void)({
     type: 'ACTION',
     payload: JSON.stringify({ type: 'DECREMENT' }),
   })
