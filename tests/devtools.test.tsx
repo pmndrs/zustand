@@ -292,7 +292,7 @@ describe('when it receives an message of type...', () => {
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: JSON.stringify(newState),
-        }) 
+        })
         expect(api.getState()).toStrictEqual({ ...initialState, ...newState })
         expect(extension.send).not.toBeCalled()
       })
