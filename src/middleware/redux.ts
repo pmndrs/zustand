@@ -34,5 +34,5 @@ export const redux =
     }
     api.dispatchFromDevtools = true
 
-    return { dispatch: api.dispatch, ...initial }
+    return { dispatch: (...a) => api.dispatch(...a), ...initial }
   }
