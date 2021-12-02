@@ -107,6 +107,18 @@ describe('when it receives an message of type...', () => {
       expect(setState).not.toBeCalled()
     })
 
+    it('unless action type is __setState', () => {
+      const initialState = { count: 0 }
+      const api = create(devtools(() => initialState))
+
+      ;(extensionSubscriber as (message: any) => void)({
+        type: 'ACTION',
+        payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, foo: 'bar' })
+    })
+
     it('does nothing even if there is `api.dispatch`', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
@@ -454,4 +466,15 @@ it('works with redux middleware', () => {
     [{ type: 'DECREMENT' }, { count: 1 }],
   ])
   expect(api.getState()).toMatchObject({ count: 1 })
+
+  const originalConsoleWarn = console.warn
+  console.warn = jest.fn()
+
+  api.dispatch({ type: '__setState' as any })
+  expect(console.warn).toHaveBeenLastCalledWith(
+    '[zustand devtools middleware] "__setState" action type is reserved ' +
+      'to set state from the devtools. Avoid using it.'
+  )
+
+  console.warn = originalConsoleWarn
 })

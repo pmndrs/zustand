@@ -193,9 +193,19 @@ export const devtools =
     extension.subscribe((message: any) => {
       switch (message.type) {
         case 'ACTION':
-          if (!api.dispatchFromDevtools) return
-          if (typeof api.dispatch !== 'function') return
-          return parseJsonThen(message.payload, api.dispatch as any)
+          return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
+            message.payload,
+            (action) => {
+              if (action.type === '__setState') {
+                setStateFromDevtools(action.state as PartialState<S>)
+                return
+              }
+
+              if (!api.dispatchFromDevtools) return
+              if (typeof api.dispatch !== 'function') return
+              ;(api.dispatch as any)(action)
+            }
+          )
 
         case 'DISPATCH':
           switch (message.payload.type) {
@@ -234,6 +244,21 @@ export const devtools =
           return
       }
     })
+
+    if (api.dispatchFromDevtools && typeof api.dispatch === 'function') {
+      let didWarnAboutReservedActionType = false
+      const originalDispatch = api.dispatch
+      api.dispatch = (...a: any[]) => {
+        if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
+          console.warn(
+            '[zustand devtools middleware] "__setState" action type is reserved ' +
+              'to set state from the devtools. Avoid using it.'
+          )
+          didWarnAboutReservedActionType = true
+        }
+        ;(originalDispatch as any)(...a)
+      }
+    }
 
     return initialState
   }
