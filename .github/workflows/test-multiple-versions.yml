@@ -30,8 +30,8 @@ jobs:
         react:
           - 16.8.0
           - 17.0.0
-          - 18.0.0-beta-fdc1d617a-20211118
-          - 0.0.0-experimental-fdc1d617a-20211118
+          - 18.0.0-beta-71d16750c-20211202
+          - 0.0.0-experimental-71d16750c-20211202
         testing: [default, alpha]
         exclude:
           - { react: 16.8.0, testing: alpha }
@@ -52,6 +52,7 @@ jobs:
         run: |
           sed -i~ '1s/^/import React from "react";/' tests/*.tsx
           sed -i~ 's/automatic/classic/' babel.config.js
+          sed -i~ 's/automatic/classic/' .swcrc
       - name: Test ${{ matrix.react }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
