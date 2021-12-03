@@ -1,4 +1,5 @@
 import { GetState, SetState, State, StoreApi } from '../vanilla'
+import { NamedSet } from './devtools'
 
 type DevtoolsType = {
   prefix: string
@@ -14,6 +15,7 @@ export type StoreApiWithRedux<
   A extends { type: unknown }
 > = StoreApi<T & { dispatch: (a: A) => A }> & {
   dispatch: (a: A) => A
+  dispatchFromDevtools: boolean
 }
 
 export const redux =
@@ -27,11 +29,10 @@ export const redux =
     api: StoreApiWithRedux<S, A> & { devtools?: DevtoolsType }
   ): S & { dispatch: (a: A) => A } => {
     api.dispatch = (action: A) => {
-      set((state: S) => reducer(state, action))
-      if (api.devtools) {
-        api.devtools.send(api.devtools.prefix + action.type, get())
-      }
+      ;(set as NamedSet<S>)((state: S) => reducer(state, action), false, action)
       return action
     }
-    return { dispatch: api.dispatch, ...initial }
+    api.dispatchFromDevtools = true
+
+    return { dispatch: (...a) => api.dispatch(...a), ...initial }
   }
