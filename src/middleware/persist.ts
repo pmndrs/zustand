@@ -1,6 +1,6 @@
 import { GetState, SetState, State, StoreApi } from '../vanilla'
 
-type DeepPartial<T extends Object> = {
+type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>
 }
 
