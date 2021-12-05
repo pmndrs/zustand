@@ -74,7 +74,7 @@ describe('If there is no extension installed...', () => {
 })
 
 describe('When state changes...', () => {
-  it("sends { type: setStateName ?? 'anonymous` } as the action with current state", () => {
+  it("sends { type: setStateName || 'anonymous` } as the action with current state", () => {
     const api = create(
       devtools(() => ({ count: 0, foo: 'bar' }), { name: 'testOptionsName' })
     )

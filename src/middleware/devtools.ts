@@ -88,8 +88,9 @@ export const devtools =
         : options
 
     const extensionConnector =
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ??
-      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+      typeof window !== 'undefined' &&
+      ((window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
+        (window as any).top.__REDUX_DEVTOOLS_EXTENSION__)
 
     if (!extensionConnector) {
       if (
@@ -174,7 +175,7 @@ export const devtools =
       if (!isRecording) return
       extension.send(
         nameOrAction === undefined
-          ? { type: devtoolsOptions.anonymousActionType ?? 'anonymous' }
+          ? { type: devtoolsOptions.anonymousActionType || 'anonymous' }
           : typeof nameOrAction === 'string'
           ? { type: nameOrAction }
           : nameOrAction,
