@@ -478,3 +478,14 @@ it('works with redux middleware', () => {
 
   console.warn = originalConsoleWarn
 })
+
+it('works in non-browser env', () => {
+  const originalWindow = global.window
+  global.window = undefined as any
+
+  expect(() => {
+    create(devtools(() => ({ count: 0 })))
+  }).not.toThrow()
+
+  global.window = originalWindow
+})
