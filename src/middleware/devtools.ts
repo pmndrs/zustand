@@ -87,20 +87,20 @@ export const devtools =
         ? { name: options }
         : options
 
+    if (typeof window === 'undefined') {
+      return fn(set, get, api)
+    }
+
     const extensionConnector =
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ??
+      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
       (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
 
     if (!extensionConnector) {
-      if (
-        process.env.NODE_ENV === 'development' &&
-        typeof window !== 'undefined'
-      ) {
+      if (process.env.NODE_ENV === 'development') {
         console.warn(
           '[zustand devtools middleware] Please install/enable Redux devtools extension'
         )
       }
-
       return fn(set, get, api)
     }
 
@@ -174,7 +174,7 @@ export const devtools =
       if (!isRecording) return
       extension.send(
         nameOrAction === undefined
-          ? { type: devtoolsOptions.anonymousActionType ?? 'anonymous' }
+          ? { type: devtoolsOptions.anonymousActionType || 'anonymous' }
           : typeof nameOrAction === 'string'
           ? { type: nameOrAction }
           : nameOrAction,
