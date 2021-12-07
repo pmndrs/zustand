@@ -7,8 +7,7 @@ type DeepPartial<T> = {
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
-  // Note: This will be required in v4
-  removeItem?: (name: string) => void | Promise<void>
+  removeItem: (name: string) => void | Promise<void>
 }
 
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
@@ -44,18 +43,6 @@ export type PersistOptions<
   deserialize?: (
     str: string
   ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
-  /**
-   * Prevent some items from being stored.
-   *
-   * @deprecated This options is deprecated and will be removed in the next version. Please use the `partialize` option instead.
-   */
-  blacklist?: (keyof S)[]
-  /**
-   * Only store the listed properties.
-   *
-   * @deprecated This options is deprecated and will be removed in the next version. Please use the `partialize` option instead.
-   */
-  whitelist?: (keyof S)[]
   /**
    * Filter the persisted value.
    *
@@ -169,14 +156,6 @@ export const persist =
       ...baseOptions,
     }
 
-    if (options.blacklist || options.whitelist) {
-      console.warn(
-        `The ${
-          options.blacklist ? 'blacklist' : 'whitelist'
-        } option is deprecated and will be removed in the next version. Please use the 'partialize' option instead.`
-      )
-    }
-
     let hasHydrated = false
     const hydrationListeners = new Set<PersistListener<S>>()
     const finishHydrationListeners = new Set<PersistListener<S>>()
@@ -199,25 +178,12 @@ export const persist =
         get,
         api
       )
-    } else if (!storage.removeItem) {
-      console.warn(
-        `[zustand persist middleware] The given storage for item '${options.name}' does not contain a 'removeItem' method, which will be required in v4.`
-      )
     }
 
     const thenableSerialize = toThenable(options.serialize)
 
     const setItem = (): Thenable<void> => {
       const state = options.partialize({ ...get() })
-
-      if (options.whitelist) {
-        ;(Object.keys(state) as (keyof S)[]).forEach((key) => {
-          !options.whitelist?.includes(key) && delete state[key]
-        })
-      }
-      if (options.blacklist) {
-        options.blacklist.forEach((key) => delete state[key])
-      }
 
       let errorInSync: Error | undefined
       const thenable = thenableSerialize({ state, version: options.version })
@@ -319,7 +285,7 @@ export const persist =
         }
       },
       clearStorage: () => {
-        storage?.removeItem?.(options.name)
+        storage?.removeItem(options.name)
       },
       rehydrate: () => hydrate() as Promise<void>,
       hasHydrated: () => hasHydrated,
