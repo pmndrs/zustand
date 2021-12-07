@@ -49,7 +49,7 @@ function createContext<
 
   const useBoundStore: UseContextStore<TState> = <StateSlice>(
     selector?: StateSelector<TState, StateSlice>,
-    equalityFn = Object.is
+    equalityFn?: EqualityChecker<StateSlice>
   ) => {
     const store = useContext(ZustandContext)
     if (!store) {

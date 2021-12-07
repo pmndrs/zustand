@@ -19,7 +19,7 @@ export function useStore<T extends State, U>(
 export function useStore<TState extends State, StateSlice>(
   api: StoreApi<TState>,
   selector: StateSelector<TState, StateSlice> = api.getState as any,
-  equalityFn: EqualityChecker<StateSlice> = Object.is
+  equalityFn?: EqualityChecker<StateSlice>
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
