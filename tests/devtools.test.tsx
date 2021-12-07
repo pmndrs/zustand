@@ -74,7 +74,7 @@ describe('If there is no extension installed...', () => {
 })
 
 describe('When state changes...', () => {
-  it("sends { type: setStateName ?? 'anonymous` } as the action with current state", () => {
+  it("sends { type: setStateName || 'anonymous` } as the action with current state", () => {
     const api = create(
       devtools(() => ({ count: 0, foo: 'bar' }), { name: 'testOptionsName' })
     )
@@ -477,4 +477,15 @@ it('works with redux middleware', () => {
   )
 
   console.warn = originalConsoleWarn
+})
+
+it('works in non-browser env', () => {
+  const originalWindow = global.window
+  global.window = undefined as any
+
+  expect(() => {
+    create(devtools(() => ({ count: 0 })))
+  }).not.toThrow()
+
+  global.window = originalWindow
 })
