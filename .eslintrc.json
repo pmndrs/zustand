@@ -48,36 +48,16 @@
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-namespace": "off",
     "jest/consistent-test-it": [
       "error",
       { "fn": "it", "withinDescribe": "it" }
     ],
-    "import/order": [
-      "error",
-      {
-        "alphabetize": { "order": "asc", "caseInsensitive": true },
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-          "object"
-        ],
-        "newlines-between": "never",
-        "pathGroups": [
-          {
-            "pattern": "react",
-            "group": "builtin",
-            "position": "before"
-          }
-        ],
-        "pathGroupsExcludedImportTypes": ["builtin"]
-      }
-    ],
+    "import/order": "off",
     "react/jsx-uses-react": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "prettier/prettier": "off"
   },
   "settings": {
     "react": {
