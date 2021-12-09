@@ -185,11 +185,11 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
   let options = { ...defaultOptions, ..._options }
 
   let persistentStorage = tryElse(options.getStorage, () => undefined)
-  let persistentStorageGetItem = () =>
+  const persistentStorageGetItem = () =>
     persistentStorage!.getItem(options.name)
-  let persistentStorageSetItem = (serializedState: E.Serialized<EPersistentStorageValue>) =>
+  const persistentStorageSetItem = (serializedState: E.Serialized<EPersistentStorageValue>) =>
     persistentStorage!.setItem(options.name, serializedState)
-  let persistentStorageRemoveItem = () =>
+  const persistentStorageRemoveItem = () =>
     persistentStorage!.removeItem(options.name)
   
   if (!persistentStorage) {
@@ -215,7 +215,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
     .throw()
   
 
-  let initialState = storeInitializer(
+  const initialState = storeInitializer(
     (...a) => {
       parentSet(...a)
       updatePersistentStorage()
@@ -229,13 +229,13 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
   let initialStateFromPersistentStorage: EState | undefined
 
   let hasHydrated = false
-  let hydrationEmitter = emitter(new Set<(state: EState) => void>())
-  let finishHydrationEmitter = emitter(new Set<(state: EState) => void>())
+  const hydrationEmitter = emitter(new Set<(state: EState) => void>())
+  const finishHydrationEmitter = emitter(new Set<(state: EState) => void>())
 
   const hydrate = () => {
     hasHydrated = false
     hydrationEmitter.emit(parentGet())
-    let postRehydrationCallback = options.onRehydrateStorage?.(parentGet()) || undefined
+    const postRehydrationCallback = options.onRehydrateStorage?.(parentGet()) || undefined
 
     return thenablify(persistentStorageGetItem)()
     .then(serialized => serialized !== null ? options.deserialize(serialized) : null)
@@ -320,7 +320,7 @@ const tryElse = <T, U>(result: () => T, fallback: (e: unknown) => U) => {
 
 const update =
   <T, K extends keyof T>(t: T, k: K, replacer: (original: T[K]) => T[K]) => {
-    let original = t[k]
+    const original = t[k]
     Object.assign(t, { k: replacer(original) })
     return t
   }

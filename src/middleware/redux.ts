@@ -31,10 +31,10 @@ type ReduxStore<A extends UnknownAction> =
 const redux: Redux = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
   type A = F.Arguments<typeof reducer>[1]
 
-  let store = parentStore as typeof parentStore & ReduxStore<A>
+  const store = parentStore as typeof parentStore & ReduxStore<A>
   store.dispatchFromDevtools = true;
 
-  let parentSet = _parentSet as F.WidenArguments<typeof _parentSet>
+  const parentSet = _parentSet as F.WidenArguments<typeof _parentSet>
   store.dispatch = a => {
     parentSet(reducer(parentGet(), a), false, a)
     return a;

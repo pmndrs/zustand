@@ -33,8 +33,8 @@ const create =
   <T extends UnknownState, S extends Store<T>>
     (storeOrInitializer: S | StoreInitializer<T, S>): UseBoundStore<T, S> => {
 
-  let store: S =
-    typeof storeOrInitializer == "function"
+  const store: S =
+    typeof storeOrInitializer === "function"
       ? createStore(storeOrInitializer as StoreInitializer<T, S>)
       : storeOrInitializer
 

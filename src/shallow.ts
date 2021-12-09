@@ -6,18 +6,18 @@ const shallow = <A, B>(_a: A, _b: B) => {
   if (_a === null) return false
   if (_b === null) return false
 
-  let a = _a as WidenTo<A, B>;
-  let b = _b as WidenTo<B, A>;
-  let aKeys = keys(a)
-  let bKeys = keys(b)
-  let checkedKeys = new Set<(keyof A | keyof B) & string>();
+  const a = _a as WidenTo<A, B>;
+  const b = _b as WidenTo<B, A>;
+  const aKeys = keys(a)
+  const bKeys = keys(b)
+  const checkedKeys = new Set<(keyof A | keyof B) & string>();
   
-  for (let k of aKeys) {
+  for (const k of aKeys) {
     if (!is(a[k], b[k])) return false;
     checkedKeys.add(k)
   }
 
-  for (let k of bKeys) {
+  for (const k of bKeys) {
     if (checkedKeys.has(k)) continue;
     if (!is(b[k], a[k])) return false;
   }

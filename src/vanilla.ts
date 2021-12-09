@@ -80,21 +80,21 @@ const createImpl: ECreate = storeInitializer => {
   let state: EState
 
   type Listener = (state: EState, previousState: E.Previous<EState>) => void
-  let listeners: Set<Listener> = new Set()
+  const listeners: Set<Listener> = new Set()
   const emit = (...a: F.Arguments<Listener>) =>
     listeners.forEach(f => f(...a))
 
-  let store: EStore = {
+  const store: EStore = {
     getState: () => state,
     setState: (nextStateOrUpdater, shouldReplace) => {
-      let nextState =
+      const nextState =
         typeof nextStateOrUpdater === 'function'
           ? nextStateOrUpdater(state)
           : nextStateOrUpdater
 
       if (objectIs(nextState, state)) return
 
-      let previousState = E.previous(state)
+      const previousState = E.previous(state)
       state = shouldReplace
         ? nextState as EState
         : Object.assign({}, state, nextState)

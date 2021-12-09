@@ -52,8 +52,8 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
   storeInitializer =>
     (parentSet, parentGet, parentStore) => {
 
-  let parentSubscribe = parentStore.subscribe
-  let updatedParentStore = parentStore as EStore & ESubscribeWithSelectorStore
+  const parentSubscribe = parentStore.subscribe
+  const updatedParentStore = parentStore as EStore & ESubscribeWithSelectorStore
   type UpdatedSubscribeArguments = F.O2.Arguments<(typeof updatedParentStore)['subscribe']>
 
   updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
@@ -63,16 +63,16 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
     }
   
     pseudoAssert(args.length === 3)
-    let [selector, listener, _options] = args
-    let { equalityFn: equals, fireImmediately } =
+    const [selector, listener, _options] = args
+    const { equalityFn: equals, fireImmediately } =
       { equalityFn: objectIs, fireImmediately: false, ..._options }
   
     let currentSelected = selector(parentGet())
     let previousSelected = currentSelected as E.Previous<ESelectedState>
     const emit = () => listener(currentSelected, previousSelected)
 
-    let unsubscribe = parentSubscribe(() => {
-      let nextSelected = selector(parentGet())
+    const unsubscribe = parentSubscribe(() => {
+      const nextSelected = selector(parentGet())
       if (equals(currentSelected, nextSelected)) return
   
       previousSelected = E.previous(currentSelected)

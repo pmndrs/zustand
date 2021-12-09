@@ -159,7 +159,7 @@ const devtoolsImpl: EDevtools =
     return storeInitializer(parentSet, parentGet, parentStore)
   }
 
-  let extensionConnector =
+  const extensionConnector =
     devtoolsWindow.__REDUX_DEVTOOLS_EXTENSION__ ??
     devtoolsWindow.top.__REDUX_DEVTOOLS_EXTENSION__
 
@@ -171,8 +171,8 @@ const devtoolsImpl: EDevtools =
     return storeInitializer(parentSet, parentGet, parentStore)
   }
 
-  let store: EStore & EDevtoolsStore = parentStore
-  let devtools = extensionConnector.connect(devtoolsOptions)
+  const store: EStore & EDevtoolsStore = parentStore
+  const devtools = extensionConnector.connect(devtoolsOptions)
 
   let isRecording = false
   store.setState = (...[state, replace, action]: F.Arguments<typeof store['setState']>) => {
@@ -191,7 +191,7 @@ const devtoolsImpl: EDevtools =
     isRecording = false
   }
 
-  let initialState =
+  const initialState =
     storeInitializer(store.setState, parentGet, store)
 
   devtools.subscribe(message => {
@@ -228,13 +228,14 @@ const devtoolsImpl: EDevtools =
           case 'JUMP_TO_ACTION':
             return parseJsonThen(message.state, setStateFromDevtools)
 
-          case 'IMPORT_STATE':
-            let { nextLiftedState } = message.payload
-            let lastComputedState = nextLiftedState.computedStates.slice(-1)[0]?.state
+          case 'IMPORT_STATE': {
+            const { nextLiftedState } = message.payload
+            const lastComputedState = nextLiftedState.computedStates.slice(-1)[0]?.state
             if (!lastComputedState) return
             setStateFromDevtools(lastComputedState)
             devtools.send(null, nextLiftedState)
             return
+          }
 
           default: pseudoAssertIs(message.payload.type, {} as UnknownString)    
         }
