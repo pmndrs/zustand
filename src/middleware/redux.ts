@@ -21,7 +21,7 @@ type UnknownAction =
 
 type ReduxStore<A extends UnknownAction> =
   { dispatch: (a: A) => A
-  , isReduxLike: true
+  , dispatchFromDevtools: true
   }
 
 
@@ -32,7 +32,7 @@ const redux: Redux = (reducer, initialState) => (_parentSet, parentGet, parentSt
   type A = F.Arguments<typeof reducer>[1]
 
   let store = parentStore as typeof parentStore & ReduxStore<A>
-  store.isReduxLike = true;
+  store.dispatchFromDevtools = true;
 
   let parentSet = _parentSet as F.WidenArguments<typeof _parentSet>
   store.dispatch = a => {

@@ -279,7 +279,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
   hydrate()
   return initialStateFromPersistentStorage || initialState
 }
-const persist = persistImpl as Persist
+const persist = persistImpl as unknown as Persist
 
 type EPersistDefaultedOptions =
   O.Required<O.ExcludeKey<EPersistOptions, 'name' | 'onRehydrateStorage' | 'migrate'>>
