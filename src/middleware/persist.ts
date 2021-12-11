@@ -1,4 +1,4 @@
-import { Store, UnknownState, StoreInitializer, TagStore } from '../vanilla'
+import { Store, UnknownState, StoreInitializer, StoreMutatorIdentifier } from '../vanilla'
 import { thenablify, Thenable } from './utils'
 
 // ============================================================================
@@ -6,20 +6,31 @@ import { thenablify, Thenable } from './utils'
 
 type Persist =
   < T extends UnknownState
-  , S extends Store<T>
+  , Mps extends [StoreMutatorIdentifier, unknown][] = []
+  , Mcs extends [StoreMutatorIdentifier, unknown][] = []
   , U = T
   >
-    ( storeInitializer:
-      & ( ( set: (S & PersistStore<T>)['setState']
-          , get: (S & PersistStore<T>)['getState']
-          , store: S & PersistStore<T>
-          ) =>
-            T
-        )
-      & TagStore<S>
-    , options: PersistOptions<T, U>
+    ( initializer: StoreInitializer<T, [...Mps, [$$persist, unknown]], Mcs>
+    , options?: PersistOptions<T, U>
     ) =>
-      StoreInitializer<T, S & PersistStore<T, U>>
+      StoreInitializer<T, Mps, [[$$persist, U], ...Mcs]>
+
+declare const $$persist: unique symbol;
+type $$persist = typeof $$persist;
+
+declare module '../vanilla' {
+  interface StoreMutators<S, A>
+    { [$$persist]: WithPersist<S, A>
+    }
+}
+
+type WithPersist<S, A> =
+  S extends { getState: () => infer T }
+    ? O.Overwrite<
+        S,
+        StorePersist<A.Cast<T, O.Unknown>, A>
+      >
+    : never
 
 interface PersistOptions<T extends UnknownState, U>
   {
@@ -41,8 +52,7 @@ interface PersistOptions<T extends UnknownState, U>
      *
      * @default JSON.stringify
      */
-    serialize?:
-      (storageValue: PersistentStorageValue<U>) => MaybePromise<string>
+    serialize?(storageValue: PersistentStorageValue<U>): MaybePromise<string>
 
     /**
      * Use a custom deserializer.
@@ -51,24 +61,21 @@ interface PersistOptions<T extends UnknownState, U>
      * @param serializedString The storage's current value.
      * @default JSON.parse
      */
-    deserialize?:
-      (serializedString: string) => MaybePromise<PersistentStorageValue<T>>
+    deserialize?(serializedString: string): MaybePromise<PersistentStorageValue<T>>
 
     /**
      * Filter the persisted value.
      *
      * @param state The state's value
      */
-    partialize?: (state: T) => U
+    partialize?(state: T): U
     
     /**
      * A function returning another (optional) function.
      * The main function will be called before the state rehydration.
      * The returned function will be called after the state rehydration or when an error occurred.
      */
-    onRehydrateStorage?:
-      (state: T) =>
-        void | ((state?: T, error?: unknown) => void)
+    onRehydrateStorage?(state: T): void | ((state?: T, error?: unknown) => void)
 
     /**
      * If the stored state's version mismatch the one specified here, the storage will not be used.
@@ -80,15 +87,13 @@ interface PersistOptions<T extends UnknownState, U>
      * A function to perform persisted state migration.
      * This function will be called when persisted state versions mismatch with the one specified here.
      */
-    migrate?:
-      (persistedState: unknown, version: number) => MaybePromise<T>
+    migrate?(persistedState: unknown, version: number): MaybePromise<T>
 
     /**
      * A function to perform custom hydration merges when combining the stored state with the current one.
      * By default, this function does a shallow merge.
      */
-    merge?:
-      (persistedState: unknown, currentState: T) => T
+    merge?(persistedState: unknown, currentState: T): T
   }
 
 interface PersistentStorage
@@ -102,7 +107,7 @@ interface PersistentStorageValue<T>
   , version?: number
   }
 
-interface PersistStore<T extends UnknownState, U = T>
+interface StorePersist<T extends UnknownState, U = T>
   { persist:
       { setOptions: (options: O.Partial<PersistOptions<T, U>>) => void
       , clearStorage: () => void
@@ -121,17 +126,15 @@ interface PersistStore<T extends UnknownState, U = T>
 
 type EState = { __isState: true }
 type ESelectedState = { __isSelectedState: true }
-type EPersistentStorageName = string & { __isPersistentStorageName: true }
-type EPersistentStorageValue =
-  { state: ESelectedState
-  , version?: number & { __isPersistentStorageValueVersion: true } 
-  }
 
 type EPersist =
-    ( storeInitializer: StoreInitializer<EState, Store<EState>>
-    , options: EPersistOptions
-    ) =>
-    StoreInitializer<EState, Store<EState> & EPersistStore>
+  ( storeInitializer: EStoreInitializer
+  , options: EPersistOptions
+  ) =>
+    EStoreInitializer
+
+type EStoreInitializer = 
+  F.PopArgument<StoreInitializer<EState, [], []>>
 
 interface EPersistOptions
   { name: EPersistentStorageName
@@ -159,6 +162,9 @@ interface EPersistOptions
         EState
   }
 
+type EPersistentStorageName =
+  string & { __isPersistentStorageName: true }
+
 interface EPersistentStorage
   { getItem: (name: EPersistentStorageName) =>
       MaybePromise<E.Serialized<EPersistentStorageValue> | null>
@@ -168,6 +174,11 @@ interface EPersistentStorage
       ) =>
         MaybePromise<void>
   , removeItem: (name: EPersistentStorageName) => MaybePromise<void>
+  }
+
+type EPersistentStorageValue =
+  { state: ESelectedState
+  , version?: number & { __isPersistentStorageValueVersion: true } 
   }
 
 interface EPersistStore
@@ -353,20 +364,40 @@ namespace O {
     { [P in U.Exclude<keyof T, K>]: T[P]
     }
 
-  export type Required<T> =
+  export type Required<T extends O.Unknown> =
     { [K in keyof T]-?: U.Exclude<T[K], undefined>
     }
+
+  export type Overwrite<T extends O.Unknown, U extends O.Unknown> =
+    & O.ExcludeKey<T, U.Extract<keyof U, keyof T>>
+    & U
+}
+
+namespace F {
+  export type Unknown =
+    (...a: never[]) => unknown
+
+  export type PopArgument<T extends F.Unknown> =
+    T extends (...a: [...infer A, infer _]) => infer R
+      ? (...a: A) => R
+      : never
 }
 
 namespace U {
   export type Exclude<T, U> =
     T extends U ? never : T
+
+  export type Extract<T, U> =
+    T extends U ? T : never
 }
 
-
+// Bug in eslint, we are using A just in the module augmentation
+namespace A { // eslint-disable-line @typescript-eslint/no-unused-vars
+  export type Cast<T, U> = T extends U ? T : U;
+}
 
 
 // ============================================================================
 // Exports
 
-export { persist, PersistOptions, PersistStore }
+export { persist, PersistOptions, StorePersist as Persist }

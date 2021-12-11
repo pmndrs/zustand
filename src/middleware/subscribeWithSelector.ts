@@ -1,14 +1,33 @@
-import { Store, UnknownState, StoreInitializer } from '../vanilla'
+import { Store, UnknownState, StoreInitializer, StoreMutatorIdentifier } from '../vanilla'
 
 // ============================================================================
 // Types
 
-type SubscribeWithSelector = 
-  <T extends UnknownState, S extends Store<T>>
-    (storeInitializer: StoreInitializer<T, S>) =>
-      StoreInitializer<T, S & SubscribeWithSelectorStore<T>>
+type SubscribeWithSelectorMiddleware = 
+  < T extends UnknownState
+  , Mps extends [StoreMutatorIdentifier, unknown][] = []
+  , Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  >
+    (initializer: StoreInitializer<T, [...Mps, [$$subscribeWithSelector, never]], Mcs>) =>
+      StoreInitializer<T, Mps, [[$$subscribeWithSelector, never], ...Mcs]>
 
-interface SubscribeWithSelectorStore<T extends UnknownState>
+
+declare const $$subscribeWithSelector: unique symbol;
+type $$subscribeWithSelector = typeof $$subscribeWithSelector
+
+declare module '../vanilla' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface StoreMutators<S, A>
+    { [$$subscribeWithSelector]: WithSelectorSubscribe<S>
+    }
+}
+
+type WithSelectorSubscribe<S> =
+  S extends { getState: () => infer T }
+    ? S & SubscribeWithSelector<A.Cast<T, UnknownState>>
+    : never
+
+interface SubscribeWithSelector<T extends UnknownState>
   { subscribe:
       <U>
         ( selector: (state: T) => U
@@ -28,9 +47,13 @@ interface SubscribeWithSelectorStore<T extends UnknownState>
 type EState = { __isState: true }
 type ESelectedState = { __isSelectedState: true }
 type EStore = Store<EState>
+
 type ESubscribeWithSelector = 
-  (storeInitializer: StoreInitializer<EState, EStore>) =>
-    StoreInitializer<EState, EStore & ESubscribeWithSelectorStore>
+  (storeInitializer: EStoreInitializer) =>
+    EStoreInitializer
+
+type EStoreInitializer = 
+  F.PopArgument<StoreInitializer<EState, [], []>>
 
 interface ESubscribeWithSelectorStore
   { subscribe:
@@ -86,7 +109,8 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
 
   return storeInitializer(parentSet, parentGet, updatedParentStore)
 }
-const subscribeWithSelector = subscribeWithSelectorImpl as SubscribeWithSelector
+const subscribeWithSelector = subscribeWithSelectorImpl as unknown as
+  SubscribeWithSelectorMiddleware
 
 
 // ============================================================================
@@ -104,8 +128,11 @@ function pseudoAssert<T extends boolean>(predicate: T):
   asserts predicate {}
 
 namespace F {
+  export type Unknown = 
+    (...a: never[]) => unknown
+
   export namespace O2 {
-    export type Arguments<T> =
+    export type Arguments<T extends F.Unknown> =
       T extends {
         (...a: infer A1): unknown 
         (...a: infer A2): unknown 
@@ -113,9 +140,19 @@ namespace F {
         ? A1 | A2
         : never
   }
+
+  export type PopArgument<T extends F.Unknown> =
+    T extends (...a: [...infer A, infer _]) => infer R
+      ? (...a: A) => R
+      : never
+}
+
+// Bug in eslint, we are using A just in the module augmentation
+namespace A { // eslint-disable-line @typescript-eslint/no-unused-vars
+  export type Cast<T, U> = T extends U ? T : U;
 }
 
 // ============================================================================
 // Exports
 
-export { subscribeWithSelector, SubscribeWithSelectorStore }
+export { subscribeWithSelector, SubscribeWithSelector }

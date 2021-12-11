@@ -1,21 +1,38 @@
-import { Store, UnknownState, StoreInitializer, TagStore } from '../vanilla'
+import { Store, UnknownState, StoreInitializer, StoreMutatorIdentifier } from '../vanilla'
 
 // ============================================================================
 // Types
 
 type Devtools =
-  <T extends UnknownState, S extends Store<T>>
-    ( storeInitializer:
-      & ( ( set: (S & DevtoolsStore<T>)['setState']
-          , get: (S & DevtoolsStore<T>)['getState']
-          , store: S & DevtoolsStore<T>
-          ) =>
-            T
-        )
-      & TagStore<S>
+  < T extends UnknownState
+  , Mps extends [StoreMutatorIdentifier, unknown][] = []
+  , Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  >
+    ( initializer: StoreInitializer<T, [...Mps, [$$devtools, never]], Mcs>
     , options?: DevtoolsOptions
     ) =>
-      StoreInitializer<T, S & DevtoolsStore<T>>
+      StoreInitializer<T, Mps, [[$$devtools, never], ...Mcs]>
+
+declare const $$devtools: unique symbol;
+type $$devtools = typeof $$devtools;
+
+declare module '../vanilla' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface StoreMutators<S, A>
+    { [$$devtools]: WithDevtools<S>
+    }
+}
+
+type WithDevtools<S> =
+  O.Overwrite<
+    A.Cast<S, O.Unknown>,
+    StoreSetStateWithAction<S>
+  >
+
+type StoreSetStateWithAction<S> =
+  S extends { setState: (...a: infer A) => infer R }
+    ? { setState: (...a: [...a: A, actionType?: string]) => R }
+    : never
 
 type DevtoolsOptions =
   | string
@@ -37,16 +54,6 @@ type DevtoolsOptions =
       }
     }
 
-interface DevtoolsStore<T extends UnknownState>
-  { setState:
-      (...a:
-        [...a: F.Arguments<Store<T>['setState']>
-        , actionType?: string
-        ]
-      ) =>
-        F.Call<Store<T>['setState']>
-  }
-
 interface DevtoolsWindow
   { __REDUX_DEVTOOLS_EXTENSION__?:
       { connect:
@@ -62,16 +69,13 @@ interface DevtoolsWindow
 type EState = { __isState: true }
 type EStore = Store<EState>
 type EDevtools = 
-  ( storeInitializer:
-      ( set: EDevtoolsStore['setState']
-      , get: EStore['getState']
-      , store: EStore
-      ) =>
-        EState
+  ( storeInitializer: EStoreInitializer
   , options?: EDevtoolsOptions
   ) =>
-    StoreInitializer<EState, EStore & EDevtoolsStore>
+    EStoreInitializer
 
+type EStoreInitializer = 
+  F.PopArgument<StoreInitializer<EState, [], []>>
 
 type EDevtoolsOptions =
   | EDevtoolsStoreName
@@ -247,7 +251,7 @@ const devtoolsImpl: EDevtools =
 
   return initialState
 }
-const devtools = devtoolsImpl as Devtools
+const devtools = devtoolsImpl as unknown as Devtools;
 
 // ============================================================================
 // Utilities
@@ -317,6 +321,11 @@ namespace F {
 
   export type Arguments<T extends F.Unknown> =
     T extends (...a: infer A) => unknown ? A : never
+
+  export type PopArgument<T extends F.Unknown> =
+    T extends (...a: [...infer A, infer _]) => infer R
+      ? (...a: A) => R
+      : never
 }
 
 namespace U {
@@ -332,9 +341,12 @@ namespace A {
     (<T>() => T extends B ? 1 : 0) extends (<T>() => T extends A ? 1 : 0)
       ? true
       : false
+
+  export type Cast<T, U> =
+    T extends U ? T : U;
 }
 
 // ============================================================================
 // Exports
 
-export { devtools, DevtoolsOptions, DevtoolsStore }
+export { devtools, DevtoolsOptions }

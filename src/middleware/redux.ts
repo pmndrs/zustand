@@ -1,25 +1,40 @@
-import { StoreInitializer, UnknownState, Store } from '../vanilla'
+import { StoreInitializer, UnknownState, StoreMutatorIdentifier } from '../vanilla'
 
 // ============================================================================
 // Types
 
-type Redux =
+type ReduxMiddleware =
   < T extends UnknownState
   , A extends UnknownAction
-  , S extends Store<T & ReduxState<A>>
+  , Cms extends [StoreMutatorIdentifier, unknown][] = []
   >
     ( reducer: (state: T, action: A) => T
     , initialState: T
     ) =>
-      & StoreInitializer<T & ReduxState<A>, S & ReduxStore<A>>
+      StoreInitializer<O.Overwrite<T, ReduxState<A>>, Cms, [[$$redux, A]]>
+
+declare const $$redux: unique symbol;
+type $$redux = typeof $$redux;        
+
+declare module '../vanilla' {
+  interface StoreMutators<S, A>
+    { [$$redux]: WithRedux<S, A>
+    }
+}
+
+type WithRedux<S, A> =
+  O.Overwrite<
+    A.Cast<S, O.Unknown>,
+    Redux<A.Cast<A, UnknownAction>>
+  >
 
 type ReduxState<A extends UnknownAction> =
-  { dispatch: ReduxStore<A>['dispatch'] }
+  { dispatch: Redux<A>['dispatch'] }
 
 type UnknownAction =
   { type: unknown }
 
-type ReduxStore<A extends UnknownAction> =
+type Redux<A extends UnknownAction> =
   { dispatch: (a: A) => A
   , dispatchFromDevtools: true
   }
@@ -28,10 +43,22 @@ type ReduxStore<A extends UnknownAction> =
 // ============================================================================
 // Implementation
 
-const redux: Redux = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
+type EState = { __isState: true }
+type EAction = UnknownAction & { __isAction: true }
+
+type ERedux = 
+  ( reducer: (state: EState, action: EAction) => EState
+  , initialState: EState
+  ) =>
+    EStoreInitializer
+
+type EStoreInitializer =
+  F.PopArgument<StoreInitializer<EState & ReduxState<EAction>, [], []>>
+
+const reduxImpl: ERedux = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
   type A = F.Arguments<typeof reducer>[1]
 
-  const store = parentStore as typeof parentStore & ReduxStore<A>
+  const store = parentStore as typeof parentStore & Redux<A>
   store.dispatchFromDevtools = true;
 
   const parentSet = _parentSet as F.WidenArguments<typeof _parentSet>
@@ -42,6 +69,7 @@ const redux: Redux = (reducer, initialState) => (_parentSet, parentGet, parentSt
 
   return { ...initialState, dispatch: store.dispatch }
 }
+const redux = reduxImpl as unknown as ReduxMiddleware;
 
 // ============================================================================
 // Utilities
@@ -57,9 +85,39 @@ namespace F {
     T extends (...a: infer A) => infer R
       ? (...a: [...A, ...unknown[]]) => R
       : never
+
+  export type PopArgument<T extends F.Unknown> =
+    T extends (...a: [...infer A, infer _]) => infer R
+      ? (...a: A) => R
+      : never
 }
 
+namespace O {
+  export type Unknown =
+    object
+
+  export type ExcludeKey<T extends O.Unknown, K extends keyof T> =
+    { [P in U.Exclude<keyof T, K>]: T[P]
+    }
+
+  export type Overwrite<T extends O.Unknown, U extends O.Unknown> =
+    & O.ExcludeKey<T, U.Extract<keyof U, keyof T>>
+    & U
+}
+
+namespace U {
+  export type Exclude<T, U> =
+    T extends U ? never : T
+
+  export type Extract<T, U> =
+    T extends U ? T : never
+}
+
+// Bug in eslint, we are using A just in the module augmentation
+namespace A { // eslint-disable-line @typescript-eslint/no-unused-vars
+  export type Cast<T, U> = T extends U ? T : U;
+}
 // ============================================================================
 // Exports
 
-export { redux, ReduxStore, UnknownAction }
+export { redux, Redux, UnknownAction }

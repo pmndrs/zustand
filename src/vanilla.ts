@@ -21,23 +21,41 @@ type UnknownState =
   object
 
 type Create =
-  <T extends UnknownState, S extends Store<T>>
-    ( storeInitializer: StoreInitializer<T, S>
-    , phantomInitialState?: T
+  < T extends UnknownState
+  , Mos extends [StoreMutatorIdentifier, unknown][] = []
+  >
+    ( initializer: StoreInitializer<T, [], Mos>
     ) =>
-      S
+      Mutate<Store<T>, Mos>
+    
+type StoreInitializer
+  < T extends UnknownState
+  , Mis extends [StoreMutatorIdentifier, unknown][]
+  , Mos extends [StoreMutatorIdentifier, unknown][]
+  , U = T
+  > =
+    & ( ( setState: A.Get<Mutate<Store<T>, Mis>, "setState", undefined>
+        , getState: A.Get<Mutate<Store<T>, Mis>, "getState", undefined>
+        , store: Mutate<Store<T>, Mis>
+        , $$storeMutations: Mis
+        ) =>
+          U
+      )
+    & { [$$storeMutators]?: Mos }
+declare const $$storeMutators: unique symbol;
 
-type StoreInitializer<T extends UnknownState, S extends Store<T>> =
-  & ( ( set: Store<T>['setState'] 
-      , get: Store<T>['getState']
-      , store: Store<T>
-      ) =>
-        T
-    )
-  & TagStore<S>
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface StoreMutators<S, A> {}
+type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
 
-declare const $$store: unique symbol
-type TagStore<S> = { [$$store]?: S }
+type Mutate<S, Ms> =
+  Ms extends [] ? S :
+  Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+    ? Mutate<
+        StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier],
+        Mrs
+      > :
+  never
 
 
 
@@ -110,7 +128,7 @@ const createImpl: ECreate = storeInitializer => {
   state = storeInitializer(store.setState, store.getState, store)
   return store
 }
-const create = createImpl as Create
+const create = createImpl as unknown as Create
 
 
 
@@ -144,9 +162,20 @@ namespace F {
     T extends (...a: infer A) => unknown ? A : never
 }
 
+namespace A {
+  export type Get<T, K, F = never> = 
+    K extends keyof T ? T[K] : F
+}
 
 // ============================================================================
 // Exports
 
 export default create
-export { Store, UnknownState, StoreInitializer, TagStore }
+export {
+  Store,
+  UnknownState,
+  StoreInitializer,
+  $$storeMutators,
+  StoreMutators,
+  StoreMutatorIdentifier
+}

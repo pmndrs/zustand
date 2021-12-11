@@ -1,19 +1,18 @@
-import { Store, UnknownState, StoreInitializer } from '../vanilla'
+import { UnknownState, StoreInitializer, StoreMutatorIdentifier } from '../vanilla'
 
 // ============================================================================
 // Types
 
 type Combine =
-  <T extends UnknownState, U extends UnknownState>
+  < T extends UnknownState
+  , U extends UnknownState
+  , Mps extends [StoreMutatorIdentifier, unknown][] = []
+  , Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  >
     ( initialState: T
-    , additionalStateCreator:
-        ( set: Store<O.Overwrite<T, U>>['setState']
-        , get: Store<O.Overwrite<T, U>>['getState']
-        , store: Store<O.Overwrite<T, U>>
-        ) => U
+    , additionalStateCreator: StoreInitializer<O.Overwrite<T, U>, Mps, Mcs, U>
     ) =>
-      StoreInitializer<O.Overwrite<T, U>, Store<O.Overwrite<T, U>>>
-
+      StoreInitializer<O.Overwrite<T, U>, Mps, Mcs>
 
 // ============================================================================
 // Implementation
