@@ -442,7 +442,24 @@ devtools takes the store function as its first argument, optionally you can name
 Name store: `devtools(store, {name: "MyStore"})`, which will create a seperate instance named "MyStore" in the devtools.
 Serialize options: `devtools(store, { serialize: { options: true } })`.  
   
+#### Logging Actions
+
 devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
+
+Because of this, actions will be logged as "anonymous" by default. To set a default log action type for all actions from your store: `devtools(store, {name: 'MyStore', anonymousActionType: 'MyStoreAction'})`
+
+Alternatively, `set` functions take a third parameter which can be used to log any action type you choose: 
+
+```jsx
+const createBearSlice = (set, get) => ({
+  eatFish: () =>
+    set(
+      (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
+      false,
+      "bear/eatFish"
+    ),
+})
+```
 
 ## React context
 
