@@ -98,7 +98,11 @@ function createContext<
   return {
     Provider,
     useStore,
+    /**
+    * @deprecated `useStoreApi` is renamed to `useStoreRef`, `useStoreApi` will be removed in next major
+    */
     useStoreApi,
+    useStoreRef: useStoreApi
   }
 }
 
