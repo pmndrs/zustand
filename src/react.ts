@@ -1,53 +1,100 @@
-import { useDebugValue } from 'react'
+import createStore, { Store, UnknownState, StoreInitializer, StoreMutatorIdentifier, Mutate } from './vanilla'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
-import createStore, { Store, UnknownState, StoreInitializer } from './vanilla'
+import { useDebugValue } from 'react'
+
+// ============================================================================
+// Types
 
 type UseStore =
-  { <T extends UnknownState>
-      (store: Store<T>):
-        T
+  <S extends Store<UnknownState>, U = State<S>>
+    ( store: S
+    , selector?: (state: State<S>) => U
+    , equals?: (a: U, b: U) => boolean
+    ) =>
+      U
 
-  , <T extends UnknownState, U>
-      ( store: Store<T>
-      , selector: (state: T) => U
-      , equals?: (a: U, b: U) => boolean
-      ):
-        U
+type Create =
+  { <S extends Store<UnknownState>>
+      (store: S):
+        UseBoundStore<S>
+
+  , <T extends UnknownState, Mos extends [StoreMutatorIdentifier, unknown][] = []>
+      (initializer: StoreInitializer<T, [], Mos>):
+        UseBoundStore<Mutate<Store<T>, Mos>>
   }
+      
+type UseBoundStore<S> =
+  & ( <U = State<S>>
+        ( selector: (state: State<S>) => U
+        , equals?: (a: U, b: U) => boolean
+        ) =>
+          U
+    )
+  & S
 
-export const useStore = ((store, selector, equals) => {
+type State<S> =
+  S extends { getState: () => infer T } ? T : never
+
+
+// ============================================================================
+// Implementation
+
+const useStore: UseStore = (store, selector, equals) => {
+  type S = typeof store;
   const selected = useSyncExternalStoreWithSelector(
     store.subscribe,
-    store.getState,
+    store.getState as () => State<S>,
     null,
-    selector,
+    selector as U.Exclude<typeof selector, undefined>,
+    // TODO: fix `@types/useSyncExternalStoreWithSelector`, should not  require selector
     equals
   )
   useDebugValue(selected)
 
   return selected
-}) as UseStore
+}
 
-
-const create =
-  <T extends UnknownState, S extends Store<T>>
-    (storeOrInitializer: S | StoreInitializer<T, S>): UseBoundStore<T, S> => {
-
-  const store: S =
+const create: Create = (...[storeOrInitializer]: F.O2.Arguments<Create>) => {
+  const store =
     typeof storeOrInitializer === "function"
-      ? createStore(storeOrInitializer as StoreInitializer<T, S>)
+      ? createStore(storeOrInitializer)
       : storeOrInitializer
 
   return Object.assign(
-    ((selector, equals) => useStore(store, selector, equals)) as UseBoundStore<T, S>,
+    ((selector, equals) => useStore(store, selector, equals)) as UseBoundStore<Store<UnknownState>>,
     store
   )
 }
 
-type UseBoundStore<T extends UnknownState, S extends Store<T>> =
-  & { (): T
-    , <U>(selector: (state: T) => U, equals?: (a: U, b: U) => boolean): U
-    }
-  & S
-  
+
+// ============================================================================
+// Utilities
+
+namespace F {
+  export type Unknown = 
+    (...a: never[]) => unknown
+
+  export type Call<T extends F.Unknown> =
+    T extends (...a: never[]) => infer R ? R : never
+
+  export namespace O2 {
+    export type Arguments<T extends F.Unknown> =
+      T extends {
+        (...a: infer A1): unknown 
+        (...a: infer A2): unknown 
+      }
+        ? A1 | A2
+        : never
+  }
+}  
+
+namespace U {
+  export type Exclude<T, U> =
+    T extends U ? never : T;
+}
+
+// ============================================================================
+// Exports
+
 export default create
+export { useStore };

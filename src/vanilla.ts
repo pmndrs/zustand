@@ -21,13 +21,10 @@ type UnknownState =
   object
 
 type Create =
-  < T extends UnknownState
-  , Mos extends [StoreMutatorIdentifier, unknown][] = []
-  >
-    ( initializer: StoreInitializer<T, [], Mos>
-    ) =>
+  <T extends UnknownState, Mos extends [StoreMutatorIdentifier, unknown][] = []>
+    (initializer: StoreInitializer<T, [], Mos>) =>
       Mutate<Store<T>, Mos>
-    
+
 type StoreInitializer
   < T extends UnknownState
   , Mis extends [StoreMutatorIdentifier, unknown][]
@@ -177,5 +174,6 @@ export {
   StoreInitializer,
   $$storeMutators,
   StoreMutators,
-  StoreMutatorIdentifier
+  StoreMutatorIdentifier,
+  Mutate
 }
