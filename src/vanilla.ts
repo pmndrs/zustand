@@ -5,7 +5,7 @@ interface Store<T extends UnknownState>
   { getState: 
       () => T
   , setState:
-      <Nt extends (R extends true ? T : O.Partial<T>), R extends boolean>
+      <Nt extends (R extends true ? T : Partial<T>), R extends boolean>
         ( nextStateOrUpdater: Nt | ((state: T) => Nt)
         , shouldReplace?: R
         ) =>
@@ -31,8 +31,8 @@ type StoreInitializer
   , Mos extends [StoreMutatorIdentifier, unknown][]
   , U = T
   > =
-    & ( ( setState: A.Get<Mutate<Store<T>, Mis>, "setState", undefined>
-        , getState: A.Get<Mutate<Store<T>, Mis>, "getState", undefined>
+    & ( ( setState: Get<Mutate<Store<T>, Mis>, "setState", undefined>
+        , getState: Get<Mutate<Store<T>, Mis>, "getState", undefined>
         , store: Mutate<Store<T>, Mis>
         , $$storeMutations: Mis
         ) =>
@@ -68,14 +68,14 @@ interface EStore
       () => EState
   , setState:
       ( nextStateOrUpdater:
-          | O.Partial<EState>
-          | ((state: EState) => O.Partial<EState>)
+          | Partial<EState>
+          | ((state: EState) => Partial<EState>)
       , shouldReplace?: EShouldReplaceState
       ) =>
         void
   , subscribe:
       ( listener:
-          (state: EState, previousState: E.Previous<EState>) => void
+          (state: EState, previousState: Previous<EState>) => void
       ) =>
         () => void
   , destroy:
@@ -94,9 +94,9 @@ type ECreate =
 const createImpl: ECreate = storeInitializer => {
   let state: EState
 
-  type Listener = (state: EState, previousState: E.Previous<EState>) => void
+  type Listener = (state: EState, previousState: Previous<EState>) => void
   const listeners: Set<Listener> = new Set()
-  const emit = (...a: F.Arguments<Listener>) =>
+  const emit = (...a: Parameters<Listener>) =>
     listeners.forEach(f => f(...a))
 
   const store: EStore = {
@@ -107,9 +107,9 @@ const createImpl: ECreate = storeInitializer => {
           ? nextStateOrUpdater(state)
           : nextStateOrUpdater
 
-      if (objectIs(nextState, state)) return
+      if (nextState === state) return
 
-      const previousState = E.previous(state)
+      const previousState = previous(state)
       state = shouldReplace
         ? nextState as EState
         : Object.assign({}, state, nextState)
@@ -133,36 +133,11 @@ const create = createImpl as unknown as Create
 // ============================================================================
 // Utilities
 
-const objectIs = Object.is as (<T>(a: T, b: T) => boolean)
+type Previous<T> = T & { __isPrevious: true }
+const previous = <T>(t: T) => t as Previous<T>
 
-namespace E {
-  export type Previous<T> = T & { __isPrevious: true }
-  export const previous = <T>(t: T) => t as Previous<T>
-}
-
-namespace O {
-  export type Unknown =
-    object
-
-  export type Partial<T extends O.Unknown> =
-    { [K in keyof T]?: T[K] }
-}
-
-namespace F {
-  export type Unknown =
-    (...a: never[]) => unknown
-
-  export type Call<T extends F.Unknown> =
-    T extends (...a: never[]) => infer R ? R : never
-
-  export type Arguments<T extends F.Unknown> =
-    T extends (...a: infer A) => unknown ? A : never
-}
-
-namespace A {
-  export type Get<T, K, F = never> = 
-    K extends keyof T ? T[K] : F
-}
+type Get<T, K, F = never> = 
+  K extends keyof T ? T[K] : F
 
 // ============================================================================
 // Exports
