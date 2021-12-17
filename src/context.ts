@@ -53,13 +53,14 @@ const createContextImpl: ECreateContext = () => {
   const StoreContext =
     React.createContext<EStore | undefined>(undefined);
 
-  const Provider: F.Call<ECreateContext>["Provider"] =
+  const Provider: ReturnType<ECreateContext>["Provider"] =
     ({ createStore, children }) =>
-      <StoreContext.Provider value={useConstant(createStore)}>
-        {children}
-      </StoreContext.Provider>
+      React.createElement(StoreContext.Provider, {
+        value: useConstant(createStore),
+        children
+      })
 
-  const useStoreRef: F.Call<ECreateContext>["useStoreRef"] =
+  const useStoreRef: ReturnType<ECreateContext>["useStoreRef"] =
     () => {
       let store = React.useContext(StoreContext);
       if (!store) {
@@ -68,7 +69,7 @@ const createContextImpl: ECreateContext = () => {
       return store;
     }
 
-  const useBoundStore: F.Call<ECreateContext>["useStore"] =
+  const useBoundStore: ReturnType<ECreateContext>["useStore"] =
     (...a) => useStore(useStoreRef(), ...a)
 
   return {
@@ -89,14 +90,6 @@ const useConstant = <T extends unknown>(create: () => T) => {
     ref.current = create();
   }
   return ref.current;
-}
-
-namespace F {
-  export type Unknown =
-    (...a: never[]) => unknown
-
-  export type Call<T extends F.Unknown> =
-    T extends (...a: never[]) => infer R ? R : never
 }
 
 // ============================================================================
