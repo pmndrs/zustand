@@ -24,7 +24,7 @@ declare module '../vanilla' {
 
 type WithSelectorSubscribe<S> =
   S extends { getState: () => infer T }
-    ? S & SubscribeWithSelector<A.Cast<T, UnknownState>>
+    ? S & SubscribeWithSelector<Extract<T, UnknownState>>
     : never
 
 interface SubscribeWithSelector<T extends UnknownState>
@@ -53,14 +53,14 @@ type ESubscribeWithSelector =
     EStoreInitializer
 
 type EStoreInitializer = 
-  F.PopArgument<StoreInitializer<EState, [], []>>
+  PopArgument<StoreInitializer<EState, [], []>>
 
 interface ESubscribeWithSelectorStore
   { subscribe:
     ( selector: (state: EState) => ESelectedState
     , listener:
         ( selectedState: ESelectedState
-        , previousSelectedState: E.Previous<ESelectedState>
+        , previousSelectedState: Previous<ESelectedState>
         )
           => void
     , options?:
@@ -77,7 +77,7 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
 
   const parentSubscribe = parentStore.subscribe
   const updatedParentStore = parentStore as EStore & ESubscribeWithSelectorStore
-  type UpdatedSubscribeArguments = F.O2.Arguments<(typeof updatedParentStore)['subscribe']>
+  type UpdatedSubscribeArguments = Parameters2<(typeof updatedParentStore)['subscribe']>
 
   updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
     if (!args[1]) {
@@ -91,14 +91,14 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
       { equalityFn: objectIs, fireImmediately: false, ..._options }
   
     let currentSelected = selector(parentGet())
-    let previousSelected = currentSelected as E.Previous<ESelectedState>
+    let previousSelected = currentSelected as Previous<ESelectedState>
     const emit = () => listener(currentSelected, previousSelected)
 
     const unsubscribe = parentSubscribe(() => {
       const nextSelected = selector(parentGet())
       if (equals(currentSelected, nextSelected)) return
   
-      previousSelected = E.previous(currentSelected)
+      previousSelected = previous(currentSelected)
       currentSelected = nextSelected
       emit()
     })
@@ -116,10 +116,8 @@ const subscribeWithSelector = subscribeWithSelectorImpl as unknown as
 // ============================================================================
 // Utilities
 
-namespace E {
-  export type Previous<T> = T & { __isPrevious: true }
-  export const previous = <T>(t: T) => t as Previous<T>
-}
+type Previous<T> = T & { __isPrevious: true }
+const previous = <T>(t: T) => t as Previous<T>
 
 const objectIs =
   Object.is as (<T>(a: T, b: T) => boolean)
@@ -127,30 +125,18 @@ const objectIs =
 function pseudoAssert<T extends boolean>(predicate: T):
   asserts predicate {}
 
-namespace F {
-  export type Unknown = 
-    (...a: never[]) => unknown
-
-  export namespace O2 {
-    export type Arguments<T extends F.Unknown> =
-      T extends {
-        (...a: infer A1): unknown 
-        (...a: infer A2): unknown 
-      }
-        ? A1 | A2
-        : never
+type Parameters2<T extends (...a: never[]) => unknown> =
+  T extends {
+    (...a: infer A1): unknown 
+    (...a: infer A2): unknown 
   }
+    ? A1 | A2
+    : never
 
-  export type PopArgument<T extends F.Unknown> =
-    T extends (...a: [...infer A, infer _]) => infer R
-      ? (...a: A) => R
-      : never
-}
-
-// Bug in eslint, we are using A just in the module augmentation
-namespace A { // eslint-disable-line @typescript-eslint/no-unused-vars
-  export type Cast<T, U> = T extends U ? T : U;
-}
+type PopArgument<T extends (...a: never[]) => unknown> =
+  T extends (...a: [...infer A, infer _]) => infer R
+    ? (...a: A) => R
+    : never
 
 // ============================================================================
 // Exports

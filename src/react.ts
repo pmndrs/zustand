@@ -45,7 +45,7 @@ const useStore: UseStore = (store, selector, equals) => {
     store.subscribe,
     store.getState as () => State<S>,
     null,
-    selector as U.Exclude<typeof selector, undefined>,
+    selector as Exclude<typeof selector, undefined>,
     // TODO: fix `@types/useSyncExternalStoreWithSelector`, should not  require selector
     equals
   )
@@ -54,7 +54,7 @@ const useStore: UseStore = (store, selector, equals) => {
   return selected
 }
 
-const create: Create = (...[storeOrInitializer]: F.O2.Arguments<Create>) => {
+const create: Create = (...[storeOrInitializer]: Parameters2<Create>) => {
   const store =
     typeof storeOrInitializer === "function"
       ? createStore(storeOrInitializer)
@@ -70,28 +70,13 @@ const create: Create = (...[storeOrInitializer]: F.O2.Arguments<Create>) => {
 // ============================================================================
 // Utilities
 
-namespace F {
-  export type Unknown = 
-    (...a: never[]) => unknown
-
-  export type Call<T extends F.Unknown> =
-    T extends (...a: never[]) => infer R ? R : never
-
-  export namespace O2 {
-    export type Arguments<T extends F.Unknown> =
-      T extends {
-        (...a: infer A1): unknown 
-        (...a: infer A2): unknown 
-      }
-        ? A1 | A2
-        : never
+type Parameters2<T extends (...a: never[]) => unknown> =
+  T extends {
+    (...a: infer A1): unknown 
+    (...a: infer A2): unknown 
   }
-}  
-
-namespace U {
-  export type Exclude<T, U> =
-    T extends U ? never : T;
-}
+    ? A1 | A2
+    : never
 
 // ============================================================================
 // Exports

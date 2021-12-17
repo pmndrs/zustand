@@ -10,9 +10,9 @@ type Combine =
   , Mcs extends [StoreMutatorIdentifier, unknown][] = []
   >
     ( initialState: T
-    , additionalStateCreator: StoreInitializer<O.Overwrite<T, U>, Mps, Mcs, U>
+    , additionalStateCreator: StoreInitializer<Write<T, U>, Mps, Mcs, U>
     ) =>
-      StoreInitializer<O.Overwrite<T, U>, Mps, Mcs>
+      StoreInitializer<Write<T, U>, Mps, Mcs>
 
 // ============================================================================
 // Implementation
@@ -27,31 +27,11 @@ const combine: Combine = (initialState, additionalStateCreator) => (...a) =>
 // ============================================================================
 // Utilities
 
-const overwrite = <T extends O.Unknown, U extends O.Unknown>(t: T, u: U) =>
-  Object.assign({}, t, u) as O.Overwrite<T, U>
+const overwrite = <T extends object, U extends object>(t: T, u: U) =>
+  Object.assign({}, t, u) as Write<T, U>
 
-namespace O {
-  export type Unknown =
-    object
-
-  export type Overwrite<T extends O.Unknown, U extends O.Unknown> =
-    & ExcludeKey<T, U.Extract<keyof U, keyof T>>
-    & U
-
-  export type ExcludeKey<T extends O.Unknown, K extends keyof T> =
-    { [P in U.Exclude<keyof T, K>]?:
-        T[P]
-    }
-}
-
-namespace U {
-  export type Exclude<T, U> =
-    T extends U ? never : U
-
-  export type Extract<T, U> =
-    T extends U ? T : never
-}
-
+export type Write<T extends object, U extends object> =
+  Omit<T, keyof U> & U
 
 // ============================================================================
 // Exports

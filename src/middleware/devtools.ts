@@ -24,8 +24,8 @@ declare module '../vanilla' {
 }
 
 type WithDevtools<S> =
-  O.Overwrite<
-    A.Cast<S, O.Unknown>,
+  Write<
+    Extract<S, object>,
     StoreSetStateWithAction<S>
   >
 
@@ -57,7 +57,7 @@ type DevtoolsOptions =
 interface DevtoolsWindow
   { __REDUX_DEVTOOLS_EXTENSION__?:
       { connect:
-          (options?: U.Exclude<EDevtoolsOptions, string>) => EDevtoolsExtension
+          (options?: Exclude<EDevtoolsOptions, string>) => EDevtoolsExtension
       }
   }
 
@@ -75,12 +75,12 @@ type EDevtools =
     EStoreInitializer
 
 type EStoreInitializer = 
-  F.PopArgument<StoreInitializer<EState, [], []>>
+  PopArgument<StoreInitializer<EState, [], []>>
 
 type EDevtoolsOptions =
   | EDevtoolsStoreName
-  | O.Overwrite<
-      U.Exclude<DevtoolsOptions, string>,
+  | Write<
+      Exclude<DevtoolsOptions, string>,
       { name?: EDevtoolsStoreName | undefined, anonymousActionType?: EAnonymousActionType }
     >
 type EDevtoolsStoreName =
@@ -91,11 +91,11 @@ type EAnonymousActionType =
 interface EDevtoolsStore
   { setState:
     (...a:
-      [...a: F.Arguments<Store<EState>['setState']>
+      [...a: Parameters<Store<EState>['setState']>
       , name?: EAction
       ]
     ) =>
-      F.Call<Store<EState>['setState']>
+      ReturnType<Store<EState>['setState']>
   , dispatchFromDevtools?: boolean
   }
 
@@ -116,7 +116,7 @@ type EDevtoolsMessage =
   | { type: "ACTION"
     , payload: StringifiedJson<
         | { type: EActionType }
-        | { type: "__setState", state: O.Partial<EStateFromDevtools> }
+        | { type: "__setState", state: Partial<EStateFromDevtools> }
         >
     }
   | { type: "DISPATCH"
@@ -135,7 +135,7 @@ type EDevtoolsMessage =
   | { type: UnknownString }
 
 type EStateLifted =
-  { computedStates: { state: O.Partial<EStateFromDevtools> }[] }
+  { computedStates: { state: Partial<EStateFromDevtools> }[] }
 type EStateFromDevtools = { __isStateFromDevtools: true }
 
 const devtoolsWindow = window as
@@ -179,7 +179,7 @@ const devtoolsImpl: EDevtools =
   const devtools = extensionConnector.connect(devtoolsOptions)
 
   let isRecording = false
-  store.setState = (...[state, replace, action]: F.Arguments<typeof store['setState']>) => {
+  store.setState = (...[state, replace, action]: Parameters<typeof store['setState']>) => {
     parentSet(state, replace)
     if (!isRecording) return
     devtools?.send(
@@ -189,7 +189,7 @@ const devtoolsImpl: EDevtools =
       parentGet()
     )
   }
-  const setStateFromDevtools = (state: EStateFromDevtools | O.Partial<EStateFromDevtools>) => {
+  const setStateFromDevtools = (state: EStateFromDevtools | Partial<EStateFromDevtools>) => {
     isRecording = true
     store.setState(state as unknown as EState)
     isRecording = false
@@ -205,7 +205,7 @@ const devtoolsImpl: EDevtools =
         if (typeof message.payload !== "string") return
         return parseJsonThen(message.payload, action => {
           if (action.type === '__setState') {
-            setStateFromDevtools((action as { state: O.Partial<EStateFromDevtools> }).state)
+            setStateFromDevtools((action as { state: Partial<EStateFromDevtools> }).state)
             return
           }
 
@@ -285,66 +285,23 @@ type UnknownString = { __isUnknownString: true }
 
 
 const pseudoAssertIs:
-  <T, U>
-    ( value: A.AreEqual<T, U> extends true ? T : "Error: Not equal to the type on right"
-    , type: U
+  <A, E>
+    ( value:
+        (<T>() => T extends A ? 1 : 0) extends (<T>() => T extends E ? 1 : 0)
+          ? A
+          : "Error: Not equal to the type on right"
+    , type: E
     ) =>
       void
   = () => {}
 
-namespace O {
-  export type Unknown =
-    object
+type Write<T extends object, U extends object> =
+  Omit<T, keyof U> & U
 
-  export type ExcludeKey<T extends O.Unknown, K extends keyof T,
-    Ek extends keyof T = U.Exclude<keyof T, K>
-    // Ek extracted to make ExcludeKey homomorphic
-  > =
-    { [P in Ek]: T[P]
-    }
-
-  export type Overwrite<T extends O.Unknown, U extends O.Unknown> =
-    & O.ExcludeKey<T, U.Extract<keyof U, keyof T>>
-    & U
-
-  export type Partial<T> =
-    { [K in keyof T]?: T[K]
-    }
-}
-
-namespace F {
-  export type Unknown =
-    (...a: never[]) => unknown
-
-  export type Call<T extends F.Unknown> =
-    T extends (...a: never[]) => infer R ? R : never
-
-  export type Arguments<T extends F.Unknown> =
-    T extends (...a: infer A) => unknown ? A : never
-
-  export type PopArgument<T extends F.Unknown> =
-    T extends (...a: [...infer A, infer _]) => infer R
-      ? (...a: A) => R
-      : never
-}
-
-namespace U {
-  export type Exclude<T, U> =
-    T extends U ? never : T
-  
-  export type Extract<T, U> =
-    T extends U ? T : never
-}
-
-namespace A {
-  export type AreEqual<A, B> =
-    (<T>() => T extends B ? 1 : 0) extends (<T>() => T extends A ? 1 : 0)
-      ? true
-      : false
-
-  export type Cast<T, U> =
-    T extends U ? T : U;
-}
+export type PopArgument<T extends (...a: never[]) => unknown> =
+  T extends (...a: [...infer A, infer _]) => infer R
+    ? (...a: A) => R
+    : never
 
 // ============================================================================
 // Exports

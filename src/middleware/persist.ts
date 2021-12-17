@@ -25,9 +25,9 @@ declare module '../vanilla' {
 
 type WithPersist<S, A> =
   S extends { getState: () => infer T }
-    ? O.Overwrite<
+    ? Write<
         S,
-        StorePersist<A.Cast<T, O.Unknown>, A>
+        StorePersist<Extract<T, UnknownState>, A>
       >
     : never
 
@@ -108,7 +108,7 @@ interface PersistentStorageValue<T>
 
 interface StorePersist<T extends UnknownState, U = T>
   { persist:
-      { setOptions: (options: O.Partial<PersistOptions<T, U>>) => void
+      { setOptions: (options: Partial<PersistOptions<T, U>>) => void
       , clearStorage: () => void
       , rehydrate: () => Thenable<void>
       , hasHydrated: () => boolean
@@ -133,16 +133,16 @@ type EPersist =
     EStoreInitializer
 
 type EStoreInitializer = 
-  F.PopArgument<StoreInitializer<EState, [], []>>
+  PopArgument<StoreInitializer<EState, [], []>>
 
 interface EPersistOptions
   { name: EPersistentStorageName
   , getStorage?: () => EPersistentStorage
   , serialize?:
       (storageValue: EPersistentStorageValue) =>
-        MaybePromise<E.Serialized<EPersistentStorageValue>>
+        MaybePromise<Serialized<EPersistentStorageValue>>
   , deserialize?:
-      (serializedString: E.Serialized<EPersistentStorageValue>) =>
+      (serializedString: Serialized<EPersistentStorageValue>) =>
         MaybePromise<EPersistentStorageValue>
   , partialize?: (state: EState) => ESelectedState
   , onRehydrateStorage?:
@@ -166,10 +166,10 @@ type EPersistentStorageName =
 
 interface EPersistentStorage
   { getItem: (name: EPersistentStorageName) =>
-      MaybePromise<E.Serialized<EPersistentStorageValue> | null>
+      MaybePromise<Serialized<EPersistentStorageValue> | null>
   , setItem:
       ( name: EPersistentStorageName
-      , value: E.Serialized<EPersistentStorageValue>
+      , value: Serialized<EPersistentStorageValue>
       ) =>
         MaybePromise<void>
   , removeItem: (name: EPersistentStorageName) => MaybePromise<void>
@@ -182,7 +182,7 @@ type EPersistentStorageValue =
 
 interface EPersistStore
   { persist:
-      { setOptions: (options: O.Partial<EPersistOptions>) => void
+      { setOptions: (options: Partial<EPersistOptions>) => void
       , clearStorage: () => void
       , rehydrate: () => Thenable<void>
       , hasHydrated: () => boolean
@@ -197,7 +197,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
   let persistentStorage = tryElse(options.getStorage, () => undefined)
   const persistentStorageGetItem = () =>
     persistentStorage!.getItem(options.name)
-  const persistentStorageSetItem = (serializedState: E.Serialized<EPersistentStorageValue>) =>
+  const persistentStorageSetItem = (serializedState: Serialized<EPersistentStorageValue>) =>
     persistentStorage!.setItem(options.name, serializedState)
   const persistentStorageRemoveItem = () =>
     persistentStorage!.removeItem(options.name)
@@ -292,7 +292,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
 const persist = persistImpl as unknown as Persist
 
 type EPersistDefaultedOptions =
-  O.Required<O.ExcludeKey<EPersistOptions, 'name' | 'onRehydrateStorage' | 'migrate'>>
+  Required<Omit<EPersistOptions, 'name' | 'onRehydrateStorage' | 'migrate'>>
 
 const defaultOptions: EPersistDefaultedOptions = {
   getStorage: (() => localStorage) as unknown as EPersistDefaultedOptions['getStorage'],
@@ -382,49 +382,25 @@ const hasThen = (t: unknown): t is { then: unknown } =>
 type MaybePromise<T> =
   T | Promise<T>
 
-namespace E {
-  export type Serialized<T> = { __serialized: T }
+type Serialized<T> = { __serialized: T }
+
+type Write<T extends object, U extends object> =
+  Omit<T, keyof U> & U
+
+type PopArgument<T extends (...a: never[]) => unknown> =
+  T extends (...a: [...infer A, infer _]) => infer R
+    ? (...a: A) => R
+    : never
+
+
+// ============================================================================
+// Exports
+
+export {
+  persist,
+  PersistOptions,
+  PersistentStorage,
+  WithPersist,
+  $$persist
 }
-
-namespace O {
-  export type Unknown =
-    object
-
-  export type Partial<T extends O.Unknown> =
-    { [K in keyof T]?: T[K] }
-
-  export type ExcludeKey<T extends O.Unknown, K extends keyof T> =
-    { [P in U.Exclude<keyof T, K>]: T[P]
-    }
-
-  export type Required<T extends O.Unknown> =
-    { [K in keyof T]-?: U.Exclude<T[K], undefined>
-    }
-
-  export type Overwrite<T extends O.Unknown, U extends O.Unknown> =
-    & O.ExcludeKey<T, U.Extract<keyof U, keyof T>>
-    & U
-}
-
-namespace F {
-  export type Unknown =
-    (...a: never[]) => unknown
-
-  export type PopArgument<T extends F.Unknown> =
-    T extends (...a: [...infer A, infer _]) => infer R
-      ? (...a: A) => R
-      : never
-}
-
-namespace U {
-  export type Exclude<T, U> =
-    T extends U ? never : T
-
-  export type Extract<T, U> =
-    T extends U ? T : never
-}
-
-// Bug in eslint, we are using A just in the module augmentation
-namespace A { // eslint-disable-line @typescript-eslint/no-unused-vars
-  export type Cast<T, U> = T extends U ? T : U;
-}
+ 

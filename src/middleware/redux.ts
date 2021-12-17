@@ -11,7 +11,7 @@ type ReduxMiddleware =
     ( reducer: (state: T, action: A) => T
     , initialState: T
     ) =>
-      StoreInitializer<O.Overwrite<T, ReduxState<A>>, Cms, [[$$redux, A]]>
+      StoreInitializer<Write<T, ReduxState<A>>, Cms, [[$$redux, A]]>
 
 declare const $$redux: unique symbol;
 type $$redux = typeof $$redux;        
@@ -23,9 +23,9 @@ declare module '../vanilla' {
 }
 
 type WithRedux<S, A> =
-  O.Overwrite<
-    A.Cast<S, O.Unknown>,
-    Redux<A.Cast<A, UnknownAction>>
+  Write<
+    Extract<S, UnknownState>,
+    Redux<Extract<A, UnknownAction>>
   >
 
 type ReduxState<A extends UnknownAction> =
@@ -92,31 +92,9 @@ namespace F {
       : never
 }
 
-namespace O {
-  export type Unknown =
-    object
+type Write<T extends object, U extends object> =
+  Omit<T, keyof U> & U
 
-  export type ExcludeKey<T extends O.Unknown, K extends keyof T> =
-    { [P in U.Exclude<keyof T, K>]: T[P]
-    }
-
-  export type Overwrite<T extends O.Unknown, U extends O.Unknown> =
-    & O.ExcludeKey<T, U.Extract<keyof U, keyof T>>
-    & U
-}
-
-namespace U {
-  export type Exclude<T, U> =
-    T extends U ? never : T
-
-  export type Extract<T, U> =
-    T extends U ? T : never
-}
-
-// Bug in eslint, we are using A just in the module augmentation
-namespace A { // eslint-disable-line @typescript-eslint/no-unused-vars
-  export type Cast<T, U> = T extends U ? T : U;
-}
 // ============================================================================
 // Exports
 
