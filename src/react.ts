@@ -25,7 +25,7 @@ type Create =
       
 type UseBoundStore<S> =
   & ( <U = State<S>>
-        ( selector: (state: State<S>) => U
+        ( selector?: (state: State<S>) => U
         , equals?: (a: U, b: U) => boolean
         ) =>
           U
