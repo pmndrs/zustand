@@ -218,7 +218,7 @@ const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmedia
 
 ```ts
 import create, { GetState, SetState } from 'zustand'
-import { StoreApiWithSubscribeWithSelector } from 'zustand/middleware'
+import { StoreApiWithSubscribeWithSelector, subscribeWithSelector } from 'zustand/middleware'
 
 type BearState = {
   paw: boolean
