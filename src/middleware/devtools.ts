@@ -35,24 +35,23 @@ type StoreSetStateWithAction<S> =
     : never
 
 type DevtoolsOptions =
-  | string
-  | { name?: string
-    , anonymousActionType?: string
-    , serialize?:
-      { options:
-        | boolean
-        | { date?: boolean
-          , regex?: boolean
-          , undefined?: boolean
-          , nan?: boolean
-          , infinity?: boolean
-          , error?: boolean
-          , symbol?: boolean
-          , map?: boolean
-          , set?: boolean
-          }
-      }
+  { name?: string
+  , anonymousActionType?: string
+  , serialize?:
+    { options:
+      | boolean
+      | { date?: boolean
+        , regex?: boolean
+        , undefined?: boolean
+        , nan?: boolean
+        , infinity?: boolean
+        , error?: boolean
+        , symbol?: boolean
+        , map?: boolean
+        , set?: boolean
+        }
     }
+  }
 
 interface DevtoolsWindow
   { __REDUX_DEVTOOLS_EXTENSION__?:
@@ -78,11 +77,12 @@ type StoreInitializerImpl =
   PopArgument<StoreInitializer<T, [], []>>
 
 type DevtoolsOptionsImpl =
-  | DevtoolsStoreNameImpl
-  | Write<
-      Exclude<DevtoolsOptions, string>,
-      { name?: DevtoolsStoreNameImpl | undefined, anonymousActionType?: AnonymousActionTypeImpl }
-    >
+  Write<
+    DevtoolsOptions,
+    { name?: DevtoolsStoreNameImpl | undefined
+    , anonymousActionType?: AnonymousActionTypeImpl
+    }
+  >
 type DevtoolsStoreNameImpl = string & { __isDevtoolsStoreName: true }
 type AnonymousActionTypeImpl = string & { __isAnonymousActionType: true }
 
@@ -149,7 +149,6 @@ const devtoolsImpl: DevtoolsImpl =
   const devtoolsOptions =
     { ...(
         _devtoolsOptions === undefined ? { name: undefined } :
-        typeof _devtoolsOptions === 'string' ? { name: _devtoolsOptions } :
         _devtoolsOptions
       ),
       anonymousActionType: 'anonymous' as AnonymousActionTypeImpl
