@@ -95,14 +95,24 @@ function createContext<
     )
   }
 
+  let didWarnAboutStoreApiDeprecation = false
+
   return {
     Provider,
     useStore,
     /**
-    * @deprecated `useStoreApi` is renamed to `useStoreRef`, `useStoreApi` will be removed in next major
-    */
-    useStoreApi,
-    useStoreRef: useStoreApi
+     * @deprecated `useStoreApi` is renamed to `useStoreRef`, `useStoreApi` will be removed in next major
+     */
+    useStoreApi: (...a: Parameters<typeof useStoreApi>) => {
+      if (!didWarnAboutStoreApiDeprecation) {
+        console.warn(
+          '`useStoreApi` is renamed to `useStoreRef`, `useStoreApi` will be removed in next major'
+        )
+        didWarnAboutStoreApiDeprecation = true
+      }
+      return useStoreApi(...a)
+    },
+    useStoreRef: useStoreApi,
   }
 }
 
