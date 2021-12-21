@@ -12,7 +12,7 @@ type SubscribeWithSelectorMiddleware =
       StoreInitializer<T, Mps, [[$$subscribeWithSelector, never], ...Mcs]>
 
 
-declare const $$subscribeWithSelector: unique symbol;
+const $$subscribeWithSelector = Symbol("$$subscribeWithSelector");
 type $$subscribeWithSelector = typeof $$subscribeWithSelector
 
 declare module '../vanilla' {
@@ -141,4 +141,9 @@ type PopArgument<T extends (...a: never[]) => unknown> =
 // ============================================================================
 // Exports
 
-export { subscribeWithSelector, SubscribeWithSelector }
+export {
+  subscribeWithSelector,
+  SubscribeWithSelector,
+  $$subscribeWithSelector,
+  WithSelectorSubscribe
+}

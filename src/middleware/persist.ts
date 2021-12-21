@@ -14,7 +14,7 @@ type Persist =
     ) =>
       StoreInitializer<T, Mps, [[$$persist, U], ...Mcs]>
 
-declare const $$persist: unique symbol;
+const $$persist = Symbol("$$persist");
 type $$persist = typeof $$persist;
 
 declare module '../vanilla' {
@@ -400,7 +400,7 @@ export {
   persist,
   PersistOptions,
   PersistentStorage,
-  WithPersist,
-  $$persist
+  $$persist,
+  WithPersist
 }
  

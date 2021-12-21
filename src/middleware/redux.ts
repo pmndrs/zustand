@@ -13,7 +13,7 @@ type ReduxMiddleware =
     ) =>
       StoreInitializer<Write<T, ReduxState<A>>, Cms, [[$$redux, A]]>
 
-declare const $$redux: unique symbol;
+const $$redux = Symbol("$$redux");
 type $$redux = typeof $$redux;        
 
 declare module '../vanilla' {
@@ -98,4 +98,4 @@ type Write<T extends object, U extends object> =
 // ============================================================================
 // Exports
 
-export { redux, Redux, UnknownAction }
+export { redux, Redux, UnknownAction, $$redux, WithRedux }

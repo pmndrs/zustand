@@ -13,7 +13,7 @@ type Devtools =
     ) =>
       StoreInitializer<T, Mps, [[$$devtools, never], ...Mcs]>
 
-declare const $$devtools: unique symbol;
+const $$devtools = Symbol("$$devtools");
 type $$devtools = typeof $$devtools;
 
 declare module '../vanilla' {
@@ -306,4 +306,4 @@ export type PopArgument<T extends (...a: never[]) => unknown> =
 // ============================================================================
 // Exports
 
-export { devtools, DevtoolsOptions }
+export { devtools, DevtoolsOptions, $$devtools, WithDevtools }
