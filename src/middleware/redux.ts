@@ -53,15 +53,15 @@ type ERedux =
     EStoreInitializer
 
 type EStoreInitializer =
-  F.PopArgument<StoreInitializer<EState & ReduxState<EAction>, [], []>>
+  PopArgument<StoreInitializer<EState & ReduxState<EAction>, [], []>>
 
 const reduxImpl: ERedux = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
-  type A = F.Arguments<typeof reducer>[1]
+  type A = Parameters<typeof reducer>[1]
 
   const store = parentStore as typeof parentStore & Redux<A>
   store.dispatchFromDevtools = true;
 
-  const parentSet = _parentSet as F.WidenArguments<typeof _parentSet>
+  const parentSet = _parentSet as WidenArguments<typeof _parentSet>
   store.dispatch = a => {
     parentSet(reducer(parentGet(), a), false, a)
     return a;
@@ -73,24 +73,15 @@ const redux = reduxImpl as unknown as ReduxMiddleware;
 
 // ============================================================================
 // Utilities
+type WidenArguments<T extends (...a: never[]) => unknown> =
+  T extends (...a: infer A) => infer R
+    ? (...a: [...A, ...unknown[]]) => R
+    : never
 
-namespace F {
-  export type Unknown =
-    (...a: never[]) => unknown
-
-  export type Arguments<T extends F.Unknown> =
-    T extends (...a: infer A) => unknown ? A : never
-
-  export type WidenArguments<T extends F.Unknown> =
-    T extends (...a: infer A) => infer R
-      ? (...a: [...A, ...unknown[]]) => R
-      : never
-
-  export type PopArgument<T extends F.Unknown> =
-    T extends (...a: [...infer A, infer _]) => infer R
-      ? (...a: A) => R
-      : never
-}
+type PopArgument<T extends (...a: never[]) => unknown> =
+  T extends (...a: [...infer A, infer _]) => infer R
+    ? (...a: A) => R
+    : never
 
 type Write<T extends object, U extends object> =
   Omit<T, keyof U> & U
