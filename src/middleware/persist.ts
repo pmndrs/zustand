@@ -217,12 +217,11 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
   }
  
   const updatePersistentStorage = () =>
-    thenablify(options.serialize)({
+    thenablify(options.serialize, true)({
       state: options.partialize({ ...parentGet() }),
       version: options.version
     })
     .then(persistentStorageSetItem)
-    .throw()
   
 
   const initialState = storeInitializer(
@@ -267,7 +266,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
       return updatePersistentStorage()
     })
     .then(() => {
-      postRehydrationCallback?.(initialStateFromPersistentStorage)
+      postRehydrationCallback?.(initialStateFromPersistentStorage, undefined)
       hasHydrated = true
       finishHydrationEmitter.emit(initialStateFromPersistentStorage!)
     })
@@ -331,7 +330,7 @@ const tryElse = <T, U>(result: () => T, fallback: (e: unknown) => U) => {
 const update =
   <T, K extends keyof T>(t: T, k: K, replacer: (original: T[K]) => T[K]) => {
     const original = t[k]
-    Object.assign(t, { k: replacer(original) })
+    Object.assign(t, { [k]: replacer(original) })
     return t
   }
 
@@ -350,12 +349,11 @@ export interface Thenable<T>
       Thenable<U>
   , catch: <U>(onRejected: (error: unknown) => U | Promise<U> | Thenable<U>) =>
       Thenable<U>
-  , throw: () => Thenable<T>
   }
 
 export const thenablify =
   <A extends unknown[], R>
-    (f: (...a: A) => R | Promise<R> | Thenable<R>) =>
+    (f: (...a: A) => R | Promise<R> | Thenable<R>, throwImmediately: boolean = false) =>
       (...a: A): Thenable<R> => {
 
   try {
@@ -363,21 +361,20 @@ export const thenablify =
     if (hasThen(r)) return r as Thenable<R>
 
     return {
-      then(f) { return thenablify(f)(r) },
-      catch() { return this as Thenable<never> },
-      throw() { return this }
+      then(f) { return thenablify(f, throwImmediately)(r) },
+      catch() { return this as Thenable<never> }
     }
   } catch (error) {
+    if (throwImmediately) throw error;
     return {
       then() { return this as Thenable<never> },
-      catch(f) { return thenablify(f)(error) },
-      throw() { throw error; }
+      catch(f) { return thenablify(f, throwImmediately)(error) }
     }
   }
 }
 
 const hasThen = (t: unknown): t is { then: unknown } =>
-  (t as any).then !== undefined
+  typeof t === 'object' && t !== null && (t as { then?: never }).then !== undefined
 
 type MaybePromise<T> =
   T | Promise<T>
