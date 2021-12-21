@@ -177,7 +177,7 @@ interface PersistentStorageImpl
 
 type PersistentStorageValueImpl =
   { state: U
-  , version?: number & { __isPersistentStorageValueVersion: true } 
+  , version: number & { __isPersistentStorageValueVersion: true } 
   }
 
 interface PersistStoreImpl
@@ -388,7 +388,6 @@ type PopArgument<T extends (...a: never[]) => unknown> =
   T extends (...a: [...infer A, infer _]) => infer R
     ? (...a: A) => R
     : never
-
 
 // ============================================================================
 // Exports
