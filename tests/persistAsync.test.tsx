@@ -1,8 +1,8 @@
 import { act, render, waitFor } from '@testing-library/react'
-import create from 'zustand'
+import create, { createWithState } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const createPersistantStore = (initialValue: string | null) => {
+const createPersistentStore = (initialValue: string | null) => {
   let state = initialValue
 
   const getItem = async (): Promise<string | null> => {
@@ -118,7 +118,7 @@ describe('persist middleware with async configuration', () => {
   })
 
   it('can persist state', async () => {
-    const { storage, setItemSpy } = createPersistantStore(null)
+    const { storage, setItemSpy } = createPersistentStore(null)
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
@@ -349,17 +349,22 @@ describe('persist middleware with async configuration', () => {
     }
 
     const unstorableMethod = () => {}
+    type State = { count: number; actions: { unstorableMethod: () => void } }
 
-    const useStore = create(
+    const useStore = createWithState<State>()(
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
         getStorage: () => storage,
-        merge: (persistedState, currentState) => {
+        merge: (_persistedState, currentState) => {
+          const persistedState = _persistedState as Omit<State, 'actions'> & {
+            actions?: State['actions']
+          }
+
           delete persistedState.actions
 
           return {
             ...currentState,
-            ...persistedState,
+            ...(persistedState as object),
           }
         },
       })
@@ -414,7 +419,7 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
-  it('can manually rehydrate through the api', async () => {
+  it('can manually rehydrate', async () => {
     const storageValue = '{"state":{"count":1},"version":0}'
 
     const storage = {
@@ -437,7 +442,7 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
-  it('can check if the store has been hydrated through the api', async () => {
+  it('can check if the store has been hydrated', async () => {
     const storage = {
       getItem: async () => null,
       setItem: () => {},

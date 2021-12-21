@@ -1,7 +1,7 @@
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const createPersistantStore = (initialValue: string | null) => {
+const createPersistentStore = (initialValue: string | null) => {
   let state = initialValue
 
   const getItem = (): string | null => {
@@ -89,7 +89,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can persist state', () => {
-    const { storage, setItemSpy } = createPersistantStore(null)
+    const { storage, setItemSpy } = createPersistentStore(null)
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
@@ -266,12 +266,16 @@ describe('persist middleware with sync configuration', () => {
     }
 
     const unstorableMethod = () => {}
+    type State = { count: number; actions: { unstorableMethod: () => void } }
 
     const useStore = create(
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
         getStorage: () => storage,
-        merge: (persistedState, currentState) => {
+        merge: (_persistedState, currentState) => {
+          const persistedState = _persistedState as Omit<State, 'actions'> & {
+            actions?: State['actions']
+          }
           delete persistedState.actions
 
           return {
@@ -380,7 +384,7 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
-  it('can change the options through the api', () => {
+  it('can change the options', () => {
     const setItemSpy = jest.fn()
 
     const storage = {
@@ -393,6 +397,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
+        partialize: s => s as { count: number } | {}
       })
     )
 
@@ -416,7 +421,7 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
-  it('can clear the storage through the api', () => {
+  it('can clear the storage', () => {
     const removeItemSpy = jest.fn()
 
     const storage = {
@@ -436,7 +441,7 @@ describe('persist middleware with sync configuration', () => {
     expect(removeItemSpy).toBeCalledWith('test-storage')
   })
 
-  it('can manually rehydrate through the api', () => {
+  it('can manually rehydrate', () => {
     const storageValue = '{"state":{"count":1},"version":0}'
 
     const storage = {
@@ -459,7 +464,7 @@ describe('persist middleware with sync configuration', () => {
     })
   })
 
-  it('can check if the store has been hydrated through the api', async () => {
+  it('can check if the store has been hydrated', async () => {
     const storage = {
       getItem: () => null,
       setItem: () => {},
@@ -479,7 +484,7 @@ describe('persist middleware with sync configuration', () => {
     expect(useStore.persist.hasHydrated()).toBe(true)
   })
 
-  it('can wait for rehydration through the api', async () => {
+  it('can wait for rehydration', async () => {
     const storageValue1 = '{"state":{"count":1},"version":0}'
     const storageValue2 = '{"state":{"count":2},"version":0}'
 

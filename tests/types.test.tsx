@@ -1,17 +1,4 @@
-import create, {
-  Destroy,
-  EqualityChecker,
-  GetState,
-  PartialState,
-  SetState,
-  State,
-  StateCreator,
-  StateListener,
-  StateSelector,
-  StoreApi,
-  Subscribe,
-  UseBoundStore,
-} from 'zustand'
+import create, { createWithState, Store, StoreInitializer, UseBoundStore } from 'zustand'
 
 it('can use exposed types', () => {
   interface ExampleState {
@@ -22,44 +9,25 @@ it('can use exposed types', () => {
     numSetState: (v: number) => void
   }
 
-  const listener: StateListener<ExampleState> = (state) => {
-    if (state) {
-      const value = state.num * state.numGet() * state.numGetState()
-      state.numSet(value)
-      state.numSetState(value)
-    }
-  }
-  const selector: StateSelector<ExampleState, number> = (state) => state.num
-  const partial: PartialState<ExampleState, 'num' | 'numGet'> = {
-    num: 2,
-    numGet: () => 2,
-  }
-  const partialFn: PartialState<ExampleState, 'num' | 'numGet'> = (state) => ({
-    ...state,
-    num: 2,
-  })
-  const equalityFn: EqualityChecker<ExampleState> = (state, newState) =>
-    state !== newState
-
-  const storeApi = create<ExampleState>((set, get) => ({
+  const store = createWithState<ExampleState>()((set, get) => ({
     num: 1,
     numGet: () => get().num,
     numGetState: () => {
       // TypeScript can't get the type of storeApi when it trys to enforce the signature of numGetState.
       // Need to explicitly state the type of storeApi.getState().num or storeApi type will be type 'any'.
-      const result: number = storeApi.getState().num
+      const result: number = store.getState().num
       return result
     },
     numSet: (v) => {
       set({ num: v })
     },
     numSetState: (v) => {
-      storeApi.setState({ num: v })
+      store.setState({ num: v })
     },
   }))
-  const useStore = storeApi
+  const useStore = store
 
-  const stateCreator: StateCreator<ExampleState> = (set, get) => ({
+  const stateCreator: StoreInitializer<ExampleState, [], []> = (set, get) => ({
     num: 1,
     numGet: () => get().num,
     numGetState: () => get().num,
@@ -72,33 +40,25 @@ it('can use exposed types', () => {
   })
 
   function checkAllTypes(
-    _getState: GetState<ExampleState>,
-    _partialState: PartialState<ExampleState, 'num' | 'numGet'>,
-    _setState: SetState<ExampleState>,
-    _state: State,
-    _stateListener: StateListener<ExampleState>,
-    _stateSelector: StateSelector<ExampleState, number>,
-    _storeApi: StoreApi<ExampleState>,
-    _subscribe: Subscribe<ExampleState>,
-    _destroy: Destroy,
-    _equalityFn: EqualityChecker<ExampleState>,
-    _stateCreator: StateCreator<ExampleState>,
-    _useStore: UseBoundStore<ExampleState>
+    _getState: Store<ExampleState>['getState'],
+    _setState: Store<ExampleState>['setState'],
+    _state: ExampleState,
+    _store: Store<ExampleState>,
+    _subscribe: Store<ExampleState>['subscribe'],
+    _destroy: Store<ExampleState>['destroy'],
+    _stateCreator: StoreInitializer<ExampleState, [], []>,
+    _useStore: UseBoundStore<Store<ExampleState>>
   ) {
     expect(true).toBeTruthy()
   }
 
   checkAllTypes(
-    storeApi.getState,
-    Math.random() > 0.5 ? partial : partialFn,
-    storeApi.setState,
-    storeApi.getState(),
-    listener,
-    selector,
-    storeApi,
-    storeApi.subscribe,
-    storeApi.destroy,
-    equalityFn,
+    store.getState,
+    store.setState,
+    store.getState(),
+    store,
+    store.subscribe,
+    store.destroy,
     stateCreator,
     useStore
   )
@@ -113,7 +73,7 @@ type AssertEqual<Type, Expected> = Type extends Expected
 it('should have correct (partial) types for setState', () => {
   type Count = { count: number }
 
-  const store = create<Count>((set) => ({
+  const store = createWithState<Count>()((set) => ({
     count: 0,
     // @ts-expect-error we shouldn't be able to set count to undefined
     a: () => set(() => ({ count: undefined })),
@@ -122,13 +82,12 @@ it('should have correct (partial) types for setState', () => {
     c: () => set({ count: 1 }),
   }))
 
-  const setState: AssertEqual<typeof store.setState, SetState<Count>> = true
+  const setState: AssertEqual<typeof store.setState, Store<Count>['setState']> = true
   expect(setState).toEqual(true)
 
   // ok, should not error
   store.setState({ count: 1 })
   store.setState({})
-  store.setState(() => undefined)
   store.setState((previous) => previous)
 
   // @ts-expect-error type undefined is not assignable to type number
@@ -145,7 +104,7 @@ it('should allow for different partial keys to be returnable from setState', () 
     something: 'foo',
   }))
 
-  const setState: AssertEqual<typeof store.setState, SetState<State>> = true
+  const setState: AssertEqual<typeof store.setState, Store<State>['setState']> = true
   expect(setState).toEqual(true)
 
   // ok, should not error
@@ -155,7 +114,7 @@ it('should allow for different partial keys to be returnable from setState', () 
     }
     return { count: 0 }
   })
-  store.setState<'count', 'something'>((previous) => {
+  store.setState((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
@@ -166,7 +125,7 @@ it('should allow for different partial keys to be returnable from setState', () 
   })
 
   // @ts-expect-error Type '{ something: boolean; count?: undefined; }' is not assignable to type 'State'.
-  store.setState<'count', 'something'>((previous) => {
+  store.setState((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
