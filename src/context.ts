@@ -18,7 +18,7 @@ type Provider<S> =
       , children?: React.ReactNode
       }
   ) =>
-    React.ReactNode
+    React.ReactElement
 
 type UseStore<S> =
   <U = State<S>>
