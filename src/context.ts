@@ -83,7 +83,7 @@ const createContext = createContextImpl as CreateContext;
 // ============================================================================
 // Utilities
 
-const useConstant = <T extends unknown>(create: () => T): T => {
+const useConstant = <T>(create: () => T) => {
   const ref = React.useRef<T | undefined>();
   if (!ref.current) {
     ref.current = create();
