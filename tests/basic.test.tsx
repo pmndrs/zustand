@@ -1,5 +1,6 @@
 import {
   Component as ClassComponent,
+  ReactNode,
   useEffect,
   useLayoutEffect,
   useState,
@@ -291,8 +292,11 @@ it('can throw an error in selector', async () => {
     // @ts-expect-error This function is supposed to throw an error
     s.value.toUpperCase()
 
-  class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
-    constructor(props: {}) {
+  class ErrorBoundary extends ClassComponent<
+    { children?: ReactNode | undefined },
+    { hasError: boolean }
+  > {
+    constructor(props: { children?: ReactNode | undefined }) {
       super(props)
       this.state = { hasError: false }
     }
@@ -334,8 +338,11 @@ it('can throw an error in equality checker', async () => {
     // @ts-expect-error This function is supposed to throw an error
     a.value.trim() === b.value.trim()
 
-  class ErrorBoundary extends ClassComponent<{}, { hasError: boolean }> {
-    constructor(props: {}) {
+  class ErrorBoundary extends ClassComponent<
+    { children?: ReactNode | undefined },
+    { hasError: boolean }
+  > {
+    constructor(props: { children?: ReactNode | undefined }) {
       super(props)
       this.state = { hasError: false }
     }
