@@ -14,13 +14,12 @@ type UseStore =
       U
 
 type Create =
-  { <S extends Store<UnknownState>>
-      (store: S):
-        UseBoundStore<S>
-
-  , <T extends UnknownState, Mos extends [StoreMutatorIdentifier, unknown][] = []>
+  { <T extends UnknownState, Mos extends [StoreMutatorIdentifier, unknown][] = []>
       (initializer: StoreInitializer<T, [], Mos>):
         UseBoundStore<Mutate<Store<T>, Mos>>
+  , <S extends Store<UnknownState>>
+      (store: S):
+        UseBoundStore<S>
   }
       
 type UseBoundStore<S> =
@@ -35,18 +34,29 @@ type UseBoundStore<S> =
 type State<S> =
   S extends { getState: () => infer T } ? T : never
 
+type CreateWithState =
+  <T extends UnknownState>() =>
+    { <Mos extends [StoreMutatorIdentifier, unknown][] = []>
+        (initializer: StoreInitializer<T, [], Mos>):
+          UseBoundStore<Mutate<Store<T>, Mos>>
+    , <S extends Store<T>>
+        (store: S):
+          UseBoundStore<S>
+    }
 
 // ============================================================================
 // Implementation
 
 const useStore: UseStore = (store, selector, equals) => {
   type S = typeof store;
-  const selected = useSyncExternalStoreWithSelector(
+  type T = State<S>;
+  type U = ReturnType<NonNullable<typeof selector>>;
+  
+  const selected = useSyncExternalStoreWithSelector<T, U>(
     store.subscribe,
-    store.getState as () => State<S>,
+    store.getState as () => T,
     null,
-    selector as Exclude<typeof selector, undefined>,
-    // TODO: fix `@types/useSyncExternalStoreWithSelector`, should not  require selector
+    selector || ((s: State<S>) => s as U),
     equals
   )
   useDebugValue(selected)
@@ -66,6 +76,7 @@ const create: Create = (...[storeOrInitializer]: Parameters2<Create>) => {
   )
 }
 
+const createWithState: CreateWithState = () => create
 
 // ============================================================================
 // Utilities
@@ -82,4 +93,4 @@ type Parameters2<T extends (...a: never[]) => unknown> =
 // Exports
 
 export default create
-export { useStore };
+export { useStore, createWithState, UseBoundStore };
