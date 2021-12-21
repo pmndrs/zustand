@@ -130,6 +130,7 @@ type EDevtoolsMessage =
         | { type: "IMPORT_STATE"
           , nextLiftedState: EStateLifted
           }
+        | { type: "PAUSE_RECORDING" }
         | { type: UnknownString }
     }
   | { type: UnknownString }
@@ -176,9 +177,11 @@ const devtoolsImpl: EDevtools =
   }
 
   const store: EStore & EDevtoolsStore = parentStore
-  const devtools = extensionConnector.connect(devtoolsOptions)
+  const devtools = extensionConnector.connect(
+    (({ anonymousActionType, ...options }) => options)(devtoolsOptions)
+  )
 
-  let isRecording = false
+  let isRecording = true
   store.setState = (...[state, replace, action]: Parameters<typeof store['setState']>) => {
     parentSet(state, replace)
     if (!isRecording) return
@@ -190,19 +193,42 @@ const devtoolsImpl: EDevtools =
     )
   }
   const setStateFromDevtools = (state: EStateFromDevtools | Partial<EStateFromDevtools>) => {
-    isRecording = true
+    let originalRecording = isRecording
+    isRecording = false;
     store.setState(state as unknown as EState)
-    isRecording = false
+    isRecording = originalRecording
   }
 
-  const initialState =
-    storeInitializer(store.setState, parentGet, store)
+  const initialState = storeInitializer(store.setState, parentGet, store)
+  devtools.init(initialState)
+
+  if (shouldDispatchFromDevtools(store)) {
+    let didWarnAboutReservedActionType = false
+    const originalDispatch = store.dispatch
+    store.dispatch = (...a) => {
+      const action = a[0]
+      if (
+        action === '__setState'
+        || (typeof action === 'object' && action.type === '__setState')
+        && !didWarnAboutReservedActionType
+      ) {
+        console.warn(
+          '[zustand devtools middleware] "__setState" action type is reserved ' +
+            'to set state from the devtools. Avoid using it.'
+        )
+        didWarnAboutReservedActionType = true
+      }
+      originalDispatch(...a)
+    }
+  }
 
   devtools.subscribe(message => {
     switch (message.type) {
       case 'ACTION':
-        if (!shouldDispatchFromDevtools(store)) return
-        if (typeof message.payload !== "string") return
+        if (typeof message.payload !== "string") {
+          console.error("[zustand devtools middleware] Unsupported action format");
+          return;
+        }
         return parseJsonThen(message.payload, action => {
           if (action.type === '__setState') {
             setStateFromDevtools((action as { state: Partial<EStateFromDevtools> }).state)
@@ -217,7 +243,7 @@ const devtoolsImpl: EDevtools =
         switch (message.payload.type) {
           case 'RESET':
             setStateFromDevtools(initialState as unknown as EStateFromDevtools)
-            return devtools.init(initialState)
+            return devtools.init(store.getState())
 
           case 'COMMIT':
             return devtools.init(store.getState())
@@ -225,7 +251,7 @@ const devtoolsImpl: EDevtools =
           case 'ROLLBACK':
             return parseJsonThen(message.state, state => {
               setStateFromDevtools(state)
-              devtools.init(state)
+              devtools.init(store.getState())
             })
 
           case 'JUMP_TO_STATE':
@@ -240,6 +266,10 @@ const devtoolsImpl: EDevtools =
             devtools.send(null, nextLiftedState)
             return
           }
+
+          case 'PAUSE_RECORDING':
+            isRecording = !isRecording;
+            return;
 
           default: pseudoAssertIs(message.payload.type, {} as UnknownString)    
         }
