@@ -128,8 +128,8 @@
     ]
   },
   "dependencies": {
-    "use-sync-external-store": "1.0.0-beta-96ca8d915-20211115",
-    "@types/use-sync-external-store": "^0.0.3"
+    "@types/use-sync-external-store": "^0.0.3",
+    "use-sync-external-store": "1.0.0-beta-96ca8d915-20211115"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
