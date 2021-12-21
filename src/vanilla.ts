@@ -25,21 +25,30 @@ type Create =
     (initializer: StoreInitializer<T, [], Mos>) =>
       Mutate<Store<T>, Mos>
 
+type CreateWithState =
+  <T extends UnknownState>
+    () =>
+    <Mos extends [StoreMutatorIdentifier, unknown][] = []>
+      (initializer: StoreInitializer<T, [], Mos>) =>
+        Mutate<Store<T>, Mos>
+
+const $$storeMutators =
+  Symbol("$$storeMutators")
+
 type StoreInitializer
   < T extends UnknownState
   , Mis extends [StoreMutatorIdentifier, unknown][]
   , Mos extends [StoreMutatorIdentifier, unknown][]
   , U = T
   > =
-    & ( ( setState: Get<Mutate<Store<T>, Mis>, "setState", undefined>
-        , getState: Get<Mutate<Store<T>, Mis>, "getState", undefined>
+    & ( ( setState: Get<Mutate<Store<T>, Mis>, 'setState', undefined>
+        , getState: Get<Mutate<Store<T>, Mis>, 'getState', undefined>
         , store: Mutate<Store<T>, Mis>
         , $$storeMutations: Mis
         ) =>
           U
       )
     & { [$$storeMutators]?: Mos }
-declare const $$storeMutators: unique symbol;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface StoreMutators<S, A> {}
@@ -53,7 +62,6 @@ type Mutate<S, Ms> =
         Mrs
       > :
   never
-
 
 
 
@@ -127,8 +135,7 @@ const createImpl: ECreate = storeInitializer => {
 }
 const create = createImpl as unknown as Create
 
-
-
+const createWithState: CreateWithState = () => create
 
 // ============================================================================
 // Utilities
@@ -142,13 +149,16 @@ type Get<T, K, F = never> =
 // ============================================================================
 // Exports
 
-export default create
 export {
+  create as default,
+  createWithState,
+
   Store,
   UnknownState,
   StoreInitializer,
-  $$storeMutators,
+
   StoreMutators,
   StoreMutatorIdentifier,
-  Mutate
+  $$storeMutators,
+  Mutate,
 }
