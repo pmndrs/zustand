@@ -187,14 +187,7 @@ describe('when it receives an message of type...', () => {
       }).not.toThrow()
 
       expect(console.error).toHaveBeenLastCalledWith(
-        '[zustand devtools middleware] Could not parse the received json',
-        (() => {
-          try {
-            JSON.parse({ name: 'increment', args: [] } as unknown as string)
-          } catch (e) {
-            return e
-          }
-        })()
+        '[zustand devtools middleware] Unsupported action format'
       )
 
       expect(api.getState()).toBe(initialState)
@@ -488,4 +481,19 @@ it('works in non-browser env', () => {
   }).not.toThrow()
 
   global.window = originalWindow
+})
+
+it('preserves isRecording after setting from devtools', () => {
+  const api = create(devtools(() => ({ count: 0 })))
+  ;(extensionSubscriber as (message: any) => void)({
+    type: 'DISPATCH',
+    payload: { type: 'PAUSE_RECORDING' },
+  })
+  ;(extensionSubscriber as (message: any) => void)({
+    type: 'ACTION',
+    payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
+  })
+
+  api.setState({ count: 1 })
+  expect(extension.send).not.toBeCalled()
 })
