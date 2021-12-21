@@ -57,7 +57,7 @@ type DevtoolsOptions =
 interface DevtoolsWindow
   { __REDUX_DEVTOOLS_EXTENSION__?:
       { connect:
-          (options?: Exclude<EDevtoolsOptions, string>) => EDevtoolsExtension
+          (options?: Exclude<DevtoolsOptionsImpl, string>) => DevtoolsExtensionImpl
       }
   }
 
@@ -66,61 +66,58 @@ interface DevtoolsWindow
 // ============================================================================
 // Implementation
 
-type EState = { __isState: true }
-type EStore = Store<EState>
-type EDevtools = 
-  ( storeInitializer: EStoreInitializer
-  , options?: EDevtoolsOptions
+type T = { __isState: true }
+type StoreImpl = Store<T>
+type DevtoolsImpl = 
+  ( storeInitializer: StoreInitializerImpl
+  , options?: DevtoolsOptionsImpl
   ) =>
-    EStoreInitializer
+    StoreInitializerImpl
 
-type EStoreInitializer = 
-  PopArgument<StoreInitializer<EState, [], []>>
+type StoreInitializerImpl =
+  PopArgument<StoreInitializer<T, [], []>>
 
-type EDevtoolsOptions =
-  | EDevtoolsStoreName
+type DevtoolsOptionsImpl =
+  | DevtoolsStoreNameImpl
   | Write<
       Exclude<DevtoolsOptions, string>,
-      { name?: EDevtoolsStoreName | undefined, anonymousActionType?: EAnonymousActionType }
+      { name?: DevtoolsStoreNameImpl | undefined, anonymousActionType?: AnonymousActionTypeImpl }
     >
-type EDevtoolsStoreName =
-  string & { __isDevtoolsStoreName: true }
-type EAnonymousActionType =
-  string & { __isAnonymousActionType: true }
+type DevtoolsStoreNameImpl = string & { __isDevtoolsStoreName: true }
+type AnonymousActionTypeImpl = string & { __isAnonymousActionType: true }
 
-interface EDevtoolsStore
+interface DevtoolsStoreImpl
   { setState:
     (...a:
-      [...a: Parameters<Store<EState>['setState']>
-      , name?: EAction
+      [...a: Parameters<StoreImpl['setState']>
+      , name?: ActionImpl
       ]
     ) =>
-      ReturnType<Store<EState>['setState']>
+      ReturnType<StoreImpl['setState']>
   , dispatchFromDevtools?: boolean
   }
 
-type EAction = EActionType | { type: EActionType }
-type EActionType =
-  (string & { __isActionType: true }) | undefined
+type ActionImpl = ActionTypeImpl | { type: ActionTypeImpl }
+type ActionTypeImpl = (string & { __isActionType: true }) | undefined
 
-interface EDevtoolsExtension
-  { init: (state: EState | EStateFromDevtools) => void
+interface DevtoolsExtensionImpl
+  { init: (state: T | StateFromDevtoolsImpl) => void
   , send: (..._:
-      | [action: { type: EActionType } | { type: EAnonymousActionType }, state: EState]
-      | [_: null, liftedState: EStateLifted]
+      | [action: { type: ActionTypeImpl } | { type: AnonymousActionTypeImpl }, state: T]
+      | [_: null, liftedState: StateLiftedImpl]
     ) => void
-  , subscribe: (listener: (message: EDevtoolsMessage) => void) => () => void
+  , subscribe: (listener: (message: DevtoolsMessageImpl) => void) => () => void
   }
 
-type EDevtoolsMessage = 
+type DevtoolsMessageImpl = 
   | { type: "ACTION"
     , payload: StringifiedJson<
-        | { type: EActionType }
-        | { type: "__setState", state: Partial<EStateFromDevtools> }
+        | { type: ActionTypeImpl }
+        | { type: "__setState", state: Partial<StateFromDevtoolsImpl> }
         >
     }
   | { type: "DISPATCH"
-    , state: StringifiedJson<EStateFromDevtools>
+    , state: StringifiedJson<StateFromDevtoolsImpl>
     , payload:
         | { type: "RESET" }
         | { type: "COMMIT" }
@@ -128,16 +125,15 @@ type EDevtoolsMessage =
         | { type: "JUMP_TO_ACTION" }
         | { type: "JUMP_TO_STATE" }
         | { type: "IMPORT_STATE"
-          , nextLiftedState: EStateLifted
+          , nextLiftedState: StateLiftedImpl
           }
         | { type: "PAUSE_RECORDING" }
         | { type: UnknownString }
     }
   | { type: UnknownString }
 
-type EStateLifted =
-  { computedStates: { state: Partial<EStateFromDevtools> }[] }
-type EStateFromDevtools = { __isStateFromDevtools: true }
+type StateLiftedImpl = { computedStates: { state: Partial<StateFromDevtoolsImpl> }[] }
+type StateFromDevtoolsImpl = { __isStateFromDevtools: true }
 
 const devtoolsWindow = window as
   | ( Window
@@ -146,7 +142,7 @@ const devtoolsWindow = window as
     )
   | undefined
 
-const devtoolsImpl: EDevtools =
+const devtoolsImpl: DevtoolsImpl =
   (storeInitializer, _devtoolsOptions) =>
     (parentSet, parentGet, parentStore) => {
 
@@ -156,7 +152,7 @@ const devtoolsImpl: EDevtools =
         typeof _devtoolsOptions === 'string' ? { name: _devtoolsOptions } :
         _devtoolsOptions
       ),
-      anonymousActionType: 'anonymous' as EAnonymousActionType
+      anonymousActionType: 'anonymous' as AnonymousActionTypeImpl
     }
       
 
@@ -176,7 +172,7 @@ const devtoolsImpl: EDevtools =
     return storeInitializer(parentSet, parentGet, parentStore)
   }
 
-  const store: EStore & EDevtoolsStore = parentStore
+  const store: StoreImpl & DevtoolsStoreImpl = parentStore
   const devtools = extensionConnector.connect(
     (({ anonymousActionType, ...options }) => options)(devtoolsOptions)
   )
@@ -192,10 +188,10 @@ const devtoolsImpl: EDevtools =
       parentGet()
     )
   }
-  const setStateFromDevtools = (state: EStateFromDevtools | Partial<EStateFromDevtools>) => {
+  const setStateFromDevtools = (state: StateFromDevtoolsImpl | Partial<StateFromDevtoolsImpl>) => {
     let originalRecording = isRecording
     isRecording = false;
-    store.setState(state as unknown as EState)
+    store.setState(state as unknown as T)
     isRecording = originalRecording
   }
 
@@ -231,18 +227,18 @@ const devtoolsImpl: EDevtools =
         }
         return parseJsonThen(message.payload, action => {
           if (action.type === '__setState') {
-            setStateFromDevtools((action as { state: Partial<EStateFromDevtools> }).state)
+            setStateFromDevtools((action as { state: Partial<StateFromDevtoolsImpl> }).state)
             return
           }
 
           if (!shouldDispatchFromDevtools(store)) return
-          store.dispatch(action as EAction)
+          store.dispatch(action as ActionImpl)
         })
 
       case 'DISPATCH':
         switch (message.payload.type) {
           case 'RESET':
-            setStateFromDevtools(initialState as unknown as EStateFromDevtools)
+            setStateFromDevtools(initialState as unknown as StateFromDevtoolsImpl)
             return devtools.init(store.getState())
 
           case 'COMMIT':
@@ -287,8 +283,8 @@ const devtools = devtoolsImpl as unknown as Devtools;
 // Utilities
 
 type ShouldDispatchFromDevtools = 
-  <S extends EStore & EDevtoolsStore>(store: S) =>
-    store is S & { dispatchFromDevtools: true, dispatch: (action: EAction) => void }
+  <S extends StoreImpl & DevtoolsStoreImpl>(store: S) =>
+    store is S & { dispatchFromDevtools: true, dispatch: (action: ActionImpl) => void }
 
 const shouldDispatchFromDevtools = (store =>
   store.dispatchFromDevtools &&

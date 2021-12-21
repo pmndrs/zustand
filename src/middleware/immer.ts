@@ -43,22 +43,18 @@ declare class Undefined { private _: undefined }
 // ============================================================================
 // Implementation
 
-type EState = { __isState: true }
-type EImmer = 
-  (storeInitializer: EStoreInitializer) =>
-    EStoreInitializer
+type T = { __isState: true }
+type ImmerImpl = (storeInitializer: StoreInitializerImpl) => StoreInitializerImpl
+type StoreInitializerImpl = PopArgument<StoreInitializer<T, [], []>>
 
-type EStoreInitializer = 
-  PopArgument<StoreInitializer<EState, [], []>>
-
-const immerImpl: EImmer = initializer => (set, get, store) =>
+const immerImpl: ImmerImpl = initializer => (set, get, store) =>
   initializer(
     ((updater, replace) => {
       const nextState =
         ( typeof updater === 'function'
             ? produce(updater)
             : updater
-        ) as ((s: EState) => EState) | EState | Partial<EState>
+        ) as ((s: T) => T) | T | Partial<T>
 
       return set(nextState as any, replace)
     }),

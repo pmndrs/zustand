@@ -123,81 +123,81 @@ interface StorePersist<T extends UnknownState, U = T>
 // ============================================================================
 // Implementation
 
-type EState = { __isState: true }
-type ESelectedState = { __isSelectedState: true }
+type T = { __isState: true }
+type U = { __isSelectedState: true }
 
-type EPersist =
-  ( storeInitializer: EStoreInitializer
-  , options: EPersistOptions
+type PersistImpl =
+  ( storeInitializer: StoreInitializerImpl
+  , options: PersistOptionsImpl
   ) =>
-    EStoreInitializer
+    StoreInitializerImpl
 
-type EStoreInitializer = 
-  PopArgument<StoreInitializer<EState, [], []>>
+type StoreInitializerImpl = 
+  PopArgument<StoreInitializer<T, [], []>>
 
-interface EPersistOptions
-  { name: EPersistentStorageName
-  , getStorage?: () => EPersistentStorage
+interface PersistOptionsImpl
+  { name: PersistentStorageNameImpl
+  , getStorage?: () => PersistentStorageImpl
   , serialize?:
-      (storageValue: EPersistentStorageValue) =>
-        MaybePromise<Serialized<EPersistentStorageValue>>
+      (storageValue: PersistentStorageValueImpl) =>
+        MaybePromise<Serialized<PersistentStorageValueImpl>>
   , deserialize?:
-      (serializedString: Serialized<EPersistentStorageValue>) =>
-        MaybePromise<EPersistentStorageValue>
-  , partialize?: (state: EState) => ESelectedState
+      (serializedString: Serialized<PersistentStorageValueImpl>) =>
+        MaybePromise<PersistentStorageValueImpl>
+  , partialize?: (state: T) => U
   , onRehydrateStorage?:
-      (state: EState) =>
-        void | ((state?: EState, error?: unknown) => void)
-  , version?: EPersistentStorageValue['version']
+      (state: T) =>
+        void | ((state?: T, error?: unknown) => void)
+  , version?: PersistentStorageValueImpl['version']
     migrate?:
-      ( persistedState: EPersistentStorageValue['state']
-      , version: EPersistentStorageValue['version']
+      ( persistedState: PersistentStorageValueImpl['state']
+      , version: PersistentStorageValueImpl['version']
       ) =>
-        MaybePromise<EPersistentStorageValue['state']>
+        MaybePromise<PersistentStorageValueImpl['state']>
     merge?:
-      ( persistedState: EPersistentStorageValue['state']
-      , currentState: EState
+      ( persistedState: PersistentStorageValueImpl['state']
+      , currentState: T
       ) =>
-        EState
+        T
   }
 
-type EPersistentStorageName =
+type PersistentStorageNameImpl =
   string & { __isPersistentStorageName: true }
 
-interface EPersistentStorage
-  { getItem: (name: EPersistentStorageName) =>
-      MaybePromise<Serialized<EPersistentStorageValue> | null>
+interface PersistentStorageImpl
+  { getItem: (name: PersistentStorageNameImpl) =>
+      MaybePromise<Serialized<PersistentStorageValueImpl> | null>
   , setItem:
-      ( name: EPersistentStorageName
-      , value: Serialized<EPersistentStorageValue>
+      ( name: PersistentStorageNameImpl
+      , value: Serialized<PersistentStorageValueImpl>
       ) =>
         MaybePromise<void>
-  , removeItem: (name: EPersistentStorageName) => MaybePromise<void>
+  , removeItem: (name: PersistentStorageNameImpl) => MaybePromise<void>
   }
 
-type EPersistentStorageValue =
-  { state: ESelectedState
+type PersistentStorageValueImpl =
+  { state: U
   , version?: number & { __isPersistentStorageValueVersion: true } 
   }
 
-interface EPersistStore
+interface PersistStoreImpl
   { persist:
-      { setOptions: (options: Partial<EPersistOptions>) => void
+      { setOptions: (options: Partial<PersistOptionsImpl>) => void
       , clearStorage: () => void
       , rehydrate: () => Thenable<void>
       , hasHydrated: () => boolean
-      , onHydrate: (listener: (state: EState) => void) => () => void
-      , onFinishHydration: (listener: (state: EState) => void) => () => void
+      , onHydrate: (listener: (state: T) => void) => () => void
+      , onFinishHydration: (listener: (state: T) => void) => () => void
       }
   }
 
-const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parentGet, parentStore) => {
+const persistImpl: PersistImpl = (storeInitializer, _options) => (parentSet, parentGet, parentStore) => {
   let options = { ...defaultOptions, ..._options }
 
   let persistentStorage = tryElse(options.getStorage, () => undefined)
   const persistentStorageGetItem = () =>
     persistentStorage!.getItem(options.name)
-  const persistentStorageSetItem = (serializedState: Serialized<EPersistentStorageValue>) =>
+  const persistentStorageSetItem = (serializedState: Serialized<PersistentStorageValueImpl>) =>
     persistentStorage!.setItem(options.name, serializedState)
   const persistentStorageRemoveItem = () =>
     persistentStorage!.removeItem(options.name)
@@ -235,11 +235,11 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
       updatePersistentStorage()
     })
   )
-  let initialStateFromPersistentStorage: EState | undefined
+  let initialStateFromPersistentStorage: T | undefined
 
   let hasHydrated = false
-  const hydrationEmitter = emitter(new Set<(state: EState) => void>())
-  const finishHydrationEmitter = emitter(new Set<(state: EState) => void>())
+  const hydrationEmitter = emitter(new Set<(state: T) => void>())
+  const finishHydrationEmitter = emitter(new Set<(state: T) => void>())
 
   const hydrate = () => {
     hasHydrated = false
@@ -273,7 +273,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
     .catch(error => postRehydrationCallback?.(undefined, error))
   }
 
-  (parentStore as Store<EState> & EPersistStore).persist = {
+  (parentStore as Store<T> & PersistStoreImpl).persist = {
     setOptions: (newOptions) => {
       options = { ...options, ...newOptions }
       if (options.getStorage) persistentStorage = options.getStorage()
@@ -291,7 +291,7 @@ const persistImpl: EPersist = (storeInitializer, _options) => (parentSet, parent
 const persist = persistImpl as unknown as Persist
 
 type EPersistDefaultedOptions =
-  Required<Omit<EPersistOptions, 'name' | 'onRehydrateStorage' | 'migrate'>>
+  Required<Omit<PersistOptionsImpl, 'name' | 'onRehydrateStorage' | 'migrate'>>
 
 const defaultOptions: EPersistDefaultedOptions = {
   getStorage: (() => localStorage) as unknown as EPersistDefaultedOptions['getStorage'],
@@ -306,7 +306,7 @@ const defaultOptions: EPersistDefaultedOptions = {
 }
 
 const messages = {
-  noPersistentStorage: (name: EPersistentStorageName) =>
+  noPersistentStorage: (name: PersistentStorageNameImpl) =>
     `[zustand persist middleware] Unable to update item '${name}', ` +
     `the given storage is currently unavailable.`,
   couldNotMigrate: () =>

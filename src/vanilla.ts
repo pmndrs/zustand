@@ -66,48 +66,27 @@ type Mutate<S, Ms> =
 
 
 // ============================================================================
-// Implementation via Existential Types
+// Implementation
 
-type EState = { __isState: true }
-type EShouldReplaceState = boolean & { __isShouldReplaceState: true }
-
-interface EStore
-  { getState:
-      () => EState
-  , setState:
-      ( nextStateOrUpdater:
-          | Partial<EState>
-          | ((state: EState) => Partial<EState>)
-      , shouldReplace?: EShouldReplaceState
-      ) =>
-        void
-  , subscribe:
-      ( listener:
-          (state: EState, previousState: Previous<EState>) => void
-      ) =>
-        () => void
-  , destroy:
-      () => void
-  }
-
-type ECreate =
+type T = { __isState: true }
+type CreateImpl =
   ( storeInitializer:
-    ( set: EStore['setState']
-    , get: EStore['getState']
-    , store: EStore
-    ) => EState
+    ( set: Store<T>['setState']
+    , get: Store<T>['getState']
+    , store: Store<T>
+    ) => T
   ) =>
-    EStore
+    Store<T>
 
-const createImpl: ECreate = storeInitializer => {
-  let state: EState
+const createImpl: CreateImpl = storeInitializer => {
+  let state: T
 
-  type Listener = (state: EState, previousState: Previous<EState>) => void
+  type Listener = (state: T, previousState: Previous<T>) => void
   const listeners: Set<Listener> = new Set()
   const emit = (...a: Parameters<Listener>) =>
     listeners.forEach(f => f(...a))
 
-  const store: EStore = {
+  const store: Store<T> = {
     getState: () => state,
     setState: (nextStateOrUpdater, shouldReplace) => {
       const nextState =
@@ -119,7 +98,7 @@ const createImpl: ECreate = storeInitializer => {
 
       const previousState = previous(state)
       state = shouldReplace
-        ? nextState as EState
+        ? nextState as T
         : Object.assign({}, state, nextState)
 
       emit(state, previousState)

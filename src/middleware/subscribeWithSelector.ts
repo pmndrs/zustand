@@ -44,39 +44,38 @@ interface SubscribeWithSelector<T extends UnknownState>
 // ============================================================================
 // Implementation
 
-type EState = { __isState: true }
-type ESelectedState = { __isSelectedState: true }
-type EStore = Store<EState>
+type T = { __isState: true }
+type U = { __isSelectedState: true }
 
-type ESubscribeWithSelector = 
-  (storeInitializer: EStoreInitializer) =>
-    EStoreInitializer
+type SubscribeWithSelectorImpl = 
+  (storeInitializer: StoreInitializerImpl) =>
+    StoreInitializerImpl
 
-type EStoreInitializer = 
-  PopArgument<StoreInitializer<EState, [], []>>
+type StoreInitializerImpl = 
+  PopArgument<StoreInitializer<T, [], []>>
 
-interface ESubscribeWithSelectorStore
+interface SubscribeWithSelectorStoreImpl
   { subscribe:
-    ( selector: (state: EState) => ESelectedState
+    ( selector: (state: T) => U
     , listener:
-        ( selectedState: ESelectedState
-        , previousSelectedState: Previous<ESelectedState>
+        ( selectedState: U
+        , previousSelectedState: Previous<U>
         )
           => void
     , options?:
-        { equalityFn?: (a: ESelectedState, b: ESelectedState) => boolean
+        { equalityFn?: (a: U, b: U) => boolean
         , fireImmediately?: boolean
         }
     ) =>
       () => void
   }
 
-const subscribeWithSelectorImpl: ESubscribeWithSelector =
+const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =
   storeInitializer =>
     (parentSet, parentGet, parentStore) => {
 
   const parentSubscribe = parentStore.subscribe
-  const updatedParentStore = parentStore as EStore & ESubscribeWithSelectorStore
+  const updatedParentStore = parentStore as Store<T> & SubscribeWithSelectorStoreImpl
   type UpdatedSubscribeArguments = Parameters2<(typeof updatedParentStore)['subscribe']>
 
   updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
@@ -91,7 +90,7 @@ const subscribeWithSelectorImpl: ESubscribeWithSelector =
       { equalityFn: objectIs, fireImmediately: false, ..._options }
   
     let currentSelected = selector(parentGet())
-    let previousSelected = currentSelected as Previous<ESelectedState>
+    let previousSelected = currentSelected as Previous<U>
     const emit = () => listener(currentSelected, previousSelected)
 
     const unsubscribe = parentSubscribe(() => {

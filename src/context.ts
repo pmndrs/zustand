@@ -39,28 +39,27 @@ type State<S> =
 // ============================================================================
 // Implementation
 
-type EState = { __isState: true }
-type EStore = Store<EState>
-type ECreateContext = 
+type T = { __isState: true }
+type CreateContextImpl = 
   () =>
-    { Provider: Provider<EStore>
-    , useStoreRef: UseStoreRef<EStore>
-    , useStore: UseStore<EStore>
+    { Provider: Provider<Store<T>>
+    , useStoreRef: UseStoreRef<Store<T>>
+    , useStore: UseStore<Store<T>>
     }
 
-const createContextImpl: ECreateContext = () => {
+const createContextImpl: CreateContextImpl = () => {
   
   const StoreContext =
-    React.createContext<EStore | undefined>(undefined);
+    React.createContext<Store<T> | undefined>(undefined);
 
-  const Provider: ReturnType<ECreateContext>["Provider"] =
+  const Provider: ReturnType<CreateContextImpl>["Provider"] =
     ({ createStore, children }) =>
       React.createElement(StoreContext.Provider, {
         value: useConstant(createStore),
         children
       })
 
-  const useStoreRef: ReturnType<ECreateContext>["useStoreRef"] =
+  const useStoreRef: ReturnType<CreateContextImpl>["useStoreRef"] =
     () => {
       let store = React.useContext(StoreContext);
       if (!store) {
@@ -69,7 +68,7 @@ const createContextImpl: ECreateContext = () => {
       return store;
     }
 
-  const useBoundStore: ReturnType<ECreateContext>["useStore"] =
+  const useBoundStore: ReturnType<CreateContextImpl>["useStore"] =
     (...a) => useStore(useStoreRef(), ...a)
 
   return {

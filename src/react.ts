@@ -56,7 +56,7 @@ const useStore: UseStore = (store, selector, equals) => {
     store.subscribe,
     store.getState as () => T,
     null,
-    selector || ((s: State<S>) => s as U),
+    selector || ((s => s) as (s: T) => U),
     equals
   )
   useDebugValue(selected)

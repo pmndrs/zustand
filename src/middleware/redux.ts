@@ -28,13 +28,13 @@ type WithRedux<S, A> =
     Redux<Extract<A, UnknownAction>>
   >
 
-type ReduxState<A extends UnknownAction> =
+interface ReduxState<A extends UnknownAction>
   { dispatch: Redux<A>['dispatch'] }
 
-type UnknownAction =
+interface UnknownAction
   { type: unknown }
 
-type Redux<A extends UnknownAction> =
+interface Redux<A extends UnknownAction>
   { dispatch: (a: A) => A
   , dispatchFromDevtools: true
   }
@@ -43,19 +43,19 @@ type Redux<A extends UnknownAction> =
 // ============================================================================
 // Implementation
 
-type EState = { __isState: true }
-type EAction = UnknownAction & { __isAction: true }
+type T = { __isState: true }
+type ActionImpl = UnknownAction & { __isAction: true }
 
-type ERedux = 
-  ( reducer: (state: EState, action: EAction) => EState
-  , initialState: EState
+type ReduxImpl = 
+  ( reducer: (state: T, action: ActionImpl) => T
+  , initialState: T
   ) =>
-    EStoreInitializer
+    StoreInitializerImpl
 
-type EStoreInitializer =
-  PopArgument<StoreInitializer<EState & ReduxState<EAction>, [], []>>
+type StoreInitializerImpl =
+  PopArgument<StoreInitializer<T & ReduxState<ActionImpl>, [], []>>
 
-const reduxImpl: ERedux = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
+const reduxImpl: ReduxImpl = (reducer, initialState) => (_parentSet, parentGet, parentStore) => {
   type A = Parameters<typeof reducer>[1]
 
   const store = parentStore as typeof parentStore & Redux<A>
