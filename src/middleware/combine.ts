@@ -10,7 +10,7 @@ type Combine =
   , Mcs extends [StoreMutatorIdentifier, unknown][] = []
   >
     ( initialState: T
-    , additionalStateCreator: StoreInitializer<Write<T, U>, Mps, Mcs, U>
+    , additionalStateCreator: StoreInitializer<T, Mps, Mcs, U>
     ) =>
       StoreInitializer<Write<T, U>, Mps, Mcs>
 
@@ -18,16 +18,15 @@ type Combine =
 // Implementation
 
 const combine: Combine = (initialState, additionalStateCreator) => (...a) =>
-  overwrite(
+  write(
     initialState,
-    additionalStateCreator(...a)
+    (additionalStateCreator as any)(...a)
   )
-
 
 // ============================================================================
 // Utilities
 
-const overwrite = <T extends object, U extends object>(t: T, u: U) =>
+const write = <T extends object, U extends object>(t: T, u: U) =>
   Object.assign({}, t, u) as Write<T, U>
 
 export type Write<T extends object, U extends object> =
