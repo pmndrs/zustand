@@ -173,7 +173,7 @@ const devtoolsImpl: DevtoolsImpl =
 
   const store: StoreImpl & DevtoolsStoreImpl = parentStore
   const devtools = extensionConnector.connect(
-    (({ anonymousActionType, ...options }) => options)(devtoolsOptions)
+    (({ anonymousActionType: _, ...options }) => options)(devtoolsOptions)
   )
 
   let isRecording = true
@@ -188,7 +188,7 @@ const devtoolsImpl: DevtoolsImpl =
     )
   }
   const setStateFromDevtools = (state: StateFromDevtoolsImpl | Partial<StateFromDevtoolsImpl>) => {
-    let originalRecording = isRecording
+    const originalRecording = isRecording
     isRecording = false;
     store.setState(state as unknown as T)
     isRecording = originalRecording

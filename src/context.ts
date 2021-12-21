@@ -61,7 +61,7 @@ const createContextImpl: CreateContextImpl = () => {
 
   const useStoreRef: ReturnType<CreateContextImpl>["useStoreRef"] =
     () => {
-      let store = React.useContext(StoreContext);
+      const store = React.useContext(StoreContext);
       if (!store) {
         throw new Error("Seems like you have not used zustand provider as an ancestor.")
       }
@@ -83,8 +83,8 @@ const createContext = createContextImpl as CreateContext;
 // ============================================================================
 // Utilities
 
-const useConstant = <T extends unknown>(create: () => T) => {
-  let ref = React.useRef<T | undefined>();
+const useConstant = <T extends unknown>(create: () => T): T => {
+  const ref = React.useRef<T | undefined>();
   if (!ref.current) {
     ref.current = create();
   }

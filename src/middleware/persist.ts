@@ -353,7 +353,7 @@ export interface Thenable<T>
 
 export const thenablify =
   <A extends unknown[], R>
-    (f: (...a: A) => R | Promise<R> | Thenable<R>, throwImmediately: boolean = false) =>
+    (f: (...a: A) => R | Promise<R> | Thenable<R>, throwImmediately = false) =>
       (...a: A): Thenable<R> => {
 
   try {
