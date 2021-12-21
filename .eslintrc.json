@@ -56,7 +56,6 @@
     "import/order": "off",
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": "off",
     "import/export": "off",
     "import/named": "off"
   },

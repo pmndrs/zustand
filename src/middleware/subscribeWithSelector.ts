@@ -1,45 +1,49 @@
-import { Store, UnknownState, StoreInitializer, StoreMutatorIdentifier } from '../vanilla'
+import {
+  Store,
+  UnknownState,
+  StoreInitializer,
+  StoreMutatorIdentifier,
+} from '../vanilla'
 
 // ============================================================================
 // Types
 
-type SubscribeWithSelectorMiddleware = 
-  < T extends UnknownState
-  , Mps extends [StoreMutatorIdentifier, unknown][] = []
-  , Mcs extends [StoreMutatorIdentifier, unknown][] = []
+type SubscribeWithSelectorMiddleware = <
+  T extends UnknownState,
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
+  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+>(
+  initializer: StoreInitializer<
+    T,
+    [...Mps, [$$subscribeWithSelector, never]],
+    Mcs
   >
-    (initializer: StoreInitializer<T, [...Mps, [$$subscribeWithSelector, never]], Mcs>) =>
-      StoreInitializer<T, Mps, [[$$subscribeWithSelector, never], ...Mcs]>
+) => StoreInitializer<T, Mps, [[$$subscribeWithSelector, never], ...Mcs]>
 
-
-const $$subscribeWithSelector = Symbol("$$subscribeWithSelector");
+const $$subscribeWithSelector = Symbol('$$subscribeWithSelector')
 type $$subscribeWithSelector = typeof $$subscribeWithSelector
 
 declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface StoreMutators<S, A>
-    { [$$subscribeWithSelector]: WithSelectorSubscribe<S>
-    }
+  interface StoreMutators<S, A> {
+    [$$subscribeWithSelector]: WithSelectorSubscribe<S>
+  }
 }
 
-type WithSelectorSubscribe<S> =
-  S extends { getState: () => infer T }
-    ? S & SubscribeWithSelector<Extract<T, UnknownState>>
-    : never
+type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
+  ? S & SubscribeWithSelector<Extract<T, UnknownState>>
+  : never
 
-interface SubscribeWithSelector<T extends UnknownState>
-  { subscribe:
-      <U>
-        ( selector: (state: T) => U
-        , listener: (selectedState: U, previousSelectedState: U) => void
-        , options?:
-            { equalityFn?: (a: U, b: U) => boolean
-            , fireImmediately?: boolean
-            }
-        ) =>
-          () => void
-  }
-
+interface SubscribeWithSelector<T extends UnknownState> {
+  subscribe: <U>(
+    selector: (state: T) => U,
+    listener: (selectedState: U, previousSelectedState: U) => void,
+    options?: {
+      equalityFn?: (a: U, b: U) => boolean
+      fireImmediately?: boolean
+    }
+  ) => () => void
+}
 
 // ============================================================================
 // Implementation
@@ -47,70 +51,67 @@ interface SubscribeWithSelector<T extends UnknownState>
 type T = { __isState: true }
 type U = { __isSelectedState: true }
 
-type SubscribeWithSelectorImpl = 
-  (storeInitializer: StoreInitializerImpl) =>
-    StoreInitializerImpl
+type SubscribeWithSelectorImpl = (
+  storeInitializer: StoreInitializerImpl
+) => StoreInitializerImpl
 
-type StoreInitializerImpl = 
-  PopArgument<StoreInitializer<T, [], []>>
+type StoreInitializerImpl = PopArgument<StoreInitializer<T, [], []>>
 
-interface SubscribeWithSelectorStoreImpl
-  { subscribe:
-    ( selector: (state: T) => U
-    , listener:
-        ( selectedState: U
-        , previousSelectedState: Previous<U>
-        )
-          => void
-    , options?:
-        { equalityFn?: (a: U, b: U) => boolean
-        , fireImmediately?: boolean
-        }
-    ) =>
-      () => void
-  }
+interface SubscribeWithSelectorStoreImpl {
+  subscribe: (
+    selector: (state: T) => U,
+    listener: (selectedState: U, previousSelectedState: Previous<U>) => void,
+    options?: {
+      equalityFn?: (a: U, b: U) => boolean
+      fireImmediately?: boolean
+    }
+  ) => () => void
+}
 
 const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =
-  storeInitializer =>
-    (parentSet, parentGet, parentStore) => {
+  (storeInitializer) => (parentSet, parentGet, parentStore) => {
+    const parentSubscribe = parentStore.subscribe
+    const updatedParentStore = parentStore as Store<T> &
+      SubscribeWithSelectorStoreImpl
+    type UpdatedSubscribeArguments = Parameters2<
+      typeof updatedParentStore['subscribe']
+    >
 
-  const parentSubscribe = parentStore.subscribe
-  const updatedParentStore = parentStore as Store<T> & SubscribeWithSelectorStoreImpl
-  type UpdatedSubscribeArguments = Parameters2<(typeof updatedParentStore)['subscribe']>
+    updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
+      if (!args[1]) {
+        pseudoAssert(args.length === 1)
+        return parentSubscribe(...args)
+      }
 
-  updatedParentStore.subscribe = (...args: UpdatedSubscribeArguments) => {
-    if (!args[1]) {
-      pseudoAssert(args.length === 1)
-      return parentSubscribe(...args)
+      pseudoAssert(args.length === 3)
+      const [selector, listener, _options] = args
+      const { equalityFn: equals, fireImmediately } = {
+        equalityFn: objectIs,
+        fireImmediately: false,
+        ..._options,
+      }
+
+      let currentSelected = selector(parentGet())
+      let previousSelected = currentSelected as Previous<U>
+      const emit = () => listener(currentSelected, previousSelected)
+
+      const unsubscribe = parentSubscribe(() => {
+        const nextSelected = selector(parentGet())
+        if (equals(currentSelected, nextSelected)) return
+
+        previousSelected = previous(currentSelected)
+        currentSelected = nextSelected
+        emit()
+      })
+      if (fireImmediately) emit()
+
+      return unsubscribe
     }
-  
-    pseudoAssert(args.length === 3)
-    const [selector, listener, _options] = args
-    const { equalityFn: equals, fireImmediately } =
-      { equalityFn: objectIs, fireImmediately: false, ..._options }
-  
-    let currentSelected = selector(parentGet())
-    let previousSelected = currentSelected as Previous<U>
-    const emit = () => listener(currentSelected, previousSelected)
 
-    const unsubscribe = parentSubscribe(() => {
-      const nextSelected = selector(parentGet())
-      if (equals(currentSelected, nextSelected)) return
-  
-      previousSelected = previous(currentSelected)
-      currentSelected = nextSelected
-      emit()
-    })
-    if (fireImmediately) emit()
-
-    return unsubscribe
+    return storeInitializer(parentSet, parentGet, updatedParentStore)
   }
-
-  return storeInitializer(parentSet, parentGet, updatedParentStore)
-}
-const subscribeWithSelector = subscribeWithSelectorImpl as unknown as
-  SubscribeWithSelectorMiddleware
-
+const subscribeWithSelector =
+  subscribeWithSelectorImpl as unknown as SubscribeWithSelectorMiddleware
 
 // ============================================================================
 // Utilities
@@ -118,24 +119,22 @@ const subscribeWithSelector = subscribeWithSelectorImpl as unknown as
 type Previous<T> = T & { __isPrevious: true }
 const previous = <T>(t: T) => t as Previous<T>
 
-const objectIs =
-  Object.is as (<T>(a: T, b: T) => boolean)
+const objectIs = Object.is as <T>(a: T, b: T) => boolean
 
-function pseudoAssert<T extends boolean>(predicate: T):
-  asserts predicate {}
+function pseudoAssert<T extends boolean>(predicate: T): asserts predicate {}
 
-type Parameters2<T extends (...a: never[]) => unknown> =
-  T extends {
-    (...a: infer A1): unknown 
-    (...a: infer A2): unknown 
-  }
-    ? A1 | A2
-    : never
+type Parameters2<T extends (...a: never[]) => unknown> = T extends {
+  (...a: infer A1): unknown
+  (...a: infer A2): unknown
+}
+  ? A1 | A2
+  : never
 
-type PopArgument<T extends (...a: never[]) => unknown> =
-  T extends (...a: [...infer A, infer _]) => infer R
-    ? (...a: A) => R
-    : never
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+  ...a: [...infer A, infer _]
+) => infer R
+  ? (...a: A) => R
+  : never
 
 // ============================================================================
 // Exports
@@ -144,5 +143,5 @@ export {
   subscribeWithSelector,
   SubscribeWithSelector,
   $$subscribeWithSelector,
-  WithSelectorSubscribe
+  WithSelectorSubscribe,
 }
