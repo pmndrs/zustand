@@ -5,7 +5,7 @@ import {
   persist,
   redux,
   subscribeWithSelector,
-  immer
+  immer,
 } from 'zustand/middleware'
 
 type CounterState = {
