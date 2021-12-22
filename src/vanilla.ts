@@ -4,7 +4,7 @@
  */
 export type State = object
 
-export type UnknownState = object;
+export type UnknownState = object
 
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
@@ -35,13 +35,13 @@ export type StateSelector<T extends State, U> = (state: T) => U
  */
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 
-/** 
+/**
  * @deprecated Use `(state: T, prevState: T) => void` instead of `StateListener<T>`.
  * `StateListener` will be removed in next major.
  */
 export type StateListener<T> = (state: T, previousState: T) => void
 
-/** 
+/**
  * @deprecated Use `(slice: T, prevSlice: T) => void` instead of `StateSliceListener<T>`.
  * `StateSliceListener` will be removed in next major.
  */
@@ -119,7 +119,6 @@ export type StateCreator<
   CustomGetState = GetState<T>,
   CustomStoreApi extends StoreApi<T> = StoreApi<T>
 > = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
-
 
 export type StoreInitializer<
   T extends State,

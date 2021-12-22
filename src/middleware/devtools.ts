@@ -69,26 +69,25 @@ export function devtools<
   CustomStoreApi extends StoreApi<S>
 >(
   fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
-  options?:
-    {
-      name?: string
-      anonymousActionType?: string
-      serialize?: {
-        options:
-          | boolean
-          | {
-              date?: boolean
-              regex?: boolean
-              undefined?: boolean
-              nan?: boolean
-              infinity?: boolean
-              error?: boolean
-              symbol?: boolean
-              map?: boolean
-              set?: boolean
-            }
-      }
+  options?: {
+    name?: string
+    anonymousActionType?: string
+    serialize?: {
+      options:
+        | boolean
+        | {
+            date?: boolean
+            regex?: boolean
+            undefined?: boolean
+            nan?: boolean
+            infinity?: boolean
+            error?: boolean
+            symbol?: boolean
+            map?: boolean
+            set?: boolean
+          }
     }
+  }
 ): (
   set: CustomSetState,
   get: CustomGetState,
@@ -136,13 +135,13 @@ export function devtools<
         dispatchFromDevtools?: boolean
       }
   ): S => {
-    let didWarnAboutNameDeprecation = false;
+    let didWarnAboutNameDeprecation = false
     if (typeof options === 'string' && !didWarnAboutNameDeprecation) {
       console.warn(
         '[zustand devtools middleware]: passing `name` as directly will be not allowed in next major' +
-        'pass the `name` in an object `{ name: ... }` instead'
+          'pass the `name` in an object `{ name: ... }` instead'
       )
-      didWarnAboutNameDeprecation = true;
+      didWarnAboutNameDeprecation = true
     }
     const devtoolsOptions =
       options === undefined
