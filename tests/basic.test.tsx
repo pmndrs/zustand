@@ -78,7 +78,9 @@ it('uses the store with selectors', async () => {
 })
 
 it('uses the store with a selector and equality checker', async () => {
-  const useStore = createWithState<{ item: { value: number } }>()(() => ({ item: { value: 0 } }))
+  const useStore = createWithState<{ item: { value: number } }>()(() => ({
+    item: { value: 0 },
+  }))
   const { setState } = useStore
   let renderCount = 0
 
@@ -144,7 +146,9 @@ it('only re-renders if selected state has changed', async () => {
 })
 
 it('re-renders with useLayoutEffect', async () => {
-  const useStore = createWithState<{ state: boolean }>()(() => ({ state: false }))
+  const useStore = createWithState<{ state: boolean }>()(() => ({
+    state: false,
+  }))
 
   function Component() {
     const { state } = useStore()
@@ -395,11 +399,13 @@ it('can set the store', () => {
     setState2: Store<State>['setState']
   }
 
-  const { setState, getState } = createWithState<State>()((set): State => ({
-    value: 1,
-    setState1: (v) => set(v),
-    setState2: (v) => setState(v),
-  }))
+  const { setState, getState } = createWithState<State>()(
+    (set): State => ({
+      value: 1,
+      setState1: (v) => set(v),
+      setState2: (v) => setState(v),
+    })
+  )
 
   getState().setState1({ value: 2 })
   expect(getState().value).toBe(2)
@@ -412,11 +418,11 @@ it('can set the store', () => {
 })
 
 it('can set the store without merging', () => {
-  const { setState, getState } = createWithState<{ a: number } | { b: number }>()(
-    (_set) => ({
-      a: 1,
-    })
-  )
+  const { setState, getState } = createWithState<
+    { a: number } | { b: number }
+  >()((_set) => ({
+    a: 1,
+  }))
 
   // Should override the state instead of merging.
   setState({ b: 2 }, true)
@@ -424,7 +430,9 @@ it('can set the store without merging', () => {
 })
 
 it('can destroy the store', () => {
-  const { destroy, getState, setState, subscribe } = createWithState<{ value: number }>() (() => ({
+  const { destroy, getState, setState, subscribe } = createWithState<{
+    value: number
+  }>()(() => ({
     value: 1,
   }))
 

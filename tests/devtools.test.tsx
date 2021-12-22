@@ -149,7 +149,9 @@ describe('when it receives an message of type...', () => {
 
       expect(store.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect((store as any).dispatch).toHaveBeenLastCalledWith({ type: 'INCREMENT' })
+      expect((store as any).dispatch).toHaveBeenLastCalledWith({
+        type: 'INCREMENT',
+      })
     })
 
     it('does not throw for unsupported payload', () => {

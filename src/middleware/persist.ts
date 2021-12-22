@@ -250,8 +250,9 @@ const persistImpl: PersistImpl =
         .then((storageValue) => {
           if (storageValue === null) return storageValue
           if (storageValue.version === undefined) return storageValue.state
-          if (storageValue.version === options.version)
+          if (storageValue.version === options.version) {
             return storageValue.state
+          }
           if (!options.migrate) {
             console.error(messages.couldNotMigrate())
             return undefined

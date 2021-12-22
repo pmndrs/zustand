@@ -1,4 +1,9 @@
-import create, { createWithState, Store, StoreInitializer, UseBoundStore } from 'zustand'
+import create, {
+  createWithState,
+  Store,
+  StoreInitializer,
+  UseBoundStore,
+} from 'zustand'
 
 it('can use exposed types', () => {
   interface ExampleState {
@@ -82,7 +87,8 @@ it('should have correct (partial) types for setState', () => {
     c: () => set({ count: 1 }),
   }))
 
-  const setState: AssertEqual<typeof store.setState, Store<Count>['setState']> = true
+  const setState: AssertEqual<typeof store.setState, Store<Count>['setState']> =
+    true
   expect(setState).toEqual(true)
 
   // ok, should not error
@@ -104,7 +110,8 @@ it('should allow for different partial keys to be returnable from setState', () 
     something: 'foo',
   }))
 
-  const setState: AssertEqual<typeof store.setState, Store<State>['setState']> = true
+  const setState: AssertEqual<typeof store.setState, Store<State>['setState']> =
+    true
   expect(setState).toEqual(true)
 
   // ok, should not error
