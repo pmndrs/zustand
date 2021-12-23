@@ -88,9 +88,19 @@ const create: Create = (createState) => {
 
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  state = createState(setState, getState, api, undefined as any)
+  state = (createState as PopArgument<typeof createState>)(
+    setState,
+    getState,
+    api
+  )
   return api as any
 }
+
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+  ...a: [...infer A, infer _]
+) => infer R
+  ? (...a: A) => R
+  : never
 
 export default create
 
