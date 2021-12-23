@@ -182,17 +182,39 @@ export const devtools =
       )
     }
     const setStateFromDevtools: SetState<S> = (...a) => {
+      const originalIsRecording = isRecording
       isRecording = false
       set(...a)
-      isRecording = true
+      isRecording = originalIsRecording
     }
 
     const initialState = fn(api.setState, get, api)
     extension.init(initialState)
 
+    if (api.dispatchFromDevtools && typeof api.dispatch === 'function') {
+      let didWarnAboutReservedActionType = false
+      const originalDispatch = api.dispatch
+      api.dispatch = (...a: any[]) => {
+        if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
+          console.warn(
+            '[zustand devtools middleware] "__setState" action type is reserved ' +
+              'to set state from the devtools. Avoid using it.'
+          )
+          didWarnAboutReservedActionType = true
+        }
+        ;(originalDispatch as any)(...a)
+      }
+    }
+
     extension.subscribe((message: any) => {
       switch (message.type) {
         case 'ACTION':
+          if (typeof message.payload !== 'string') {
+            console.error(
+              '[zustand devtools middleware] Unsupported action format'
+            )
+            return
+          }
           return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
             message.payload,
             (action) => {
@@ -244,21 +266,6 @@ export const devtools =
           return
       }
     })
-
-    if (api.dispatchFromDevtools && typeof api.dispatch === 'function') {
-      let didWarnAboutReservedActionType = false
-      const originalDispatch = api.dispatch
-      api.dispatch = (...a: any[]) => {
-        if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
-          console.warn(
-            '[zustand devtools middleware] "__setState" action type is reserved ' +
-              'to set state from the devtools. Avoid using it.'
-          )
-          didWarnAboutReservedActionType = true
-        }
-        ;(originalDispatch as any)(...a)
-      }
-    }
 
     return initialState
   }
