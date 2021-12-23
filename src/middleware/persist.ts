@@ -126,17 +126,6 @@ const toThenable =
     }
   }
 
-type PersistImpl = <T extends State>(
-  storeInitializer: PopArgument<StateCreator<T, [], []>>,
-  options: PersistOptions<T, unknown>
-) => PopArgument<StateCreator<T, [], []>>
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
-
 const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   type S = ReturnType<typeof config>
   let options = {
@@ -327,6 +316,17 @@ declare module '../vanilla' {
 
 type WithPersist<S, A> = S extends { getState: () => infer T }
   ? Write<S, StoreApiWithPersist<Cast<T, State>, A>>
+  : never
+
+type PersistImpl = <T extends State>(
+  storeInitializer: PopArgument<StateCreator<T, [], []>>,
+  options: PersistOptions<T, unknown>
+) => PopArgument<StateCreator<T, [], []>>
+
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+  ...a: [...infer A, infer _]
+) => infer R
+  ? (...a: A) => R
   : never
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
