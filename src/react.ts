@@ -147,7 +147,7 @@ function create<
         listener() // state has changed before subscription
       }
       return unsubscribe
-    }, [])
+    }, [api])
 
     const sliceToReturn = hasNewStateSlice
       ? (newStateSlice as StateSlice)
