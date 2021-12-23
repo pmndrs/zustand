@@ -441,7 +441,7 @@ devtools takes the store function as its first argument, optionally you can name
   
 Name store: `devtools(store, {name: "MyStore"})`, which will create a seperate instance named "MyStore" in the devtools.
 
-Serialize options: `devtools(store, { serialize: { options: true } })`. 
+Serialize options: `devtools(store, { serialize: { options: true } })`.
   
 #### Logging Actions
 
