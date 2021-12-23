@@ -440,9 +440,31 @@ const useStore = create(devtools(redux(reducer, initialState)))
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.  
   
 Name store: `devtools(store, {name: "MyStore"})`, which will create a seperate instance named "MyStore" in the devtools.
-Serialize options: `devtools(store, { serialize: { options: true } })`.  
+
+Serialize options: `devtools(store, { serialize: { options: true } })`.
   
+#### Logging Actions
+
 devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
+
+You can log a specific action type for each `set` function by passing a third parameter:
+
+```jsx
+const createBearSlice = (set, get) => ({
+  eatFish: () =>
+    set(
+      (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
+      false,
+      "bear/eatFish"
+    ),
+})
+```
+
+If an action type is not provided, it is defaulted to "anonymous". You can customize this default value by providing an `anonymousActionType` parameter: 
+
+```jsx
+devtools(..., { anonymousActionType: 'unknown', ... })
+```
 
 ## React context
 
