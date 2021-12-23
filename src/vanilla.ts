@@ -1,15 +1,5 @@
 export type State = object
-// types inspired by setState from React, see:
-// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
-export type PartialState<
-  T extends State,
-  K1 extends keyof T = keyof T,
-  K2 extends keyof T = K1,
-  K3 extends keyof T = K2,
-  K4 extends keyof T = K3
-> =
-  | (Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
-  | ((state: T) => Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
+export type PartialState<T extends State> = Partial<T>
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
@@ -18,17 +8,13 @@ export type Subscribe<T extends State> = {
   (listener: StateListener<T>): () => void
 }
 
-export type SetState<T extends State> = {
-  <
-    K1 extends keyof T,
-    K2 extends keyof T = K1,
-    K3 extends keyof T = K2,
-    K4 extends keyof T = K3
-  >(
-    partial: PartialState<T, K1, K2, K3, K4>,
-    replace?: boolean
-  ): void
-}
+export type SetState<T extends State> = <
+  Nt extends R extends true ? T : Partial<T>,
+  R extends boolean
+>(
+  partial: Nt | ((state: T) => Nt),
+  replace?: R
+) => void
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
 export type StoreApi<T extends State> = {
@@ -37,44 +23,42 @@ export type StoreApi<T extends State> = {
   subscribe: Subscribe<T>
   destroy: Destroy
 }
+
+export const $$storeMutators = Symbol('$$storeMutators')
+
 export type StateCreator<
   T extends State,
-  CustomSetState = SetState<T>,
-  CustomGetState = GetState<T>,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
-> = (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => T
+  Mis extends [StoreMutatorIdentifier, unknown][],
+  Mos extends [StoreMutatorIdentifier, unknown][],
+  U = T
+> = ((
+  setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', undefined>,
+  getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', undefined>,
+  store: Mutate<StoreApi<T>, Mis>,
+  $$storeMutations: Mis
+) => U) & { [$$storeMutators]?: Mos }
 
-function createStore<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface StoreMutators<S, A> {}
+export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
+
+export type Mutate<S, Ms> = Ms extends []
+  ? S
+  : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+  ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
+  : never
+
+type Get<T, K, F = never> = K extends keyof T ? T[K] : F
+
+type Create = <
+  T extends State,
+  Mos extends [StoreMutatorIdentifier, unknown][] = []
 >(
-  createState: StateCreator<
-    TState,
-    CustomSetState,
-    CustomGetState,
-    CustomStoreApi
-  >
-): CustomStoreApi
+  initializer: StateCreator<T, [], Mos>
+) => Mutate<StoreApi<T>, Mos>
 
-function createStore<TState extends State>(
-  createState: StateCreator<TState, SetState<TState>, GetState<TState>, any>
-): StoreApi<TState>
-
-function createStore<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState: StateCreator<
-    TState,
-    CustomSetState,
-    CustomGetState,
-    CustomStoreApi
-  >
-): CustomStoreApi {
+const create: Create = (createState) => {
+  type TState = ReturnType<typeof createState>
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
 
@@ -104,12 +88,16 @@ function createStore<
 
   const destroy: Destroy = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  state = createState(
-    setState as unknown as CustomSetState,
-    getState as unknown as CustomGetState,
-    api as unknown as CustomStoreApi
-  )
-  return api as unknown as CustomStoreApi
+  state = createState(setState, getState, api, undefined as any)
+  return api as any
 }
 
-export default createStore
+export default create
+
+type CreateWithState = <T extends State>() => <
+  Mos extends [StoreMutatorIdentifier, unknown][] = []
+>(
+  initializer: StateCreator<T, [], Mos>
+) => Mutate<StoreApi<T>, Mos>
+
+export const createWithState: CreateWithState = () => create
