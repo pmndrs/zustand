@@ -1,4 +1,9 @@
-import { GetState, SetState, State, StoreApi } from '../vanilla'
+import {
+  State,
+  StateCreator,
+  StoreApi,
+  StoreMutatorIdentifier,
+} from '../vanilla'
 
 type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>
@@ -12,10 +17,7 @@ export type StateStorage = {
 
 type StorageValue<S> = { state: DeepPartial<S>; version?: number }
 
-export type PersistOptions<
-  S,
-  PersistedState extends Partial<S> = Partial<S>
-> = {
+export type PersistOptions<S, PersistedState = Partial<S>> = {
   /** Name of the storage (must be unique) */
   name: string
   /**
@@ -74,9 +76,9 @@ export type PersistOptions<
 
 type PersistListener<S> = (state: S) => void
 
-export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
+export type StoreApiWithPersist<S extends State, Ps> = StoreApi<S> & {
   persist: {
-    setOptions: (options: Partial<PersistOptions<S>>) => void
+    setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
     rehydrate: () => Promise<void>
     hasHydrated: () => boolean
@@ -124,188 +126,210 @@ const toThenable =
     }
   }
 
-export const persist =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    config: (
-      set: CustomSetState,
-      get: CustomGetState,
-      api: CustomStoreApi
-    ) => S,
-    baseOptions: PersistOptions<S>
-  ) =>
-  (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: CustomStoreApi & StoreApiWithPersist<S>
-  ): S => {
-    let options = {
-      getStorage: () => localStorage,
-      serialize: JSON.stringify as (state: StorageValue<S>) => string,
-      deserialize: JSON.parse as (str: string) => StorageValue<Partial<S>>,
-      partialize: (state: S) => state,
-      version: 0,
-      merge: (persistedState: any, currentState: S) => ({
-        ...currentState,
-        ...persistedState,
-      }),
-      ...baseOptions,
-    }
+type PersistImpl = <T extends State>(
+  storeInitializer: PopArgument<StateCreator<T, [], []>>,
+  options: PersistOptions<T, unknown>
+) => PopArgument<StateCreator<T, [], []>>
 
-    let hasHydrated = false
-    const hydrationListeners = new Set<PersistListener<S>>()
-    const finishHydrationListeners = new Set<PersistListener<S>>()
-    let storage: StateStorage | undefined
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+  ...a: [...infer A, infer _]
+) => infer R
+  ? (...a: A) => R
+  : never
 
-    try {
-      storage = options.getStorage()
-    } catch (e) {
-      // prevent error if the storage is not defined (e.g. when server side rendering a page)
-    }
+const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
+  type S = ReturnType<typeof config>
+  let options = {
+    getStorage: () => localStorage,
+    serialize: JSON.stringify as (state: StorageValue<S>) => string,
+    deserialize: JSON.parse as (str: string) => StorageValue<Partial<S>>,
+    partialize: (state: S) => state,
+    version: 0,
+    merge: (persistedState: any, currentState: S) => ({
+      ...currentState,
+      ...persistedState,
+    }),
+    ...baseOptions,
+  }
 
-    if (!storage) {
-      return config(
-        ((...args) => {
-          console.warn(
-            `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
-          )
-          set(...args)
-        }) as CustomSetState,
-        get,
-        api
-      )
-    }
+  let hasHydrated = false
+  const hydrationListeners = new Set<PersistListener<S>>()
+  const finishHydrationListeners = new Set<PersistListener<S>>()
+  let storage: StateStorage | undefined
 
-    const thenableSerialize = toThenable(options.serialize)
+  try {
+    storage = options.getStorage()
+  } catch (e) {
+    // prevent error if the storage is not defined (e.g. when server side rendering a page)
+  }
 
-    const setItem = (): Thenable<void> => {
-      const state = options.partialize({ ...get() })
-
-      let errorInSync: Error | undefined
-      const thenable = thenableSerialize({ state, version: options.version })
-        .then((serializedValue) =>
-          (storage as StateStorage).setItem(options.name, serializedValue)
+  if (!storage) {
+    return config(
+      (...args) => {
+        console.warn(
+          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
         )
-        .catch((e) => {
-          errorInSync = e
-        })
-      if (errorInSync) {
-        throw errorInSync
-      }
-      return thenable
-    }
-
-    const savedSetState = api.setState
-
-    api.setState = (state, replace) => {
-      savedSetState(state, replace)
-      void setItem()
-    }
-
-    const configResult = config(
-      ((...args) => {
         set(...args)
-        void setItem()
-      }) as CustomSetState,
+      },
       get,
       api
     )
-
-    // a workaround to solve the issue of not storing rehydrated state in sync storage
-    // the set(state) value would be later overridden with initial state by create()
-    // to avoid this, we merge the state from localStorage into the initial state.
-    let stateFromStorage: S | undefined
-
-    // rehydrate initial state with existing stored state
-    const hydrate = () => {
-      if (!storage) return
-
-      hasHydrated = false
-      hydrationListeners.forEach((cb) => cb(get()))
-
-      const postRehydrationCallback =
-        options.onRehydrateStorage?.(get()) || undefined
-
-      // bind is used to avoid `TypeError: Illegal invocation` error
-      return toThenable(storage.getItem.bind(storage))(options.name)
-        .then((storageValue) => {
-          if (storageValue) {
-            return options.deserialize(storageValue)
-          }
-        })
-        .then((deserializedStorageValue) => {
-          if (deserializedStorageValue) {
-            if (
-              typeof deserializedStorageValue.version === 'number' &&
-              deserializedStorageValue.version !== options.version
-            ) {
-              if (options.migrate) {
-                return options.migrate(
-                  deserializedStorageValue.state,
-                  deserializedStorageValue.version
-                )
-              }
-              console.error(
-                `State loaded from storage couldn't be migrated since no migrate function was provided`
-              )
-            } else {
-              return deserializedStorageValue.state
-            }
-          }
-        })
-        .then((migratedState) => {
-          stateFromStorage = options.merge(migratedState as S, configResult)
-
-          set(stateFromStorage as S, true)
-          return setItem()
-        })
-        .then(() => {
-          postRehydrationCallback?.(stateFromStorage, undefined)
-          hasHydrated = true
-          finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
-        })
-        .catch((e: Error) => {
-          postRehydrationCallback?.(undefined, e)
-        })
-    }
-
-    api.persist = {
-      setOptions: (newOptions) => {
-        options = {
-          ...options,
-          ...newOptions,
-        }
-
-        if (newOptions.getStorage) {
-          storage = newOptions.getStorage()
-        }
-      },
-      clearStorage: () => {
-        storage?.removeItem(options.name)
-      },
-      rehydrate: () => hydrate() as Promise<void>,
-      hasHydrated: () => hasHydrated,
-      onHydrate: (cb) => {
-        hydrationListeners.add(cb)
-
-        return () => {
-          hydrationListeners.delete(cb)
-        }
-      },
-      onFinishHydration: (cb) => {
-        finishHydrationListeners.add(cb)
-
-        return () => {
-          finishHydrationListeners.delete(cb)
-        }
-      },
-    }
-
-    hydrate()
-
-    return stateFromStorage || configResult
   }
+
+  const thenableSerialize = toThenable(options.serialize)
+
+  const setItem = (): Thenable<void> => {
+    const state = options.partialize({ ...get() })
+
+    let errorInSync: Error | undefined
+    const thenable = thenableSerialize({ state, version: options.version })
+      .then((serializedValue) =>
+        (storage as StateStorage).setItem(options.name, serializedValue)
+      )
+      .catch((e) => {
+        errorInSync = e
+      })
+    if (errorInSync) {
+      throw errorInSync
+    }
+    return thenable
+  }
+
+  const savedSetState = api.setState
+
+  api.setState = (state, replace) => {
+    savedSetState(state, replace)
+    void setItem()
+  }
+
+  const configResult = config(
+    (...args) => {
+      set(...args)
+      void setItem()
+    },
+    get,
+    api
+  )
+
+  // a workaround to solve the issue of not storing rehydrated state in sync storage
+  // the set(state) value would be later overridden with initial state by create()
+  // to avoid this, we merge the state from localStorage into the initial state.
+  let stateFromStorage: S | undefined
+
+  // rehydrate initial state with existing stored state
+  const hydrate = () => {
+    if (!storage) return
+
+    hasHydrated = false
+    hydrationListeners.forEach((cb) => cb(get()))
+
+    const postRehydrationCallback =
+      options.onRehydrateStorage?.(get()) || undefined
+
+    // bind is used to avoid `TypeError: Illegal invocation` error
+    return toThenable(storage.getItem.bind(storage))(options.name)
+      .then((storageValue) => {
+        if (storageValue) {
+          return options.deserialize(storageValue)
+        }
+      })
+      .then((deserializedStorageValue) => {
+        if (deserializedStorageValue) {
+          if (
+            typeof deserializedStorageValue.version === 'number' &&
+            deserializedStorageValue.version !== options.version
+          ) {
+            if (options.migrate) {
+              return options.migrate(
+                deserializedStorageValue.state,
+                deserializedStorageValue.version
+              )
+            }
+            console.error(
+              `State loaded from storage couldn't be migrated since no migrate function was provided`
+            )
+          } else {
+            return deserializedStorageValue.state
+          }
+        }
+      })
+      .then((migratedState) => {
+        stateFromStorage = options.merge(migratedState as S, configResult)
+
+        set(stateFromStorage as S, true)
+        return setItem()
+      })
+      .then(() => {
+        postRehydrationCallback?.(stateFromStorage, undefined)
+        hasHydrated = true
+        finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
+      })
+      .catch((e: Error) => {
+        postRehydrationCallback?.(undefined, e)
+      })
+  }
+
+  ;(api as StoreApi<S> & StoreApiWithPersist<S, unknown>).persist = {
+    setOptions: (newOptions) => {
+      options = {
+        ...options,
+        ...newOptions,
+      }
+
+      if (newOptions.getStorage) {
+        storage = newOptions.getStorage()
+      }
+    },
+    clearStorage: () => {
+      storage?.removeItem(options.name)
+    },
+    rehydrate: () => hydrate() as Promise<void>,
+    hasHydrated: () => hasHydrated,
+    onHydrate: (cb) => {
+      hydrationListeners.add(cb)
+
+      return () => {
+        hydrationListeners.delete(cb)
+      }
+    },
+    onFinishHydration: (cb) => {
+      finishHydrationListeners.add(cb)
+
+      return () => {
+        finishHydrationListeners.delete(cb)
+      }
+    },
+  }
+
+  hydrate()
+
+  return stateFromStorage || configResult
+}
+
+type Persist = <
+  T extends State,
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+  U = Partial<T>
+>(
+  initializer: StateCreator<T, [...Mps, [$$persist, unknown]], Mcs>,
+  options?: PersistOptions<T, U>
+) => StateCreator<T, Mps, [[$$persist, U], ...Mcs]>
+
+const $$persist = Symbol('$$persist')
+type $$persist = typeof $$persist
+
+declare module '../vanilla' {
+  interface StoreMutators<S, A> {
+    [$$persist]: WithPersist<S, A>
+  }
+}
+
+type WithPersist<S, A> = S extends { getState: () => infer T }
+  ? Write<S, StoreApiWithPersist<Cast<T, State>, A>>
+  : never
+
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
+export const persist = persistImpl as unknown as Persist
