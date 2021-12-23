@@ -7,7 +7,8 @@ import {
 } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import ReactDOM from 'react-dom'
-import create, { EqualityChecker, SetState, StateSelector } from 'zustand'
+import create, { EqualityChecker, SetState, StateSelector, UseBoundStore } from 'zustand'
+import createStore from 'zustand/vanilla'
 
 const consoleError = console.error
 afterEach(() => {
@@ -141,6 +142,54 @@ it('only re-renders if selected state has changed', async () => {
 
   expect(counterRenderCount).toBe(2)
   expect(controlRenderCount).toBe(1)
+})
+
+it('still re-renders if store has changed', async () => {
+  const origStore = {useStore: create<CounterState>((set) => ({
+    count: 0,
+    inc: () => set((state) => ({ count: state.count + 1 })),
+  }))}
+  const nextStore = {useStore: create<CounterState>((set) => ({
+    count: 0,
+    inc: () => set((state) => ({ count: state.count + 1 })),
+  }))}
+  let counterRenderCount = 0
+
+  function Counter({store}: {store: {useStore: UseBoundStore<CounterState>}}) {
+    const count = store.useStore((state) => state.count)
+    counterRenderCount++
+    return <div>count: {count}</div>
+  }
+
+  const { getByText, findByText, rerender } = render(
+    <>
+      <Counter store={origStore} />
+    </>
+  )
+
+  await findByText('count: 0')
+
+  act(() => {
+    origStore.useStore.setState({count: 1})
+  })
+
+  await findByText('count: 1')
+
+  rerender(
+    <>
+      <Counter store={nextStore} />
+    </>
+  )
+
+  await findByText('count: 0')
+
+  act(() => {
+    nextStore.useStore.setState({count: 1})
+  })
+
+  await findByText('count: 1')
+
+  expect(counterRenderCount).toBe(4)
 })
 
 it('re-renders with useLayoutEffect', async () => {
