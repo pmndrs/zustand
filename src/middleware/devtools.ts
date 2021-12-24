@@ -41,37 +41,92 @@ export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   devtools?: DevtoolsType
 }
 
-export const devtools =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
-    options?:
-      | string
-      | {
-          name?: string
-          anonymousActionType?: string
-          serialize?: {
-            options:
-              | boolean
-              | {
-                  date?: boolean
-                  regex?: boolean
-                  undefined?: boolean
-                  nan?: boolean
-                  infinity?: boolean
-                  error?: boolean
-                  symbol?: boolean
-                  map?: boolean
-                  set?: boolean
-                }
+/**
+ * @deprecated Passing `name` as directly will be not allowed in next major.
+ * Pass the `name` in an object `{ name: ... }` instead
+ */
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
+  options?: string
+): (
+  set: CustomSetState,
+  get: CustomGetState,
+  api: CustomStoreApi &
+    StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+      dispatchFromDevtools?: boolean
+    }
+) => S
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
+  options?: {
+    name?: string
+    anonymousActionType?: string
+    serialize?: {
+      options:
+        | boolean
+        | {
+            date?: boolean
+            regex?: boolean
+            undefined?: boolean
+            nan?: boolean
+            infinity?: boolean
+            error?: boolean
+            symbol?: boolean
+            map?: boolean
+            set?: boolean
           }
+    }
+  }
+): (
+  set: CustomSetState,
+  get: CustomGetState,
+  api: CustomStoreApi &
+    StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+      dispatchFromDevtools?: boolean
+    }
+) => S
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
+  options?:
+    | string
+    | {
+        name?: string
+        anonymousActionType?: string
+        serialize?: {
+          options:
+            | boolean
+            | {
+                date?: boolean
+                regex?: boolean
+                undefined?: boolean
+                nan?: boolean
+                infinity?: boolean
+                error?: boolean
+                symbol?: boolean
+                map?: boolean
+                set?: boolean
+              }
         }
-  ) =>
-  (
+      }
+) {
+  return (
     set: CustomSetState,
     get: CustomGetState,
     api: CustomStoreApi &
@@ -80,6 +135,14 @@ export const devtools =
         dispatchFromDevtools?: boolean
       }
   ): S => {
+    let didWarnAboutNameDeprecation = false
+    if (typeof options === 'string' && !didWarnAboutNameDeprecation) {
+      console.warn(
+        '[zustand devtools middleware]: passing `name` as directly will be not allowed in next major' +
+          'pass the `name` in an object `{ name: ... }` instead'
+      )
+      didWarnAboutNameDeprecation = true
+    }
     const devtoolsOptions =
       options === undefined
         ? { name: undefined, anonymousActionType: undefined }
@@ -273,6 +336,7 @@ export const devtools =
 
     return initialState
   }
+}
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
