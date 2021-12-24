@@ -127,6 +127,9 @@
       "tests/**/*.{js,ts,tsx}"
     ]
   },
+  "dependencies": {
+    "use-sync-external-store": "1.0.0-rc.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.5",
     "@babel/plugin-external-helpers": "^7.16.5",
@@ -143,6 +146,7 @@
     "@types/jest": "^27.0.3",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
+    "@types/use-sync-external-store": "^0.0.3",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "concurrently": "^6.5.1",
