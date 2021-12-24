@@ -483,6 +483,17 @@ it('works in non-browser env', () => {
   global.window = originalWindow
 })
 
+it('works in react native env', () => {
+  const originalWindow = global.window
+  global.window = {} as any
+
+  expect(() => {
+    create(devtools(() => ({ count: 0 })))
+  }).not.toThrow()
+
+  global.window = originalWindow
+})
+
 it('preserves isRecording after setting from devtools', () => {
   const api = create(devtools(() => ({ count: 0 })))
   ;(extensionSubscriber as (message: any) => void)({

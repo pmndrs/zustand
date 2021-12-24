@@ -87,16 +87,20 @@ export const devtools =
         ? { name: options }
         : options
 
-    if (typeof window === 'undefined') {
-      return fn(set, get, api)
+    let extensionConnector
+    try {
+      extensionConnector =
+        (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
+        (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+    } catch {
+      // ignored
     }
 
-    const extensionConnector =
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
-
     if (!extensionConnector) {
-      if (process.env.NODE_ENV === 'development') {
+      if (
+        process.env.NODE_ENV === 'development' &&
+        typeof window !== 'undefined'
+      ) {
         console.warn(
           '[zustand devtools middleware] Please install/enable Redux devtools extension'
         )
