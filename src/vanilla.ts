@@ -50,14 +50,24 @@ export type Mutate<S, Ms> = Ms extends []
 
 type Get<T, K, F = never> = K extends keyof T ? T[K] : F
 
-type Create = <
+type CreateStore = {
+  <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+    initializer: StateCreator<T, [], Mos>
+  ): Mutate<StoreApi<T>, Mos>
+
+  <T extends State>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+    initializer: StateCreator<T, [], Mos>
+  ) => Mutate<StoreApi<T>, Mos>
+}
+
+type CreateStoreImpl = <
   T extends State,
   Mos extends [StoreMutatorIdentifier, unknown][] = []
 >(
   initializer: StateCreator<T, [], Mos>
 ) => Mutate<StoreApi<T>, Mos>
 
-const create: Create = (createState) => {
+const _createStore: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
@@ -102,12 +112,9 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-export default create
+const createStore = ((f) => {
+  if (f === undefined) return _createStore
+  return _createStore(f)
+}) as CreateStore
 
-type CreateWithState = <T extends State>() => <
-  Mos extends [StoreMutatorIdentifier, unknown][] = []
->(
-  initializer: StateCreator<T, [], Mos>
-) => Mutate<StoreApi<T>, Mos>
-
-export const createWithState: CreateWithState = () => create
+export default createStore
