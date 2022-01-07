@@ -88,6 +88,23 @@ function createUMDConfig(input, output) {
   }
 }
 
+function createSystemConfig(input, output) {
+  return {
+    input,
+    output: {
+      file: output,
+      format: 'system',
+      exports: 'named',
+      esModule: true,
+    },
+    external,
+    plugins: [
+      resolve({ extensions }),
+      babelPlugin(getBabelOptions({ ie: 11 })),
+    ],
+  }
+}
+
 export default function (args) {
   let c = Object.keys(args).find((key) => key.startsWith('config-'))
   if (c) {
@@ -103,5 +120,6 @@ export default function (args) {
     createCommonJSConfig('src/index.ts', 'dist/index.js'),
     createESMConfig('src/index.ts', 'dist/esm/index'),
     createUMDConfig('src/index.ts', 'dist/umd/index.js'),
+    createSystemConfig('src/index.ts', 'dist/system/index.js'),
   ]
 }
