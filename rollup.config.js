@@ -70,6 +70,24 @@ function createCommonJSConfig(input, output) {
   }
 }
 
+function createUMDConfig(input, output) {
+  return {
+    input,
+    output: {
+      file: output,
+      format: 'umd',
+      exports: 'named',
+      name: 'zustand',
+      esModule: true,
+    },
+    external,
+    plugins: [
+      resolve({ extensions }),
+      babelPlugin(getBabelOptions({ ie: 11 })),
+    ],
+  }
+}
+
 export default function (args) {
   let c = Object.keys(args).find((key) => key.startsWith('config-'))
   if (c) {
@@ -77,11 +95,13 @@ export default function (args) {
     return [
       createCommonJSConfig(`src/${c}.ts`, `dist/${c}.js`),
       createESMConfig(`src/${c}.ts`, `dist/esm/${c}`),
+      createUMDConfig(`src/${c}.ts`, `dist/umd/${c}.js`),
     ]
   }
   return [
     createDeclarationConfig('src/index.ts', 'dist'),
     createCommonJSConfig('src/index.ts', 'dist/index.js'),
     createESMConfig('src/index.ts', 'dist/esm/index'),
+    createUMDConfig('src/index.ts', 'dist/umd/index.js'),
   ]
 }
