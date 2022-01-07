@@ -113,6 +113,7 @@ export default function (args) {
       createCommonJSConfig(`src/${c}.ts`, `dist/${c}.js`),
       createESMConfig(`src/${c}.ts`, `dist/esm/${c}`),
       createUMDConfig(`src/${c}.ts`, `dist/umd/${c}.js`),
+      createSystemConfig(`src/${c}.ts`, `dist/system/${c}.js`),
     ]
   }
   return [
