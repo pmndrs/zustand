@@ -24,8 +24,6 @@ export type StoreApi<T extends State> = {
   destroy: Destroy
 }
 
-export const $$storeMutators = Symbol('$$storeMutators')
-
 export type StateCreator<
   T extends State,
   Mis extends [StoreMutatorIdentifier, unknown][],
@@ -36,7 +34,7 @@ export type StateCreator<
   getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', undefined>,
   store: Mutate<StoreApi<T>, Mis>,
   $$storeMutations: Mis
-) => U) & { [$$storeMutators]?: Mos }
+) => U) & { $$storeMutators?: Mos }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface StoreMutators<S, A> {}
