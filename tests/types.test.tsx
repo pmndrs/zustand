@@ -30,11 +30,11 @@ it('can use exposed types', () => {
     }
   }
   const selector: StateSelector<ExampleState, number> = (state) => state.num
-  const partial: PartialState<ExampleState, 'num' | 'numGet'> = {
+  const partial: PartialState<ExampleState> = {
     num: 2,
     numGet: () => 2,
   }
-  const partialFn: PartialState<ExampleState, 'num' | 'numGet'> = (state) => ({
+  const partialFn: PartialState<ExampleState> = (state) => ({
     ...state,
     num: 2,
   })
@@ -59,7 +59,7 @@ it('can use exposed types', () => {
   }))
   const useStore = storeApi
 
-  const stateCreator: StateCreator<ExampleState> = (set, get) => ({
+  const stateCreator: StateCreator<ExampleState, [], []> = (set, get) => ({
     num: 1,
     numGet: () => get().num,
     numGetState: () => get().num,
@@ -73,7 +73,7 @@ it('can use exposed types', () => {
 
   function checkAllTypes(
     _getState: GetState<ExampleState>,
-    _partialState: PartialState<ExampleState, 'num' | 'numGet'>,
+    _partialState: PartialState<ExampleState>,
     _setState: SetState<ExampleState>,
     _state: State,
     _stateListener: StateListener<ExampleState>,
@@ -82,8 +82,8 @@ it('can use exposed types', () => {
     _subscribe: Subscribe<ExampleState>,
     _destroy: Destroy,
     _equalityFn: EqualityChecker<ExampleState>,
-    _stateCreator: StateCreator<ExampleState>,
-    _useStore: UseBoundStore<ExampleState>
+    _stateCreator: StateCreator<ExampleState, [], []>,
+    _useStore: UseBoundStore<StoreApi<ExampleState>>
   ) {
     expect(true).toBeTruthy()
   }
@@ -128,7 +128,6 @@ it('should have correct (partial) types for setState', () => {
   // ok, should not error
   store.setState({ count: 1 })
   store.setState({})
-  store.setState(() => undefined)
   store.setState((previous) => previous)
 
   // @ts-expect-error type undefined is not assignable to type number
@@ -155,7 +154,7 @@ it('should allow for different partial keys to be returnable from setState', () 
     }
     return { count: 0 }
   })
-  store.setState<'count', 'something'>((previous) => {
+  store.setState((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
@@ -166,7 +165,7 @@ it('should allow for different partial keys to be returnable from setState', () 
   })
 
   // @ts-expect-error Type '{ something: boolean; count?: undefined; }' is not assignable to type 'State'.
-  store.setState<'count', 'something'>((previous) => {
+  store.setState((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }

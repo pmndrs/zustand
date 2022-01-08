@@ -1,5 +1,7 @@
 export type State = object
-export type PartialState<T extends State> = Partial<T>
+export type PartialState<T extends State> =
+  | Partial<T>
+  | ((state: T) => Partial<T>)
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
