@@ -14,27 +14,24 @@ import {
   useStore,
 } from 'zustand'
 
-export type UseContextStore<T extends State> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-}
+export type UseContextStore<S> = <U = ExtractState<S>>(
+  selector?: (state: ExtractState<S>) => U,
+  equals?: (a: U, b: U) => boolean
+) => U
 
-function createContext<
-  TState extends State,
-  CustomStoreApi extends StoreApi<TState> = StoreApi<TState>
->() {
-  const ZustandContext = reactCreateContext<CustomStoreApi | undefined>(
-    undefined
-  )
+type ExtractState<S> = S extends { getState: () => infer T } ? T : never
+
+function createContext<S extends StoreApi<State>>() {
+  const ZustandContext = reactCreateContext<S | undefined>(undefined)
 
   const Provider = ({
     createStore,
     children,
   }: {
-    createStore: () => CustomStoreApi
+    createStore: () => S
     children: ReactNode
   }) => {
-    const storeRef = useRef<CustomStoreApi>()
+    const storeRef = useRef<S>()
 
     if (!storeRef.current) {
       storeRef.current = createStore()
@@ -47,8 +44,8 @@ function createContext<
     )
   }
 
-  const useBoundStore: UseContextStore<TState> = <StateSlice>(
-    selector?: StateSelector<TState, StateSlice>,
+  const useBoundStore: UseContextStore<S> = <StateSlice>(
+    selector?: StateSelector<ExtractState<S>, StateSlice>,
     equalityFn?: EqualityChecker<StateSlice>
   ) => {
     const store = useContext(ZustandContext)
@@ -59,17 +56,12 @@ function createContext<
     }
     return useStore(
       store,
-      selector as StateSelector<TState, StateSlice>,
+      selector as StateSelector<ExtractState<S>, StateSlice>,
       equalityFn
     )
   }
 
-  const useStoreApi = (): {
-    getState: CustomStoreApi['getState']
-    setState: CustomStoreApi['setState']
-    subscribe: CustomStoreApi['subscribe']
-    destroy: CustomStoreApi['destroy']
-  } => {
+  const useStoreApi = (): S => {
     const store = useContext(ZustandContext)
     if (!store) {
       throw new Error(
@@ -77,12 +69,13 @@ function createContext<
       )
     }
     return useMemo(
-      () => ({
-        getState: store.getState,
-        setState: store.setState,
-        subscribe: store.subscribe,
-        destroy: store.destroy,
-      }),
+      () =>
+        ({
+          getState: store.getState,
+          setState: store.setState,
+          subscribe: store.subscribe,
+          destroy: store.destroy,
+        } as S),
       [store]
     )
   }
