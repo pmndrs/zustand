@@ -1,43 +1,62 @@
 import {
-  EqualityChecker,
-  GetState,
-  SetState,
   State,
+  StateCreator,
   StateListener,
-  StateSelector,
-  StateSliceListener,
   StoreApi,
+  StoreMutatorIdentifier,
   Subscribe,
 } from '../vanilla'
 
-export type StoreApiWithSubscribeWithSelector<T extends State> = StoreApi<T> & {
-  subscribe: Subscribe<T> & {
-    (listener: StateListener<T>): () => void
-    <StateSlice>(
-      selector: StateSelector<T, StateSlice>,
-      listener: StateSliceListener<StateSlice>,
-      options?: {
-        equalityFn?: EqualityChecker<StateSlice>
-        fireImmediately?: boolean
-      }
-    ): () => void
+type SubscribeWithSelector = <
+  T extends State,
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
+  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+>(
+  initializer: StateCreator<
+    T,
+    [...Mps, ['zustand/subscribeWithSelector', never]],
+    Mcs
+  >
+) => StateCreator<T, Mps, [['zustand/subscribeWithSelector', never], ...Mcs]>
+
+declare module '../vanilla' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface StoreMutators<S, A> {
+    ['zustand/subscribeWithSelector']: WithSelectorSubscribe<S>
   }
 }
 
-export const subscribeWithSelector =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
-  ) =>
-  (
-    set: CustomSetState,
-    get: CustomGetState,
-    api: CustomStoreApi & StoreApiWithSubscribeWithSelector<S>
-  ): S => {
+type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
+  ? S & StoreSubscribeWithSelector<Extract<T, State>>
+  : never
+
+interface StoreSubscribeWithSelector<T extends State> {
+  subscribe: <U>(
+    selector: (state: T) => U,
+    listener: (selectedState: U, previousSelectedState: U) => void,
+    options?: {
+      equalityFn?: (a: U, b: U) => boolean
+      fireImmediately?: boolean
+    }
+  ) => () => void
+}
+
+export type StoreApiWithSubscribeWithSelector<T extends State> =
+  WithSelectorSubscribe<StoreApi<T>>
+
+type SubscribeWithSelectorImpl = <T extends State>(
+  storeInitializer: PopArgument<StateCreator<T, [], []>>
+) => PopArgument<StateCreator<T, [], []>>
+
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+  ...a: [...infer A, infer _]
+) => infer R
+  ? (...a: A) => R
+  : never
+
+const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =
+  (fn) => (set, get, api) => {
+    type S = ReturnType<typeof fn>
     const origSubscribe = api.subscribe as Subscribe<S>
     api.subscribe = ((selector: any, optListener: any, options: any) => {
       let listener: StateListener<S> = selector // if no selector
@@ -60,3 +79,5 @@ export const subscribeWithSelector =
     const initialState = fn(set, get, api)
     return initialState
   }
+export const subscribeWithSelector =
+  subscribeWithSelectorImpl as unknown as SubscribeWithSelector

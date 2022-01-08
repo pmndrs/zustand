@@ -301,16 +301,13 @@ type Persist = <
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
   U = Partial<T>
 >(
-  initializer: StateCreator<T, [...Mps, [$$persist, unknown]], Mcs>,
+  initializer: StateCreator<T, [...Mps, ['zustand/persist', unknown]], Mcs>,
   options?: PersistOptions<T, U>
-) => StateCreator<T, Mps, [[$$persist, U], ...Mcs]>
-
-const $$persist = Symbol('$$persist')
-type $$persist = typeof $$persist
+) => StateCreator<T, Mps, [['zustand/persist', U], ...Mcs]>
 
 declare module '../vanilla' {
   interface StoreMutators<S, A> {
-    [$$persist]: WithPersist<S, A>
+    'zustand/persist': WithPersist<S, A>
   }
 }
 
