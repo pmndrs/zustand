@@ -33,7 +33,7 @@ export function useStore<TState extends State, StateSlice>(
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type UseBoundStore<S> = (<U = ExtractState<S>>(
+export type UseBoundStore<S> = (<U = ExtractState<S>>(
   selector?: (state: ExtractState<S>) => U,
   equals?: (a: U, b: U) => boolean
 ) => U) &
