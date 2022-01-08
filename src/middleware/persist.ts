@@ -76,7 +76,7 @@ export type PersistOptions<S, PersistedState = Partial<S>> = {
 
 type PersistListener<S> = (state: S) => void
 
-export type StoreApiWithPersist<S extends State, Ps> = StoreApi<S> & {
+type StorePersist<S extends State, Ps> = {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
@@ -86,6 +86,11 @@ export type StoreApiWithPersist<S extends State, Ps> = StoreApi<S> & {
     onFinishHydration: (fn: PersistListener<S>) => () => void
   }
 }
+
+export type StoreApiWithPersist<S extends State, Ps> = WithPersist<
+  StoreApi<S>,
+  Ps
+>
 
 type Thenable<Value> = {
   then<V>(
@@ -258,7 +263,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       })
   }
 
-  ;(api as StoreApi<S> & StoreApiWithPersist<S, unknown>).persist = {
+  ;(api as StoreApi<S> & StorePersist<S, unknown>).persist = {
     setOptions: (newOptions) => {
       options = {
         ...options,
@@ -312,7 +317,7 @@ declare module '../vanilla' {
 }
 
 type WithPersist<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StoreApiWithPersist<Cast<T, State>, A>>
+  ? Write<S, StorePersist<Cast<T, State>, A>>
   : never
 
 type PersistImpl = <T extends State>(
