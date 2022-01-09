@@ -67,7 +67,7 @@ type CreateStoreImpl = <
   initializer: StateCreator<T, [], Mos>
 ) => Mutate<StoreApi<T>, Mos>
 
-const _createStore: CreateStoreImpl = (createState) => {
+const createStoreImpl: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
   let state: TState
   const listeners: Set<StateListener<TState>> = new Set()
@@ -113,8 +113,8 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   : never
 
 const createStore = ((f) => {
-  if (f === undefined) return _createStore
-  return _createStore(f)
+  if (f === undefined) return createStoreImpl
+  return createStoreImpl(f)
 }) as CreateStore
 
 export default createStore
