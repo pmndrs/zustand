@@ -78,7 +78,6 @@ function createUMDConfig(input, output) {
       format: 'umd',
       exports: 'named',
       name: 'zustand',
-      esModule: true,
     },
     external,
     plugins: [
@@ -95,13 +94,9 @@ function createSystemConfig(input, output) {
       file: output,
       format: 'system',
       exports: 'named',
-      esModule: true,
     },
     external,
-    plugins: [
-      resolve({ extensions }),
-      babelPlugin(getBabelOptions({ ie: 11 })),
-    ],
+    plugins: [resolve({ extensions }), getEsbuild('node12')],
   }
 }
 
