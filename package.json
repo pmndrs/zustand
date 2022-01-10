@@ -1,7 +1,7 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "3.6.8",
+  "version": "3.6.9",
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
   "types": "./index.d.ts",
