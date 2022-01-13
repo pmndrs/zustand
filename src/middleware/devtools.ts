@@ -1,5 +1,39 @@
 import { GetState, PartialState, SetState, State, StoreApi } from '../vanilla'
 
+type DevtoolsOptions = {
+  name?: string
+  anonymousActionType?: string
+  serialize?: {
+    options:
+      | boolean
+      | {
+          date?: boolean
+          regex?: boolean
+          undefined?: boolean
+          nan?: boolean
+          infinity?: boolean
+          error?: boolean
+          symbol?: boolean
+          map?: boolean
+          set?: boolean
+        }
+  }
+  features?: {
+    pause?: boolean
+    lock?: boolean
+    persist?: boolean
+    export?: boolean | 'custom'
+    import?: boolean | 'custom'
+    jump?: boolean
+    skip?: boolean
+    reorder?: boolean
+    dispatch?: boolean
+    test?: boolean
+  }
+  trace?: boolean | (() => string)
+  traceLimit?: number
+}
+
 type DevtoolsType = {
   /**
    * @deprecated along with `api.devtools`, `api.devtools.prefix` is deprecated.
@@ -69,25 +103,7 @@ export function devtools<
   CustomStoreApi extends StoreApi<S>
 >(
   fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
-  options?: {
-    name?: string
-    anonymousActionType?: string
-    serialize?: {
-      options:
-        | boolean
-        | {
-            date?: boolean
-            regex?: boolean
-            undefined?: boolean
-            nan?: boolean
-            infinity?: boolean
-            error?: boolean
-            symbol?: boolean
-            map?: boolean
-            set?: boolean
-          }
-    }
-  }
+  options?: DevtoolsOptions
 ): (
   set: CustomSetState,
   get: CustomGetState,
@@ -104,27 +120,7 @@ export function devtools<
   CustomStoreApi extends StoreApi<S>
 >(
   fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
-  options?:
-    | string
-    | {
-        name?: string
-        anonymousActionType?: string
-        serialize?: {
-          options:
-            | boolean
-            | {
-                date?: boolean
-                regex?: boolean
-                undefined?: boolean
-                nan?: boolean
-                infinity?: boolean
-                error?: boolean
-                symbol?: boolean
-                map?: boolean
-                set?: boolean
-              }
-        }
-      }
+  options?: string | DevtoolsOptions
 ) {
   return (
     set: CustomSetState,
