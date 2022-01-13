@@ -3,7 +3,7 @@ import React from 'react'
 export default function () {
   return (
     <>
-      <a href="https://github.com/drcmda/zustand" className="top-right" children="Github" />
+      <a href="https://github.com/pmndrs/zustand" className="top-right" children="Github" />
       <div className="bottom">
         <a href="https://codesandbox.io/s/xgjtc" className="bottom-right" children="<Source />" />
         <a
