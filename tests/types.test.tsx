@@ -59,7 +59,7 @@ it('can use exposed types', () => {
   }))
   const useStore = storeApi
 
-  const stateCreator: StateCreator<ExampleState, [], []> = (set, get) => ({
+  const stateCreator: StateCreator<ExampleState> = (set, get) => ({
     num: 1,
     numGet: () => get().num,
     numGetState: () => get().num,
@@ -82,7 +82,7 @@ it('can use exposed types', () => {
     _subscribe: Subscribe<ExampleState>,
     _destroy: Destroy,
     _equalityFn: EqualityChecker<ExampleState>,
-    _stateCreator: StateCreator<ExampleState, [], []>,
+    _stateCreator: StateCreator<ExampleState>,
     _useStore: UseBoundStore<StoreApi<ExampleState>>
   ) {
     expect(true).toBeTruthy()

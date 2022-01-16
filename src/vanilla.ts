@@ -28,8 +28,8 @@ export type StoreApi<T extends State> = {
 
 export type StateCreator<
   T extends State,
-  Mis extends [StoreMutatorIdentifier, unknown][],
-  Mos extends [StoreMutatorIdentifier, unknown][],
+  Mis extends [StoreMutatorIdentifier, unknown][] = [],
+  Mos extends [StoreMutatorIdentifier, unknown][] = [],
   U = T
 > = ((
   setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', undefined>,
