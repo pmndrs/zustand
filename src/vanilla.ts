@@ -1,6 +1,12 @@
 export type State = object
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
+
+/**
+ * @deprecated Use the builtin `Partial<T>` instead of `PartialState<T>`.
+ * Additionally turn on `--exactOptionalPropertyTypes` tsc flag.
+ * `PartialState` will be removed in next major
+ */
 export type PartialState<
   T extends State,
   K1 extends keyof T = keyof T,
