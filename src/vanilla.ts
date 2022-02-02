@@ -19,6 +19,9 @@ export type PartialState<
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
+/**
+ * @deprecated Use `StateListener<T>` instead of `StateSliceListener<T>`.
+ */
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export type Subscribe<T extends State> = {
   (listener: StateListener<T>): () => void
