@@ -6,12 +6,20 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { EqualityChecker, State, StateSelector, UseBoundStore } from 'zustand'
+import {
+  EqualityChecker,
+  State,
+  StateSelector,
+  StoreApi,
+  UseBoundStore,
+} from 'zustand'
 
-export type UseContextStore<T extends State> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-}
+export type UseContextStore<T extends State | StoreApi<State>> = <
+  U = T extends StoreApi<infer X> ? X : T
+>(
+  selector: StateSelector<T, U>,
+  equalityFn?: EqualityChecker<U>
+) => U
 
 function createContext<
   TState extends State,
