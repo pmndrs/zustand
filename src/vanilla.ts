@@ -151,3 +151,13 @@ function createStore<
 }
 
 export default createStore
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface StoreMutators<S, A> {}
+export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
+
+export type Mutate<S, Ms> = Ms extends []
+  ? S
+  : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+  ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
+  : never

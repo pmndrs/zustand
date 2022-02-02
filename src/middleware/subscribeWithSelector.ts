@@ -10,6 +10,31 @@ import {
   Subscribe,
 } from '../vanilla'
 
+declare module '../vanilla' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface StoreMutators<S, A> {
+    ['zustand/subscribeWithSelector']: WithSelectorSubscribe<S>
+  }
+}
+
+type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
+  ? S & StoreSubscribeWithSelector<Extract<T, State>>
+  : never
+
+interface StoreSubscribeWithSelector<T extends State> {
+  subscribe: <U>(
+    selector: (state: T) => U,
+    listener: (selectedState: U, previousSelectedState: U) => void,
+    options?: {
+      equalityFn?: (a: U, b: U) => boolean
+      fireImmediately?: boolean
+    }
+  ) => () => void
+}
+
+/**
+ * @deprecated use `Mutate<StoreApi<T>, ["zustand/subscribeWithSelector"]>`
+ */
 export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   StoreApi<T>,
   'subscribe' // FIXME remove omit in v4
