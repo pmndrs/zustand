@@ -6,18 +6,13 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import {
-  EqualityChecker,
-  State,
-  StateSelector,
-  StoreApi,
-  UseBoundStore,
-} from 'zustand'
+import { EqualityChecker, State, StateSelector, UseBoundStore } from 'zustand'
 
-export type UseContextStore<T extends State | StoreApi<State>> = <
-  U = T extends StoreApi<infer X> ? X : T
->(
-  selector: StateSelector<T, U>,
+/**
+ * @deprecated Use `typeof MyContext.useStore` instead.
+ */
+export type UseContextStore<T extends State> = <U = T>(
+  selector?: StateSelector<T, U>,
   equalityFn?: EqualityChecker<U>
 ) => U
 
