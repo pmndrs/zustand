@@ -3,6 +3,7 @@ import {
   ReactNode,
   useEffect,
   useLayoutEffect,
+  useRef,
   useState,
 } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
@@ -10,6 +11,7 @@ import ReactDOM from 'react-dom'
 import create, { EqualityChecker, SetState, StateSelector } from 'zustand'
 
 const consoleError = console.error
+const useRenderCount = () => ++useRef(0).current
 afterEach(() => {
   console.error = consoleError
 })
@@ -80,7 +82,6 @@ it('uses the store with selectors', async () => {
 it('uses the store with a selector and equality checker', async () => {
   const useStore = create(() => ({ item: { value: 0 } }))
   const { setState } = useStore
-  let renderCount = 0
 
   function Component() {
     // Prevent re-render if new value === 1.
@@ -88,9 +89,10 @@ it('uses the store with a selector and equality checker', async () => {
       (s) => s.item,
       (_, newItem) => newItem.value === 1
     )
+    const renderCount = useRenderCount()
     return (
       <div>
-        renderCount: {++renderCount}, value: {item.value}
+        renderCount: {renderCount}, value: {item.value}
       </div>
     )
   }
@@ -208,12 +210,12 @@ it('can update the equality checker', async () => {
   const { setState } = useStore
   const selector: StateSelector<State, number> = (s) => s.value
 
-  let renderCount = 0
   function Component({ equalityFn }: Props) {
     const value = useStore(selector, equalityFn)
+    const renderCount = useRenderCount()
     return (
       <div>
-        renderCount: {++renderCount}, value: {value}
+        renderCount: {renderCount}, value: {value}
       </div>
     )
   }
@@ -245,12 +247,12 @@ it('can call useStore with progressively more arguments', async () => {
   const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
 
-  let renderCount = 0
   function Component({ selector, equalityFn }: Props) {
     const value = useStore(selector as any, equalityFn)
+    const renderCount = useRenderCount()
     return (
       <div>
-        renderCount: {++renderCount}, value: {JSON.stringify(value)}
+        renderCount: {renderCount}, value: {JSON.stringify(value)}
       </div>
     )
   }
