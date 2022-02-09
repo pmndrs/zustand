@@ -14,6 +14,11 @@ import {
   useStore,
 } from 'zustand'
 
+type UseContextStore<S> = <U = ExtractState<S>>(
+  selector?: (state: ExtractState<S>) => U,
+  equals?: (a: U, b: U) => boolean
+) => U
+
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
@@ -41,7 +46,7 @@ function createContext<S extends StoreApi<State>>() {
     )
   }
 
-  const useBoundStore = <StateSlice = ExtractState<S>>(
+  const useBoundStore: UseContextStore<S> = <StateSlice = ExtractState<S>>(
     selector?: StateSelector<ExtractState<S>, StateSlice>,
     equalityFn?: EqualityChecker<StateSlice>
   ) => {
