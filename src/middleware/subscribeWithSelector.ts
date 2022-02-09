@@ -18,18 +18,21 @@ declare module '../vanilla' {
 }
 
 type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
-  ? S & StoreSubscribeWithSelector<Extract<T, State>>
+  ? Omit<S, 'subscribe'> & StoreSubscribeWithSelector<Extract<T, State>>
   : never
 
 interface StoreSubscribeWithSelector<T extends State> {
-  subscribe: <U>(
-    selector: (state: T) => U,
-    listener: (selectedState: U, previousSelectedState: U) => void,
-    options?: {
-      equalityFn?: (a: U, b: U) => boolean
-      fireImmediately?: boolean
-    }
-  ) => () => void
+  subscribe: {
+    (listener: (selectedState: T, previousSelectedState: T) => void): () => void
+    <U>(
+      selector: (state: T) => U,
+      listener: (selectedState: U, previousSelectedState: U) => void,
+      options?: {
+        equalityFn?: (a: U, b: U) => boolean
+        fireImmediately?: boolean
+      }
+    ): () => void
+  }
 }
 
 /**
