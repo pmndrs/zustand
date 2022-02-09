@@ -89,7 +89,7 @@ type PersistListener<S> = (state: S) => void
 
 /**
  * @deprecated Use `Mutate<StoreApi<T>, [["zustand/persist", Partial<T>]]>`.
- * If you have multiple middlewares see the documentation for `Mutate` usage.
+ * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
  */
 export type StoreApiWithPersist<S extends State> = StoreApi<S> &
   StorePersist<S, Partial<S>>

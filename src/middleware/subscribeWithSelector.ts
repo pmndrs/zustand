@@ -37,7 +37,7 @@ interface StoreSubscribeWithSelector<T extends State> {
 
 /**
  * @deprecated Use `Mutate<StoreApi<T>, [["zustand/subscribeWithSelector", never]]>`.
- * If you have multiple middlewares see the documentation for `Mutate` usage.
+ * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
  */
 export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   StoreApi<T>,

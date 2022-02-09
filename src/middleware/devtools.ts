@@ -75,7 +75,7 @@ export type NamedSet<T extends State> = {
 }
 /**
  * @deprecated Use `Mutate<StoreApi<T>, [["zustand/devtools", never]]>`.
- * If you have multiple middlewares see the documentation for `Mutate` usage.
+ * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
  */
 export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   setState: NamedSet<T>

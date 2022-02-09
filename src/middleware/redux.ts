@@ -12,7 +12,7 @@ type DevtoolsType = {
 
 /**
  * @deprecated Use `Mutate<StoreApi<T & { dispatch: (a: A) => A }>, [["zustand/redux", A]]>`.
- * If you have multiple middlewares see the documentation for `Mutate` usage.
+ * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
  */
 export type StoreApiWithRedux<
   T extends State,
