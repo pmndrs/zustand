@@ -140,9 +140,9 @@ const toThenable =
 export const persist =
   <
     S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
+    CustomSetState extends SetState<S> = SetState<S>,
+    CustomGetState extends GetState<S> = GetState<S>,
+    CustomStoreApi extends StoreApi<S> = StoreApi<S>
   >(
     config: (
       set: CustomSetState,

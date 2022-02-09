@@ -63,9 +63,9 @@ export function devtools<
  */
 export function devtools<
   S extends State,
-  CustomSetState extends SetState<S>,
-  CustomGetState extends GetState<S>,
-  CustomStoreApi extends StoreApi<S>
+  CustomSetState extends SetState<S> = SetState<S>,
+  CustomGetState extends GetState<S> = GetState<S>,
+  CustomStoreApi extends StoreApi<S> = StoreApi<S>
 >(
   fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
   options?: string
