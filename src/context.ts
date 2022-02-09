@@ -14,11 +14,6 @@ import {
   useStore,
 } from 'zustand'
 
-export type UseContextStore<S> = <U = ExtractState<S>>(
-  selector?: (state: ExtractState<S>) => U,
-  equals?: (a: U, b: U) => boolean
-) => U
-
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
