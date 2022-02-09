@@ -127,7 +127,7 @@ function createSystemConfig(input, output, env) {
         __DEV__: env !== 'production' ? 'true' : 'false',
         preventAssignment: true,
       }),
-      getEsbuild('node12'),
+      getEsbuild('node12', env),
     ],
   }
 }
