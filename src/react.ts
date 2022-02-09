@@ -43,8 +43,6 @@ type Create = {
   <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): UseBoundStore<Mutate<StoreApi<T>, Mos>>
-  <S extends StoreApi<State>>(store: S): UseBoundStore<S>
-
   <T extends State>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
