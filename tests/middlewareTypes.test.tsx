@@ -2,6 +2,7 @@ import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, {
   GetState,
+  Mutate,
   SetState,
   State,
   StateCreator,
@@ -150,7 +151,7 @@ describe('counter state spec (single middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
+      Mutate<StoreApi<CounterState>, [['zustand/subscribeWithSelector', never]]>
     >(
       subscribeWithSelector((set, get) => ({
         count: 1,
