@@ -99,9 +99,14 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
     return fn(set, get, api)
   }
 
-  const extensionConnector =
-    (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-    (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+  let extensionConnector
+  try {
+    extensionConnector =
+      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
+      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+  } catch {
+    // ignored
+  }
 
   if (!extensionConnector) {
     if (process.env.NODE_ENV === 'development') {
