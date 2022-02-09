@@ -30,8 +30,8 @@ export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
 export const subscribeWithSelector =
   <
     S extends State,
-    CustomSetState = SetState<S>,
-    CustomGetState = GetState<S>,
+    CustomSetState extends SetState<S> = SetState<S>,
+    CustomGetState extends GetState<S> = GetState<S>,
     CustomStoreApi extends StoreApi<S> = StoreApi<S>
   >(
     fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
