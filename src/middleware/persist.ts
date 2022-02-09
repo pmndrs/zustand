@@ -316,7 +316,7 @@ declare module '../vanilla' {
   }
 }
 
-type WithPersist<S, A> = S extends { getState: () => infer T }
+export type WithPersist<S, A> = S extends { getState: () => infer T }
   ? Write<S, StorePersist<Cast<T, State>, A>>
   : never
 
