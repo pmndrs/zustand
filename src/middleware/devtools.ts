@@ -147,6 +147,12 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
   extension.subscribe((message: any) => {
     switch (message.type) {
       case 'ACTION':
+        if (typeof message.payload !== 'string') {
+          console.error(
+            '[zustand devtools middleware] Unsupported action format'
+          )
+          return
+        }
         return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
           message.payload,
           (action) => {
