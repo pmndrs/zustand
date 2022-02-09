@@ -41,6 +41,22 @@ export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   devtools?: DevtoolsType
 }
 
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S
+): (
+  set: CustomSetState,
+  get: CustomGetState,
+  api: CustomStoreApi &
+    StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+      dispatchFromDevtools?: boolean
+    }
+) => S
 /**
  * @deprecated Passing `name` as directly will be not allowed in next major.
  * Pass the `name` in an object `{ name: ... }` instead
