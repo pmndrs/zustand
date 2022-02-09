@@ -10,9 +10,6 @@ import create, {
 } from 'zustand'
 import {
   PersistOptions,
-  StoreApiWithDevtools,
-  StoreApiWithPersist,
-  StoreApiWithSubscribeWithSelector,
   combine,
   devtools,
   persist,
@@ -123,7 +120,7 @@ describe('counter state spec (single middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithDevtools<CounterState>
+      Mutate<StoreApi<CounterState>, [['zustand/devtools', never]]>
     >(
       devtools(
         (set, get) => ({
@@ -197,7 +194,10 @@ describe('counter state spec (single middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [['zustand/persist', Partial<CounterState>]]
+      >
     >(
       persist(
         (set, get) => ({
@@ -249,7 +249,7 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithDevtools<CounterState>
+      Mutate<StoreApi<CounterState>, [['zustand/devtools', never]]>
     >(
       devtools(
         immer((set, get) => ({
@@ -354,8 +354,10 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [['zustand/subscribeWithSelector', never], ['zustand/devtools', never]]
+      >
     >(
       devtools(
         subscribeWithSelector((set, get) => ({
@@ -387,7 +389,13 @@ describe('counter state spec (double middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         persist(
@@ -421,7 +429,13 @@ describe('counter state spec (triple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         persist(
@@ -484,9 +498,14 @@ describe('counter state spec (triple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState> &
-        StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/subscribeWithSelector', never],
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         subscribeWithSelector(
@@ -526,9 +545,14 @@ describe('counter state spec (quadruple middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState> &
-        StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/subscribeWithSelector', never],
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         subscribeWithSelector(
@@ -577,8 +601,13 @@ describe('more complex state spec with subscribeWithSelector', () => {
           MyState,
           SetState<MyState>,
           GetState<MyState>,
-          StoreApiWithSubscribeWithSelector<MyState> &
-            StoreApiWithPersist<MyState>
+          Mutate<
+            StoreApi<MyState>,
+            [
+              ['zustand/subscribeWithSelector', never],
+              ['zustand/persist', Partial<MyState>]
+            ]
+          >
         >(
           () => ({
             foo: true,
@@ -609,7 +638,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
       MyState,
       SetState<MyState>,
       GetState<MyState>,
-      StoreApiWithSubscribeWithSelector<MyState>
+      Mutate<StoreApi<MyState>, [['zustand/subscribeWithSelector', never]]>
     >(
       subscribeWithSelector(
         () =>
