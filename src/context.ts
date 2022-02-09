@@ -41,7 +41,7 @@ function createContext<S extends StoreApi<State>>() {
     )
   }
 
-  const useBoundStore: UseContextStore<S> = <StateSlice>(
+  const useBoundStore = <StateSlice = ExtractState<S>>(
     selector?: StateSelector<ExtractState<S>, StateSlice>,
     equalityFn?: EqualityChecker<StateSlice>
   ) => {
