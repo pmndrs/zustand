@@ -36,7 +36,8 @@ interface StoreSubscribeWithSelector<T extends State> {
 }
 
 /**
- * @deprecated use `Mutate<StoreApi<T>, [["zustand/subscribeWithSelector", never]]>`
+ * @deprecated Use `Mutate<StoreApi<T>, [["zustand/subscribeWithSelector", never]]>`.
+ * If you have multiple middlewares see the documentation for `Mutate` usage.
  */
 export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
   StoreApi<T>,
