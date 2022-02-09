@@ -87,11 +87,6 @@ type StorePersist<S extends State, Ps> = {
   }
 }
 
-export type StoreApiWithPersist<S extends State, Ps> = WithPersist<
-  StoreApi<S>,
-  Ps
->
-
 type Thenable<Value> = {
   then<V>(
     onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
@@ -316,7 +311,7 @@ declare module '../vanilla' {
   }
 }
 
-export type WithPersist<S, A> = S extends { getState: () => infer T }
+type WithPersist<S, A> = S extends { getState: () => infer T }
   ? Write<S, StorePersist<Cast<T, State>, A>>
   : never
 

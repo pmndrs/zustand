@@ -1,9 +1,4 @@
-import {
-  State,
-  StateCreator,
-  StoreApi,
-  StoreMutatorIdentifier,
-} from '../vanilla'
+import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
 import { NamedSet } from './devtools'
 
 type Redux = <
@@ -43,11 +38,6 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   : never
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-
-export type StoreApiWithRedux<
-  T extends State,
-  A extends { type: unknown }
-> = WithRedux<StoreApi<T>, A>
 
 type ReduxImpl = <T extends State, A extends Action>(
   reducer: (state: T, action: A) => T,

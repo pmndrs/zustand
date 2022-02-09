@@ -17,7 +17,7 @@ declare module 'zustand' {
   }
 }
 
-export type WithImmer<S> = S extends {
+type WithImmer<S> = S extends {
   getState: () => infer T
   setState: infer SetState
 }
