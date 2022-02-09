@@ -122,7 +122,7 @@ describe('when it receives an message of type...', () => {
     it('does nothing even if there is `api.dispatch`', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
-      api.dispatch = jest.fn()
+      ;(api as any).dispatch = jest.fn()
       const setState = jest.spyOn(api, 'setState')
 
       ;(extensionSubscriber as (message: any) => void)({
@@ -132,14 +132,14 @@ describe('when it receives an message of type...', () => {
 
       expect(api.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect(api.dispatch).not.toBeCalled()
+      expect((api as any).dispatch).not.toBeCalled()
     })
 
     it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
-      api.dispatch = jest.fn()
-      api.dispatchFromDevtools = true
+      ;(api as any).dispatch = jest.fn()
+      ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
 
       ;(extensionSubscriber as (message: any) => void)({
@@ -149,14 +149,16 @@ describe('when it receives an message of type...', () => {
 
       expect(api.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect(api.dispatch).toHaveBeenLastCalledWith({ type: 'INCREMENT' })
+      expect((api as any).dispatch).toHaveBeenLastCalledWith({
+        type: 'INCREMENT',
+      })
     })
 
     it('does not throw for unsupported payload', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
-      api.dispatch = jest.fn()
-      api.dispatchFromDevtools = true
+      ;(api as any).dispatch = jest.fn()
+      ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
       const originalConsoleError = console.error
       console.error = jest.fn()
@@ -192,7 +194,7 @@ describe('when it receives an message of type...', () => {
 
       expect(api.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect(api.dispatch).not.toBeCalled()
+      expect((api as any).dispatch).not.toBeCalled()
 
       console.error = originalConsoleError
     })
