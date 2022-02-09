@@ -109,7 +109,10 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
   }
 
   if (!extensionConnector) {
-    if (process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined'
+    ) {
       console.warn(
         '[zustand devtools middleware] Please install/enable Redux devtools extension'
       )
