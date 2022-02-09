@@ -557,3 +557,41 @@ describe('more complex state spec with subscribeWithSelector', () => {
     TestComponent
   })
 })
+
+describe('create with explicitly annotated mutators', () => {
+  it('subscribeWithSelector & persist', () => {
+    const useStore = create<
+      CounterState,
+      [
+        ['zustand/subscribeWithSelector', never],
+        ['zustand/persist', Partial<CounterState>]
+      ]
+    >(
+      subscribeWithSelector(
+        persist(
+          (set, get) => ({
+            count: 0,
+            inc: () => set({ count: get().count + 1 }, false),
+          }),
+          { name: 'count' }
+        )
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.count) * 2
+      useStore((s) => s.inc)()
+      useStore().count * 2
+      useStore().inc()
+      useStore.getState().count * 2
+      useStore.getState().inc()
+      useStore.subscribe(
+        (state) => state.count,
+        (count) => console.log(count * 2)
+      )
+      useStore.setState({ count: 0 }, false)
+      useStore.persist.hasHydrated()
+      return <></>
+    }
+    TestComponent
+  })
+})
