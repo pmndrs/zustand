@@ -71,6 +71,14 @@ describe('counter state spec (no middleware)', () => {
 })
 
 describe('counter state spec (single middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('immer', () => {
     const useStore = create<CounterState>(
       immer((set, get) => ({
@@ -118,6 +126,7 @@ describe('counter state spec (single middleware)', () => {
   })
 
   it('devtools', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
@@ -243,7 +252,16 @@ describe('counter state spec (single middleware)', () => {
 })
 
 describe('counter state spec (double middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('devtools & immer', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
@@ -275,6 +293,7 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & redux', () => {
+    __DEV__ = false
     const useStore = create(
       devtools(
         redux<{ count: number }, { type: 'INC' }>(
@@ -303,6 +322,7 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & combine', () => {
+    __DEV__ = false
     const useStore = create(
       devtools(
         combine({ count: 1 }, (set, get) => ({
@@ -349,6 +369,7 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & subscribeWithSelector', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
@@ -382,6 +403,7 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & persist', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
@@ -415,7 +437,16 @@ describe('counter state spec (double middleware)', () => {
 })
 
 describe('counter state spec (triple middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('devtools & persist & immer', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
@@ -451,6 +482,7 @@ describe('counter state spec (triple middleware)', () => {
   })
 
   it('devtools & subscribeWithSelector & combine', () => {
+    __DEV__ = false
     const useStore = create(
       devtools(
         subscribeWithSelector(
@@ -479,6 +511,7 @@ describe('counter state spec (triple middleware)', () => {
   })
 
   it('devtools & subscribeWithSelector & persist', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
@@ -520,7 +553,16 @@ describe('counter state spec (triple middleware)', () => {
 })
 
 describe('counter state spec (quadruple middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('devtools & subscribeWithSelector & persist & immer (#616)', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,

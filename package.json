@@ -44,7 +44,7 @@
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
-    "build": "concurrently 'yarn:build:*'",
+    "build": "concurrently -m 8 'yarn:build:*'",
     "build:base": "rollup -c",
     "build:vanilla": "rollup -c --config-vanilla",
     "build:middleware": "rollup -c --config-middleware",
@@ -106,6 +106,9 @@
         "@swc/jest"
       ]
     },
+    "globals": {
+      "__DEV__": true
+    },
     "moduleNameMapper": {
       "^zustand$": "<rootDir>/src/index.ts",
       "^zustand/(.*)$": "<rootDir>/src/$1.ts"
@@ -136,6 +139,7 @@
     "@babel/preset-env": "^7.16.5",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-node-resolve": "^13.1.1",
+    "@rollup/plugin-replace": "^3.0.1",
     "@rollup/plugin-typescript": "^8.3.0",
     "@swc/core": "^1.2.122",
     "@swc/jest": "^0.2.15",
@@ -165,6 +169,7 @@
     "react-dom": "^17.0.2",
     "rollup": "^2.62.0",
     "rollup-plugin-esbuild": "^4.7.2",
+    "rollup-plugin-terser": "^7.0.2",
     "shx": "^0.3.3",
     "typescript": "^4.5.4"
   },
