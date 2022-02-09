@@ -21,6 +21,8 @@ export type UseContextStore<S> = <U = ExtractState<S>>(
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
+type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
+
 function createContext<S extends StoreApi<State>>() {
   const ZustandContext = reactCreateContext<S | undefined>(undefined)
 
@@ -61,7 +63,7 @@ function createContext<S extends StoreApi<State>>() {
     )
   }
 
-  const useStoreApi = (): S => {
+  const useStoreApi = () => {
     const store = useContext(ZustandContext)
     if (!store) {
       throw new Error(
@@ -75,7 +77,7 @@ function createContext<S extends StoreApi<State>>() {
           setState: store.setState,
           subscribe: store.subscribe,
           destroy: store.destroy,
-        } as S),
+        } as WithoutCallSignature<S>),
       [store]
     )
   }
