@@ -132,9 +132,10 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
     )
   }
   const setStateFromDevtools: SetState<S> = (...a) => {
+    const originalIsRecording = isRecording
     isRecording = false
     set(...a)
-    isRecording = true
+    isRecording = originalIsRecording
   }
 
   const initialState = fn(api.setState, get, api)
