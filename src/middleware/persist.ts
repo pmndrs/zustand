@@ -100,6 +100,9 @@ declare module '../vanilla' {
   }
 }
 
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
 export type WithPersist<S, A> = S extends { getState: () => infer T }
   ? Write<S, StorePersist<Cast<T, State>, A>>
   : never
@@ -114,9 +117,6 @@ interface StorePersist<S extends State, Ps> {
     onFinishHydration: (fn: PersistListener<S>) => () => void
   }
 }
-
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
 
 type Thenable<Value> = {
   then<V>(

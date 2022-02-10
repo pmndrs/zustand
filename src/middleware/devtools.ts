@@ -7,6 +7,9 @@ declare module '../vanilla' {
   }
 }
 
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
 type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>> & {
   /**
    * @deprecated `devtools` property on the store is deprecated
@@ -20,9 +23,6 @@ type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>> & {
 type StoreSetStateWithAction<S> = S extends { getState: () => infer T }
   ? S & { setState: NamedSet<Cast<T, object>> }
   : never
-
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
 
 interface DevtoolsOptions {
   name?: string

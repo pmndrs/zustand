@@ -28,19 +28,19 @@ declare module '../vanilla' {
   }
 }
 
-type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
-
-interface Action {
-  type: unknown
-}
-
 interface StoreRedux<A extends Action> {
   dispatch: (a: A) => A
   dispatchFromDevtools: true
 }
 
+interface Action {
+  type: unknown
+}
+
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
+
+type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
 
 export const redux =
   <S extends State, A extends { type: unknown }>(
