@@ -16,7 +16,10 @@ declare module '../vanilla' {
   }
 }
 
-type WithRedux<S, A> = Write<Extract<S, State>, StoreRedux<Extract<A, Action>>>
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
+type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
 
 interface ReduxState<A extends Action> {
   dispatch: StoreRedux<A>['dispatch']
@@ -36,8 +39,6 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 ) => infer R
   ? (...a: A) => R
   : never
-
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 
 type ReduxImpl = <T extends State, A extends Action>(
   reducer: (state: T, action: A) => T,

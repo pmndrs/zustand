@@ -55,6 +55,9 @@ interface DevtoolsOptions {
   }
 }
 
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
 type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
 
 type StoreSetStateWithAction<S> = S extends {
@@ -75,9 +78,6 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 ) => infer R
   ? (...a: A) => R
   : never
-
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
 
 export type NamedSet<T extends State> = WithDevtools<StoreApi<T>>['setState']
 
