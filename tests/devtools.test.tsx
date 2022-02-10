@@ -35,22 +35,25 @@ it('connects to the extension by passing the options and initializes', () => {
 })
 
 describe('If there is no extension installed...', () => {
+  let savedDEV: boolean
   beforeAll(() => {
+    savedDEV = __DEV__
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = undefined
   })
   afterAll(() => {
+    __DEV__ = savedDEV
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
   })
 
   it('does not throw', () => {
+    __DEV__ = false
     expect(() => {
       create(devtools(() => ({ count: 0 })))
     }).not.toThrow()
   })
 
-  it('warns in dev env', () => {
-    const originalNodeEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'development'
+  it('[DEV-ONLY] warns in dev env', () => {
+    __DEV__ = true
     const originalConsoleWarn = console.warn
     console.warn = jest.fn()
 
@@ -59,11 +62,11 @@ describe('If there is no extension installed...', () => {
       '[zustand devtools middleware] Please install/enable Redux devtools extension'
     )
 
-    process.env.NODE_ENV = originalNodeEnv
     console.warn = originalConsoleWarn
   })
 
-  it('does not warn if not in dev env', () => {
+  it('[PRD-ONLY] does not warn if not in dev env', () => {
+    __DEV__ = false
     const consoleWarn = jest.spyOn(console, 'warn')
 
     create(devtools(() => ({ count: 0 })))
@@ -187,14 +190,7 @@ describe('when it receives an message of type...', () => {
       }).not.toThrow()
 
       expect(console.error).toHaveBeenLastCalledWith(
-        '[zustand devtools middleware] Could not parse the received json',
-        (() => {
-          try {
-            JSON.parse({ name: 'increment', args: [] } as unknown as string)
-          } catch (e) {
-            return e
-          }
-        })()
+        '[zustand devtools middleware] Unsupported action format'
       )
 
       expect(api.getState()).toBe(initialState)
@@ -488,4 +484,30 @@ it('works in non-browser env', () => {
   }).not.toThrow()
 
   global.window = originalWindow
+})
+
+it('works in react native env', () => {
+  const originalWindow = global.window
+  global.window = {} as any
+
+  expect(() => {
+    create(devtools(() => ({ count: 0 })))
+  }).not.toThrow()
+
+  global.window = originalWindow
+})
+
+it('preserves isRecording after setting from devtools', () => {
+  const api = create(devtools(() => ({ count: 0 })))
+  ;(extensionSubscriber as (message: any) => void)({
+    type: 'DISPATCH',
+    payload: { type: 'PAUSE_RECORDING' },
+  })
+  ;(extensionSubscriber as (message: any) => void)({
+    type: 'ACTION',
+    payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
+  })
+
+  api.setState({ count: 1 })
+  expect(extension.send).not.toBeCalled()
 })

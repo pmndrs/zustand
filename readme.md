@@ -12,7 +12,7 @@ A small, fast and scalable bearbones state-management solution using simplified 
 
 Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
-You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
+You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/examples).
 
 ```bash
 npm install zustand # or yarn add zustand
@@ -218,7 +218,7 @@ const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmedia
 
 ```ts
 import create, { GetState, SetState } from 'zustand'
-import { StoreApiWithSubscribeWithSelector } from 'zustand/middleware'
+import { StoreApiWithSubscribeWithSelector, subscribeWithSelector } from 'zustand/middleware'
 
 type BearState = {
   paw: boolean
@@ -439,10 +439,32 @@ const useStore = create(devtools(redux(reducer, initialState)))
 
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.  
   
-Name store: `devtools(store, {name: "MyStore"})`, which will be prefixed to your actions.  
-Serialize options: `devtools(store, { serialize: { options: true } })`.  
+Name store: `devtools(store, {name: "MyStore"})`, which will create a seperate instance named "MyStore" in the devtools.
+
+Serialize options: `devtools(store, { serialize: { options: true } })`.
   
+#### Logging Actions
+
 devtools will only log actions from each separated store unlike in a typical *combined reducers* redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
+
+You can log a specific action type for each `set` function by passing a third parameter:
+
+```jsx
+const createBearSlice = (set, get) => ({
+  eatFish: () =>
+    set(
+      (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
+      false,
+      "bear/eatFish"
+    ),
+})
+```
+
+If an action type is not provided, it is defaulted to "anonymous". You can customize this default value by providing an `anonymousActionType` parameter: 
+
+```jsx
+devtools(..., { anonymousActionType: 'unknown', ... })
+```
 
 ## React context
 

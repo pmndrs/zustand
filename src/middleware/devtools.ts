@@ -88,17 +88,70 @@ export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   devtools?: DevtoolsType
 }
 
-export const devtools =
-  <
-    S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
-  >(
-    fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
-    options?: string | DevtoolsOptions
-  ) =>
-  (
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S
+): (
+  set: CustomSetState,
+  get: CustomGetState,
+  api: CustomStoreApi &
+    StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+      dispatchFromDevtools?: boolean
+    }
+) => S
+/**
+ * @deprecated Passing `name` as directly will be not allowed in next major.
+ * Pass the `name` in an object `{ name: ... }` instead
+ */
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S> = SetState<S>,
+  CustomGetState extends GetState<S> = GetState<S>,
+  CustomStoreApi extends StoreApi<S> = StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
+  options?: string
+): (
+  set: CustomSetState,
+  get: CustomGetState,
+  api: CustomStoreApi &
+    StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+      dispatchFromDevtools?: boolean
+    }
+) => S
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
+  options?: DevtoolsOptions
+): (
+  set: CustomSetState,
+  get: CustomGetState,
+  api: CustomStoreApi &
+    StoreApiWithDevtools<S> & {
+      dispatch?: unknown
+      dispatchFromDevtools?: boolean
+    }
+) => S
+export function devtools<
+  S extends State,
+  CustomSetState extends SetState<S>,
+  CustomGetState extends GetState<S>,
+  CustomStoreApi extends StoreApi<S>
+>(
+  fn: (set: NamedSet<S>, get: CustomGetState, api: CustomStoreApi) => S,
+  options?: string | DevtoolsOptions
+) {
+  return (
     set: CustomSetState,
     get: CustomGetState,
     api: CustomStoreApi &
@@ -107,6 +160,14 @@ export const devtools =
         dispatchFromDevtools?: boolean
       }
   ): S => {
+    let didWarnAboutNameDeprecation = false
+    if (typeof options === 'string' && !didWarnAboutNameDeprecation) {
+      console.warn(
+        '[zustand devtools middleware]: passing `name` as directly will be not allowed in next major' +
+          'pass the `name` in an object `{ name: ... }` instead'
+      )
+      didWarnAboutNameDeprecation = true
+    }
     const devtoolsOptions =
       options === undefined
         ? { name: undefined, anonymousActionType: undefined }
@@ -114,16 +175,17 @@ export const devtools =
         ? { name: options }
         : options
 
-    if (typeof window === 'undefined') {
-      return fn(set, get, api)
+    let extensionConnector
+    try {
+      extensionConnector =
+        (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
+        (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+    } catch {
+      // ignored
     }
 
-    const extensionConnector =
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
-
     if (!extensionConnector) {
-      if (process.env.NODE_ENV === 'development') {
+      if (__DEV__ && typeof window !== 'undefined') {
         console.warn(
           '[zustand devtools middleware] Please install/enable Redux devtools extension'
         )
@@ -209,17 +271,39 @@ export const devtools =
       )
     }
     const setStateFromDevtools: SetState<S> = (...a) => {
+      const originalIsRecording = isRecording
       isRecording = false
       set(...a)
-      isRecording = true
+      isRecording = originalIsRecording
     }
 
     const initialState = fn(api.setState, get, api)
     extension.init(initialState)
 
+    if (api.dispatchFromDevtools && typeof api.dispatch === 'function') {
+      let didWarnAboutReservedActionType = false
+      const originalDispatch = api.dispatch
+      api.dispatch = (...a: any[]) => {
+        if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
+          console.warn(
+            '[zustand devtools middleware] "__setState" action type is reserved ' +
+              'to set state from the devtools. Avoid using it.'
+          )
+          didWarnAboutReservedActionType = true
+        }
+        ;(originalDispatch as any)(...a)
+      }
+    }
+
     extension.subscribe((message: any) => {
       switch (message.type) {
         case 'ACTION':
+          if (typeof message.payload !== 'string') {
+            console.error(
+              '[zustand devtools middleware] Unsupported action format'
+            )
+            return
+          }
           return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
             message.payload,
             (action) => {
@@ -272,23 +356,9 @@ export const devtools =
       }
     })
 
-    if (api.dispatchFromDevtools && typeof api.dispatch === 'function') {
-      let didWarnAboutReservedActionType = false
-      const originalDispatch = api.dispatch
-      api.dispatch = (...a: any[]) => {
-        if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
-          console.warn(
-            '[zustand devtools middleware] "__setState" action type is reserved ' +
-              'to set state from the devtools. Avoid using it.'
-          )
-          didWarnAboutReservedActionType = true
-        }
-        ;(originalDispatch as any)(...a)
-      }
-    }
-
     return initialState
   }
+}
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
