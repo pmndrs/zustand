@@ -87,9 +87,29 @@ export type PersistOptions<
 
 type PersistListener<S> = (state: S) => void
 
-export type StoreApiWithPersist<S extends State> = StoreApi<S> & {
+/**
+ * @deprecated Use `Mutate<StoreApi<T>, [["zustand/persist", Partial<T>]]>`.
+ * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
+ */
+export type StoreApiWithPersist<S extends State> = StoreApi<S> &
+  StorePersist<S, Partial<S>>
+
+declare module '../vanilla' {
+  interface StoreMutators<S, A> {
+    'zustand/persist': WithPersist<S, A>
+  }
+}
+
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
+type WithPersist<S, A> = S extends { getState: () => infer T }
+  ? Write<S, StorePersist<Cast<T, State>, A>>
+  : never
+
+interface StorePersist<S extends State, Ps> {
   persist: {
-    setOptions: (options: Partial<PersistOptions<S>>) => void
+    setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
     rehydrate: () => Promise<void>
     hasHydrated: () => boolean
