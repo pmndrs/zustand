@@ -1,6 +1,12 @@
 export type State = object
 // types inspired by setState from React, see:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/6c49e45842358ba59a508e13130791989911430d/types/react/v16/index.d.ts#L489-L495
+
+/**
+ * @deprecated Use the builtin `Partial<T>` instead of `PartialState<T>`.
+ * Additionally turn on `--exactOptionalPropertyTypes` tsc flag.
+ * `PartialState` will be removed in next major
+ */
 export type PartialState<
   T extends State,
   K1 extends keyof T = keyof T,
@@ -13,6 +19,9 @@ export type PartialState<
 export type StateSelector<T extends State, U> = (state: T) => U
 export type EqualityChecker<T> = (state: T, newState: T) => boolean
 export type StateListener<T> = (state: T, previousState: T) => void
+/**
+ * @deprecated Use `StateListener<T>` instead of `StateSliceListener<T>`.
+ */
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export type Subscribe<T extends State> = {
   (listener: StateListener<T>): () => void
@@ -151,3 +160,13 @@ function createStore<
 }
 
 export default createStore
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface StoreMutators<S, A> {}
+export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
+
+export type Mutate<S, Ms> = Ms extends []
+  ? S
+  : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+  ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
+  : never

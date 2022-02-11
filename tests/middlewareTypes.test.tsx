@@ -2,6 +2,7 @@ import { produce } from 'immer'
 import type { Draft } from 'immer'
 import create, {
   GetState,
+  Mutate,
   SetState,
   State,
   StateCreator,
@@ -9,9 +10,6 @@ import create, {
 } from 'zustand'
 import {
   PersistOptions,
-  StoreApiWithDevtools,
-  StoreApiWithPersist,
-  StoreApiWithSubscribeWithSelector,
   combine,
   devtools,
   persist,
@@ -71,6 +69,14 @@ describe('counter state spec (no middleware)', () => {
 })
 
 describe('counter state spec (single middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('immer', () => {
     const useStore = create<CounterState>(
       immer((set, get) => ({
@@ -118,11 +124,12 @@ describe('counter state spec (single middleware)', () => {
   })
 
   it('devtools', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithDevtools<CounterState>
+      Mutate<StoreApi<CounterState>, [['zustand/devtools', never]]>
     >(
       devtools(
         (set, get) => ({
@@ -150,7 +157,7 @@ describe('counter state spec (single middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
+      Mutate<StoreApi<CounterState>, [['zustand/subscribeWithSelector', never]]>
     >(
       subscribeWithSelector((set, get) => ({
         count: 1,
@@ -196,7 +203,10 @@ describe('counter state spec (single middleware)', () => {
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [['zustand/persist', Partial<CounterState>]]
+      >
     >(
       persist(
         (set, get) => ({
@@ -243,12 +253,21 @@ describe('counter state spec (single middleware)', () => {
 })
 
 describe('counter state spec (double middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('devtools & immer', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithDevtools<CounterState>
+      Mutate<StoreApi<CounterState>, [['zustand/devtools', never]]>
     >(
       devtools(
         immer((set, get) => ({
@@ -275,6 +294,7 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & redux', () => {
+    __DEV__ = false
     const useStore = create(
       devtools(
         redux<{ count: number }, { type: 'INC' }>(
@@ -303,6 +323,7 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & combine', () => {
+    __DEV__ = false
     const useStore = create(
       devtools(
         combine({ count: 1 }, (set, get) => ({
@@ -349,12 +370,15 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & subscribeWithSelector', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [['zustand/subscribeWithSelector', never], ['zustand/devtools', never]]
+      >
     >(
       devtools(
         subscribeWithSelector((set, get) => ({
@@ -382,11 +406,18 @@ describe('counter state spec (double middleware)', () => {
   })
 
   it('devtools & persist', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         persist(
@@ -415,12 +446,27 @@ describe('counter state spec (double middleware)', () => {
 })
 
 describe('counter state spec (triple middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('devtools & persist & immer', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithPersist<CounterState> & StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         persist(
@@ -451,6 +497,7 @@ describe('counter state spec (triple middleware)', () => {
   })
 
   it('devtools & subscribeWithSelector & combine', () => {
+    __DEV__ = false
     const useStore = create(
       devtools(
         subscribeWithSelector(
@@ -479,13 +526,19 @@ describe('counter state spec (triple middleware)', () => {
   })
 
   it('devtools & subscribeWithSelector & persist', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState> &
-        StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/subscribeWithSelector', never],
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         subscribeWithSelector(
@@ -520,14 +573,28 @@ describe('counter state spec (triple middleware)', () => {
 })
 
 describe('counter state spec (quadruple middleware)', () => {
+  let savedDEV: boolean
+  beforeEach(() => {
+    savedDEV = __DEV__
+  })
+  afterEach(() => {
+    __DEV__ = savedDEV
+  })
+
   it('devtools & subscribeWithSelector & persist & immer (#616)', () => {
+    __DEV__ = false
     const useStore = create<
       CounterState,
       SetState<CounterState>,
       GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState> &
-        StoreApiWithPersist<CounterState> &
-        StoreApiWithDevtools<CounterState>
+      Mutate<
+        StoreApi<CounterState>,
+        [
+          ['zustand/subscribeWithSelector', never],
+          ['zustand/persist', Partial<CounterState>],
+          ['zustand/devtools', never]
+        ]
+      >
     >(
       devtools(
         subscribeWithSelector(
@@ -576,8 +643,13 @@ describe('more complex state spec with subscribeWithSelector', () => {
           MyState,
           SetState<MyState>,
           GetState<MyState>,
-          StoreApiWithSubscribeWithSelector<MyState> &
-            StoreApiWithPersist<MyState>
+          Mutate<
+            StoreApi<MyState>,
+            [
+              ['zustand/subscribeWithSelector', never],
+              ['zustand/persist', Partial<MyState>]
+            ]
+          >
         >(
           () => ({
             foo: true,
@@ -608,7 +680,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
       MyState,
       SetState<MyState>,
       GetState<MyState>,
-      StoreApiWithSubscribeWithSelector<MyState>
+      Mutate<StoreApi<MyState>, [['zustand/subscribeWithSelector', never]]>
     >(
       subscribeWithSelector(
         () =>
