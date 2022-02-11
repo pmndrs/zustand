@@ -207,9 +207,8 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
     typeof (api as any).dispatch === 'function'
   ) {
     let didWarnAboutReservedActionType = false
-    const originalDispatch = ((api as any).dispatch(api as any).dispatch = (
-      ...a: any[]
-    ) => {
+    const originalDispatch = (api as any).dispatch
+    ;(api as any).dispatch = (...a: any[]) => {
       if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
         console.warn(
           '[zustand devtools middleware] "__setState" action type is reserved ' +
@@ -218,7 +217,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
         didWarnAboutReservedActionType = true
       }
       ;(originalDispatch as any)(...a)
-    })
+    }
   }
 
   return initialState
