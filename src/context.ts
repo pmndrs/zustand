@@ -8,10 +8,13 @@ import {
 } from 'react'
 import { EqualityChecker, State, StateSelector, UseBoundStore } from 'zustand'
 
-export type UseContextStore<T extends State> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-}
+/**
+ * @deprecated Use `typeof MyContext.useStore` instead.
+ */
+export type UseContextStore<T extends State> = <U = T>(
+  selector?: StateSelector<T, U>,
+  equalityFn?: EqualityChecker<U>
+) => U
 
 function createContext<
   TState extends State,
