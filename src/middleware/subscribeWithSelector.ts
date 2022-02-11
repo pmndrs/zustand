@@ -10,8 +10,37 @@ import {
   Subscribe,
 } from '../vanilla'
 
+declare module '../vanilla' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface StoreMutators<S, A> {
+    ['zustand/subscribeWithSelector']: WithSelectorSubscribe<S>
+  }
+}
+
+type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
+  ? Omit<S, 'subscribe'> & StoreSubscribeWithSelector<Extract<T, State>>
+  : never
+
+interface StoreSubscribeWithSelector<T extends State> {
+  subscribe: {
+    (listener: (selectedState: T, previousSelectedState: T) => void): () => void
+    <U>(
+      selector: (state: T) => U,
+      listener: (selectedState: U, previousSelectedState: U) => void,
+      options?: {
+        equalityFn?: (a: U, b: U) => boolean
+        fireImmediately?: boolean
+      }
+    ): () => void
+  }
+}
+
+/**
+ * @deprecated Use `Mutate<StoreApi<T>, [["zustand/subscribeWithSelector", never]]>`.
+ * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
+ */
 export type StoreApiWithSubscribeWithSelector<T extends State> = StoreApi<T> & {
-  subscribe: Subscribe<T> & {
+  subscribe: {
     (listener: StateListener<T>): () => void
     <StateSlice>(
       selector: StateSelector<T, StateSlice>,
@@ -27,9 +56,9 @@ export type StoreApiWithSubscribeWithSelector<T extends State> = StoreApi<T> & {
 export const subscribeWithSelector =
   <
     S extends State,
-    CustomSetState extends SetState<S>,
-    CustomGetState extends GetState<S>,
-    CustomStoreApi extends StoreApi<S>
+    CustomSetState extends SetState<S> = SetState<S>,
+    CustomGetState extends GetState<S> = GetState<S>,
+    CustomStoreApi extends StoreApi<S> = StoreApi<S>
   >(
     fn: (set: CustomSetState, get: CustomGetState, api: CustomStoreApi) => S
   ) =>

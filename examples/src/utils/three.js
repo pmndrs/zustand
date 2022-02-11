@@ -41,7 +41,7 @@ export class DataTexture {}
 export class CanvasTexture {}
 export { DepthTexture } from 'three/src/textures/DepthTexture.js'
 export { Texture } from 'three/src/textures/Texture.js'
-//export * from 'three/src/geometries/Geometries.js'
+export * from 'three/src/geometries/Geometries.js'
 //export * from 'three/src/materials/Materials.js'
 export { Material } from 'three/src/materials/Material.js'
 //export { MeshStandardMaterial } from 'three/src/materials/MeshStandardMaterial.js'
@@ -125,7 +125,7 @@ export class OctahedronBufferGeometry {}
 export class SphereBufferGeometry {}
 export class TorusBufferGeometry {}
 export class WireframeGeometry {}
-export { Geometry } from 'three/src/core/Geometry.js'
+//export { Geometry } from 'three/src/core/Geometry.js'
 export { PlaneBufferGeometry } from 'three/src/geometries/PlaneGeometry.js'
 //export { InterleavedBufferAttribute } from 'three/src/core/InterleavedBufferAttribute.js'
 export class InterleavedBufferAttribute {}
