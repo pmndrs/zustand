@@ -1,0 +1,57 @@
+name: Test Multiple Builds
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test_matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [cjs, umd] # [cjs, esm, umd, system]
+        env: [development, production]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - run: yarn build
+      - name: Patch for DEV-ONLY
+        if: ${{ matrix.env == 'development' }}
+        run: |
+          sed -i~ "s/it[a-zA-Z]*('\[PRD-ONLY\]/it.skip('/" tests/*.tsx
+      - name: Patch for PRD-ONLY
+        if: ${{ matrix.env == 'production' }}
+        run: |
+          sed -i~ "s/it[a-zA-Z]*('\[DEV-ONLY\]/it.skip('/" tests/*.tsx
+      - name: Patch for CJS
+        if: ${{ matrix.build == 'cjs' }}
+        run: |
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\1.js/" package.json
+      - name: Patch for ESM
+        if: ${{ matrix.build == 'esm' }}
+        run: |
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js" package.json
+          sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
+        env:
+          NODE_ENV: ${{ matrix.env }}
+      - name: Patch for UMD/SystemJS
+        if: ${{ matrix.build == 'umd' || matrix.build == 'system' }}
+        run: |
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/${BUILD}\1.${NODE_ENV}.js/" package.json
+        env:
+          BUILD: ${{ matrix.build }}
+          NODE_ENV: ${{ matrix.env }}
+      - name: Test ${{ matrix.build }} ${{ matrix.env }}
+        run: |
+          cat package.json
+          yarn test:ci
+        env:
+          NODE_ENV: ${{ matrix.env }}
