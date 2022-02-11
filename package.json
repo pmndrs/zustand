@@ -1,7 +1,10 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "3.7.0",
+  "version": "4.0.0-beta.1",
+  "publishConfig": {
+     "tag": "next"
+   },
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
   "types": "./index.d.ts",
