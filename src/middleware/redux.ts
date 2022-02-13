@@ -1,6 +1,11 @@
 import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
 import { NamedSet } from './devtools'
 
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
+type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
+
 type Redux = <
   T extends State,
   A extends Action,
@@ -16,17 +21,12 @@ declare module '../vanilla' {
   }
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
-
-type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
+interface Action {
+  type: unknown
+}
 
 interface ReduxState<A extends Action> {
   dispatch: StoreRedux<A>['dispatch']
-}
-
-interface Action {
-  type: unknown
 }
 
 interface StoreRedux<A extends Action> {

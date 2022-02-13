@@ -17,6 +17,8 @@ declare module 'zustand' {
   }
 }
 
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+
 type WithImmer<S> = S extends {
   getState: () => infer T
   setState: infer SetState
@@ -36,8 +38,6 @@ type WithImmer<S> = S extends {
       }
     >
   : never
-
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 
 type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ...a: [...infer A, infer _]

@@ -67,6 +67,12 @@ type CreateStoreImpl = <
   initializer: StateCreator<T, [], Mos>
 ) => Mutate<StoreApi<T>, Mos>
 
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+  ...a: [...infer A, infer _]
+) => infer R
+  ? (...a: A) => R
+  : never
+
 const createStoreImpl: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
   let state: TState
@@ -105,12 +111,6 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   )
   return api as any
 }
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
 
 const createStore = ((f) => {
   if (f === undefined) return createStoreImpl

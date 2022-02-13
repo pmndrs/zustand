@@ -49,7 +49,7 @@ type Create = {
   <S extends StoreApi<State>>(store: S): UseBoundStore<S>
 }
 
-const _create = <T extends State>(createState: StateCreator<T, [], []>) => {
+const createImpl = <T extends State>(createState: StateCreator<T, [], []>) => {
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
 
@@ -64,8 +64,8 @@ const _create = <T extends State>(createState: StateCreator<T, [], []>) => {
 const create = (<T extends State>(
   createState: StateCreator<T, [], []> | undefined
 ) => {
-  if (!createState) return _create
-  return _create(createState)
+  if (!createState) return createImpl
+  return createImpl(createState)
 }) as Create
 
 export default create
