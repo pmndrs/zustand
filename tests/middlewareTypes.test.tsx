@@ -2,11 +2,11 @@ import create from 'zustand'
 import {
   combine,
   devtools,
+  immer,
   persist,
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
 
 type CounterState = {
   count: number
