@@ -7,6 +7,46 @@ import {
   StoreMutatorIdentifier,
 } from '../vanilla'
 
+declare module '../vanilla' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface StoreMutators<S, A> {
+    'zustand/devtools': WithDevtools<S>
+  }
+}
+
+type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
+
+type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
+
+type StoreSetStateWithAction<S> = S extends {
+  setState: (...a: infer A) => infer R
+}
+  ? {
+      setState: (...a: [...a: A, actionType?: string | { type: unknown }]) => R
+    }
+  : never
+
+interface DevtoolsOptions {
+  name?: string
+  anonymousActionType?: string
+  serialize?: {
+    options:
+      | boolean
+      | {
+          date?: boolean
+          regex?: boolean
+          undefined?: boolean
+          nan?: boolean
+          infinity?: boolean
+          error?: boolean
+          symbol?: boolean
+          map?: boolean
+          set?: boolean
+        }
+  }
+}
+
 type DevtoolsType = {
   subscribe: (dispatch: any) => () => void
   unsubscribe: () => void
@@ -55,19 +95,6 @@ interface DevtoolsOptions {
   }
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
-
-type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
-
-type StoreSetStateWithAction<S> = S extends {
-  setState: (...a: infer A) => infer R
-}
-  ? {
-      setState: (...a: [...a: A, actionType?: string | { type: unknown }]) => R
-    }
-  : never
-
 type DevtoolsImpl = <T extends State>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
   options: DevtoolsOptions
@@ -105,10 +132,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
   }
 
   if (!extensionConnector) {
-    if (
-      process.env.NODE_ENV === 'development' &&
-      typeof window !== 'undefined'
-    ) {
+    if (__DEV__ && typeof window !== 'undefined') {
       console.warn(
         '[zustand devtools middleware] Please install/enable Redux devtools extension'
       )
