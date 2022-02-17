@@ -439,6 +439,8 @@ describe('when it receives an message of type...', () => {
 })
 
 it('works with redux middleware', () => {
+  const savedDEV = __DEV__
+  __DEV__ = true
   const api = create(
     devtools(
       redux(
@@ -475,6 +477,7 @@ it('works with redux middleware', () => {
   )
 
   console.warn = originalConsoleWarn
+  __DEV__ = savedDEV
 })
 
 it('works in non-browser env', () => {
