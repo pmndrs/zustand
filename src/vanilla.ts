@@ -115,9 +115,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   return api as any
 }
 
-const createStore = ((f) => {
-  if (f === undefined) return createStoreImpl
-  return createStoreImpl(f)
-}) as CreateStore
+const createStore = ((createState) =>
+  createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
 
 export default createStore

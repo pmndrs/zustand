@@ -4,6 +4,19 @@ import { NamedSet } from './devtools'
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
+interface Action {
+  type: unknown
+}
+
+interface ReduxState<A extends Action> {
+  dispatch: StoreRedux<A>['dispatch']
+}
+
+interface StoreRedux<A extends Action> {
+  dispatch: (a: A) => A
+  dispatchFromDevtools: true
+}
+
 type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
 
 type Redux = <
@@ -19,19 +32,6 @@ declare module '../vanilla' {
   interface StoreMutators<S, A> {
     'zustand/redux': WithRedux<S, A>
   }
-}
-
-interface Action {
-  type: unknown
-}
-
-interface ReduxState<A extends Action> {
-  dispatch: StoreRedux<A>['dispatch']
-}
-
-interface StoreRedux<A extends Action> {
-  dispatch: (a: A) => A
-  dispatchFromDevtools: true
 }
 
 type PopArgument<T extends (...a: never[]) => unknown> = T extends (

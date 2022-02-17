@@ -63,9 +63,6 @@ const createImpl = <T extends State>(createState: StateCreator<T, [], []>) => {
 
 const create = (<T extends State>(
   createState: StateCreator<T, [], []> | undefined
-) => {
-  if (!createState) return createImpl
-  return createImpl(createState)
-}) as Create
+) => (createState ? createImpl(createState) : createImpl)) as Create
 
 export default create

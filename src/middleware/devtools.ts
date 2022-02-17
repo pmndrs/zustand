@@ -118,10 +118,6 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
       ? { name: options }
       : options
 
-  if (typeof window === 'undefined') {
-    return fn(set, get, api)
-  }
-
   let extensionConnector
   try {
     extensionConnector =
@@ -233,7 +229,11 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
     let didWarnAboutReservedActionType = false
     const originalDispatch = (api as any).dispatch
     ;(api as any).dispatch = (...a: any[]) => {
-      if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
+      if (
+        __DEV__ &&
+        a[0].type === '__setState' &&
+        !didWarnAboutReservedActionType
+      ) {
         console.warn(
           '[zustand devtools middleware] "__setState" action type is reserved ' +
             'to set state from the devtools. Avoid using it.'
