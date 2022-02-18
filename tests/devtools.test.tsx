@@ -438,7 +438,7 @@ describe('when it receives an message of type...', () => {
   })
 })
 
-it('works with redux middleware', () => {
+it('[DEV-ONLY] works with redux middleware', () => {
   const savedDEV = __DEV__
   __DEV__ = true
   const api = create(
