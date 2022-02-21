@@ -157,8 +157,8 @@ it('throws error when not using provider', async () => {
 it('useCallback with useStore infers types correctly', async () => {
   const { useStore } = createContext<CounterState>()
   function _Counter() {
-    let x = useStore(useCallback((state) => state.count, []))
-    expectAreTypesEqual<typeof x, number>().toBe(true)
+    const _x = useStore(useCallback((state) => state.count, []))
+    expectAreTypesEqual<typeof _x, number>().toBe(true)
   }
 })
 
