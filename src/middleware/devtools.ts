@@ -1,3 +1,5 @@
+import '@redux-devtools/extension'
+
 import { GetState, PartialState, SetState, State, StoreApi } from '../vanilla'
 
 declare module '../vanilla' {
@@ -27,21 +29,19 @@ type StoreSetStateWithAction<S> = S extends { getState: () => infer T }
 interface DevtoolsOptions {
   name?: string
   anonymousActionType?: string
-  serialize?: {
-    options:
-      | boolean
-      | {
-          date?: boolean
-          regex?: boolean
-          undefined?: boolean
-          nan?: boolean
-          infinity?: boolean
-          error?: boolean
-          symbol?: boolean
-          map?: boolean
-          set?: boolean
-        }
-  }
+  serialize?:
+    | boolean
+    | {
+        date?: boolean
+        regex?: boolean
+        undefined?: boolean
+        nan?: boolean
+        infinity?: boolean
+        error?: boolean
+        symbol?: boolean
+        map?: boolean
+        set?: boolean
+      }
 }
 
 type DevtoolsType = {
@@ -170,16 +170,14 @@ export function devtools<
     }
     const devtoolsOptions =
       options === undefined
-        ? { name: undefined, anonymousActionType: undefined }
+        ? {}
         : typeof options === 'string'
         ? { name: options }
         : options
 
     let extensionConnector
     try {
-      extensionConnector =
-        (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-        (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+      extensionConnector = window.__REDUX_DEVTOOLS_EXTENSION__
     } catch {
       // ignored
     }
