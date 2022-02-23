@@ -191,7 +191,9 @@ export function devtools<
       return fn(set, get, api)
     }
 
-    let extension = Object.create(extensionConnector.connect(devtoolsOptions))
+    let extension = (Object.create as <T>(t: T) => T)(
+      extensionConnector.connect(devtoolsOptions)
+    )
     // We're using `Object.defineProperty` to set `prefix`, so if extensionConnector.connect
     // returns the same reference we'd get cannot redefine property prefix error
     // hence we `Object.create` to make a new reference
