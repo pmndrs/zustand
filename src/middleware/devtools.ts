@@ -1,5 +1,4 @@
-import '@redux-devtools/extension'
-
+import type {} from '@redux-devtools/extension'
 import { GetState, PartialState, SetState, State, StoreApi } from '../vanilla'
 
 declare module '../vanilla' {
