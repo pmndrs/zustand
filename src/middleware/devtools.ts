@@ -294,70 +294,75 @@ export function devtools<
       }
     }
 
-    ;(extension as any) // FIXME no-any
-      .subscribe((message: any) => {
-        switch (message.type) {
-          case 'ACTION':
-            if (typeof message.payload !== 'string') {
-              console.error(
-                '[zustand devtools middleware] Unsupported action format'
-              )
-              return
-            }
-            return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
-              message.payload,
-              (action) => {
-                if (action.type === '__setState') {
-                  setStateFromDevtools(action.state as PartialState<S>)
-                  return
-                }
-
-                if (!api.dispatchFromDevtools) return
-                if (typeof api.dispatch !== 'function') return
-                ;(api.dispatch as any)(action)
-              }
+    ;(
+      extension as unknown as {
+        subscribe: (
+          listener: (message: any) => void // FIXME no-any
+        ) => (() => void) | undefined
+      }
+    ).subscribe((message) => {
+      switch (message.type) {
+        case 'ACTION':
+          if (typeof message.payload !== 'string') {
+            console.error(
+              '[zustand devtools middleware] Unsupported action format'
             )
-
-          case 'DISPATCH':
-            switch (message.payload.type) {
-              case 'RESET':
-                setStateFromDevtools(initialState)
-                return extension.init(api.getState())
-
-              case 'COMMIT':
-                return extension.init(api.getState())
-
-              case 'ROLLBACK':
-                return parseJsonThen<S>(message.state, (state) => {
-                  setStateFromDevtools(state)
-                  extension.init(api.getState())
-                })
-
-              case 'JUMP_TO_STATE':
-              case 'JUMP_TO_ACTION':
-                return parseJsonThen<S>(message.state, (state) => {
-                  setStateFromDevtools(state)
-                })
-
-              case 'IMPORT_STATE': {
-                const { nextLiftedState } = message.payload
-                const lastComputedState =
-                  nextLiftedState.computedStates.slice(-1)[0]?.state
-                if (!lastComputedState) return
-                setStateFromDevtools(lastComputedState)
-                extension.send(
-                  null as any, // FIXME no-any
-                  nextLiftedState
-                )
+            return
+          }
+          return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
+            message.payload,
+            (action) => {
+              if (action.type === '__setState') {
+                setStateFromDevtools(action.state as PartialState<S>)
                 return
               }
 
-              case 'PAUSE_RECORDING':
-                return (isRecording = !isRecording)
+              if (!api.dispatchFromDevtools) return
+              if (typeof api.dispatch !== 'function') return
+              ;(api.dispatch as any)(action)
             }
-            return
-        }
-      })
+          )
+
+        case 'DISPATCH':
+          switch (message.payload.type) {
+            case 'RESET':
+              setStateFromDevtools(initialState)
+              return extension.init(api.getState())
+
+            case 'COMMIT':
+              return extension.init(api.getState())
+
+            case 'ROLLBACK':
+              return parseJsonThen<S>(message.state, (state) => {
+                setStateFromDevtools(state)
+                extension.init(api.getState())
+              })
+
+            case 'JUMP_TO_STATE':
+            case 'JUMP_TO_ACTION':
+              return parseJsonThen<S>(message.state, (state) => {
+                setStateFromDevtools(state)
+              })
+
+            case 'IMPORT_STATE': {
+              const { nextLiftedState } = message.payload
+              const lastComputedState =
+                nextLiftedState.computedStates.slice(-1)[0]?.state
+              if (!lastComputedState) return
+              setStateFromDevtools(lastComputedState)
+              extension.send(
+                null as any, // FIXME no-any
+                nextLiftedState
+              )
+              return
+            }
+
+            case 'PAUSE_RECORDING':
+              return (isRecording = !isRecording)
+          }
+          return
+      }
+    })
 
     return initialState
   }
