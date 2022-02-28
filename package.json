@@ -3,7 +3,7 @@
   "private": true,
   "version": "4.0.0-beta.2",
   "publishConfig": {
-     "tag": "next"
+    "tag": "next"
   },
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
