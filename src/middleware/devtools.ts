@@ -27,21 +27,35 @@ type StoreSetStateWithAction<S> = S extends { getState: () => infer T }
 interface DevtoolsOptions {
   name?: string
   anonymousActionType?: string
-  serialize?: {
-    options:
-      | boolean
-      | {
-          date?: boolean
-          regex?: boolean
-          undefined?: boolean
-          nan?: boolean
-          infinity?: boolean
-          error?: boolean
-          symbol?: boolean
-          map?: boolean
-          set?: boolean
-        }
-  }
+  serialize?:
+    | boolean
+    | {
+        date?: boolean
+        regex?: boolean
+        undefined?: boolean
+        nan?: boolean
+        infinity?: boolean
+        error?: boolean
+        symbol?: boolean
+        map?: boolean
+        set?: boolean
+        /**
+         * @deprecated serialize.options is deprecated, just use serialize
+         */
+        options:
+          | boolean
+          | {
+              date?: boolean
+              regex?: boolean
+              undefined?: boolean
+              nan?: boolean
+              infinity?: boolean
+              error?: boolean
+              symbol?: boolean
+              map?: boolean
+              set?: boolean
+            }
+      }
 }
 
 type DevtoolsType = {
@@ -174,6 +188,11 @@ export function devtools<
         : typeof options === 'string'
         ? { name: options }
         : options
+    if (typeof (devtoolsOptions as any)?.serialize?.options !== 'undefined') {
+      console.warn(
+        '[zustand devtools middleware]: `serialize.options` is deprecated, just use `serialize`'
+      )
+    }
 
     let extensionConnector
     try {
