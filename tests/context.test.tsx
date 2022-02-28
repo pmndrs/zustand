@@ -1,6 +1,7 @@
 import {
   Component as ClassComponent,
   ReactNode,
+  useCallback,
   useEffect,
   useState,
 } from 'react'
@@ -151,4 +152,20 @@ it('throws error when not using provider', async () => {
     </ErrorBoundary>
   )
   await findByText('errored')
+})
+
+it('useCallback with useStore infers types correctly', async () => {
+  const { useStore } = createContext<CounterState>()
+  function _Counter() {
+    const _x = useStore(useCallback((state) => state.count, []))
+    expectAreTypesEqual<typeof _x, number>().toBe(true)
+  }
+})
+
+const expectAreTypesEqual = <A, B>() => ({
+  toBe: (
+    _: (<T>() => T extends B ? 1 : 0) extends <T>() => T extends A ? 1 : 0
+      ? true
+      : false
+  ) => {},
 })
