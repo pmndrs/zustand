@@ -24,17 +24,6 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect
 
-/**
- * @deprecated Please use UseBoundStore instead
- */
-export type UseStore<
-  T extends State,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
-> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-} & CustomStoreApi
-
 export type UseBoundStore<
   T extends State,
   CustomStoreApi extends StoreApi<T> = StoreApi<T>
