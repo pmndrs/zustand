@@ -43,7 +43,8 @@ export type SetState<T extends State> = {
     K4 extends keyof T = K3
   >(
     partial: PartialState<T, K1, K2, K3, K4>,
-    replace?: boolean
+    replace?: boolean,
+    name?: string
   ): void
 }
 export type GetState<T extends State> = () => T
