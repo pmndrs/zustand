@@ -134,7 +134,7 @@
     ]
   },
   "dependencies": {
-    "use-sync-external-store": "1.0.0-rc.1-next-629036a9c-20220224"
+    "use-sync-external-store": "1.0.0-rc.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
