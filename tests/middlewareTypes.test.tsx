@@ -1,4 +1,4 @@
-import create from 'zustand'
+import create, { StoreApi } from 'zustand'
 import {
   combine,
   devtools,
@@ -7,6 +7,7 @@ import {
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
+import createVanilla from 'zustand/vanilla'
 
 type CounterState = {
   count: number
@@ -61,6 +62,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<{ count: number }> = createVanilla(
+      immer(() => ({ count: 0 }))
+    )
   })
 
   it('redux', () => {
@@ -85,6 +90,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<{ count: number }> = createVanilla(
+      redux((x) => x, { count: 0 })
+    )
   })
 
   it('devtools', () => {
@@ -109,6 +118,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<{ count: number }> = createVanilla(
+      devtools(() => ({ count: 0 }))
+    )
   })
 
   it('subscribeWithSelector', () => {
@@ -132,6 +145,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<{ count: number }> = createVanilla(
+      subscribeWithSelector(() => ({ count: 0 }))
+    )
   })
 
   it('combine', () => {
@@ -150,6 +167,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<{ count: number }> = createVanilla(
+      combine({ count: 0 }, () => ({}))
+    )
   })
 
   it('persist', () => {
@@ -173,6 +194,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<{ count: number }> = createVanilla(
+      persist(() => ({ count: 0 }))
+    )
   })
 
   it('persist without custom api (#638)', () => {
