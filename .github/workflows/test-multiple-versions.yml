@@ -46,7 +46,7 @@ jobs:
       - run: yarn install --frozen-lockfile --check-files
       - name: Install alpha testing-library
         if: ${{ matrix.testing == 'alpha' }}
-        run: yarn add -D @testing-library/react@alpha
+        run: yarn add -D @testing-library/react@13.0.0-alpha.5
       - name: Patch for React 16
         if: ${{ startsWith(matrix.react, '16.') }}
         run: |
