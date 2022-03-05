@@ -8,10 +8,10 @@ import {
 } from 'react'
 import { EqualityChecker, State, StateSelector, StoreApi, useStore } from '.'
 
-type UseContextStore<S> = <U = ExtractState<S>>(
-  selector?: (state: ExtractState<S>) => U,
-  equals?: (a: U, b: U) => boolean
-) => U
+type UseContextStore<T extends State> = {
+  (): T
+  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+}
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
@@ -40,7 +40,7 @@ function createContext<S extends StoreApi<State>>() {
     )
   }
 
-  const useBoundStore: UseContextStore<S> = <StateSlice = ExtractState<S>>(
+  const useBoundStore = (<StateSlice = ExtractState<S>>(
     selector?: StateSelector<ExtractState<S>, StateSlice>,
     equalityFn?: EqualityChecker<StateSlice>
   ) => {
@@ -55,7 +55,7 @@ function createContext<S extends StoreApi<State>>() {
       selector as StateSelector<ExtractState<S>, StateSlice>,
       equalityFn
     )
-  }
+  }) as UseContextStore<S>
 
   const useStoreApi = () => {
     const store = useContext(ZustandContext)

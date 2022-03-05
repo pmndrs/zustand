@@ -1,3 +1,4 @@
+import type {} from '@redux-devtools/extension'
 import {
   PartialState,
   SetState,
@@ -30,21 +31,19 @@ type StoreSetStateWithAction<S> = S extends {
 interface DevtoolsOptions {
   name?: string
   anonymousActionType?: string
-  serialize?: {
-    options:
-      | boolean
-      | {
-          date?: boolean
-          regex?: boolean
-          undefined?: boolean
-          nan?: boolean
-          infinity?: boolean
-          error?: boolean
-          symbol?: boolean
-          map?: boolean
-          set?: boolean
-        }
-  }
+  serialize?:
+    | boolean
+    | {
+        date?: boolean
+        regex?: boolean
+        undefined?: boolean
+        nan?: boolean
+        infinity?: boolean
+        error?: boolean
+        symbol?: boolean
+        map?: boolean
+        set?: boolean
+      }
 }
 
 type DevtoolsType = {
@@ -72,26 +71,6 @@ declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface StoreMutators<S, A> {
     'zustand/devtools': WithDevtools<S>
-  }
-}
-
-interface DevtoolsOptions {
-  name?: string
-  anonymousActionType?: string
-  serialize?: {
-    options:
-      | boolean
-      | {
-          date?: boolean
-          regex?: boolean
-          undefined?: boolean
-          nan?: boolean
-          infinity?: boolean
-          error?: boolean
-          symbol?: boolean
-          map?: boolean
-          set?: boolean
-        }
   }
 }
 
