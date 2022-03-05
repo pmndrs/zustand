@@ -8,9 +8,12 @@ import {
 } from 'react'
 import { EqualityChecker, State, StateSelector, StoreApi, useStore } from '.'
 
-type UseContextStore<T extends State> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
+type UseContextStore<S extends StoreApi<State>> = {
+  (): ExtractState<S>
+  <U>(
+    selector: StateSelector<ExtractState<S>, U>,
+    equalityFn?: EqualityChecker<U>
+  ): U
 }
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
