@@ -354,7 +354,8 @@ describe('persist middleware with async configuration', () => {
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
         getStorage: () => storage,
-        merge: (persistedState, currentState) => {
+        merge: (_persistedState, currentState) => {
+          const persistedState = _persistedState as any
           delete persistedState.actions
 
           return {
