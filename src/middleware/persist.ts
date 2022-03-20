@@ -5,19 +5,15 @@ import {
   StoreMutatorIdentifier,
 } from '../vanilla'
 
-type DeepPartial<T> = {
-  [P in keyof T]?: DeepPartial<T[P]>
-}
-
 export type StateStorage = {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
   removeItem: (name: string) => void | Promise<void>
 }
 
-type StorageValue<S> = { state: DeepPartial<S>; version?: number }
+type StorageValue<S> = { state: S; version?: number }
 
-export type PersistOptions<S, PersistedState = Partial<S>> = {
+export type PersistOptions<S, PersistedState = S> = {
   /** Name of the storage (must be unique) */
   name: string
   /**
@@ -50,13 +46,15 @@ export type PersistOptions<S, PersistedState = Partial<S>> = {
    *
    * @params state The state's value
    */
-  partialize?: (state: S) => DeepPartial<S>
+  partialize?: (state: S) => PersistedState
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
    * The returned function will be called after the state rehydration or when an error occurred.
    */
-  onRehydrateStorage?: (state: S) => ((state?: S, error?: Error) => void) | void
+  onRehydrateStorage?: (
+    state: S
+  ) => ((state?: S, error?: unknown) => void) | void
   /**
    * If the stored state's version mismatch the one specified here, the storage will not be used.
    * This is useful when adding a breaking change to your store.
@@ -66,12 +64,12 @@ export type PersistOptions<S, PersistedState = Partial<S>> = {
    * A function to perform persisted state migration.
    * This function will be called when persisted state versions mismatch with the one specified here.
    */
-  migrate?: (persistedState: any, version: number) => S | Promise<S>
+  migrate?: (persistedState: unknown, version: number) => S | Promise<S>
   /**
    * A function to perform custom hydration merges when combining the stored state with the current one.
    * By default, this function does a shallow merge.
    */
-  merge?: (persistedState: any, currentState: S) => S
+  merge?: (persistedState: unknown, currentState: S) => S
 }
 
 type PersistListener<S> = (state: S) => void
@@ -131,12 +129,12 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   let options = {
     getStorage: () => localStorage,
     serialize: JSON.stringify as (state: StorageValue<S>) => string,
-    deserialize: JSON.parse as (str: string) => StorageValue<Partial<S>>,
+    deserialize: JSON.parse as (str: string) => StorageValue<S>,
     partialize: (state: S) => state,
     version: 0,
-    merge: (persistedState: any, currentState: S) => ({
+    merge: (persistedState: unknown, currentState: S) => ({
       ...currentState,
-      ...persistedState,
+      ...(typeof persistedState === 'object' ? persistedState : {}),
     }),
     ...baseOptions,
   }
@@ -258,7 +256,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       })
   }
 
-  ;(api as StoreApi<S> & StorePersist<S, unknown>).persist = {
+  ;(api as StoreApi<S> & StorePersist<S, S>).persist = {
     setOptions: (newOptions) => {
       options = {
         ...options,
@@ -320,7 +318,7 @@ type WithPersist<S, A> = S extends { getState: () => infer T }
 
 type PersistImpl = <T extends State>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
-  options: PersistOptions<T, unknown>
+  options: PersistOptions<T, T>
 ) => PopArgument<StateCreator<T, [], []>>
 
 type PopArgument<T extends (...a: never[]) => unknown> = T extends (
