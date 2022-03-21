@@ -217,8 +217,8 @@ const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmedia
 <summary>How to type store with `subscribeWithSelector` in TypeScript</summary>
 
 ```ts
-import create, { GetState, SetState } from 'zustand'
-import { StoreApiWithSubscribeWithSelector, subscribeWithSelector } from 'zustand/middleware'
+import create, { Mutate, GetState, SetState, StoreApi } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 type BearState = {
   paw: boolean
@@ -229,7 +229,7 @@ const useStore = create<
   BearState,
   SetState<BearState>,
   GetState<BearState>,
-  StoreApiWithSubscribeWithSelector<BearState>
+  Mutate<StoreApi<BearState>, [["zustand/subscribeWithSelector", never]]>
 >(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
 ```
 
