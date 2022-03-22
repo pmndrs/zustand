@@ -204,11 +204,6 @@ export function devtools<
     }
 
     if (!extensionConnector) {
-      if (__DEV__ && typeof window !== 'undefined') {
-        console.warn(
-          '[zustand devtools middleware] Please install/enable Redux devtools extension'
-        )
-      }
       return fn(set, get, api)
     }
 
