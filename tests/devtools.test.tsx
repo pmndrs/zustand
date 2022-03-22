@@ -52,19 +52,6 @@ describe('If there is no extension installed...', () => {
     }).not.toThrow()
   })
 
-  it('[DEV-ONLY] warns in dev env', () => {
-    __DEV__ = true
-    const originalConsoleWarn = console.warn
-    console.warn = jest.fn()
-
-    create(devtools(() => ({ count: 0 })))
-    expect(console.warn).toHaveBeenLastCalledWith(
-      '[zustand devtools middleware] Please install/enable Redux devtools extension'
-    )
-
-    console.warn = originalConsoleWarn
-  })
-
   it('[PRD-ONLY] does not warn if not in dev env', () => {
     __DEV__ = false
     const consoleWarn = jest.spyOn(console, 'warn')
