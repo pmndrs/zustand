@@ -1,6 +1,8 @@
 import { devtools, redux } from 'zustand/middleware'
 import create from 'zustand/vanilla'
 
+const test = __DEV__ ? it : it.skip
+
 let extensionSubscriber: ((message: any) => void) | undefined
 const extension = {
   subscribe: jest.fn((f) => {
@@ -25,7 +27,7 @@ beforeEach(() => {
   extensionSubscriber = undefined
 })
 
-it('connects to the extension by passing the options and initializes', () => {
+test('connects to the extension by passing the options and initializes', () => {
   const options = { name: 'test', foo: 'bar' }
   const initialState = { count: 0 }
   create(devtools(() => initialState, options))
@@ -45,14 +47,14 @@ describe('If there is no extension installed...', () => {
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
   })
 
-  it('does not throw', () => {
+  test('does not throw', () => {
     __DEV__ = false
     expect(() => {
       create(devtools(() => ({ count: 0 })))
     }).not.toThrow()
   })
 
-  it('[PRD-ONLY] does not warn if not in dev env', () => {
+  test('[PRD-ONLY] does not warn if not in dev env', () => {
     __DEV__ = false
     const consoleWarn = jest.spyOn(console, 'warn')
 
@@ -64,7 +66,7 @@ describe('If there is no extension installed...', () => {
 })
 
 describe('When state changes...', () => {
-  it("sends { type: setStateName || 'anonymous` } as the action with current state", () => {
+  test("sends { type: setStateName || 'anonymous` } as the action with current state", () => {
     const api = create(
       devtools(() => ({ count: 0, foo: 'bar' }), { name: 'testOptionsName' })
     )
@@ -83,7 +85,7 @@ describe('When state changes...', () => {
 
 describe('when it receives an message of type...', () => {
   describe('ACTION...', () => {
-    it('does nothing', () => {
+    test('does nothing', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       const setState = jest.spyOn(api, 'setState')
@@ -97,7 +99,7 @@ describe('when it receives an message of type...', () => {
       expect(setState).not.toBeCalled()
     })
 
-    it('unless action type is __setState', () => {
+    test('unless action type is __setState', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
 
@@ -109,7 +111,7 @@ describe('when it receives an message of type...', () => {
       expect(api.getState()).toStrictEqual({ ...initialState, foo: 'bar' })
     })
 
-    it('does nothing even if there is `api.dispatch`', () => {
+    test('does nothing even if there is `api.dispatch`', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       api.dispatch = jest.fn()
@@ -125,7 +127,7 @@ describe('when it receives an message of type...', () => {
       expect(api.dispatch).not.toBeCalled()
     })
 
-    it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true', () => {
+    test('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       api.dispatch = jest.fn()
@@ -142,7 +144,7 @@ describe('when it receives an message of type...', () => {
       expect(api.dispatch).toHaveBeenLastCalledWith({ type: 'INCREMENT' })
     })
 
-    it('does not throw for unsupported payload', () => {
+    test('does not throw for unsupported payload', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       api.dispatch = jest.fn()
@@ -189,7 +191,7 @@ describe('when it receives an message of type...', () => {
   })
 
   describe('DISPATCH and payload of type...', () => {
-    it('RESET, it inits with initial state', () => {
+    test('RESET, it inits with initial state', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       api.setState({ count: 1 })
@@ -205,7 +207,7 @@ describe('when it receives an message of type...', () => {
       expect(extension.send).not.toBeCalled()
     })
 
-    it('COMMIT, it inits with current state', () => {
+    test('COMMIT, it inits with current state', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       api.setState({ count: 2 })
@@ -222,7 +224,7 @@ describe('when it receives an message of type...', () => {
     })
 
     describe('ROLLBACK...', () => {
-      it('it updates state without recording and inits with `message.state`', () => {
+      test('it updates state without recording and inits with `message.state`', () => {
         const initialState = { count: 0, increment: () => {} }
         const api = create(devtools(() => initialState))
         const newState = { foo: 'bar' }
@@ -242,7 +244,7 @@ describe('when it receives an message of type...', () => {
         expect(extension.send).not.toBeCalled()
       })
 
-      it('does not throw for unparsable `message.state`', () => {
+      test('does not throw for unparsable `message.state`', () => {
         const increment = () => {}
         const initialState = { count: 0, increment }
         const api = create(devtools(() => initialState))
@@ -277,7 +279,7 @@ describe('when it receives an message of type...', () => {
 
     describe('JUMP_TO_STATE...', () => {
       const increment = () => {}
-      it('it updates state without recording with `message.state`', () => {
+      test('it updates state without recording with `message.state`', () => {
         const initialState = { count: 0, increment }
         const api = create(devtools(() => initialState))
         const newState = { foo: 'bar' }
@@ -292,7 +294,7 @@ describe('when it receives an message of type...', () => {
         expect(extension.send).not.toBeCalled()
       })
 
-      it('does not throw for unparsable `message.state`', () => {
+      test('does not throw for unparsable `message.state`', () => {
         const initialState = { count: 0, increment: () => {} }
         const api = create(devtools(() => initialState))
         const originalConsoleError = console.error
@@ -323,7 +325,7 @@ describe('when it receives an message of type...', () => {
     })
 
     describe('JUMP_TO_ACTION...', () => {
-      it('it updates state without recording with `message.state`', () => {
+      test('it updates state without recording with `message.state`', () => {
         const initialState = { count: 0, increment: () => {} }
         const api = create(devtools(() => initialState))
         const newState = { foo: 'bar' }
@@ -338,7 +340,7 @@ describe('when it receives an message of type...', () => {
         expect(extension.send).not.toBeCalled()
       })
 
-      it('does not throw for unparsable `message.state`', () => {
+      test('does not throw for unparsable `message.state`', () => {
         const increment = () => {}
         const initialState = { count: 0, increment }
         const api = create(devtools(() => initialState))
@@ -369,7 +371,7 @@ describe('when it receives an message of type...', () => {
       })
     })
 
-    it('IMPORT_STATE, it updates state without recording and inits the last computedState', () => {
+    test('IMPORT_STATE, it updates state without recording and inits the last computedState', () => {
       const initialState = { count: 0, increment: () => {} }
       const api = create(devtools(() => initialState))
       const nextLiftedState = {
@@ -391,7 +393,7 @@ describe('when it receives an message of type...', () => {
       expect(extension.send).toHaveBeenLastCalledWith(null, nextLiftedState)
     })
 
-    it('PAUSE_RECORDING, it toggles the sending of actions', () => {
+    test('PAUSE_RECORDING, it toggles the sending of actions', () => {
       const api = create(devtools(() => ({ count: 0 })))
 
       api.setState({ count: 1 }, false, 'increment')
@@ -423,7 +425,7 @@ describe('when it receives an message of type...', () => {
   })
 })
 
-it('works with redux middleware', () => {
+test('works with redux middleware', () => {
   const api = create(
     devtools(
       redux(
@@ -462,7 +464,7 @@ it('works with redux middleware', () => {
   console.warn = originalConsoleWarn
 })
 
-it('works in non-browser env', () => {
+test('works in non-browser env', () => {
   const originalWindow = global.window
   global.window = undefined as any
 
@@ -473,7 +475,7 @@ it('works in non-browser env', () => {
   global.window = originalWindow
 })
 
-it('works in react native env', () => {
+test('works in react native env', () => {
   const originalWindow = global.window
   global.window = {} as any
 
@@ -484,7 +486,7 @@ it('works in react native env', () => {
   global.window = originalWindow
 })
 
-it('preserves isRecording after setting from devtools', () => {
+test('preserves isRecording after setting from devtools', () => {
   const api = create(devtools(() => ({ count: 0 })))
   ;(extensionSubscriber as (message: any) => void)({
     type: 'DISPATCH',
