@@ -109,7 +109,7 @@ describe('when it receives an message of type...', () => {
       expect(api.getState()).toStrictEqual({ ...initialState, foo: 'bar' })
     })
 
-    it('does nothing even if there is `api.dispatch`', () => {
+    it('[DEV-ONLY] does nothing even if there is `api.dispatch`', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
       api.dispatch = jest.fn()
