@@ -2,6 +2,7 @@ import { devtools, redux } from 'zustand/middleware'
 import create from 'zustand/vanilla'
 
 const test = __DEV__ ? it : it.skip
+console.log(test)
 
 let extensionSubscriber: ((message: any) => void) | undefined
 const extension = {
