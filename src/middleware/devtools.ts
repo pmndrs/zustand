@@ -100,8 +100,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
   let extensionConnector
   try {
     extensionConnector =
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-      (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+      window.__REDUX_DEVTOOLS_EXTENSION__
   } catch {
     // ignored
   }
