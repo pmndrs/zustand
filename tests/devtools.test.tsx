@@ -88,10 +88,7 @@ describe('when it receives an message of type...', () => {
   describe('ACTION...', () => {
     it('does nothing', () => {
       const initialState = { count: 0 }
-      const api = create(
-        devtools(() => initialState, { enabled: true }),
-        
-      )
+      const api = create(devtools(() => initialState, { enabled: true }))
       const setState = jest.spyOn(api, 'setState')
 
       ;(extensionSubscriber as (message: any) => void)({
@@ -436,8 +433,9 @@ it('works with redux middleware', () => {
         ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
           count: count + (type === 'INCREMENT' ? 1 : -1),
         }),
-        { count: 0 },
-      ),{enabled: true}
+        { count: 0 }
+      ),
+      { enabled: true }
     )
   )
 
