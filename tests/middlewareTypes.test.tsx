@@ -200,6 +200,33 @@ describe('counter state spec (single middleware)', () => {
     )
   })
 
+  it('persist with partialize', () => {
+    const useStore = create<CounterState>()(
+      persist(
+        (set, get) => ({
+          count: 1,
+          inc: () => set({ count: get().count + 1 }, false),
+        }),
+        { name: 'prefix', partialize: (s) => s.count }
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.count) * 2
+      useStore((s) => s.inc)()
+      useStore().count * 2
+      useStore().inc()
+      useStore.getState().count * 2
+      useStore.getState().inc()
+      useStore.persist.hasHydrated()
+      useStore.persist.setOptions({
+        // @ts-expect-error to test if the partialized state is inferred as number
+        partialize: () => 'not-a-number',
+      })
+      return <></>
+    }
+    TestComponent
+  })
+
   it('persist without custom api (#638)', () => {
     const useStore = create<CounterState>()(
       persist(
