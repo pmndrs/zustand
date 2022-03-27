@@ -205,7 +205,6 @@ export function devtools<
     } catch {
       // ignored
     }
-    console.log(extensionConnector)
 
     if (!extensionConnector) {
       if (__DEV__ && enabled) {
