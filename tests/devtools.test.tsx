@@ -61,6 +61,36 @@ describe('If there is no extension installed...', () => {
 
     consoleWarn.mockRestore()
   })
+
+  it('[PRD-ONLY] does not warn if not in dev env even if enabled', () => {
+    __DEV__ = false
+    const consoleWarn = jest.spyOn(console, 'warn')
+
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
+    expect(consoleWarn).not.toBeCalled()
+
+    consoleWarn.mockRestore()
+  })
+
+  it('[DEV-ONLY] does not warn if not enabled', () => {
+    __DEV__ = true
+    const consoleWarn = jest.spyOn(console, 'warn')
+
+    create(devtools(() => ({ count: 0 })))
+    expect(consoleWarn).not.toBeCalled()
+
+    consoleWarn.mockRestore()
+  })
+
+  it('[DEV-ONLY] warns if enabled in dev mode', () => {
+    __DEV__ = true
+    const consoleWarn = jest.spyOn(console, 'warn')
+
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
+    expect(consoleWarn).toBeCalled()
+
+    consoleWarn.mockRestore()
+  })
 })
 
 describe('When state changes...', () => {
