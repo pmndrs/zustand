@@ -196,30 +196,6 @@ const unsub4 = useStore.subscribe(state => [state.paw, state.fur], console.log, 
 const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmediately: true })
 ```
 
-<details>
-<summary>How to type store with `subscribeWithSelector` in TypeScript</summary>
-
-```ts
-import create, { GetState, SetState } from 'zustand'
-import { StoreApiWithSubscribeWithSelector, subscribeWithSelector } from 'zustand/middleware'
-
-type BearState = {
-  paw: boolean
-  snout: boolean
-  fur: boolean
-}
-const useStore = create<
-  BearState,
-  SetState<BearState>,
-  GetState<BearState>,
-  StoreApiWithSubscribeWithSelector<BearState>
->(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
-```
-
-For more complex typing with multiple middlewares,
-Please refer [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
-</details>
-
 ## Using zustand without React
 
 Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
@@ -305,36 +281,6 @@ const useStore = create(
   ),
 )
 ```
-
-<details>
-<summary>How to pipe middlewares</summary>
-
-```js
-import create from "zustand"
-import produce from "immer"
-import pipe from "ramda/es/pipe"
-
-/* log and immer functions from previous example */
-/* you can pipe as many middlewares as you want */
-const createStore = pipe(log, immer, create)
-
-const useStore = createStore(set => ({
-  bears: 1,
-  increasePopulation: () => set(state => ({ bears: state.bears + 1 }))
-}))
-
-export default useStore
-```
-
-For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
-</details>
-
-<details>
-<summary>How to type immer middleware in TypeScript</summary>
-
-There is a reference implementation in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx) with some use cases.
-You can use any simplified variant based on your requirement.
-</details>
 
 ## Persist middleware
 
@@ -586,43 +532,216 @@ const Component = () => {
   ```
 </details>
 
-## Typing your store and `combine` middleware
+## TypeScript Usage
 
-```tsx
-// You can use `type`
-type BearState = {
-  bears: number
-  increase: (by: number) => void
-}
+### Basic usage
 
-// Or `interface`
+When using TypeScript you just have to make a tiny change that instead of writing `create(...)` you'll have to write `create<T>()(...)` where `T` would be type of the state so as to annotate it. Example...
+
+```ts
+import create from "zustand";
+
 interface BearState {
   bears: number
-  increase: (by: number) => void
+  increase: () => 
 }
 
-// And it is going to work for both
-const useStore = create<BearState>(set => ({
+create<BearState>()((set) => ({
   bears: 0,
-  increase: (by) => set(state => ({ bears: state.bears + by })),
+  increase: () => set((state) => ({ bears: state.bears + 1 })),
 }))
 ```
 
-Or, use `combine` and let tsc infer types. This merges two states shallowly.
+<details>
+  <summary>Why can't we just simply infer the type from initial state?</summary>
 
-```tsx
-import { combine } from 'zustand/middleware'
+  **TLDR**: Because state generic `T` is invariant.
+  
+  Consider this minimal version `create`...
 
-const useStore = create(
-  combine(
-    { bears: 0 },
-    (set) => ({ increase: (by: number) => set((state) => ({ bears: state.bears + by })) })
-  ),
-)
+  ```ts
+  declare const create: <T>(f: (get: () => T) => T) => T
+
+  let x = create(get => ({
+    foo: 0,
+    bar: () => get()
+  }))
+  // `x` is inferred as `unknown` instead of
+  // interface X {
+  //   foo: number,
+  //   bar: () => X
+  // }
+  ```
+
+  Here if you look at the type of `f` in `create` ie `(get: () => T) => T` it "gives" `T` as it returns `T` but then it also "takes" `T` via `get` so where does `T` come from TypeScript thinks... It's a like that chicken or egg problem. At the end TypeScript gives up and infers `T` as `unknown`.
+
+  So as long as the generic to be inferred is invariant TypeScript won't be able to infer it. Another simple example would be this...
+
+  ```ts
+  declare const createFoo: <T>(f: (t: T) => T) => T
+  let x = createFoo(_ => "hello")
+  ```
+
+  Here again `x` is `unknown` instead of `string`.
+  
+  Now one can argue it's impossible to write an implementation for `createFoo`, and that's true. But then it's also impossible to write Zustand's `create`... Wait but Zustand exists? So what do I mean by that?
+
+  The thing is Zustand is lying in it's type, the simplest way to prove it by showing unsoundness. Consider this example...
+
+  ```ts
+  import create from "zustand/vanilla"
+
+  create<{ foo: number }>()((_, get) => ({
+    foo: get().foo,
+  }))
+  ```
+
+  This code compiles, but guess what happens when you run it? You'll get an exception "Uncaught TypeError: Cannot read properties of undefined (reading 'foo') because after all `get` would return `undefined` before the initial state is created (hence kids don't call `get` when creating the initial state). But the types tell that get is `() => { foo: number }` which is exactly the lie I was taking about, `get` is that eventually but first it's `() => undefined`.
+
+  Okay we're quite deep in the rabbit hole haha, long story short zustand has a bit crazy runtime behavior that can't be typed in a sound way and inferrable way. We could make it inferrable with the right TypeScript features that don't exist today. And hey that tiny bit of unsoundness is not a problem.
+</details>
+
+<details>
+  <summary>Why that currying `()(...)`?</summary>
+  
+  **TLDR**: It's a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571).
+
+  Imagine you have a scenario like this...
+
+  ```ts
+  declare const withError: <T, E>(p: Promise<T>) =>
+    Promise<[error: undefined, value: T] | [error: E, value: undefined]>
+  declare const doSomething: () => Promise<string>
+
+  const main = async () => {
+    let [error, value] = await withError(doSomething())
+  }
+  ```
+
+  Here `T` is inferred as `string` and `E` is inferred as `unknown`. Now for some reason you want to annotate `E` as `Foo` because you're certain what shape of error `doSomething()` would throw. But too bad you can't do that, you can either pass all generics or none. So now along with annotating `E` as `Foo` you'll also have to annotate `T` as `string` which gets inferred anyway. So what to do? What you do is make a curried version of `withError` that does nothing in runtime, it's purpose is to just allow you annotate `E`...
+
+  ```ts
+  declare const withError: {
+    <E>(): <T>(p: Promise<T>) =>
+      Promise<[error: undefined, value: T] | [error: E, value: undefined]>
+    <T, E>(p: Promise<T>):
+      Promise<[error: undefined, value: T] | [error: E, value: undefined]>
+  }
+  declare const doSomething: () => Promise<string>
+  interface Foo { bar: string }
+
+  const main = async () => {
+    let [error, value] = await withError<Foo>()(doSomething())
+  }
+  ```
+
+  And now `T` gets inferred and you get to annotate `E` too. Zustand has the same use case we want to annotate the state (the first type parameter) but allow the rest type parameters to get inferred.
+</details>
+
+### Using middlewares
+
+You don't have to do anything special to use middlewares in TypeScript, just make sure you're using them immediately inside `create` so as to make the contextual inference work. But if you're something even remotely fancy like this...
+
+```js
+import create from "zustand"
+import { devtools, persist } from "zustand/middleware"
+
+const myMiddlewares = f => devtools(persist(f))
+
+create<{ bears: number }>(myMiddlewares(() => ({ bears: 0 })))
 ```
 
-Typing with multiple middleware might require some TypeScript knowledge. Refer some working examples in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
-  
+Then it'll be a problematic to type `myMiddlewares`. Instead just keep it simple...
+
+```ts
+import create from "zustand"
+import { devtools, persist } from "zustand/middleware"
+
+create<{ bears: number }>(devtools(persist(() => ({ bears: 0 })))
+```
+
+Now you don't have to do any extra typing work.
+
+### Authoring middlewares and advanced usage
+
+Imagine you had to write this hypothetical middleware...
+
+```js
+import create from "zustand"
+
+const foo = (f, bar) => (set, get, store) => {
+  let s = f(set, get, store)
+  store.foo = bar
+  return s;
+}
+
+let store = create(foo(() => ({ bears: 0 }), "hello"))
+console.log(store.foo.toUpperCase())
+```
+
+Yes, if you didn't know Zustand middlewares do and are allowed to mutate the store. But how could we possibly encode the mutation on the type-level? That is to say how could do we type `foo` so that this code compiles?
+
+For an usual statically typed language this is impossible, but thanks to TypeScript, Zustand has something called an "higher kinded mutator" that makes this possible. If you're dealing with complex type problems like typing a middleware or using the `StateCreator` type, then you'll have to understand this implementation detail, for that check out [#710](https://github.com/pmndrs/zustand/issues/710).
+
+<details>
+  <summary>If you're eager to know what the answer is to this particular problem then it's the following...</summary>
+
+  ```js
+  import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
+
+  type Foo =
+    < T extends State
+    , A
+    , Mps extends [StoreMutatorIdentifier, unknown][] = []
+    , Mcs extends [StoreMutatorIdentifier, unknown][] = []
+    >
+      ( f: StateCreator<T, [...Mps, ['foo', A]], Mcs>
+      , bar: A
+      ) =>
+        StateCreator<T, Mps, [['foo', A], ...Mcs]>
+
+  declare module 'zustand' {
+    interface StoreMutators<S, A> {
+      foo: Write<Cast<S, object> { foo: A }>
+    }
+  }
+
+  type FooImpl =
+    <T extends State, A>
+      ( f: PopArgument<StateCreator<T, [], []>>
+      , bar: A
+      ) => PopArgument<StateCreator<T, [], []>>
+
+  const fooImpl: FooImpl = (f, bar) => (set, get, _store) => {
+    type T = ReturnType<typeof f>
+    type A = typeof bar
+
+    let s = f(set, get, _store)
+    let store = _store as Mutate<StoreApi<T>, [['foo', A]]>
+    store.foo = bar
+    return s
+  }
+
+  export const foo = fooImpl as unknown as Foo
+
+  type PopArgument<T extends (...a: never[]) => unknown> =
+    T extends (...a: [...infer A, infer _]) => infer R
+      ? (...a: A) => R
+      : never
+
+  type Write<T extends object, U extends object> =
+    Omit<T, keyof U> & U
+
+  type Cast<T, U> =
+    T extends U ? T : U;
+
+  // ---
+
+  let store = create(foo(() => ({ bears: 0 }), "hello"))
+  console.log(store.foo.toUpperCase())
+  ```
+</details>
+
 ## Best practices
   
 * You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
