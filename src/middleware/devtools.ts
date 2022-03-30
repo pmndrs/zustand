@@ -99,8 +99,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
 
   let extensionConnector
   try {
-    extensionConnector =
-      window.__REDUX_DEVTOOLS_EXTENSION__
+    extensionConnector = window.__REDUX_DEVTOOLS_EXTENSION__
   } catch {
     // ignored
   }
