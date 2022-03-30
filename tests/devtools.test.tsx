@@ -62,7 +62,7 @@ describe('If there is no extension installed...', () => {
     expect(consoleWarn).not.toBeCalled()
   })
 
-  it('warns if enabled in dev mode', () => {
+  it('[DEV-ONLY] warns if enabled in dev mode', () => {
     __DEV__ = true
     create(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(consoleWarn).toBeCalled()
