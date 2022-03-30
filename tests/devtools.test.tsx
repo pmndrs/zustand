@@ -36,60 +36,48 @@ it('connects to the extension by passing the options and initializes', () => {
 
 describe('If there is no extension installed...', () => {
   let savedDEV: boolean
-  beforeAll(() => {
+  let consoleWarn: jest.SpyInstance<
+    void,
+    [message?: any, ...optionalParams: any[]]
+  >
+  beforeEach(() => {
+    consoleWarn = jest.spyOn(console, 'warn')
     savedDEV = __DEV__
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = undefined
   })
-  afterAll(() => {
+  afterEach(() => {
+    consoleWarn.mockRestore()
     __DEV__ = savedDEV
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
   })
 
   it('does not throw', () => {
-    __DEV__ = false
     expect(() => {
       create(devtools(() => ({ count: 0 })))
     }).not.toThrow()
   })
 
-  it('[PRD-ONLY] does not warn if not in dev env', () => {
-    __DEV__ = false
-    const consoleWarn = jest.spyOn(console, 'warn')
-
+  it('does not warn if not enabled', () => {
     create(devtools(() => ({ count: 0 })))
     expect(consoleWarn).not.toBeCalled()
+  })
 
-    consoleWarn.mockRestore()
+  it('warns if enabled in dev mode', () => {
+    __DEV__ = true
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
+    expect(consoleWarn).toBeCalled()
+  })
+
+  it('[PRD-ONLY] does not warn if not in dev env', () => {
+    __DEV__ = false
+    create(devtools(() => ({ count: 0 })))
+    expect(consoleWarn).not.toBeCalled()
   })
 
   it('[PRD-ONLY] does not warn if not in dev env even if enabled', () => {
     __DEV__ = false
-    const consoleWarn = jest.spyOn(console, 'warn')
-
     create(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(consoleWarn).not.toBeCalled()
-
-    consoleWarn.mockRestore()
-  })
-
-  it('[DEV-ONLY] does not warn if not enabled', () => {
-    __DEV__ = true
-    const consoleWarn = jest.spyOn(console, 'warn')
-
-    create(devtools(() => ({ count: 0 })))
-    expect(consoleWarn).not.toBeCalled()
-
-    consoleWarn.mockRestore()
-  })
-
-  it('[DEV-ONLY] warns if enabled in dev mode', () => {
-    __DEV__ = true
-    const consoleWarn = jest.spyOn(console, 'warn')
-
-    create(devtools(() => ({ count: 0 }), { enabled: true }))
-    expect(consoleWarn).toBeCalled()
-
-    consoleWarn.mockRestore()
   })
 })
 
