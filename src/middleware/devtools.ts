@@ -92,7 +92,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
 
   const devtoolsOptions =
     options === undefined
-      ? { name: undefined, anonymousActionType: undefined }
+      ? {}
       : typeof options === 'string'
       ? { name: options }
       : options
