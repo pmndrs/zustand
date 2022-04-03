@@ -638,6 +638,25 @@ const useStore = create<BearState>()((set) => ({
   And now `T` gets inferred and you get to annotate `E` too. Zustand has the same use case we want to annotate the state (the first type parameter) but allow the rest type parameters to get inferred.
 </details>
 
+Alternatively you can also use `combine` which infers the state instead of you having to type it...
+
+```ts
+import create from "zustand"
+import { combine } from "zustand/middleware"
+
+const useStore = create(combine({ bears: 0 }, (set, get, store) => ({
+  increase: (by: number) => set((state) => ({ bears: state.bears + by })),
+}))
+```
+
+<details>
+  <summary>But there's a little cost...</summary>
+
+  We achieve the inference by lying a little in the types of `set`, `get` and `store` that you receive as parameters. The lie is that they're typed in a way as if the state is the state first parameter of `combine` only when in fact the state if the shallow-merge (`{ ...a, ...b }`) of both states the one in first parameter and the one in the second parameter. So for example `get` from the received parameter has type `() => { bears: number }` and that's a lie it should be `() => { bears: number, increase: (by: number) => void }`. It's not a lie lie because `{ bears: number }` is still a subtype `{ bears: number, increase: (by: number) => void }`, so there's not much to worry, the types are a little less specific but not really "incorrect". And `useStore` still has the correct types, ie for example `useStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
+
+  So `combine` trades-off a little type-safety for the convience of not having to write a type for state. Hence you should use `combine` accordingly, usually it's not a big deal and it's okay to use it.
+</details>
+
 ### Using middlewares
 
 You don't have to do anything special to use middlewares in TypeScript.
