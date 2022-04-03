@@ -51,16 +51,16 @@ type ImmerImpl = <T extends State>(
 
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>
-  const immerSetState: typeof set = (updater, replace) => {
+
+  store.setState = (updater, replace) => {
     const nextState = (
       typeof updater === 'function' ? produce(updater as any) : updater
     ) as ((s: T) => T) | T | Partial<T>
 
     return set(nextState as any, replace)
   }
-  const s = initializer(immerSetState, get, store)
-  store.setState = immerSetState
-  return s
+
+  return initializer(store.setState, get, store)
 }
 
 export const immer = immerImpl as unknown as Immer
