@@ -543,12 +543,12 @@ import create from "zustand";
 
 interface BearState {
   bears: number
-  increase: () => 
+  increase: (by: number) => void
 }
 
-create<BearState>()((set) => ({
+const useStore = create<BearState>()((set) => ({
   bears: 0,
-  increase: () => set((state) => ({ bears: state.bears + 1 })),
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
 ```
 
@@ -562,7 +562,7 @@ create<BearState>()((set) => ({
   ```ts
   declare const create: <T>(f: (get: () => T) => T) => T
 
-  let x = create(get => ({
+  const x = create(get => ({
     foo: 0,
     bar: () => get()
   }))
@@ -579,7 +579,7 @@ create<BearState>()((set) => ({
 
   ```ts
   declare const createFoo: <T>(f: (t: T) => T) => T
-  let x = createFoo(_ => "hello")
+  const x = createFoo(_ => "hello")
   ```
 
   Here again `x` is `unknown` instead of `string`.
@@ -591,7 +591,7 @@ create<BearState>()((set) => ({
   ```ts
   import create from "zustand/vanilla"
 
-  create<{ foo: number }>()((_, get) => ({
+  const useStore = create<{ foo: number }>()((_, get) => ({
     foo: get().foo,
   }))
   ```
@@ -640,27 +640,41 @@ create<BearState>()((set) => ({
 
 ### Using middlewares
 
-You don't have to do anything special to use middlewares in TypeScript, just make sure you're using them immediately inside `create` so as to make the contextual inference work. But if you're something even remotely fancy like this...
-
-```js
-import create from "zustand"
-import { devtools, persist } from "zustand/middleware"
-
-const myMiddlewares = f => devtools(persist(f))
-
-create<{ bears: number }>(myMiddlewares(() => ({ bears: 0 })))
-```
-
-Then it'll be a problematic to type `myMiddlewares`. Instead just keep it simple...
+You don't have to do anything special to use middlewares in TypeScript.
 
 ```ts
 import create from "zustand"
 import { devtools, persist } from "zustand/middleware"
 
-create<{ bears: number }>(devtools(persist(() => ({ bears: 0 })))
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+const useStore = create<BearState>()(devtools(persist((set) => ({
+  bears: 0,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))))
 ```
 
-Now you don't have to do any extra typing work.
+Just make sure you're using them immediately inside `create` so as to make the contextual inference work. Doing something even remotely fancy like the following `myMiddlewares` would require more advanced types.
+
+```ts
+import create from "zustand"
+import { devtools, persist } from "zustand/middleware"
+
+const myMiddlewares = f => devtools(persist(f))
+
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+const useStore = create<BearState>()(myMiddlewares((set) => ({
+  bears: 0,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+})))
+```
 
 ### Authoring middlewares and advanced usage
 
@@ -670,12 +684,11 @@ Imagine you had to write this hypothetical middleware...
 import create from "zustand"
 
 const foo = (f, bar) => (set, get, store) => {
-  let s = f(set, get, store)
   store.foo = bar
-  return s;
+  return f(set, get, store);
 }
 
-let store = create(foo(() => ({ bears: 0 }), "hello"))
+const useStore = create(foo(() => ({ bears: 0 }), "hello"))
 console.log(store.foo.toUpperCase())
 ```
 
@@ -716,10 +729,9 @@ For an usual statically typed language this is impossible, but thanks to TypeScr
     type T = ReturnType<typeof f>
     type A = typeof bar
 
-    let s = f(set, get, _store)
-    let store = _store as Mutate<StoreApi<T>, [['foo', A]]>
+    const store = _store as Mutate<StoreApi<T>, [['foo', A]]>
     store.foo = bar
-    return s
+    return f(set, get, _store)
   }
 
   export const foo = fooImpl as unknown as Foo
@@ -737,7 +749,7 @@ For an usual statically typed language this is impossible, but thanks to TypeScr
 
   // ---
 
-  let store = create(foo(() => ({ bears: 0 }), "hello"))
+  const useStore = create(foo(() => ({ bears: 0 }), "hello"))
   console.log(store.foo.toUpperCase())
   ```
 </details>
