@@ -60,12 +60,11 @@ type DevtoolsType = {
 type Devtools = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  U = Partial<T>
+  Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
-  initializer: StateCreator<T, [...Mps, ['zustand/devtools', unknown]], Mcs>,
+  initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs>,
   options?: DevtoolsOptions
-) => StateCreator<T, Mps, [['zustand/devtools', U], ...Mcs]>
+) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs]>
 
 declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
