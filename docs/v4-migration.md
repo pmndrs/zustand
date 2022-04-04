@@ -1,142 +1,203 @@
-# v4.0.0
-
-## At a glance
-
-### TypeScript Improvements
-
-Imagine you want to have a store that uses `devtools` and `persist` middleware. In v3.7.x you'd write this something like...
-
-```typescript
-import create, { GetState, SetState } from "zustand"
-import { devtools, persist, StoreApiWithDevtools, StoreApiWithPersist } from "zustand/middleware"
-
-interface BearState {
-  count: number,
-  reset: () => void,
-  clearPersistStorage: () => void
-}
-
-let useStore = create<
-  BearState,
-  SetState<BearState>,
-  GetState<BearState>,
-  StoreApiWithDevtools<BearState> & StoreApiWithPersist<BearState>
-  // or in v3.7.x as...
-  // Mutate<StoreApi<BearState>, [["zustand/persist", BearState], ["zustand/devtools", never]]>
->(
-  persist(
-    devtools(
-      (set, get, store) =>
-        ({
-          count: 0,
-          reset: () => set({ count: 0 }, false, "reset"),
-          clearPersistStorage: () => store.persist.clearStorage()
-        })
-    ),
-    { name: "temp" }
-  )
-)
-let bearState = useStore()
-//  ^?
-```
-
-But now all you have to annotate is your state...
-
-```typescript
-import create, { GetState, SetState } from "zustand"
-import { devtools, persist, StoreApiWithDevtools, StoreApiWithPersist } from "zustand/middleware"
-
-interface BearState {
-  count: number,
-  reset: () => void,
-  clearPersistStorage: () => void
-}
-
-let useStore = create<BearState>()(
-  persist(
-    devtools(
-      (set, get, store) =>
-        ({
-          count: 0,
-          reset: () => set({ count: 0 }, false, "reset"),
-          clearPersistStorage: () => store.persist.clearStorage()
-        })
-    ),
-    { name: "temp" }
-  )
-)
-let bearState = useStore()
-//  ^?
-```
-
-Middlewares in zustand can and do mutate the store, which makes it almost impossible to type them correctly and make the inference work. But nonetheless @devanshj pulled it off in [#725](https://github.com/pmndrs/zustand/pull/725), if you're curious how it works you can read [#710](https://github.com/pmndrs/zustand/issues/710).
-
-### React 18
-
-something something `useSyncExternalStore` something something
-
-### Some other feature
-
-whatever
-
-## Breaking changes and migration
+# v4 Migrations
 
 If you're not using the typed version (either via TypeScript or via JSDoc) then there are no breaking changes for you and hence no migration is needed either.
 
-### `create` (from `zustand`, `zustand/vanilla`, or `zustand/react`)
+Also it's recommended to first read the new [TypeScript Guide](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md), it'll be easier to understand the migration.
 
-#### Change
+## `create` (from `zustand`, `zustand/vanilla`, and `zustand/react`)
+
+### Change
 
 ```diff
-  // Pseudo diff
 - create:
--   < TState
--   , TStoreSetState = StoreApi<State>["set"]
--   , TStoreGetState = StoreApi<State>["get"]
--   , TStore = StoreApi<State>
+-   < State
+-   , StoreSetState = StoreApi<State>["set"]
+-   , StoreGetState = StoreApi<State>["get"]
+-   , Store = StoreApi<State>
 -   >
 -     (f: ...) => ...
 + create:
-+   { <TState>(): (f: ...) => ...
-+   , <TState, TStore>(f: ...) => ...
++   { <State>(): (f: ...) => ...
++   , <State, InMutators, OutMutators>(f: ...) => ...
 +   }
 ```
 
-#### Migration
+### Migration
 
-If you're passing zero generics to `create` then there is no migration needed. Else do one of these two things...
+If you're passing zero generics to `create` then there is no migration needed. Else replace `create<T, ...>(...)` with `create<T>()(...)`.
 
-- (Recommended) Write `create<T>()(...)` instead of `create<T, ...>(...)`
-    We use currying (that doesn't do anything in the runtime) as a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571)
-- Write `create<T, MyStore>(...)` instead of `create<T, ...>()`.
+## `StateCreator` (from `zustand` and `zustand/vanilla`)
 
-### `StateCreator`
-
-#### Change
+### Change
 
 ```diff
-  // Pseudo diff
 - type StateCreator
--   < TState
--   , TStoreSetState = StoreApi<State>["set"]
--   , TStoreGetState = StoreApi<State>["get"]
--   , TStore = StoreApi<State>
+-   < State
+-   , StoreSetState = StoreApi<State>["set"]
+-   , StoreGetState = StoreApi<State>["get"]
+-   , Store = StoreApi<State>
 -   > =
 -     ...
 + type StateCreator
-+   < TState
-+   , TInMutators extends [StoreMutatorIdentifier, unknown][] = []
-+   , TOutMutators extends [StoreMutatorIdentifier, unknown][] = []
-+   , TReturn = TState
++   < State
++   , InMutators extends [StoreMutatorIdentifier, unknown][] = []
++   , OutMutators extends [StoreMutatorIdentifier, unknown][] = []
++   , Return = State
 +   > =
 +     ...
 ```
 
-#### Migration
+### Migration
 
-If you're not using `StateCreator` for authoring middlewares then you likely won't be using `StateCreator`. But in any case if you still are, then can try the following things or open an issue for help...
+If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#authoring-middlewares-and-advanced-usage) sections.
 
-- Replace `StateCreator<T, ...>` with `StateCreator<T>`
-- Replace `StateCreator<T, ...>` with `StateCreator<T, Mutators>` where `Mutators` that the store will have eg `StateCreator<MyState, [["zustand/devtools", never]]>`. You can learn more about how to write mutators in the updated readme.
+## `PartialState` (from `zustand` and `zustand/vanilla`)
 
-If you're using `StateCreator` to author middlewares then please check the updated readme to see a guide on how to author a middleware.
+### Change
+
+```diff
+- type PartialState
+-   < T extends State
+-   , K1 extends keyof T = keyof T
+-   , K2 extends keyof T = K1
+-   , K3 extends keyof T = K2
+-   , K4 extends keyof T = K3
+-   > =
+-   | (Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
+-   | ((state: T) => Pick<T, K1> | Pick<T, K2> | Pick<T, K3> | Pick<T, K4> | T)
++ type PartialState<T> =
++   | Partial<T>
++   | ((state: T) => Partial<T>)
+```
+
+### Migration
+
+Replace `PartialState<T, ...>` with `PartialState<T>` and preferably turn on [`--exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes)/
+
+We're no longer using the trick to disallow `{ foo: undefined }` to be assigned to `Partial<{ foo: string }>` instead now we're relying on the users to turn on `--exactOptionalPropertyTypes`.
+
+## `useStore` (from `zustand` and `zustand/react`)
+
+### Change
+
+```diff
+- useStore:
+-   { <State>(store: StoreApi<State>): State
+-   , <State, StateSlice>
+-       ( store: StoreApi<State>
+-       , selector: StateSelector<State, StateSlice>,
+-       , equals?: EqualityChecker<StateSlice>
+-       ): StateSlice
+-   }
++ useStore:
++   <Store, StateSlice = ExtractState<Store>>
++     ( store: Store
++     , selector?: StateSelector<State, StateSlice>,
++     , equals?: EqualityChecker<StateSlice>
++     )
++       => StateSlice
+```
+
+### Migration
+
+If you're not passing any type parameters to `useStore` then there is no migration needed. If you are then it's recommended to remove them, or pass the store type instead of the state type as the first parameter.
+
+## `UseBoundStore` (from `zustand` and `zustand/react`)
+
+### Change 
+
+```diff
+- type UseBoundStore<
+-   State,
+-   Store = StoreApi<State>
+- > =
+-   & { (): T
+-     , <StateSlice>
+-         ( selector: StateSelector<State, StateSlice>
+-         , equals?: EqualityChecker<StateSlice>
+-         ): U
+-     }
+-   & Store
++ type UseBoundStore<Store> =
++   & (<StateSlice = ExtractState<S>>
++       ( selector?: (state: ExtractState<S>) => StateSlice
++       , equals?: (a: StateSlice, b: StateSlice) => boolean
++       ) => StateSlice
++     )
++   & S
+```
+
+### Migration
+
+Replace `UseBoundStore<T>` with `UseBoundStore<StoreApi<T>>` and `UseBoundStore<T, S>` with `UseBoundStore<S>`
+
+## `UseContextStore` (from `zustand/context`)
+
+### Change
+
+```diff
+- type UseContextStore
+```
+
+### Migration
+
+Use `typeof MyContext.useStore` instead
+
+## `createContext` (from `zustand/context`)
+
+### Change
+
+```diff
+  createContext:
+-   <State, Store = StoreApi<State>>() => ...
++   <Store>() => ...
+```
+
+### Migration
+
+Replace `createContext<T>()` with `createContext<StoreApi<T>>()` and `createContext<T, S>()` with `createContext<S>()`.
+
+## `combine`, `devtools`, `persist`, `subscribeWithSelector` (from `zustand/middleware`)
+
+### Change
+
+```diff
+- combine:
+-   <T, U>(...) => ...
++ combine:
++   <T, U, Mps, Mcs>(...) => ...
+
+- devtools:
+-   <T>(...) => ...
++ devtools:
++   <T, Mps, Mcs>(...) => ...
+
+- persist:
+-   <T, U>(...) => ...
++ persist:
++   <T, U, Mps, Mcs>(...) => ...
+
+- subscribeWithSelector:
+-   <T>(...) => ...
++ subscribeWithSelector:
++   <T, Mps, Mcs>(...) => ...
+```
+
+### Migration
+
+If you're not passing any type parameters then there is no migration needed. If you're passing any type parameters, remove them as are inferred.
+
+## `redux` (from `zustand/middleware`)
+
+### Change
+
+```diff
+- redux:
+-   <T, A>(...) => ...
++ redux:
++   <T, A, Mps, Mcs>(...) => ...
+```
+
+### Migration
+
+If you're not passing any type parameters then there is no migration needed. If you're passing type parameters them remove them and annotate the second (action) parameter. That is replace `redux<T, A>((state, action) => ..., ...)` with `redux((state, action: A) => ..., ...)`.
