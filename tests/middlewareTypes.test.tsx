@@ -658,7 +658,7 @@ describe('create with explicitly annotated mutators', () => {
       CounterState,
       [
         ['zustand/subscribeWithSelector', never],
-        ['zustand/persist', Partial<CounterState>]
+        ['zustand/persist', CounterState]
       ]
     >(
       subscribeWithSelector(
