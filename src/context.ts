@@ -6,7 +6,13 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { EqualityChecker, State, StateSelector, StoreApi, useStore } from 'zustand'
+import {
+  EqualityChecker,
+  State,
+  StateSelector,
+  StoreApi,
+  useStore,
+} from 'zustand'
 
 type UseContextStore<S extends StoreApi<State>> = {
   (): ExtractState<S>
