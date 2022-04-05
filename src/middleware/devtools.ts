@@ -137,6 +137,28 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
   const initialState = fn(api.setState, get, api)
   extension.init(initialState)
 
+  if (
+    (api as any).dispatchFromDevtools &&
+    typeof (api as any).dispatch === 'function'
+  ) {
+    let didWarnAboutReservedActionType = false
+    const originalDispatch = (api as any).dispatch
+    ;(api as any).dispatch = (...a: any[]) => {
+      if (
+        __DEV__ &&
+        a[0].type === '__setState' &&
+        !didWarnAboutReservedActionType
+      ) {
+        console.warn(
+          '[zustand devtools middleware] "__setState" action type is reserved ' +
+            'to set state from the devtools. Avoid using it.'
+        )
+        didWarnAboutReservedActionType = true
+      }
+      ;(originalDispatch as any)(...a)
+    }
+  }
+
   extension.subscribe((message: any) => {
     switch (message.type) {
       case 'ACTION':
@@ -197,28 +219,6 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
         return
     }
   })
-
-  if (
-    (api as any).dispatchFromDevtools &&
-    typeof (api as any).dispatch === 'function'
-  ) {
-    let didWarnAboutReservedActionType = false
-    const originalDispatch = (api as any).dispatch
-    ;(api as any).dispatch = (...a: any[]) => {
-      if (
-        __DEV__ &&
-        a[0].type === '__setState' &&
-        !didWarnAboutReservedActionType
-      ) {
-        console.warn(
-          '[zustand devtools middleware] "__setState" action type is reserved ' +
-            'to set state from the devtools. Avoid using it.'
-        )
-        didWarnAboutReservedActionType = true
-      }
-      ;(originalDispatch as any)(...a)
-    }
-  }
 
   return initialState
 }
