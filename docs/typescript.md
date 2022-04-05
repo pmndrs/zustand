@@ -28,7 +28,7 @@ const useStore = create<BearState>()((set) => ({
   ```ts
   declare const create: <T>(f: (get: () => T) => T) => T
 
-  const x = create(get => ({
+  const x = create((get) => ({
     foo: 0,
     bar: () => get()
   }))
@@ -110,7 +110,7 @@ Alternatively you can also use `combine` which infers the state instead of you h
 import create from "zustand"
 import { combine } from "zustand/middleware"
 
-const useStore = create(combine({ bears: 0 }, (set, get, store) => ({
+const useStore = create(combine({ bears: 0 }, (set) => ({
   increase: (by: number) => set((state) => ({ bears: state.bears + by })),
 }))
 ```
@@ -287,4 +287,29 @@ type Cast<T, U> =
 
 const useStore = create(foo(() => ({ bears: 0 }), "hello"))
 console.log(store.foo.toUpperCase())
+```
+
+### `create` without curried workaround
+
+The recommended way to use `create` is using the curried workaround ie `create<T>()(...)` because this enabled you to infer the store type. But for some reason if you don't want to use the workaround then you can pass the type parameters like the following. Note that in some cases this acts as an assertion instead of annotation, so it's not recommended.
+
+```ts
+import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
+
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+const useStore = create<
+  BearState,
+  [],
+  [
+    ['zustand/persist', BearState],
+    ['zustand/devtools', never]
+  ]
+>(devtools(persist((set) => ({
+  bears: 0,
+  increase: (by) => set(state => ({ bears: state.bears + by })),
+})))
 ```

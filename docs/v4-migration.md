@@ -4,6 +4,8 @@ If you're not using the typed version (either via TypeScript or via JSDoc) then 
 
 Also it's recommended to first read the new [TypeScript Guide](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md), it'll be easier to understand the migration.
 
+In addition to this migration guide you can also check the diff of the test files in the repo from v3 to v4.
+
 ## `create` (from `zustand`, `zustand/vanilla`, and `zustand/react`)
 
 ### Change
@@ -24,7 +26,7 @@ Also it's recommended to first read the new [TypeScript Guide](https://github.co
 
 ### Migration
 
-If you're passing zero generics to `create` then there is no migration needed. Else replace `create<T, ...>(...)` with `create<T>()(...)`.
+If you're not passing any type parameters to `create` then there is no migration needed. If you're using a "leaf" middleware like `combine` or `redux` then remove all type parameters from `create`. Else replace `create<T, ...>(...)` with `create<T>()(...)`.
 
 ## `StateCreator` (from `zustand` and `zustand/vanilla`)
 
