@@ -1,5 +1,5 @@
-import { act, render, waitFor } from '@testing-library/react'
 import { useEffect } from 'react'
+import { act, render, waitFor } from '@testing-library/react'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
