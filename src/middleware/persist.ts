@@ -312,7 +312,7 @@ export const persist =
           }
         })
         .then((migratedState) => {
-          stateFromStorage = options.merge(migratedState as S, configResult)
+          stateFromStorage = options.merge(migratedState as S, get())
 
           set(stateFromStorage as S, true)
           return setItem()
