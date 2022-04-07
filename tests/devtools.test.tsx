@@ -438,43 +438,49 @@ describe('when it receives an message of type...', () => {
   })
 })
 
-it('works with redux middleware', () => {
-  const api = create(
-    devtools(
-      redux(
-        ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
-          count: count + (type === 'INCREMENT' ? 1 : -1),
-        }),
-        { count: 0 }
+describe('with redux middleware', () => {
+  let api: any
+
+  it('works as expected', () => {
+    api = create(
+      devtools(
+        redux(
+          ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
+            count: count + (type === 'INCREMENT' ? 1 : -1),
+          }),
+          { count: 0 }
+        )
       )
     )
-  )
 
-  api.dispatch({ type: 'INCREMENT' })
-  api.dispatch({ type: 'INCREMENT' })
-  ;(extensionSubscriber as (message: any) => void)({
-    type: 'ACTION',
-    payload: JSON.stringify({ type: 'DECREMENT' }),
+    api.dispatch({ type: 'INCREMENT' })
+    api.dispatch({ type: 'INCREMENT' })
+    ;(extensionSubscriber as (message: any) => void)({
+      type: 'ACTION',
+      payload: JSON.stringify({ type: 'DECREMENT' }),
+    })
+
+    expect(extension.init.mock.calls).toMatchObject([[{ count: 0 }]])
+    expect(extension.send.mock.calls).toMatchObject([
+      [{ type: 'INCREMENT' }, { count: 1 }],
+      [{ type: 'INCREMENT' }, { count: 2 }],
+      [{ type: 'DECREMENT' }, { count: 1 }],
+    ])
+    expect(api.getState()).toMatchObject({ count: 1 })
   })
 
-  expect(extension.init.mock.calls).toMatchObject([[{ count: 0 }]])
-  expect(extension.send.mock.calls).toMatchObject([
-    [{ type: 'INCREMENT' }, { count: 1 }],
-    [{ type: 'INCREMENT' }, { count: 2 }],
-    [{ type: 'DECREMENT' }, { count: 1 }],
-  ])
-  expect(api.getState()).toMatchObject({ count: 1 })
+  it('[DEV-ONLY] warns about misusage', () => {
+    const originalConsoleWarn = console.warn
+    console.warn = jest.fn()
 
-  const originalConsoleWarn = console.warn
-  console.warn = jest.fn()
+    api.dispatch({ type: '__setState' as any })
+    expect(console.warn).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] "__setState" action type is reserved ' +
+        'to set state from the devtools. Avoid using it.'
+    )
 
-  api.dispatch({ type: '__setState' as any })
-  expect(console.warn).toHaveBeenLastCalledWith(
-    '[zustand devtools middleware] "__setState" action type is reserved ' +
-      'to set state from the devtools. Avoid using it.'
-  )
-
-  console.warn = originalConsoleWarn
+    console.warn = originalConsoleWarn
+  })
 })
 
 it('works in non-browser env', () => {
