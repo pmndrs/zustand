@@ -60,6 +60,9 @@ function createESMConfig(input, output) {
       resolve({ extensions }),
       replace({
         __DEV__: '(import.meta.env&&import.meta.env.MODE)!=="production"',
+        // a workround for #829
+        'use-sync-external-store/shim/with-selector':
+          'use-sync-external-store/shim/with-selector.js',
         preventAssignment: true,
       }),
       getEsbuild('node12'),
