@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { act, render, waitFor } from '@testing-library/react'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -215,6 +216,58 @@ describe('persist middleware with async configuration', () => {
       })
     )
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
+  })
+
+  it('can merge partial persisted state', async () => {
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: { count: 42 },
+        }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(
+        (set) => ({
+          count: 0,
+          name: 'unknown',
+          setName: (name: string) => {
+            set({ name })
+          },
+        }),
+        {
+          name: 'test-storage',
+          getStorage: () => storage,
+        }
+      )
+    )
+
+    function Component() {
+      const { count, setName, name } = useStore()
+      useEffect(() => {
+        setName('test')
+      }, [setName])
+      return (
+        <div>
+          <div>count: {count}</div>
+          <div>name: {name}</div>
+        </div>
+      )
+    }
+
+    const { findByText } = render(<Component />)
+
+    await findByText('count: 42')
+    await findByText('name: test')
+
+    expect(useStore.getState()).toEqual(
+      expect.objectContaining({
+        count: 42,
+        name: 'test',
+      })
+    )
   })
 
   it('can correclty handle a missing migrate function', async () => {
