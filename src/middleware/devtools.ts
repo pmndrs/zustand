@@ -1,3 +1,4 @@
+import type {} from '@redux-devtools/extension'
 import { GetState, PartialState, SetState, State, StoreApi } from '../vanilla'
 
 declare module '../vanilla' {
@@ -5,6 +6,13 @@ declare module '../vanilla' {
   interface StoreMutators<S, A> {
     'zustand/devtools': WithDevtools<S>
   }
+}
+
+// FIXME https://github.com/reduxjs/redux-devtools/issues/1097
+type Message = {
+  type: string
+  payload?: any
+  state?: any
 }
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
@@ -39,22 +47,6 @@ interface DevtoolsOptions {
         symbol?: boolean
         map?: boolean
         set?: boolean
-        /**
-         * @deprecated serialize.options is deprecated, just use serialize
-         */
-        options:
-          | boolean
-          | {
-              date?: boolean
-              regex?: boolean
-              undefined?: boolean
-              nan?: boolean
-              infinity?: boolean
-              error?: boolean
-              symbol?: boolean
-              map?: boolean
-              set?: boolean
-            }
       }
 }
 
@@ -184,21 +176,14 @@ export function devtools<
     }
     const devtoolsOptions =
       options === undefined
-        ? { name: undefined, anonymousActionType: undefined }
+        ? {}
         : typeof options === 'string'
         ? { name: options }
         : options
-    if (typeof (devtoolsOptions as any)?.serialize?.options !== 'undefined') {
-      console.warn(
-        '[zustand devtools middleware]: `serialize.options` is deprecated, just use `serialize`'
-      )
-    }
 
-    let extensionConnector
+    let extensionConnector: typeof window['__REDUX_DEVTOOLS_EXTENSION__']
     try {
-      extensionConnector =
-        (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-        (window as any).top.__REDUX_DEVTOOLS_EXTENSION__
+      extensionConnector = window.__REDUX_DEVTOOLS_EXTENSION__
     } catch {
       // ignored
     }
@@ -212,7 +197,9 @@ export function devtools<
       return fn(set, get, api)
     }
 
-    let extension = Object.create(extensionConnector.connect(devtoolsOptions))
+    let extension = (Object.create as <T>(t: T) => T)(
+      extensionConnector.connect(devtoolsOptions)
+    )
     // We're using `Object.defineProperty` to set `prefix`, so if extensionConnector.connect
     // returns the same reference we'd get cannot redefine property prefix error
     // hence we `Object.create` to make a new reference
@@ -314,7 +301,14 @@ export function devtools<
       }
     }
 
-    extension.subscribe((message: any) => {
+    ;(
+      extension as unknown as {
+        // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
+        subscribe: (
+          listener: (message: Message) => void
+        ) => (() => void) | undefined
+      }
+    ).subscribe((message) => {
       switch (message.type) {
         case 'ACTION':
           if (typeof message.payload !== 'string') {
@@ -364,7 +358,10 @@ export function devtools<
                 nextLiftedState.computedStates.slice(-1)[0]?.state
               if (!lastComputedState) return
               setStateFromDevtools(lastComputedState)
-              extension.send(null, nextLiftedState)
+              extension.send(
+                null as any, // FIXME no-any
+                nextLiftedState
+              )
               return
             }
 
