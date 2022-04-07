@@ -8,6 +8,13 @@ declare module '../vanilla' {
   }
 }
 
+// FIXME https://github.com/reduxjs/redux-devtools/issues/1097
+type Message = {
+  type: string
+  payload?: any
+  state?: any
+}
+
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
@@ -129,7 +136,7 @@ export function devtools<
         ? { name: options }
         : options
 
-    let extensionConnector
+    let extensionConnector: typeof window['__REDUX_DEVTOOLS_EXTENSION__']
     try {
       extensionConnector = window.__REDUX_DEVTOOLS_EXTENSION__
     } catch {

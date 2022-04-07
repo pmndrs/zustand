@@ -24,7 +24,8 @@ export function useStore<TState extends State, StateSlice>(
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    null,
+    // TODO avoid `any` and add type only in react.ts
+    (api as any).getServerState || api.getState,
     selector,
     equalityFn
   )
