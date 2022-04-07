@@ -25,14 +25,6 @@ export type StateListener<T> = (state: T, previousState: T) => void
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 export type Subscribe<T extends State> = {
   (listener: StateListener<T>): () => void
-  /**
-   * @deprecated Please use `subscribeWithSelector` middleware
-   */
-  <StateSlice>(
-    listener: StateSliceListener<StateSlice>,
-    selector?: StateSelector<T, StateSlice>,
-    equalityFn?: EqualityChecker<StateSlice>
-  ): () => void
 }
 
 export type SetState<T extends State> = {
@@ -113,40 +105,10 @@ function createStore<
 
   const getState: GetState<TState> = () => state
 
-  const subscribeWithSelector = <StateSlice>(
-    listener: StateSliceListener<StateSlice>,
-    selector: StateSelector<TState, StateSlice> = getState as any,
-    equalityFn: EqualityChecker<StateSlice> = Object.is
-  ) => {
-    console.warn('[DEPRECATED] Please use `subscribeWithSelector` middleware')
-    let currentSlice: StateSlice = selector(state)
-    function listenerToAdd() {
-      const nextSlice = selector(state)
-      if (!equalityFn(currentSlice, nextSlice)) {
-        const previousSlice = currentSlice
-        listener((currentSlice = nextSlice), previousSlice)
-      }
-    }
-    listeners.add(listenerToAdd)
+  const subscribe: Subscribe<TState> = (listener: StateListener<TState>) => {
+    listeners.add(listener)
     // Unsubscribe
-    return () => listeners.delete(listenerToAdd)
-  }
-
-  const subscribe: Subscribe<TState> = <StateSlice>(
-    listener: StateListener<TState> | StateSliceListener<StateSlice>,
-    selector?: StateSelector<TState, StateSlice>,
-    equalityFn?: EqualityChecker<StateSlice>
-  ) => {
-    if (selector || equalityFn) {
-      return subscribeWithSelector(
-        listener as StateSliceListener<StateSlice>,
-        selector,
-        equalityFn
-      )
-    }
-    listeners.add(listener as StateListener<TState>)
-    // Unsubscribe
-    return () => listeners.delete(listener as StateListener<TState>)
+    return () => listeners.delete(listener)
   }
 
   const destroy: Destroy = () => listeners.clear()
