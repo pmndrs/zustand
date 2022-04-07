@@ -23,6 +23,10 @@ jobs:
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
       - run: yarn build
+      - name: Use React 17 for production test
+        if: ${{ matrix.env == 'production' }}
+        run: |
+          yarn add -D react@17.0.2 react-dom@17.0.2 @testing-library/react@12.1.4
       - name: Patch for DEV-ONLY
         if: ${{ matrix.env == 'development' }}
         run: |
