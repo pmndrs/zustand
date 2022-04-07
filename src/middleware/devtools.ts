@@ -42,17 +42,6 @@ interface DevtoolsOptions {
       }
 }
 
-type DevtoolsType = {
-  subscribe: (dispatch: any) => () => void
-  unsubscribe: () => void
-  send: {
-    (action: string | { type: unknown }, state: any): void
-    (action: null, liftedState: any): void
-  }
-  init: (state: any) => void
-  error: (payload: any) => void
-}
-
 export type NamedSet<T extends State> = {
   <
     K1 extends keyof T,
@@ -152,9 +141,7 @@ export function devtools<
       return fn(set, get, api)
     }
 
-    const extension = extensionConnector.connect(
-      devtoolsOptions
-    ) as DevtoolsType
+    const extension = extensionConnector.connect(devtoolsOptions)
 
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
@@ -201,8 +188,14 @@ export function devtools<
       }
     }
 
-    // FIXME no-any
-    extension.subscribe((message: any) => {
+    ;(
+      extension as unknown as {
+        // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
+        subscribe: (
+          listener: (message: Message) => void
+        ) => (() => void) | undefined
+      }
+    ).subscribe((message) => {
       switch (message.type) {
         case 'ACTION':
           if (typeof message.payload !== 'string') {
