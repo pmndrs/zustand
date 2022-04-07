@@ -39,10 +39,7 @@ interface StoreSubscribeWithSelector<T extends State> {
  * @deprecated Use `Mutate<StoreApi<T>, [["zustand/subscribeWithSelector", never]]>`.
  * See tests/middlewaresTypes.test.tsx for usage with multiple middlewares.
  */
-export type StoreApiWithSubscribeWithSelector<T extends State> = Omit<
-  StoreApi<T>,
-  'subscribe' // FIXME remove omit in v4
-> & {
+export type StoreApiWithSubscribeWithSelector<T extends State> = StoreApi<T> & {
   subscribe: {
     (listener: StateListener<T>): () => void
     <StateSlice>(
@@ -68,8 +65,7 @@ export const subscribeWithSelector =
   (
     set: CustomSetState,
     get: CustomGetState,
-    api: Omit<CustomStoreApi, 'subscribe'> & // FIXME remove omit in v4
-      StoreApiWithSubscribeWithSelector<S>
+    api: CustomStoreApi & StoreApiWithSubscribeWithSelector<S>
   ): S => {
     const origSubscribe = api.subscribe as Subscribe<S>
     api.subscribe = ((selector: any, optListener: any, options: any) => {
@@ -90,10 +86,6 @@ export const subscribeWithSelector =
       }
       return origSubscribe(listener)
     }) as any
-    const initialState = fn(
-      set,
-      get,
-      api as CustomStoreApi // FIXME can remove in v4?
-    )
+    const initialState = fn(set, get, api)
     return initialState
   }
