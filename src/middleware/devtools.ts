@@ -15,6 +15,13 @@ declare module '../vanilla' {
   }
 }
 
+// FIXME https://github.com/reduxjs/redux-devtools/issues/1097
+type Message = {
+  type: string
+  payload?: any
+  state?: any
+}
+
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
@@ -44,17 +51,6 @@ interface DevtoolsOptions {
         map?: boolean
         set?: boolean
       }
-}
-
-type DevtoolsType = {
-  subscribe: (dispatch: any) => () => void
-  unsubscribe: () => void
-  send: {
-    (action: string | { type: unknown }, state: any): void
-    (action: null, liftedState: any): void
-  }
-  init: (state: any) => void
-  error: (payload: any) => void
 }
 
 type Devtools = <
@@ -112,7 +108,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
     return fn(set, get, api)
   }
 
-  const extension = extensionConnector.connect(devtoolsOptions) as DevtoolsType
+  const extension = extensionConnector.connect(devtoolsOptions)
 
   let isRecording = true
   ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
@@ -159,7 +155,14 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
     }
   }
 
-  extension.subscribe((message: any) => {
+  ;(
+    extension as unknown as {
+      // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
+      subscribe: (
+        listener: (message: Message) => void
+      ) => (() => void) | undefined
+    }
+  ).subscribe((message: any) => {
     switch (message.type) {
       case 'ACTION':
         if (typeof message.payload !== 'string') {
@@ -209,7 +212,10 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
               nextLiftedState.computedStates.slice(-1)[0]?.state
             if (!lastComputedState) return
             setStateFromDevtools(lastComputedState)
-            extension.send(null, nextLiftedState)
+            extension.send(
+              null as any, // FIXME no-any
+              nextLiftedState
+            )
             return
           }
 
