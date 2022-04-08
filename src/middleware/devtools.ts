@@ -18,15 +18,7 @@ type Message = {
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
-type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>> & {
-  /**
-   * @deprecated `devtools` property on the store is deprecated
-   * it will be removed in the next major.
-   * You shouldn't interact with the extension directly. But in case you still want to
-   * you can patch `window.__REDUX_DEVTOOLS_EXTENSION__` directly
-   */
-  devtools?: DevtoolsType
-}
+type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
 
 type StoreSetStateWithAction<S> = S extends { getState: () => infer T }
   ? S & { setState: NamedSet<Cast<T, object>> }
@@ -50,23 +42,6 @@ interface DevtoolsOptions {
       }
 }
 
-type DevtoolsType = {
-  /**
-   * @deprecated along with `api.devtools`, `api.devtools.prefix` is deprecated.
-   * We no longer prefix the actions/names, because the `name` option already
-   * creates a separate instance of devtools for each store.
-   */
-  prefix: string
-  subscribe: (dispatch: any) => () => void
-  unsubscribe: () => void
-  send: {
-    (action: string | { type: unknown }, state: any): void
-    (action: null, liftedState: any): void
-  }
-  init: (state: any) => void
-  error: (payload: any) => void
-}
-
 export type NamedSet<T extends State> = {
   <
     K1 extends keyof T,
@@ -85,13 +60,6 @@ export type NamedSet<T extends State> = {
  */
 export type StoreApiWithDevtools<T extends State> = StoreApi<T> & {
   setState: NamedSet<T>
-  /**
-   * @deprecated `devtools` property on the store is deprecated
-   * it will be removed in the next major.
-   * You shouldn't interact with the extension directly. But in case you still want to
-   * you can patch `window.__REDUX_DEVTOOLS_EXTENSION__` directly
-   */
-  devtools?: DevtoolsType
 }
 
 export function devtools<
@@ -104,11 +72,7 @@ export function devtools<
 ): (
   set: CustomSetState,
   get: CustomGetState,
-  api: CustomStoreApi &
-    StoreApiWithDevtools<S> & {
-      dispatch?: unknown
-      dispatchFromDevtools?: boolean
-    }
+  api: CustomStoreApi & StoreApiWithDevtools<S>
 ) => S
 /**
  * @deprecated Passing `name` as directly will be not allowed in next major.
@@ -125,11 +89,7 @@ export function devtools<
 ): (
   set: CustomSetState,
   get: CustomGetState,
-  api: CustomStoreApi &
-    StoreApiWithDevtools<S> & {
-      dispatch?: unknown
-      dispatchFromDevtools?: boolean
-    }
+  api: CustomStoreApi & StoreApiWithDevtools<S>
 ) => S
 export function devtools<
   S extends State,
@@ -142,11 +102,7 @@ export function devtools<
 ): (
   set: CustomSetState,
   get: CustomGetState,
-  api: CustomStoreApi &
-    StoreApiWithDevtools<S> & {
-      dispatch?: unknown
-      dispatchFromDevtools?: boolean
-    }
+  api: CustomStoreApi & StoreApiWithDevtools<S>
 ) => S
 export function devtools<
   S extends State,
@@ -160,20 +116,8 @@ export function devtools<
   return (
     set: CustomSetState,
     get: CustomGetState,
-    api: CustomStoreApi &
-      StoreApiWithDevtools<S> & {
-        dispatch?: unknown
-        dispatchFromDevtools?: boolean
-      }
+    api: CustomStoreApi & StoreApiWithDevtools<S>
   ): S => {
-    let didWarnAboutNameDeprecation = false
-    if (typeof options === 'string' && !didWarnAboutNameDeprecation) {
-      console.warn(
-        '[zustand devtools middleware]: passing `name` as directly will be not allowed in next major' +
-          'pass the `name` in an object `{ name: ... }` instead'
-      )
-      didWarnAboutNameDeprecation = true
-    }
     const devtoolsOptions =
       options === undefined
         ? {}
@@ -197,71 +141,7 @@ export function devtools<
       return fn(set, get, api)
     }
 
-    let extension = (Object.create as <T>(t: T) => T)(
-      extensionConnector.connect(devtoolsOptions)
-    )
-    // We're using `Object.defineProperty` to set `prefix`, so if extensionConnector.connect
-    // returns the same reference we'd get cannot redefine property prefix error
-    // hence we `Object.create` to make a new reference
-
-    let didWarnAboutDevtools = false
-    Object.defineProperty(api, 'devtools', {
-      get: () => {
-        if (!didWarnAboutDevtools) {
-          console.warn(
-            '[zustand devtools middleware] `devtools` property on the store is deprecated ' +
-              'it will be removed in the next major.\n' +
-              "You shouldn't interact with the extension directly. But in case you still want to " +
-              'you can patch `window.__REDUX_DEVTOOLS_EXTENSION__` directly'
-          )
-          didWarnAboutDevtools = true
-        }
-        return extension
-      },
-      set: (value) => {
-        if (!didWarnAboutDevtools) {
-          console.warn(
-            '[zustand devtools middleware] `api.devtools` is deprecated, ' +
-              'it will be removed in the next major.\n' +
-              "You shouldn't interact with the extension directly. But in case you still want to " +
-              'you can patch `window.__REDUX_DEVTOOLS_EXTENSION__` directly'
-          )
-          didWarnAboutDevtools = true
-        }
-        extension = value
-      },
-    })
-
-    let didWarnAboutPrefix = false
-    Object.defineProperty(extension, 'prefix', {
-      get: () => {
-        if (!didWarnAboutPrefix) {
-          console.warn(
-            '[zustand devtools middleware] along with `api.devtools`, `api.devtools.prefix` is deprecated.\n' +
-              'We no longer prefix the actions/names' +
-              devtoolsOptions.name ===
-              undefined
-              ? ', pass the `name` option to create a separate instance of devtools for each store.'
-              : ', because the `name` option already creates a separate instance of devtools for each store.'
-          )
-          didWarnAboutPrefix = true
-        }
-        return ''
-      },
-      set: () => {
-        if (!didWarnAboutPrefix) {
-          console.warn(
-            '[zustand devtools middleware] along with `api.devtools`, `api.devtools.prefix` is deprecated.\n' +
-              'We no longer prefix the actions/names' +
-              devtoolsOptions.name ===
-              undefined
-              ? ', pass the `name` option to create a separate instance of devtools for each store.'
-              : ', because the `name` option already creates a separate instance of devtools for each store.'
-          )
-          didWarnAboutPrefix = true
-        }
-      },
-    })
+    const extension = extensionConnector.connect(devtoolsOptions)
 
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
@@ -286,11 +166,18 @@ export function devtools<
     const initialState = fn(api.setState, get, api)
     extension.init(initialState)
 
-    if (api.dispatchFromDevtools && typeof api.dispatch === 'function') {
+    if (
+      (api as any).dispatchFromDevtools &&
+      typeof (api as any).dispatch === 'function'
+    ) {
       let didWarnAboutReservedActionType = false
-      const originalDispatch = api.dispatch
-      api.dispatch = (...a: any[]) => {
-        if (a[0].type === '__setState' && !didWarnAboutReservedActionType) {
+      const originalDispatch = (api as any).dispatch
+      ;(api as any).dispatch = (...a: any[]) => {
+        if (
+          __DEV__ &&
+          a[0].type === '__setState' &&
+          !didWarnAboutReservedActionType
+        ) {
           console.warn(
             '[zustand devtools middleware] "__setState" action type is reserved ' +
               'to set state from the devtools. Avoid using it.'
@@ -325,9 +212,9 @@ export function devtools<
                 return
               }
 
-              if (!api.dispatchFromDevtools) return
-              if (typeof api.dispatch !== 'function') return
-              ;(api.dispatch as any)(action)
+              if (!(api as any).dispatchFromDevtools) return
+              if (typeof (api as any).dispatch !== 'function') return
+              ;(api as any).dispatch(action)
             }
           )
 

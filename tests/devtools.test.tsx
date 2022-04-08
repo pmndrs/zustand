@@ -1,5 +1,5 @@
 import { devtools, redux } from 'zustand/middleware'
-import create from 'zustand/vanilla'
+import create, { StoreApi } from 'zustand/vanilla'
 
 let extensionSubscriber: ((message: any) => void) | undefined
 const extension = {
@@ -125,7 +125,7 @@ describe('when it receives an message of type...', () => {
     it('does nothing even if there is `api.dispatch`', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
-      api.dispatch = jest.fn()
+      ;(api as any).dispatch = jest.fn()
       const setState = jest.spyOn(api, 'setState')
 
       ;(extensionSubscriber as (message: any) => void)({
@@ -135,14 +135,14 @@ describe('when it receives an message of type...', () => {
 
       expect(api.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect(api.dispatch).not.toBeCalled()
+      expect((api as any).dispatch).not.toBeCalled()
     })
 
     it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
-      api.dispatch = jest.fn()
-      api.dispatchFromDevtools = true
+      ;(api as any).dispatch = jest.fn()
+      ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
 
       ;(extensionSubscriber as (message: any) => void)({
@@ -152,14 +152,16 @@ describe('when it receives an message of type...', () => {
 
       expect(api.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect(api.dispatch).toHaveBeenLastCalledWith({ type: 'INCREMENT' })
+      expect((api as any).dispatch).toHaveBeenLastCalledWith({
+        type: 'INCREMENT',
+      })
     })
 
     it('does not throw for unsupported payload', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState))
-      api.dispatch = jest.fn()
-      api.dispatchFromDevtools = true
+      ;(api as any).dispatch = jest.fn()
+      ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
       const originalConsoleError = console.error
       console.error = jest.fn()
@@ -195,7 +197,7 @@ describe('when it receives an message of type...', () => {
 
       expect(api.getState()).toBe(initialState)
       expect(setState).not.toBeCalled()
-      expect(api.dispatch).not.toBeCalled()
+      expect((api as any).dispatch).not.toBeCalled()
 
       console.error = originalConsoleError
     })
@@ -436,43 +438,50 @@ describe('when it receives an message of type...', () => {
   })
 })
 
-it('works with redux middleware', () => {
-  const api = create(
-    devtools(
-      redux(
-        ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
-          count: count + (type === 'INCREMENT' ? 1 : -1),
-        }),
-        { count: 0 }
+describe('with redux middleware', () => {
+  let api: StoreApi<{ count: number }>
+
+  it('works as expected', () => {
+    api = create(
+      devtools(
+        redux(
+          (
+            { count },
+            { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+          ) => ({
+            count: count + (type === 'INCREMENT' ? 1 : -1),
+          }),
+          { count: 0 }
+        )
       )
     )
-  )
+    ;(api as any).dispatch({ type: 'INCREMENT' })
+    ;(api as any).dispatch({ type: 'INCREMENT' })
+    ;(extensionSubscriber as (message: any) => void)({
+      type: 'ACTION',
+      payload: JSON.stringify({ type: 'DECREMENT' }),
+    })
 
-  api.dispatch({ type: 'INCREMENT' })
-  api.dispatch({ type: 'INCREMENT' })
-  ;(extensionSubscriber as (message: any) => void)({
-    type: 'ACTION',
-    payload: JSON.stringify({ type: 'DECREMENT' }),
+    expect(extension.init.mock.calls).toMatchObject([[{ count: 0 }]])
+    expect(extension.send.mock.calls).toMatchObject([
+      [{ type: 'INCREMENT' }, { count: 1 }],
+      [{ type: 'INCREMENT' }, { count: 2 }],
+      [{ type: 'DECREMENT' }, { count: 1 }],
+    ])
+    expect(api.getState()).toMatchObject({ count: 1 })
   })
 
-  expect(extension.init.mock.calls).toMatchObject([[{ count: 0 }]])
-  expect(extension.send.mock.calls).toMatchObject([
-    [{ type: 'INCREMENT' }, { count: 1 }],
-    [{ type: 'INCREMENT' }, { count: 2 }],
-    [{ type: 'DECREMENT' }, { count: 1 }],
-  ])
-  expect(api.getState()).toMatchObject({ count: 1 })
+  it('[DEV-ONLY] warns about misusage', () => {
+    const originalConsoleWarn = console.warn
+    console.warn = jest.fn()
+    ;(api as any).dispatch({ type: '__setState' as any })
+    expect(console.warn).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] "__setState" action type is reserved ' +
+        'to set state from the devtools. Avoid using it.'
+    )
 
-  const originalConsoleWarn = console.warn
-  console.warn = jest.fn()
-
-  api.dispatch({ type: '__setState' as any })
-  expect(console.warn).toHaveBeenLastCalledWith(
-    '[zustand devtools middleware] "__setState" action type is reserved ' +
-      'to set state from the devtools. Avoid using it.'
-  )
-
-  console.warn = originalConsoleWarn
+    console.warn = originalConsoleWarn
+  })
 })
 
 it('works in non-browser env', () => {
