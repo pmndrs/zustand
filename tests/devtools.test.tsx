@@ -439,20 +439,18 @@ describe('when it receives an message of type...', () => {
 })
 
 describe('with redux middleware', () => {
-  let api: any
-
-  it('works as expected', () => {
-    api = create(
-      devtools(
-        redux(
-          ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
-            count: count + (type === 'INCREMENT' ? 1 : -1),
-          }),
-          { count: 0 }
-        )
+  const api = create(
+    devtools(
+      redux(
+        ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
+          count: count + (type === 'INCREMENT' ? 1 : -1),
+        }),
+        { count: 0 }
       )
     )
+  )
 
+  it('works as expected', () => {
     api.dispatch({ type: 'INCREMENT' })
     api.dispatch({ type: 'INCREMENT' })
     ;(extensionSubscriber as (message: any) => void)({
