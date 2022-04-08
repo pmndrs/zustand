@@ -6,7 +6,7 @@ Also it's recommended to first read the new [TypeScript Guide](https://github.co
 
 In addition to this migration guide you can also check the diff of the test files in the repo from v3 to v4.
 
-## `create` (from `zustand`, `zustand/vanilla`, and `zustand/react`)
+## `create` (from `zustand` and `zustand/vanilla`)
 
 ### Change
 
@@ -20,7 +20,7 @@ In addition to this migration guide you can also check the diff of the test file
 -     (f: ...) => ...
 + create:
 +   { <State>(): (f: ...) => ...
-+   , <State, InMutators, OutMutators>(f: ...) => ...
++   , <State, Mutators>(f: ...) => ...
 +   }
 ```
 

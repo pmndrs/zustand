@@ -116,9 +116,11 @@ const useStore = create(combine({ bears: 0 }, (set) => ({
 ```
 
 <details>
-  <summary>But there's a little cost...</summary>
+  <summary>But be a little careful...</summary>
 
-  We achieve the inference by lying a little in the types of `set`, `get` and `store` that you receive as parameters. The lie is that they're typed in a way as if the state is the first parameter only when in fact the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. So for example `get` from the second parameter has type `() => { bears: number }` and that's a lie as it should be `() => { bears: number, increase: (by: number) => void }`. It's not a lie lie because `{ bears: number }` is still a subtype `{ bears: number, increase: (by: number) => void }`, so there's not much to worry, the types are a little less specific but not really "incorrect". And `useStore` still has the correct type, ie for example `useStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
+  We achieve the inference by lying a little in the types of `set`, `get` and `store` that you receive as parameters. The lie is that they're typed in a way as if the state is the first parameter only when in fact the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. So for example `get` from the second parameter has type `() => { bears: number }` and that's a lie as it should be `() => { bears: number, increase: (by: number) => void }`. And `useStore` still has the correct type, ie for example `useStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
+
+  It's not a lie lie because `{ bears: number }` is still a subtype `{ bears: number, increase: (by: number) => void }`, so in most cases there won't be a problem. Just you have to be careful while using replace. For eg `set({ bears: 0 }, true)` would compile but will be unsound as it'll delete the `increase` function. (If you set from "outside" ie `useStore.setState({ bears: 0 }, true)` then it won't compile because the "outside" store knows that `increase` is missing.) Another instance where you should be careful you're doing `Object.keys`, `Object.keys(get())` will return `["bears", "increase"]` and not `["bears"]` (the return type of `get` can make you fall for this).
 
   So `combine` trades-off a little type-safety for the convience of not having to write a type for state. Hence you should use `combine` accordingly, usually it's not a big deal and it's okay to use it.
 </details>
@@ -303,7 +305,6 @@ interface BearState {
 
 const useStore = create<
   BearState,
-  [],
   [
     ['zustand/persist', BearState],
     ['zustand/devtools', never]
