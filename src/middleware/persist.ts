@@ -134,7 +134,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     version: 0,
     merge: (persistedState: unknown, currentState: S) => ({
       ...currentState,
-      ...(typeof persistedState === 'object' ? persistedState : {}),
+      ...(persistedState as object),
     }),
     ...baseOptions,
   }
