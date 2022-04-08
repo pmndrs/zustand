@@ -228,7 +228,11 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useStore = create<{
+      count: number
+      name: string
+      setName: (name: string) => void
+    }>()(
       persist(
         (set) => ({
           count: 0,
