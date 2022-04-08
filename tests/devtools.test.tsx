@@ -1,5 +1,5 @@
 import { devtools, redux } from 'zustand/middleware'
-import create from 'zustand/vanilla'
+import create, { StoreApi } from 'zustand/vanilla'
 
 let extensionSubscriber: ((message: any) => void) | undefined
 const extension = {
@@ -439,20 +439,24 @@ describe('when it receives an message of type...', () => {
 })
 
 describe('with redux middleware', () => {
-  const api = create(
-    devtools(
-      redux(
-        ({ count }, { type }: { type: 'INCREMENT' | 'DECREMENT' }) => ({
-          count: count + (type === 'INCREMENT' ? 1 : -1),
-        }),
-        { count: 0 }
-      )
-    )
-  )
+  let api: StoreApi<{ count: number }>
 
   it('works as expected', () => {
-    api.dispatch({ type: 'INCREMENT' })
-    api.dispatch({ type: 'INCREMENT' })
+    api = create(
+      devtools(
+        redux(
+          (
+            { count },
+            { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+          ) => ({
+            count: count + (type === 'INCREMENT' ? 1 : -1),
+          }),
+          { count: 0 }
+        )
+      )
+    )
+    ;(api as any).dispatch({ type: 'INCREMENT' })
+    ;(api as any).dispatch({ type: 'INCREMENT' })
     ;(extensionSubscriber as (message: any) => void)({
       type: 'ACTION',
       payload: JSON.stringify({ type: 'DECREMENT' }),
@@ -470,8 +474,7 @@ describe('with redux middleware', () => {
   it('[DEV-ONLY] warns about misusage', () => {
     const originalConsoleWarn = console.warn
     console.warn = jest.fn()
-
-    api.dispatch({ type: '__setState' as any })
+    ;(api as any).dispatch({ type: '__setState' as any })
     expect(console.warn).toHaveBeenLastCalledWith(
       '[zustand devtools middleware] "__setState" action type is reserved ' +
         'to set state from the devtools. Avoid using it.'
