@@ -241,7 +241,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         }
       })
       .then((migratedState) => {
-        stateFromStorage = options.merge(migratedState as S, configResult)
+        stateFromStorage = options.merge(
+          migratedState as S,
+          get() ?? configResult
+        )
 
         set(stateFromStorage as S, true)
         return setItem()
