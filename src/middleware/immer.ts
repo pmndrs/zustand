@@ -1,5 +1,5 @@
-import { produce } from 'immer'
-import type { Draft } from 'immer'
+// eslint-disable-next-line import/named
+import { Draft, produce } from 'immer'
 import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type Immer = <
