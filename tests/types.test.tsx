@@ -172,3 +172,16 @@ it('should allow for different partial keys to be returnable from setState', () 
     return { something: true }
   })
 })
+
+it('setState with replace requires whole state', () => {
+  const store = create<{ count: number; something: string }>(() => ({
+    count: 0,
+    something: 'foo',
+  }))
+
+  store.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true
+  )
+})
