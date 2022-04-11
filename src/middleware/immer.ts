@@ -18,6 +18,19 @@ declare module 'zustand' {
 }
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type SkipTwo<T> = T extends []
+  ? []
+  : T extends [unknown]
+  ? []
+  : T extends [unknown?]
+  ? []
+  : T extends [unknown, unknown, ...infer A]
+  ? A
+  : T extends [unknown, unknown?, ...infer A]
+  ? A
+  : T extends [unknown?, unknown?, ...infer A]
+  ? A
+  : never
 
 type WithImmer<S> = S extends {
   getState: () => infer T
@@ -26,13 +39,11 @@ type WithImmer<S> = S extends {
   ? Write<
       S,
       {
-        setState: SetState extends (
-          ...a: [infer _, infer __, ...infer A]
-        ) => infer Sr
+        setState: SetState extends (...a: infer A) => infer Sr
           ? <Nt extends R extends true ? T : Partial<T>, R extends boolean>(
               nextStateOrUpdater: Nt | ((state: Draft<T>) => void),
               shouldReplace?: R,
-              ...a: A
+              ...a: SkipTwo<A>
             ) => Sr
           : never
       }
@@ -52,12 +63,12 @@ type ImmerImpl = <T extends State>(
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>
 
-  store.setState = (updater, replace) => {
+  store.setState = (updater, replace, ...a) => {
     const nextState = (
       typeof updater === 'function' ? produce(updater as any) : updater
     ) as ((s: T) => T) | T | Partial<T>
 
-    return set(nextState as any, replace)
+    return set(nextState as any, replace, ...a)
   }
 
   return initializer(store.setState, get, store)
