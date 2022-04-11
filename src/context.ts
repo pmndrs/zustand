@@ -20,6 +20,10 @@ type UseContextStore<S extends StoreApi<State>> = {
     selector: StateSelector<ExtractState<S>, U>,
     equalityFn?: EqualityChecker<U>
   ): U
+  (
+    selector: undefined,
+    equalityFn?: EqualityChecker<ExtractState<S>>
+  ): ExtractState<S>
 }
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never

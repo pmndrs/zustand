@@ -10,11 +10,17 @@ import createStore, {
   StoreMutatorIdentifier,
 } from './vanilla'
 
-export function useStore<S extends StoreApi<State>, U = ExtractState<S>>(
+export function useStore<S extends StoreApi<State>>(api: S): ExtractState<S>
+export function useStore<S extends StoreApi<State>, U>(
   api: S,
-  selector?: StateSelector<ExtractState<S>, U>,
+  selector: StateSelector<ExtractState<S>, U>,
   equalityFn?: EqualityChecker<U>
 ): U
+export function useStore<S extends StoreApi<State>>(
+  api: S,
+  selector: undefined,
+  equalityFn?: EqualityChecker<ExtractState<S>>
+): ExtractState<S>
 export function useStore<TState extends State, StateSlice>(
   api: StoreApi<TState>,
   selector: StateSelector<TState, StateSlice> = api.getState as any,
@@ -34,11 +40,17 @@ export function useStore<TState extends State, StateSlice>(
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-export type UseBoundStore<S extends StoreApi<State>> = (<U = ExtractState<S>>(
-  selector?: (state: ExtractState<S>) => U,
-  equals?: (a: U, b: U) => boolean
-) => U) &
-  S
+export type UseBoundStore<S extends StoreApi<State>> = {
+  (): ExtractState<S>
+  <U>(
+    selector: StateSelector<ExtractState<S>, U>,
+    equals?: EqualityChecker<U>
+  ): U
+  (
+    selector: undefined,
+    equals?: EqualityChecker<ExtractState<S>>
+  ): ExtractState<S>
+} & S
 
 type Create = {
   <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
