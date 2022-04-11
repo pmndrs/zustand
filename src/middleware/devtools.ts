@@ -1,4 +1,5 @@
 import type {} from '@redux-devtools/extension'
+import type { Draft } from 'immer'
 import {
   PartialState,
   SetState,
@@ -24,15 +25,62 @@ type Message = {
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
+type TakeTwo<T> = T extends []
+  ? [undefined, undefined]
+  : T extends [unknown]
+  ? [...a0: T, a1: undefined]
+  : T extends [unknown?]
+  ? [...a0: T, a1: undefined]
+  : T extends [unknown, unknown]
+  ? T
+  : T extends [unknown, unknown?]
+  ? T
+  : T extends [unknown?, unknown?]
+  ? T
+  : T extends [infer A0, infer A1, ...unknown[]]
+  ? [A0, A1]
+  : T extends [infer A0, (infer A1)?, ...unknown[]]
+  ? [A0, A1?]
+  : T extends [(infer A0)?, (infer A1)?, ...unknown[]]
+  ? [A0?, A1?]
+  : never
 
 type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
 
 type StoreSetStateWithAction<S> = S extends {
-  setState: (...a: infer A) => infer R
+  getState: () => infer T
+  setState: (...a: infer A) => unknown
 }
-  ? {
-      setState: (...a: [...a: A, actionType?: string | { type: unknown }]) => R
-    }
+  ? A extends [Partial<T> | ((state: T) => Partial<T>), (boolean | undefined)?]
+    ? {
+        setState: <
+          Nt extends R extends true ? T : Partial<T>,
+          R extends boolean | undefined
+        >(
+          partial: Nt | ((state: T) => Nt),
+          replace?: R,
+          actionType?: string | { type: unknown }
+        ) => void
+      }
+    : A extends [
+        Partial<T> | ((state: Draft<T>) => void),
+        (boolean | undefined)?
+      ]
+    ? {
+        setState: <
+          Nt extends R extends true ? T : Partial<T>,
+          R extends boolean | undefined
+        >(
+          nextStateOrUpdater: Nt | ((state: Draft<T>) => void),
+          shouldReplace?: R,
+          actionType?: string | { type: unknown }
+        ) => void
+      }
+    : {
+        setState: (
+          ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
+        ) => void
+      }
   : never
 
 interface DevtoolsOptions {

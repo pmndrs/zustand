@@ -12,6 +12,7 @@ import create, {
   Subscribe,
   UseBoundStore,
 } from 'zustand'
+import { devtools, immer } from 'zustand/middleware'
 
 it('can use exposed types', () => {
   interface ExampleState {
@@ -174,7 +175,7 @@ it('should allow for different partial keys to be returnable from setState', () 
 })
 
 it('setState with replace requires whole state', () => {
-  const store = create<{ count: number; something: string }>(() => ({
+  const store = create<{ count: number; something: string }>()(() => ({
     count: 0,
     something: 'foo',
   }))
@@ -184,4 +185,57 @@ it('setState with replace requires whole state', () => {
     { count: 1 },
     true
   )
+
+  const storeWithDevtools = create<{ count: number; something: string }>()(
+    devtools(() => ({
+      count: 0,
+      something: 'foo',
+    }))
+  )
+
+  storeWithDevtools.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true
+  )
+
+  storeWithDevtools.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true,
+    'FOO'
+  )
+
+  storeWithDevtools.setState({ count: 1 }, false, 'FOO')
+
+  storeWithDevtools.setState({ count: 1 }, false)
+
+  const storeWithDevtoolsAndImmer = create<{
+    count: number
+    something: string
+  }>()(
+    immer(
+      devtools(() => ({
+        count: 0,
+        something: 'foo',
+      }))
+    )
+  )
+
+  storeWithDevtoolsAndImmer.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true
+  )
+
+  storeWithDevtoolsAndImmer.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true,
+    'FOO'
+  )
+
+  storeWithDevtoolsAndImmer.setState({ count: 1 }, false, 'FOO')
+
+  storeWithDevtoolsAndImmer.setState({ count: 1 }, false)
 })
