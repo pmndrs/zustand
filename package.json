@@ -179,6 +179,9 @@
     "shx": "^0.3.4",
     "typescript": "^4.6.3"
   },
+  "resolutions": {
+    "date-fns": "2.27.0"
+  },
   "peerDependencies": {
     "react": ">=16.8"
   },
