@@ -16,11 +16,6 @@ export function useStore<S extends StoreApi<State>, U>(
   selector: StateSelector<ExtractState<S>, U>,
   equalityFn?: EqualityChecker<U>
 ): U
-export function useStore<S extends StoreApi<State>>(
-  api: S,
-  selector: undefined,
-  equalityFn?: EqualityChecker<ExtractState<S>>
-): ExtractState<S>
 export function useStore<TState extends State, StateSlice>(
   api: StoreApi<TState>,
   selector: StateSelector<TState, StateSlice> = api.getState as any,
@@ -46,10 +41,6 @@ export type UseBoundStore<S extends StoreApi<State>> = {
     selector: StateSelector<ExtractState<S>, U>,
     equals?: EqualityChecker<U>
   ): U
-  (
-    selector: undefined,
-    equals?: EqualityChecker<ExtractState<S>>
-  ): ExtractState<S>
 } & S
 
 type Create = {
