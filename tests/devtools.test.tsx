@@ -86,10 +86,10 @@ describe('When state changes...', () => {
       { type: 'testSetStateName' },
       { count: 10, foo: 'bar' }
     )
-    api.setState({ count: 5 }, true)
+    api.setState({ count: 5, foo: 'baz' }, true)
     expect(extension.send).toHaveBeenLastCalledWith(
       { type: 'anonymous' },
-      { count: 5 }
+      { count: 5, foo: 'baz' }
     )
   })
 })
@@ -439,7 +439,12 @@ describe('when it receives an message of type...', () => {
 })
 
 describe('with redux middleware', () => {
-  let api: StoreApi<{ count: number }>
+  let api: StoreApi<{
+    count: number
+    dispatch: (
+      action: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+    ) => { type: 'INCREMENT' } | { type: 'DECREMENT' }
+  }>
 
   it('works as expected', () => {
     api = create(
