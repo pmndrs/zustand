@@ -38,15 +38,17 @@ type WithImmer<S> = S extends {
 }
   ? Write<
       S,
-      {
-        setState: SetState extends (...a: infer A) => infer Sr
-          ? <Nt extends R extends true ? T : Partial<T>, R extends boolean>(
-              nextStateOrUpdater: Nt | ((state: Draft<T>) => void),
+      SetState extends (...a: infer A) => infer Sr
+        ? {
+            setState<R extends boolean | undefined>(
+              nextStateOrUpdater:
+                | (R extends true ? T : Partial<T>)
+                | ((state: Draft<T>) => void),
               shouldReplace?: R,
               ...a: SkipTwo<A>
-            ) => Sr
-          : never
-      }
+            ): Sr
+          }
+        : never
     >
   : never
 

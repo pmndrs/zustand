@@ -239,3 +239,19 @@ it('setState with replace requires whole state', () => {
 
   storeWithDevtoolsAndImmer.setState({ count: 1 }, false)
 })
+
+it('state is covariant', () => {
+  const store = create<{ count: number; foo: string }>()(() => ({
+    count: 0,
+    foo: '',
+  }))
+
+  const _testIsCovariant: StoreApi<{ count: number }> = store
+
+  // @ts-expect-error should not compile
+  const _testIsNotContravariant: StoreApi<{
+    count: number
+    foo: string
+    baz: string
+  }> = store
+})

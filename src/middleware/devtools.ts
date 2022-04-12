@@ -53,28 +53,26 @@ type StoreSetStateWithAction<S> = S extends {
 }
   ? A extends [Partial<T> | ((state: T) => Partial<T>), (boolean | undefined)?]
     ? {
-        setState: <
-          Nt extends R extends true ? T : Partial<T>,
-          R extends boolean | undefined
-        >(
-          partial: Nt | ((state: T) => Nt),
+        setState<R extends boolean | undefined>(
+          partial:
+            | (R extends true ? T : Partial<T>)
+            | ((state: T) => R extends true ? T : Partial<T>),
           replace?: R,
           actionType?: string | { type: unknown }
-        ) => void
+        ): void
       }
     : A extends [
         Partial<T> | ((state: Draft<T>) => void),
         (boolean | undefined)?
       ]
     ? {
-        setState: <
-          Nt extends R extends true ? T : Partial<T>,
-          R extends boolean | undefined
-        >(
-          nextStateOrUpdater: Nt | ((state: Draft<T>) => void),
+        setState<R extends boolean | undefined>(
+          nextStateOrUpdater:
+            | (R extends true ? T : Partial<T>)
+            | ((state: Draft<T>) => void),
           shouldReplace?: R,
           actionType?: string | { type: unknown }
-        ) => void
+        ): void
       }
     : {
         setState: (

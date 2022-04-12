@@ -13,13 +13,14 @@ export type Subscribe<T extends State> = {
   (listener: StateListener<T>): () => void
 }
 
-export type SetState<T extends State> = <
-  Nt extends R extends true ? T : Partial<T>,
-  R extends boolean
->(
-  partial: Nt | ((state: T) => Nt),
-  replace?: R
-) => void
+export type SetState<T extends State> = {
+  _<R extends boolean | undefined>(
+    partial:
+      | (R extends true ? T : Partial<T>)
+      | ((state: T) => R extends true ? T : Partial<T>),
+    replace?: R
+  ): void
+}['_']
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
 export type StoreApi<T extends State> = {
