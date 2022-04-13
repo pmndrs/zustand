@@ -49,7 +49,7 @@ type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
 
 type StoreSetStateWithAction<S> = S extends {
   getState: () => infer T
-  setState: (...a: infer A) => unknown
+  setState: (...a: infer A) => infer Sr
 }
   ? A extends [Partial<T> | ((state: T) => Partial<T>), (boolean | undefined)?]
     ? {
@@ -59,7 +59,7 @@ type StoreSetStateWithAction<S> = S extends {
             | ((state: T) => R extends true ? T : Partial<T>),
           replace?: R,
           actionType?: string | { type: unknown }
-        ): void
+        ): Sr
       }
     : A extends [
         Partial<T> | ((state: Draft<T>) => void),
@@ -72,12 +72,12 @@ type StoreSetStateWithAction<S> = S extends {
             | ((state: Draft<T>) => void),
           shouldReplace?: R,
           actionType?: string | { type: unknown }
-        ): void
+        ): Sr
       }
     : {
         setState: (
           ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
-        ) => void
+        ) => Sr
       }
   : never
 
@@ -158,8 +158,8 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
 
   let isRecording = true
   ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
-    set(state, replace)
-    if (!isRecording) return
+    const r = set(state, replace)
+    if (!isRecording) return r
     extension.send(
       nameOrAction === undefined
         ? { type: devtoolsOptions.anonymousActionType || 'anonymous' }
@@ -168,6 +168,7 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
         : nameOrAction,
       get()
     )
+    return r
   }
   const setStateFromDevtools: SetState<S> = (...a) => {
     const originalIsRecording = isRecording
