@@ -14,11 +14,9 @@ export type Subscribe<T extends State> = {
 }
 
 export type SetState<T extends State> = {
-  _<R extends boolean | undefined>(
-    partial:
-      | (R extends true ? T : Partial<T>)
-      | ((state: T) => R extends true ? T : Partial<T>),
-    replace?: R
+  _(
+    partial: T | Partial<T> | ((state: T) => T | Partial<T>),
+    replace?: boolean | undefined
   ): void
 }['_']
 export type GetState<T extends State> = () => T

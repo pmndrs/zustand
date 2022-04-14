@@ -40,11 +40,9 @@ type WithImmer<S> = S extends {
       S,
       SetState extends (...a: infer A) => infer Sr
         ? {
-            setState<R extends boolean | undefined>(
-              nextStateOrUpdater:
-                | (R extends true ? T : Partial<T>)
-                | ((state: Draft<T>) => void),
-              shouldReplace?: R,
+            setState(
+              nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
+              shouldReplace?: boolean | undefined,
               ...a: SkipTwo<A>
             ): Sr
           }
