@@ -75,9 +75,9 @@ type StoreSetStateWithAction<S> = S extends {
         ): Sr
       }
     : {
-        setState: (
+        setState(
           ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
-        ) => Sr
+        ): Sr
       }
   : never
 
