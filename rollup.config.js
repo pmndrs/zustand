@@ -1,4 +1,5 @@
 import path from 'path'
+import alias from '@rollup/plugin-alias'
 import babelPlugin from '@rollup/plugin-babel'
 import resolve from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
@@ -57,6 +58,11 @@ function createESMConfig(input, output) {
     ],
     external,
     plugins: [
+      alias({
+        entries: {
+          './vanilla': 'zustand/vanilla',
+        },
+      }),
       resolve({ extensions }),
       replace({
         __DEV__: '(import.meta.env&&import.meta.env.MODE)!=="production"',
@@ -76,6 +82,11 @@ function createCommonJSConfig(input, output) {
     output: { file: `${output}.js`, format: 'cjs', exports: 'named' },
     external,
     plugins: [
+      alias({
+        entries: {
+          './vanilla': 'zustand/vanilla',
+        },
+      }),
       resolve({ extensions }),
       replace({
         __DEV__: 'process.env.NODE_ENV!=="production"',
@@ -100,10 +111,19 @@ function createUMDConfig(input, output, env) {
           : `zustand${c.slice(0, 1).toUpperCase()}${c.slice(1)}`,
       globals: {
         react: 'React',
+        // FIXME not yet supported
+        'use-sync-external-store/shim/with-selector':
+          'useSyncExternalStoreShimWithSelector',
+        'zustand/vanilla': 'zustandVanilla',
       },
     },
     external,
     plugins: [
+      alias({
+        entries: {
+          './vanilla': 'zustand/vanilla',
+        },
+      }),
       resolve({ extensions }),
       replace({
         __DEV__: env !== 'production' ? 'true' : 'false',
@@ -125,6 +145,11 @@ function createSystemConfig(input, output, env) {
     },
     external,
     plugins: [
+      alias({
+        entries: {
+          './vanilla': 'zustand/vanilla',
+        },
+      }),
       resolve({ extensions }),
       replace({
         __DEV__: env !== 'production' ? 'true' : 'false',
