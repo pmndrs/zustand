@@ -173,8 +173,8 @@ it('calls onDestroy callback when Provider component unmounting', async () => {
   const { findByText, unmount } = render(
     <Provider
       createStore={createStore}
-      onDestroy={(state) => {
-        onDestroyState = state.getState()
+      onDestroy={(store) => {
+        onDestroyState = store.getState()
       }}>
       <Counter />
     </Provider>
