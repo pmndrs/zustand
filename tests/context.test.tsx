@@ -154,6 +154,38 @@ it('throws error when not using provider', async () => {
   await findByText('errored')
 })
 
+it('calls onDestroy callback when Provider component unmounting', async () => {
+  const { Provider, useStore } = createContext<CounterState>()
+
+  const createStore = () =>
+    create<CounterState>((set) => ({
+      count: 0,
+      inc: () => set((state) => ({ count: state.count + 1 })),
+    }))
+
+  function Counter() {
+    const { count, inc } = useStore()
+    useEffect(inc, [inc])
+    return <div>count: {count * 1}</div>
+  }
+
+  let onDestroyState: any
+  const { findByText, unmount } = render(
+    <Provider
+      createStore={createStore}
+      onDestroy={(state) => {
+        onDestroyState = state.getState()
+      }}>
+      <Counter />
+    </Provider>
+  )
+
+  await findByText('count: 1')
+  unmount()
+
+  expect(onDestroyState.count).toBe(1)
+})
+
 it('useCallback with useStore infers types correctly', async () => {
   const { useStore } = createContext<CounterState>()
   function _Counter() {

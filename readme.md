@@ -586,6 +586,61 @@ const Component = () => {
   ```
 </details>
 
+<details>
+  <summary>createContext usage with onDestroy callback for store housekeeping before Provider unmounting</summary>
+
+  ```tsx
+  import create from "zustand";
+  import createContext from "zustand/context";
+
+  type BearState = {
+    bears: number
+    increase: () => void
+  }
+
+  // pass the type to `createContext` rather than to `create`
+  const { Provider, useStore } = createContext<BearState>();
+
+  const createStore = () => 
+    create((set) => {
+      // Track ESC key press for setting bears equal to 0
+      const onKeyup = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          set({ bears: 0 })
+        }
+      };
+      window.addEventListener('keyup', onKeyup);
+
+      return {
+        bears: initialBears,
+        increase: () => set((state) => ({ bears: state.bears + 1 })),
+        removeListeners: () => {
+          window.removeEventListener('keyup', onKeyup)
+        },
+      };
+    });
+
+  export default function App({ initialBears }: { initialBears: number }) {
+    return (
+      <Provider
+        createStore={createStore}
+        onDestroy={(store) => {
+          const state = store.getState();
+
+          // removes previously registered event listeners 
+          // for preventing memory leaks
+          state.removeListeners();
+          
+          console.log('Last bears value was:', state.bears);
+        }}
+      >
+        <Button />
+      </Provider>
+  )
+}
+  ```
+</details>
+
 ## Typing your store and `combine` middleware
 
 ```tsx

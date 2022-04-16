@@ -3,6 +3,7 @@ import {
   createElement,
   createContext as reactCreateContext,
   useContext,
+  useEffect,
   useMemo,
   useRef,
 } from 'react'
@@ -32,9 +33,11 @@ function createContext<
 
   const Provider = ({
     createStore,
+    onDestroy,
     children,
   }: {
     createStore: () => CustomStoreApi
+    onDestroy?: (store: CustomStoreApi) => void
     children: ReactNode
   }) => {
     const storeRef = useRef<CustomStoreApi>()
@@ -42,6 +45,16 @@ function createContext<
     if (!storeRef.current) {
       storeRef.current = createStore()
     }
+
+    useEffect(
+      () => () => {
+        if (onDestroy) {
+          // @ts-expect-error current is never undefined but typescript doesn't know that
+          onDestroy(storeRef.current)
+        }
+      },
+      []
+    )
 
     return createElement(
       ZustandContext.Provider,
