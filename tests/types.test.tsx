@@ -12,7 +12,6 @@ import create, {
   Subscribe,
   UseBoundStore,
 } from 'zustand'
-import { devtools, immer } from 'zustand/middleware'
 
 it('can use exposed types', () => {
   interface ExampleState {
