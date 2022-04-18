@@ -106,23 +106,6 @@ const treats = useStore(
 )
 ```
 
-## Memoizing selectors
-
-It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
-
-```jsx
-const fruit = useStore(useCallback(state => state.fruits[id], [id]))
-```
-
-If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
-
-```jsx
-const selector = state => state.berries
-
-function Component() {
-  const berries = useStore(selector)
-```
-
 ## Overwriting state
 
 The `set` function has a second argument, `false` by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
@@ -213,30 +196,6 @@ const unsub4 = useStore.subscribe(state => [state.paw, state.fur], console.log, 
 const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmediately: true })
 ```
 
-<details>
-<summary>How to type store with `subscribeWithSelector` in TypeScript</summary>
-
-```ts
-import create, { Mutate, GetState, SetState, StoreApi } from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
-
-type BearState = {
-  paw: boolean
-  snout: boolean
-  fur: boolean
-}
-const useStore = create<
-  BearState,
-  SetState<BearState>,
-  GetState<BearState>,
-  Mutate<StoreApi<BearState>, [["zustand/subscribeWithSelector", never]]>
->(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
-```
-
-For more complex typing with multiple middlewares,
-Please refer [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
-</details>
-
 ## Using zustand without React
 
 Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
@@ -322,36 +281,6 @@ const useStore = create(
   ),
 )
 ```
-
-<details>
-<summary>How to pipe middlewares</summary>
-
-```js
-import create from "zustand"
-import produce from "immer"
-import pipe from "ramda/es/pipe"
-
-/* log and immer functions from previous example */
-/* you can pipe as many middlewares as you want */
-const createStore = pipe(log, immer, create)
-
-const useStore = createStore(set => ({
-  bears: 1,
-  increasePopulation: () => set(state => ({ bears: state.bears + 1 }))
-}))
-
-export default useStore
-```
-
-For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
-</details>
-
-<details>
-<summary>How to type immer middleware in TypeScript</summary>
-
-There is a reference implementation in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx) with some use cases.
-You can use any simplified variant based on your requirement.
-</details>
 
 ## Persist middleware
 
@@ -468,7 +397,33 @@ devtools(..., { anonymousActionType: 'unknown', ... })
 
 ## React context
 
-The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the store is a hook, passing it as a normal context value may violate rules of hooks. To avoid misusage, a special `createContext` is provided.
+The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the normal store is a hook, passing it as a normal context value may violate rules of hooks.
+
+The flexible method available since v4 is to use vanilla store.
+
+```jsx
+import { createContext, useContext } from 'react'
+import { createStore, useStore } from 'zustand'
+
+const store = createStore(...) // vanilla store without hooks
+
+const StoreContext = createContext()
+
+const App = () => (
+  <StoreContext.Provider value={store}>
+    ...
+  </StoreContext.Provider>
+)
+
+const Component = () => {
+  const store = useContext(StoreContext)
+  const slice = useStore(store, selector)
+  ...
+}
+```
+
+Alternatively, a special `createContext` is provided since v3.5,
+which avoid misusing the store hook.
 
 ```jsx
 import create from 'zustand'
@@ -490,6 +445,7 @@ const Component = () => {
   ...
 }
 ```
+
 <details>
   <summary>createContext usage in real components</summary>
 
@@ -571,48 +527,32 @@ const Component = () => {
       >
         <Button />
       </Provider>
-  )
-}
+    )
+  }
   ```
 </details>
 
-## Typing your store and `combine` middleware
+## TypeScript Usage
 
-```tsx
-// You can use `type`
-type BearState = {
-  bears: number
-  increase: (by: number) => void
-}
+Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`...
 
-// Or `interface`
+```ts
+import create from "zustand"
+import { devtools, persist } from "zustand/middleware"
+
 interface BearState {
   bears: number
   increase: (by: number) => void
 }
 
-// And it is going to work for both
-const useStore = create<BearState>(set => ({
+const useStore = create<BearState>()(devtools(persist((set) => ({
   bears: 0,
-  increase: (by) => set(state => ({ bears: state.bears + by })),
-}))
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))))
 ```
 
-Or, use `combine` and let tsc infer types. This merges two states shallowly.
+A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md).
 
-```tsx
-import { combine } from 'zustand/middleware'
-
-const useStore = create(
-  combine(
-    { bears: 0 },
-    (set) => ({ increase: (by: number) => set((state) => ({ bears: state.bears + by })) })
-  ),
-)
-```
-
-Typing with multiple middleware might require some TypeScript knowledge. Refer some working examples in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
-  
 ## Best practices
   
 * You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
