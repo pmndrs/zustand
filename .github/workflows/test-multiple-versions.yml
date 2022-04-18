@@ -31,8 +31,8 @@ jobs:
           - 16.8.0
           - 17.0.0
           - 18.0.0
-          - 18.1.0-next-af730436c-20220405
-          - 0.0.0-experimental-af730436c-20220405
+          - 18.1.0-next-726ba8029-20220415
+          - 0.0.0-experimental-726ba8029-20220415
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
