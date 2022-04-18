@@ -258,28 +258,16 @@ You can functionally compose your store any way you like.
 
 ```jsx
 // Log every time state is changed
-const log = config => (set, get, api) => config(args => {
+const log = (config) => (set, get, api) => config((...args) => {
   console.log("  applying", args)
-  set(args)
+  set(...args)
   console.log("  new state", get())
 }, get, api)
 
-// Turn the set method into an immer proxy
-const immer = config => (set, get, api) => config((partial, replace) => {
-  const nextState = typeof partial === 'function'
-      ? produce(partial)
-      : partial
-  return set(nextState, replace)
-}, get, api)
-
-const useStore = create(
-  log(
-    immer((set) => ({
-      bees: false,
-      setBees: (input) => set((state) => void (state.bees = input)),
-    })),
-  ),
-)
+const useStore = create(log((set) => ({
+  bees: false,
+  setBees: (input) => set({ bees: input }),
+})))
 ```
 
 ## Persist middleware
@@ -290,7 +278,7 @@ You can persist your store's data using any kind of storage.
 import create from "zustand"
 import { persist } from "zustand/middleware"
 
-export const useStore = create(persist(
+const useStore = create(persist(
   (set, get) => ({
     fishes: 0,
     addAFish: () => set({ fishes: get().fishes + 1 })
@@ -300,6 +288,20 @@ export const useStore = create(persist(
     getStorage: () => sessionStorage, // (optional) by default, 'localStorage' is used
   }
 ))
+```
+
+## Immer middleware
+
+Immer is available as middleware too.
+
+```jsx
+import create from "zustand"
+import { immer } from "zustand/middleware/immer"
+
+const useStore = create(immer((set) => ({
+  bees: 0,
+  addBees: (by) => set((state) => { state.bees += by }),
+})))
 ```
 
 [See the full documentation for this middleware.](https://github.com/pmndrs/zustand/wiki/Persisting-the-store's-data)
