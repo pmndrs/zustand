@@ -2,11 +2,11 @@ import create, { State, StoreApi } from 'zustand'
 import {
   combine,
   devtools,
-  immer,
   persist,
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 import createVanilla from 'zustand/vanilla'
 
 type CounterState = {

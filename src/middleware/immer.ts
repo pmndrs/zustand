@@ -10,7 +10,7 @@ type Immer = <
   initializer: StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs>
 ) => StateCreator<T, Mps, [['zustand/immer', never], ...Mcs]>
 
-declare module 'zustand' {
+declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface StoreMutators<S, A> {
     ['zustand/immer']: WithImmer<S>

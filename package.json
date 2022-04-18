@@ -28,6 +28,12 @@
       "import": "./esm/middleware.mjs",
       "default": "./middleware.js"
     },
+    "./middleware/immer": {
+      "types": "./middleware/immer.d.ts",
+      "module": "./esm/middleware/immer.js",
+      "import": "./esm/middleware/immer.mjs",
+      "default": "./middleware/immer.js"
+    },
     "./shallow": {
       "types": "./shallow.d.ts",
       "module": "./esm/shallow.js",
@@ -48,6 +54,7 @@
     "build:base": "rollup -c",
     "build:vanilla": "rollup -c --config-vanilla",
     "build:middleware": "rollup -c --config-middleware",
+    "build:middleware:immer": "rollup -c --config-middleware_immer",
     "build:shallow": "rollup -c --config-shallow",
     "build:context": "rollup -c --config-context",
     "postbuild": "yarn copy",
@@ -58,7 +65,7 @@
     "test:ci": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx cp -r dist/src/* dist/esm && shx mv dist/src/* dist && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
+    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
   },
   "engines": {
     "node": ">=12.7.0"
@@ -184,9 +191,13 @@
     "date-fns": "2.27.0"
   },
   "peerDependencies": {
+    "immer": ">=9.0",
     "react": ">=16.8"
   },
   "peerDependenciesMeta": {
+    "immer": {
+      "optional": true
+    },
     "react": {
       "optional": true
     }
