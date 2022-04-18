@@ -30,11 +30,11 @@ it('can use exposed types', () => {
     }
   }
   const selector: StateSelector<ExampleState, number> = (state) => state.num
-  const partial: PartialState<ExampleState, 'num' | 'numGet'> = {
+  const partial: PartialState<ExampleState> = {
     num: 2,
     numGet: () => 2,
   }
-  const partialFn: PartialState<ExampleState, 'num' | 'numGet'> = (state) => ({
+  const partialFn: PartialState<ExampleState> = (state) => ({
     ...state,
     num: 2,
   })
@@ -73,7 +73,7 @@ it('can use exposed types', () => {
 
   function checkAllTypes(
     _getState: GetState<ExampleState>,
-    _partialState: PartialState<ExampleState, 'num' | 'numGet'>,
+    _partialState: PartialState<ExampleState>,
     _setState: SetState<ExampleState>,
     _state: State,
     _stateListener: StateListener<ExampleState>,
@@ -83,7 +83,7 @@ it('can use exposed types', () => {
     _destroy: Destroy,
     _equalityFn: EqualityChecker<ExampleState>,
     _stateCreator: StateCreator<ExampleState>,
-    _useStore: UseBoundStore<ExampleState>
+    _useStore: UseBoundStore<StoreApi<ExampleState>>
   ) {
     expect(true).toBeTruthy()
   }
@@ -128,7 +128,6 @@ it('should have correct (partial) types for setState', () => {
   // ok, should not error
   store.setState({ count: 1 })
   store.setState({})
-  store.setState(() => undefined)
   store.setState((previous) => previous)
 
   // @ts-expect-error type undefined is not assignable to type number
@@ -155,7 +154,7 @@ it('should allow for different partial keys to be returnable from setState', () 
     }
     return { count: 0 }
   })
-  store.setState<'count', 'something'>((previous) => {
+  store.setState((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
@@ -166,10 +165,26 @@ it('should allow for different partial keys to be returnable from setState', () 
   })
 
   // @ts-expect-error Type '{ something: boolean; count?: undefined; }' is not assignable to type 'State'.
-  store.setState<'count', 'something'>((previous) => {
+  store.setState((previous) => {
     if (previous.count === 0) {
       return { count: 1 }
     }
     return { something: true }
   })
+})
+
+it('state is covariant', () => {
+  const store = create<{ count: number; foo: string }>()(() => ({
+    count: 0,
+    foo: '',
+  }))
+
+  const _testIsCovariant: StoreApi<{ count: number }> = store
+
+  // @ts-expect-error should not compile
+  const _testIsNotContravariant: StoreApi<{
+    count: number
+    foo: string
+    baz: string
+  }> = store
 })

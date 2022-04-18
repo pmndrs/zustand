@@ -6,12 +6,9 @@ import {
   useState,
 } from 'react'
 import { render } from '@testing-library/react'
-import create, { GetState, SetState } from 'zustand'
+import create, { StoreApi } from 'zustand'
 import createContext from 'zustand/context'
-import {
-  StoreApiWithSubscribeWithSelector,
-  subscribeWithSelector,
-} from 'zustand/middleware'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 const consoleError = console.error
 afterEach(() => {
@@ -24,7 +21,7 @@ type CounterState = {
 }
 
 it('creates and uses context store', async () => {
-  const { Provider, useStore } = createContext<CounterState>()
+  const { Provider, useStore } = createContext<StoreApi<CounterState>>()
 
   const createStore = () =>
     create<CounterState>((set) => ({
@@ -48,7 +45,7 @@ it('creates and uses context store', async () => {
 })
 
 it('uses context store with selectors', async () => {
-  const { Provider, useStore } = createContext<CounterState>()
+  const { Provider, useStore } = createContext<StoreApi<CounterState>>()
 
   const createStore = () =>
     create<CounterState>((set) => ({
@@ -74,12 +71,7 @@ it('uses context store with selectors', async () => {
 
 it('uses context store api', async () => {
   const createStore = () =>
-    create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      StoreApiWithSubscribeWithSelector<CounterState>
-    >(
+    create<CounterState>()(
       subscribeWithSelector((set) => ({
         count: 0,
         inc: () => set((state) => ({ count: state.count + 1 })),
@@ -87,7 +79,7 @@ it('uses context store api', async () => {
     )
 
   type CustomStore = ReturnType<typeof createStore>
-  const { Provider, useStoreApi } = createContext<CounterState, CustomStore>()
+  const { Provider, useStoreApi } = createContext<CustomStore>()
 
   function Counter() {
     const storeApi = useStoreApi()
@@ -140,7 +132,7 @@ it('throws error when not using provider', async () => {
     }
   }
 
-  const { useStore } = createContext<CounterState>()
+  const { useStore } = createContext<StoreApi<CounterState>>()
   function Component() {
     useStore()
     return <div>no error</div>
@@ -155,7 +147,7 @@ it('throws error when not using provider', async () => {
 })
 
 it('useCallback with useStore infers types correctly', async () => {
-  const { useStore } = createContext<CounterState>()
+  const { useStore } = createContext<StoreApi<CounterState>>()
   function _Counter() {
     const _x = useStore(useCallback((state) => state.count, []))
     expectAreTypesEqual<typeof _x, number>().toBe(true)
