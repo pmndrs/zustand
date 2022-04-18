@@ -252,6 +252,8 @@ const clearForest = useStore(state => state.clearForest)
 clearForest();
 ```
 
+[Alternatively, there are some other solutions.](https://github.com/pmndrs/zustand/wiki/Updating-nested-state-object-values)
+
 ## Middleware
 
 You can functionally compose your store any way you like.
@@ -290,6 +292,8 @@ const useStore = create(persist(
 ))
 ```
 
+[See the full documentation for this middleware.](https://github.com/pmndrs/zustand/wiki/Persisting-the-store's-data)
+
 ## Immer middleware
 
 Immer is available as middleware too.
@@ -303,8 +307,6 @@ const useStore = create(immer((set) => ({
   addBees: (by) => set((state) => { state.bees += by }),
 })))
 ```
-
-[See the full documentation for this middleware.](https://github.com/pmndrs/zustand/wiki/Persisting-the-store's-data)
 
 ## Can't live without redux-like reducers and action types?
 
@@ -334,28 +336,6 @@ import { redux } from 'zustand/middleware'
 
 const useStore = create(redux(reducer, initialState))
 ```
-
-## Calling actions outside a React event handler
-
-Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
-In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
-
-```jsx
-import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
-
-const useStore = create((set) => ({
-  fishes: 0,
-  increaseFishes: () => set((prev) => ({ fishes: prev.fishes + 1 }))
-}))
-
-const nonReactCallback = () => {
-  unstable_batchedUpdates(() => {
-    useStore.getState().increaseFishes()
-  })
-}
-```
-
-More details: https://github.com/pmndrs/zustand/issues/302
 
 ## Redux devtools
 
@@ -561,6 +541,31 @@ A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blo
   
 * Recommended usage for this unopinionated library: [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
   
+<details>
+<summary>Calling actions outside a React event handler in pre React 18</summary>
+
+Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
+In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
+
+```jsx
+import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
+
+const useStore = create((set) => ({
+  fishes: 0,
+  increaseFishes: () => set((prev) => ({ fishes: prev.fishes + 1 }))
+}))
+
+const nonReactCallback = () => {
+  unstable_batchedUpdates(() => {
+    useStore.getState().increaseFishes()
+  })
+}
+```
+
+More details: https://github.com/pmndrs/zustand/issues/302
+
+</details>
+
 ## Testing
 
 For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
