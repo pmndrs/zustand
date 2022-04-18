@@ -228,7 +228,11 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useStore = create<{
+      count: number
+      name: string
+      setName: (name: string) => void
+    }>()(
       persist(
         (set) => ({
           count: 0,
@@ -407,7 +411,8 @@ describe('persist middleware with async configuration', () => {
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
         getStorage: () => storage,
-        merge: (persistedState, currentState) => {
+        merge: (_persistedState, currentState) => {
+          const persistedState = _persistedState as any
           delete persistedState.actions
 
           return {

@@ -1,48 +1,13 @@
-import { produce } from 'immer'
-import type { Draft } from 'immer'
-import create, {
-  GetState,
-  Mutate,
-  SetState,
-  State,
-  StateCreator,
-  StoreApi,
-} from 'zustand'
+import create, { State, StoreApi } from 'zustand'
 import {
-  PersistOptions,
   combine,
   devtools,
+  immer,
   persist,
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
-
-const immer =
-  <
-    T extends State,
-    CustomSetState extends SetState<T>,
-    CustomGetState extends GetState<T>,
-    CustomStoreApi extends StoreApi<T>
-  >(
-    config: StateCreator<
-      T,
-      (partial: ((draft: Draft<T>) => void) | T, replace?: boolean) => void,
-      CustomGetState,
-      CustomStoreApi
-    >
-  ): StateCreator<T, CustomSetState, CustomGetState, CustomStoreApi> =>
-  (set, get, api) =>
-    config(
-      (partial, replace) => {
-        const nextState =
-          typeof partial === 'function'
-            ? produce(partial as (state: Draft<T>) => T)
-            : (partial as T)
-        return set(nextState, replace)
-      },
-      get,
-      api
-    )
+import createVanilla from 'zustand/vanilla'
 
 type CounterState = {
   count: number
@@ -78,7 +43,7 @@ describe('counter state spec (single middleware)', () => {
   })
 
   it('immer', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<CounterState>()(
       immer((set, get) => ({
         count: 0,
         inc: () =>
@@ -97,6 +62,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<State> = createVanilla(
+      immer(() => ({ count: 0 }))
+    )
   })
 
   it('redux', () => {
@@ -121,16 +90,15 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<State> = createVanilla(
+      redux((x) => x, { count: 0 })
+    )
   })
 
   it('devtools', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<StoreApi<CounterState>, [['zustand/devtools', never]]>
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         (set, get) => ({
           count: 0,
@@ -150,15 +118,14 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<State> = createVanilla(
+      devtools(() => ({ count: 0 }))
+    )
   })
 
   it('subscribeWithSelector', () => {
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<StoreApi<CounterState>, [['zustand/subscribeWithSelector', never]]>
-    >(
+    const useStore = create<CounterState>()(
       subscribeWithSelector((set, get) => ({
         count: 1,
         inc: () => set({ count: get().count + 1 }, false),
@@ -178,6 +145,10 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<State> = createVanilla(
+      subscribeWithSelector(() => ({ count: 0 }))
+    )
   })
 
   it('combine', () => {
@@ -196,18 +167,14 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<State> = createVanilla(
+      combine({ count: 0 }, () => ({}))
+    )
   })
 
   it('persist', () => {
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<
-        StoreApi<CounterState>,
-        [['zustand/persist', Partial<CounterState>]]
-      >
-    >(
+    const useStore = create<CounterState>()(
       persist(
         (set, get) => ({
           count: 1,
@@ -227,10 +194,41 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     TestComponent
+
+    const _testSubtyping: StoreApi<State> = createVanilla(
+      persist(() => ({ count: 0 }))
+    )
+  })
+
+  it('persist with partialize', () => {
+    const useStore = create<CounterState>()(
+      persist(
+        (set, get) => ({
+          count: 1,
+          inc: () => set({ count: get().count + 1 }, false),
+        }),
+        { name: 'prefix', partialize: (s) => s.count }
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.count) * 2
+      useStore((s) => s.inc)()
+      useStore().count * 2
+      useStore().inc()
+      useStore.getState().count * 2
+      useStore.getState().inc()
+      useStore.persist.hasHydrated()
+      useStore.persist.setOptions({
+        // @ts-expect-error to test if the partialized state is inferred as number
+        partialize: () => 'not-a-number',
+      })
+      return <></>
+    }
+    TestComponent
   })
 
   it('persist without custom api (#638)', () => {
-    const useStore = create<CounterState>(
+    const useStore = create<CounterState>()(
       persist(
         (set, get) => ({
           count: 1,
@@ -263,12 +261,7 @@ describe('counter state spec (double middleware)', () => {
 
   it('devtools & immer', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<StoreApi<CounterState>, [['zustand/devtools', never]]>
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         immer((set, get) => ({
           count: 0,
@@ -297,8 +290,8 @@ describe('counter state spec (double middleware)', () => {
     __DEV__ = false
     const useStore = create(
       devtools(
-        redux<{ count: number }, { type: 'INC' }>(
-          (state, action) => {
+        redux(
+          (state, action: { type: 'INC' }) => {
             switch (action.type) {
               case 'INC':
                 return { ...state, count: state.count + 1 }
@@ -371,15 +364,7 @@ describe('counter state spec (double middleware)', () => {
 
   it('devtools & subscribeWithSelector', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<
-        StoreApi<CounterState>,
-        [['zustand/subscribeWithSelector', never], ['zustand/devtools', never]]
-      >
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         subscribeWithSelector((set, get) => ({
           count: 1,
@@ -407,18 +392,7 @@ describe('counter state spec (double middleware)', () => {
 
   it('devtools & persist', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<
-        StoreApi<CounterState>,
-        [
-          ['zustand/persist', Partial<CounterState>],
-          ['zustand/devtools', never]
-        ]
-      >
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         persist(
           (set, get) => ({
@@ -456,18 +430,7 @@ describe('counter state spec (triple middleware)', () => {
 
   it('devtools & persist & immer', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<
-        StoreApi<CounterState>,
-        [
-          ['zustand/persist', Partial<CounterState>],
-          ['zustand/devtools', never]
-        ]
-      >
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         persist(
           immer((set, get) => ({
@@ -527,19 +490,7 @@ describe('counter state spec (triple middleware)', () => {
 
   it('devtools & subscribeWithSelector & persist', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<
-        StoreApi<CounterState>,
-        [
-          ['zustand/subscribeWithSelector', never],
-          ['zustand/persist', Partial<CounterState>],
-          ['zustand/devtools', never]
-        ]
-      >
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         subscribeWithSelector(
           persist(
@@ -583,19 +534,7 @@ describe('counter state spec (quadruple middleware)', () => {
 
   it('devtools & subscribeWithSelector & persist & immer (#616)', () => {
     __DEV__ = false
-    const useStore = create<
-      CounterState,
-      SetState<CounterState>,
-      GetState<CounterState>,
-      Mutate<
-        StoreApi<CounterState>,
-        [
-          ['zustand/subscribeWithSelector', never],
-          ['zustand/persist', Partial<CounterState>],
-          ['zustand/devtools', never]
-        ]
-      >
-    >(
+    const useStore = create<CounterState>()(
       devtools(
         subscribeWithSelector(
           persist(
@@ -633,24 +572,9 @@ describe('counter state spec (quadruple middleware)', () => {
 
 describe('more complex state spec with subscribeWithSelector', () => {
   it('#619, #632', () => {
-    type MyState = {
-      foo: boolean
-    }
     const useStore = create(
       subscribeWithSelector(
-        // NOTE: Adding type annotation to inner middleware works.
-        persist<
-          MyState,
-          SetState<MyState>,
-          GetState<MyState>,
-          Mutate<
-            StoreApi<MyState>,
-            [
-              ['zustand/subscribeWithSelector', never],
-              ['zustand/persist', Partial<MyState>]
-            ]
-          >
-        >(
+        persist(
           () => ({
             foo: true,
           }),
@@ -676,12 +600,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
     type MyState = {
       foo: number | null
     }
-    const useStore = create<
-      MyState,
-      SetState<MyState>,
-      GetState<MyState>,
-      Mutate<StoreApi<MyState>, [['zustand/subscribeWithSelector', never]]>
-    >(
+    const useStore = create<MyState>()(
       subscribeWithSelector(
         () =>
           ({
@@ -708,13 +627,8 @@ describe('more complex state spec with subscribeWithSelector', () => {
       authenticated: boolean
       authenticate: (username: string, password: string) => Promise<void>
     }
-    // NOTE: This is a simplified middleware type without persist api
-    type MyPersist = (
-      config: StateCreator<MyState>,
-      options: PersistOptions<MyState>
-    ) => StateCreator<MyState>
-    const useStore = create<MyState>(
-      (persist as MyPersist)(
+    const useStore = create<MyState>()(
+      persist(
         (set) => ({
           token: undefined,
           authenticated: false,
@@ -732,6 +646,44 @@ describe('more complex state spec with subscribeWithSelector', () => {
       useStore().authenticate('u', 'p')
       useStore.getState().authenticated
       useStore.getState().authenticate('u', 'p')
+      return <></>
+    }
+    TestComponent
+  })
+})
+
+describe('create with explicitly annotated mutators', () => {
+  it('subscribeWithSelector & persist', () => {
+    const useStore = create<
+      CounterState,
+      [
+        ['zustand/subscribeWithSelector', never],
+        ['zustand/persist', CounterState]
+      ]
+    >(
+      subscribeWithSelector(
+        persist(
+          (set, get) => ({
+            count: 0,
+            inc: () => set({ count: get().count + 1 }, false),
+          }),
+          { name: 'count' }
+        )
+      )
+    )
+    const TestComponent = () => {
+      useStore((s) => s.count) * 2
+      useStore((s) => s.inc)()
+      useStore().count * 2
+      useStore().inc()
+      useStore.getState().count * 2
+      useStore.getState().inc()
+      useStore.subscribe(
+        (state) => state.count,
+        (count) => console.log(count * 2)
+      )
+      useStore.setState({ count: 0 }, false)
+      useStore.persist.hasHydrated()
       return <></>
     }
     TestComponent

@@ -196,30 +196,6 @@ const unsub4 = useStore.subscribe(state => [state.paw, state.fur], console.log, 
 const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmediately: true })
 ```
 
-<details>
-<summary>How to type store with `subscribeWithSelector` in TypeScript</summary>
-
-```ts
-import create, { Mutate, GetState, SetState, StoreApi } from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
-
-type BearState = {
-  paw: boolean
-  snout: boolean
-  fur: boolean
-}
-const useStore = create<
-  BearState,
-  SetState<BearState>,
-  GetState<BearState>,
-  Mutate<StoreApi<BearState>, [["zustand/subscribeWithSelector", never]]>
->(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
-```
-
-For more complex typing with multiple middlewares,
-Please refer [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
-</details>
-
 ## Using zustand without React
 
 Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
@@ -305,36 +281,6 @@ const useStore = create(
   ),
 )
 ```
-
-<details>
-<summary>How to pipe middlewares</summary>
-
-```js
-import create from "zustand"
-import produce from "immer"
-import pipe from "ramda/es/pipe"
-
-/* log and immer functions from previous example */
-/* you can pipe as many middlewares as you want */
-const createStore = pipe(log, immer, create)
-
-const useStore = createStore(set => ({
-  bears: 1,
-  increasePopulation: () => set(state => ({ bears: state.bears + 1 }))
-}))
-
-export default useStore
-```
-
-For a TS example see the following [discussion](https://github.com/pmndrs/zustand/discussions/224#discussioncomment-118208)
-</details>
-
-<details>
-<summary>How to type immer middleware in TypeScript</summary>
-
-There is a reference implementation in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx) with some use cases.
-You can use any simplified variant based on your requirement.
-</details>
 
 ## Persist middleware
 
@@ -581,48 +527,32 @@ const Component = () => {
       >
         <Button />
       </Provider>
-  )
-}
+    )
+  }
   ```
 </details>
 
-## Typing your store and `combine` middleware
+## TypeScript Usage
 
-```tsx
-// You can use `type`
-type BearState = {
-  bears: number
-  increase: (by: number) => void
-}
+Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`...
 
-// Or `interface`
+```ts
+import create from "zustand"
+import { devtools, persist } from "zustand/middleware"
+
 interface BearState {
   bears: number
   increase: (by: number) => void
 }
 
-// And it is going to work for both
-const useStore = create<BearState>(set => ({
+const useStore = create<BearState>()(devtools(persist((set) => ({
   bears: 0,
-  increase: (by) => set(state => ({ bears: state.bears + by })),
-}))
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))))
 ```
 
-Or, use `combine` and let tsc infer types. This merges two states shallowly.
+A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md).
 
-```tsx
-import { combine } from 'zustand/middleware'
-
-const useStore = create(
-  combine(
-    { bears: 0 },
-    (set) => ({ increase: (by: number) => set((state) => ({ bears: state.bears + by })) })
-  ),
-)
-```
-
-Typing with multiple middleware might require some TypeScript knowledge. Refer some working examples in [middlewareTypes.test.tsx](./tests/middlewareTypes.test.tsx).
-  
 ## Best practices
   
 * You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).

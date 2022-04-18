@@ -2,18 +2,18 @@ import { useDebugValue } from 'react'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import createStore, {
   EqualityChecker,
-  GetState,
-  SetState,
+  Mutate,
   State,
   StateCreator,
   StateSelector,
   StoreApi,
+  StoreMutatorIdentifier,
 } from './vanilla'
 
-export function useStore<T extends State>(api: StoreApi<T>): T
-export function useStore<T extends State, U>(
-  api: StoreApi<T>,
-  selector: StateSelector<T, U>,
+export function useStore<S extends StoreApi<State>>(api: S): ExtractState<S>
+export function useStore<S extends StoreApi<State>, U>(
+  api: S,
+  selector: StateSelector<ExtractState<S>, U>,
   equalityFn?: EqualityChecker<U>
 ): U
 export function useStore<TState extends State, StateSlice>(
@@ -33,42 +33,28 @@ export function useStore<TState extends State, StateSlice>(
   return slice
 }
 
-export type UseBoundStore<
-  T extends State,
-  CustomStoreApi extends StoreApi<T> = StoreApi<T>
-> = {
-  (): T
-  <U>(selector: StateSelector<T, U>, equalityFn?: EqualityChecker<U>): U
-} & CustomStoreApi
+type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState:
-    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
-    | CustomStoreApi
-): UseBoundStore<TState, CustomStoreApi>
+export type UseBoundStore<S extends StoreApi<State>> = {
+  (): ExtractState<S>
+  <U>(
+    selector: StateSelector<ExtractState<S>, U>,
+    equals?: EqualityChecker<U>
+  ): U
+} & S
 
-function create<TState extends State>(
-  createState:
-    | StateCreator<TState, SetState<TState>, GetState<TState>, any>
-    | StoreApi<TState>
-): UseBoundStore<TState, StoreApi<TState>>
+type Create = {
+  <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+    initializer: StateCreator<T, [], Mos>
+  ): UseBoundStore<Mutate<StoreApi<T>, Mos>>
+  <T extends State>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+    initializer: StateCreator<T, [], Mos>
+  ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
+  <S extends StoreApi<State>>(store: S): UseBoundStore<S>
+}
 
-function create<
-  TState extends State,
-  CustomSetState,
-  CustomGetState,
-  CustomStoreApi extends StoreApi<TState>
->(
-  createState:
-    | StateCreator<TState, CustomSetState, CustomGetState, CustomStoreApi>
-    | CustomStoreApi
-): UseBoundStore<TState, CustomStoreApi> {
-  const api: CustomStoreApi =
+const createImpl = <T extends State>(createState: StateCreator<T, [], []>) => {
+  const api =
     typeof createState === 'function' ? createStore(createState) : createState
 
   const useBoundStore: any = (selector?: any, equalityFn?: any) =>
@@ -78,5 +64,9 @@ function create<
 
   return useBoundStore
 }
+
+const create = (<T extends State>(
+  createState: StateCreator<T, [], []> | undefined
+) => (createState ? createImpl(createState) : createImpl)) as Create
 
 export default create
