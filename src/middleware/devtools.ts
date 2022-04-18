@@ -57,6 +57,7 @@ type StoreSetStateWithAction<S> = S extends {
   : never
 
 interface DevtoolsOptions {
+  enabled?: boolean
   name?: string
   anonymousActionType?: string
   serialize?:
@@ -113,15 +114,17 @@ const devtoolsImpl: DevtoolsImpl = (fn, options) => (set, get, api) => {
       ? { name: options }
       : options
 
-  let extensionConnector
+  const { enabled } = devtoolsOptions as { enabled?: boolean }
+  let extensionConnector: typeof window['__REDUX_DEVTOOLS_EXTENSION__'] | false
   try {
-    extensionConnector = window.__REDUX_DEVTOOLS_EXTENSION__
+    extensionConnector =
+      (enabled ?? __DEV__) && window.__REDUX_DEVTOOLS_EXTENSION__
   } catch {
     // ignored
   }
 
   if (!extensionConnector) {
-    if (__DEV__ && typeof window !== 'undefined') {
+    if (__DEV__ && enabled) {
       console.warn(
         '[zustand devtools middleware] Please install/enable Redux devtools extension'
       )

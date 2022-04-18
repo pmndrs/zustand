@@ -26,7 +26,7 @@ beforeEach(() => {
 })
 
 it('connects to the extension by passing the options and initializes', () => {
-  const options = { name: 'test', foo: 'bar' }
+  const options = { name: 'test', foo: 'bar', enabled: true }
   const initialState = { count: 0 }
   create(devtools(() => initialState, options))
 
@@ -35,51 +35,57 @@ it('connects to the extension by passing the options and initializes', () => {
 })
 
 describe('If there is no extension installed...', () => {
+  let savedConsoleWarn: any
   let savedDEV: boolean
-  beforeAll(() => {
+  beforeEach(() => {
+    savedConsoleWarn = console.warn
+    console.warn = jest.fn()
     savedDEV = __DEV__
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = undefined
   })
-  afterAll(() => {
+  afterEach(() => {
+    console.warn = savedConsoleWarn
     __DEV__ = savedDEV
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
   })
 
   it('does not throw', () => {
-    __DEV__ = false
     expect(() => {
       create(devtools(() => ({ count: 0 })))
     }).not.toThrow()
   })
 
-  it('[DEV-ONLY] warns in dev env', () => {
-    __DEV__ = true
-    const originalConsoleWarn = console.warn
-    console.warn = jest.fn()
-
+  it('does not warn if not enabled', () => {
     create(devtools(() => ({ count: 0 })))
-    expect(console.warn).toHaveBeenLastCalledWith(
-      '[zustand devtools middleware] Please install/enable Redux devtools extension'
-    )
+    expect(console.warn).not.toBeCalled()
+  })
 
-    console.warn = originalConsoleWarn
+  it('[DEV-ONLY] warns if enabled in dev mode', () => {
+    __DEV__ = true
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
+    expect(console.warn).toBeCalled()
   })
 
   it('[PRD-ONLY] does not warn if not in dev env', () => {
     __DEV__ = false
-    const consoleWarn = jest.spyOn(console, 'warn')
-
     create(devtools(() => ({ count: 0 })))
-    expect(consoleWarn).not.toBeCalled()
+    expect(console.warn).not.toBeCalled()
+  })
 
-    consoleWarn.mockRestore()
+  it('[PRD-ONLY] does not warn if not in dev env even if enabled', () => {
+    __DEV__ = false
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
+    expect(console.warn).not.toBeCalled()
   })
 })
 
 describe('When state changes...', () => {
   it("sends { type: setStateName || 'anonymous` } as the action with current state", () => {
     const api = create(
-      devtools(() => ({ count: 0, foo: 'bar' }), { name: 'testOptionsName' })
+      devtools(() => ({ count: 0, foo: 'bar' }), {
+        name: 'testOptionsName',
+        enabled: true,
+      })
     )
     api.setState({ count: 10 }, false, 'testSetStateName')
     expect(extension.send).toHaveBeenLastCalledWith(
@@ -98,7 +104,7 @@ describe('when it receives an message of type...', () => {
   describe('ACTION...', () => {
     it('does nothing', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       const setState = jest.spyOn(api, 'setState')
 
       ;(extensionSubscriber as (message: any) => void)({
@@ -112,7 +118,7 @@ describe('when it receives an message of type...', () => {
 
     it('unless action type is __setState', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
 
       ;(extensionSubscriber as (message: any) => void)({
         type: 'ACTION',
@@ -124,7 +130,7 @@ describe('when it receives an message of type...', () => {
 
     it('does nothing even if there is `api.dispatch`', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       ;(api as any).dispatch = jest.fn()
       const setState = jest.spyOn(api, 'setState')
 
@@ -140,7 +146,7 @@ describe('when it receives an message of type...', () => {
 
     it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       ;(api as any).dispatch = jest.fn()
       ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
@@ -159,7 +165,7 @@ describe('when it receives an message of type...', () => {
 
     it('does not throw for unsupported payload', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       ;(api as any).dispatch = jest.fn()
       ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
@@ -206,7 +212,7 @@ describe('when it receives an message of type...', () => {
   describe('DISPATCH and payload of type...', () => {
     it('RESET, it inits with initial state', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       api.setState({ count: 1 })
 
       extension.send.mockClear()
@@ -222,7 +228,7 @@ describe('when it receives an message of type...', () => {
 
     it('COMMIT, it inits with current state', () => {
       const initialState = { count: 0 }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       api.setState({ count: 2 })
       const currentState = api.getState()
 
@@ -239,7 +245,7 @@ describe('when it receives an message of type...', () => {
     describe('ROLLBACK...', () => {
       it('it updates state without recording and inits with `message.state`', () => {
         const initialState = { count: 0, increment: () => {} }
-        const api = create(devtools(() => initialState))
+        const api = create(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
 
         extension.send.mockClear()
@@ -260,7 +266,7 @@ describe('when it receives an message of type...', () => {
       it('does not throw for unparsable `message.state`', () => {
         const increment = () => {}
         const initialState = { count: 0, increment }
-        const api = create(devtools(() => initialState))
+        const api = create(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
         console.error = jest.fn()
 
@@ -294,7 +300,7 @@ describe('when it receives an message of type...', () => {
       const increment = () => {}
       it('it updates state without recording with `message.state`', () => {
         const initialState = { count: 0, increment }
-        const api = create(devtools(() => initialState))
+        const api = create(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
 
         extension.send.mockClear()
@@ -309,7 +315,7 @@ describe('when it receives an message of type...', () => {
 
       it('does not throw for unparsable `message.state`', () => {
         const initialState = { count: 0, increment: () => {} }
-        const api = create(devtools(() => initialState))
+        const api = create(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
         console.error = jest.fn()
 
@@ -340,7 +346,7 @@ describe('when it receives an message of type...', () => {
     describe('JUMP_TO_ACTION...', () => {
       it('it updates state without recording with `message.state`', () => {
         const initialState = { count: 0, increment: () => {} }
-        const api = create(devtools(() => initialState))
+        const api = create(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
 
         extension.send.mockClear()
@@ -356,7 +362,7 @@ describe('when it receives an message of type...', () => {
       it('does not throw for unparsable `message.state`', () => {
         const increment = () => {}
         const initialState = { count: 0, increment }
-        const api = create(devtools(() => initialState))
+        const api = create(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
         console.error = jest.fn()
 
@@ -386,7 +392,7 @@ describe('when it receives an message of type...', () => {
 
     it('IMPORT_STATE, it updates state without recording and inits the last computedState', () => {
       const initialState = { count: 0, increment: () => {} }
-      const api = create(devtools(() => initialState))
+      const api = create(devtools(() => initialState, { enabled: true }))
       const nextLiftedState = {
         computedStates: [{ state: { count: 4 } }, { state: { count: 5 } }],
       }
@@ -407,7 +413,7 @@ describe('when it receives an message of type...', () => {
     })
 
     it('PAUSE_RECORDING, it toggles the sending of actions', () => {
-      const api = create(devtools(() => ({ count: 0 })))
+      const api = create(devtools(() => ({ count: 0 }), { enabled: true }))
 
       api.setState({ count: 1 }, false, 'increment')
       expect(extension.send).toHaveBeenLastCalledWith(
@@ -457,7 +463,8 @@ describe('with redux middleware', () => {
             count: count + (type === 'INCREMENT' ? 1 : -1),
           }),
           { count: 0 }
-        )
+        ),
+        { enabled: true }
       )
     )
     ;(api as any).dispatch({ type: 'INCREMENT' })
@@ -494,7 +501,7 @@ it('works in non-browser env', () => {
   global.window = undefined as any
 
   expect(() => {
-    create(devtools(() => ({ count: 0 })))
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
   }).not.toThrow()
 
   global.window = originalWindow
@@ -505,14 +512,14 @@ it('works in react native env', () => {
   global.window = {} as any
 
   expect(() => {
-    create(devtools(() => ({ count: 0 })))
+    create(devtools(() => ({ count: 0 }), { enabled: true }))
   }).not.toThrow()
 
   global.window = originalWindow
 })
 
 it('preserves isRecording after setting from devtools', () => {
-  const api = create(devtools(() => ({ count: 0 })))
+  const api = create(devtools(() => ({ count: 0 }), { enabled: true }))
   ;(extensionSubscriber as (message: any) => void)({
     type: 'DISPATCH',
     payload: { type: 'PAUSE_RECORDING' },
