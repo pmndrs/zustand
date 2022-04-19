@@ -381,7 +381,7 @@ devtools(..., { anonymousActionType: 'unknown', ... })
 
 The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the normal store is a hook, passing it as a normal context value may violate rules of hooks.
 
-The flexible method available since v4 is to use vanilla store.
+The recommended method available since v4 is to use vanilla store.
 
 ```jsx
 import { createContext, useContext } from 'react'
@@ -405,7 +405,7 @@ const Component = () => {
 ```
 
 Alternatively, a special `createContext` is provided since v3.5,
-which avoid misusing the store hook.
+which avoids misusing the store hook.
 
 ```jsx
 import create from 'zustand'
@@ -483,21 +483,15 @@ const Component = () => {
 </details>
 
 <details>
-  <summary>createContext usage with initialization from props (in TypeScript)</summary>
+  <summary>createContext usage with initialization from props</summary>
 
   ```tsx
   import create from "zustand";
   import createContext from "zustand/context";
 
-  type BearState = {
-    bears: number
-    increase: () => void
-  }
+  const { Provider, useStore } = createContext();
 
-  // pass the type to `createContext` rather than to `create`
-  const { Provider, useStore } = createContext<BearState>();
-
-  export default function App({ initialBears }: { initialBears: number }) {
+  export default function App({ initialBears }) {
     return (
       <Provider
         createStore={() =>
