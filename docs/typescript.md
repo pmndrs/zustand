@@ -253,7 +253,7 @@ type Foo =
 
 declare module 'zustand' {
   interface StoreMutators<S, A> {
-    foo: Write<Cast<S, object> { foo: A }>
+    foo: Write<Cast<S, object>, { foo: A }>
   }
 }
 
