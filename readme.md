@@ -252,6 +252,22 @@ const clearForest = useStore(state => state.clearForest)
 clearForest();
 ```
 
+or use our `createImmerStore` so you can skip wrapping functions in produce:
+
+```jsx
+import { createImmerStore } from "zustand/middleware/immer"
+
+const useStore = createImmerStore(set => ({
+  lush: { forest: { contains: { a: "bear" } } },
+  clearForest: () => set((state => {
+    state.lush.forest.contains = null
+  })
+}))
+
+const clearForest = useStore(state => state.clearForest)
+clearForest();
+```
+
 [Alternatively, there are some other solutions.](https://github.com/pmndrs/zustand/wiki/Updating-nested-state-object-values)
 
 ## Middleware
