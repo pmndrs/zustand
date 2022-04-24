@@ -74,11 +74,11 @@ const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   return initializer(store.setState, get, store)
 }
 
+export const immer = immerImpl as unknown as Immer
+
 export function createImmerStore<
   T extends State,
   Mos extends [StoreMutatorIdentifier, unknown][] = []
 >(initializer: StateCreator<T, [...Mos, ["zustand/immer", never]]>) {
   return create<T, Mos>(immer<T, Mos>(initializer) as any);
 }
-
-export const immer = immerImpl as unknown as Immer
