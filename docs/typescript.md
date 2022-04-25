@@ -190,7 +190,7 @@ If you're eager to know what the answer is to this particular problem then it's 
 ### Middleware that does not change the store type
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
+import create, { State, StateCreator, StoreMutatorIdentifier } from "zustand"
 
 type Logger =
   < T extends State
@@ -296,7 +296,7 @@ console.log(store.foo.toUpperCase())
 The recommended way to use `create` is using the curried workaround ie `create<T>()(...)` because this enabled you to infer the store type. But for some reason if you don't want to use the workaround then you can pass the type parameters like the following. Note that in some cases this acts as an assertion instead of annotation, so it's not recommended.
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
+import create from "zustand"
 
 interface BearState {
   bears: number
@@ -318,7 +318,7 @@ const useStore = create<
 ### Independent slices pattern
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
+import create, { StateCreator } from "zustand"
 
 interface BearSlice {
   bears: number
@@ -351,7 +351,7 @@ Also you can even write `StateCreator<MySlice>` instead of `StateCreator<MySlice
 ### Interdependent slices pattern
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
+import create, { StateCreator } from "zustand"
 
 interface BearSlice {
   bears: number
