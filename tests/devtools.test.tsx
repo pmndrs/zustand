@@ -26,7 +26,7 @@ beforeEach(() => {
 })
 
 it('connects to the extension by passing the options and initializes', () => {
-  const options = { name: 'test', foo: 'bar', enabled: true }
+  const options = { name: 'test', foo: 'bar' }
   const initialState = { count: 0 }
   create(devtools(() => initialState, options))
 
