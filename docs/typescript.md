@@ -21,6 +21,8 @@ const useStore = create<BearState>()((set) => ({
 <details>
   <summary>Why can't we just simply infer the type from initial state?</summary>
 
+  <br/>
+
   **TLDR**: Because state generic `T` is invariant.
   
   Consider this minimal version `create`...
@@ -69,6 +71,8 @@ const useStore = create<BearState>()((set) => ({
 
 <details>
   <summary>Why that currying `()(...)`?</summary>
+
+  <br/>
   
   **TLDR**: It's a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571).
 
@@ -117,6 +121,8 @@ const useStore = create(combine({ bears: 0 }, (set) => ({
 
 <details>
   <summary>But be a little careful...</summary>
+
+  <br/>
 
   We achieve the inference by lying a little in the types of `set`, `get` and `store` that you receive as parameters. The lie is that they're typed in a way as if the state is the first parameter only when in fact the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. So for example `get` from the second parameter has type `() => { bears: number }` and that's a lie as it should be `() => { bears: number, increase: (by: number) => void }`. And `useStore` still has the correct type, ie for example `useStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
 
