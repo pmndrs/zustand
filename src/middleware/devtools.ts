@@ -44,9 +44,9 @@ type TakeTwo<T> = T extends []
   ? [A0?, A1?]
   : never
 
-type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
+type WithDevtools<S> = Write<Cast<S, object>, StoreDevtools<S>>
 
-type StoreSetStateWithAction<S> = S extends {
+type StoreDevtools<S> = S extends {
   setState: (...a: infer A) => infer Sr
 }
   ? {
