@@ -32,7 +32,7 @@ declare module '../vanilla' {
   }
 }
 
-interface StoreSubscribeWithSelector<T extends State> {
+type StoreSubscribeWithSelector<T extends State> = {
   subscribe: {
     (listener: (selectedState: T, previousSelectedState: T) => void): () => void
     <U>(

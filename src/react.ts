@@ -10,22 +10,31 @@ import createStore, {
   StoreMutatorIdentifier,
 } from './vanilla'
 
-export function useStore<S extends StoreApi<State>>(api: S): ExtractState<S>
-export function useStore<S extends StoreApi<State>, U>(
+type ExtractState<S> = S extends { getState: () => infer T } ? T : never
+
+type WithReact<S extends StoreApi<State>> = S & {
+  getServerState?: () => ExtractState<S>
+}
+
+export function useStore<S extends WithReact<StoreApi<State>>>(
+  api: S
+): ExtractState<S>
+
+export function useStore<S extends WithReact<StoreApi<State>>, U>(
   api: S,
   selector: StateSelector<ExtractState<S>, U>,
   equalityFn?: EqualityChecker<U>
 ): U
+
 export function useStore<TState extends State, StateSlice>(
-  api: StoreApi<TState>,
+  api: WithReact<StoreApi<TState>>,
   selector: StateSelector<TState, StateSlice> = api.getState as any,
   equalityFn?: EqualityChecker<StateSlice>
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    // TODO avoid `any` and add type only in react.ts
-    (api as any).getServerState || api.getState,
+    api.getServerState || api.getState,
     selector,
     equalityFn
   )
@@ -33,9 +42,7 @@ export function useStore<TState extends State, StateSlice>(
   return slice
 }
 
-type ExtractState<S> = S extends { getState: () => infer T } ? T : never
-
-export type UseBoundStore<S extends StoreApi<State>> = {
+export type UseBoundStore<S extends WithReact<StoreApi<State>>> = {
   (): ExtractState<S>
   <U>(
     selector: StateSelector<ExtractState<S>, U>,
