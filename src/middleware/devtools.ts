@@ -71,7 +71,7 @@ type StoreSetStateWithAction<S> = S extends {
                 ? Partial<T>
                 : T | Partial<T>),
           replace?: R,
-          actionType?: string | { type: unknown }
+          action?: string | { type: unknown }
         ): Sr
       }
     : A extends [
@@ -88,12 +88,12 @@ type StoreSetStateWithAction<S> = S extends {
                 : T | Partial<T>)
             | ((state: Draft<T>) => void),
           shouldReplace?: R,
-          actionType?: string | { type: unknown }
+          action?: string | { type: unknown }
         ): Sr
       }
     : {
         setState(
-          ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
+          ...a: [...a: TakeTwo<A>, action?: string | { type: unknown }]
         ): Sr
       }
   : never
