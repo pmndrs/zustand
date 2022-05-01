@@ -12,6 +12,8 @@ import create, {
   Subscribe,
   UseBoundStore,
 } from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 
 it('can use exposed types', () => {
   interface ExampleState {
@@ -187,4 +189,72 @@ it('state is covariant', () => {
     foo: string
     baz: string
   }> = store
+})
+
+it('setState with replace requires whole state', () => {
+  const store = create<{ count: number; something: string }>()(() => ({
+    count: 0,
+    something: 'foo',
+  }))
+
+  store.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true
+  )
+  store.setState({ count: 1 }, false)
+  store.setState({ count: 1 }, true as boolean)
+
+  const storeWithDevtools = create<{ count: number; something: string }>()(
+    devtools(() => ({
+      count: 0,
+      something: 'foo',
+    }))
+  )
+
+  storeWithDevtools.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true
+  )
+  storeWithDevtools.setState({ count: 1 }, false)
+  storeWithDevtools.setState({ count: 1 }, true as boolean)
+
+  storeWithDevtools.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true,
+    'FOO'
+  )
+  storeWithDevtools.setState({ count: 1 }, false, 'FOO')
+  storeWithDevtools.setState({ count: 1 }, true as boolean, 'FOO')
+
+  const storeWithDevtoolsAndImmer = create<{
+    count: number
+    something: string
+  }>()(
+    immer(
+      devtools(() => ({
+        count: 0,
+        something: 'foo',
+      }))
+    )
+  )
+
+  storeWithDevtoolsAndImmer.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true
+  )
+  storeWithDevtoolsAndImmer.setState({ count: 1 }, false)
+  storeWithDevtoolsAndImmer.setState({ count: 1 }, true as boolean)
+
+  storeWithDevtoolsAndImmer.setState(
+    // @ts-expect-error missing `something`
+    { count: 1 },
+    true,
+    'FOO'
+  )
+  storeWithDevtoolsAndImmer.setState({ count: 1 }, false, 'FOO')
+  storeWithDevtoolsAndImmer.setState({ count: 1 }, true as boolean, 'FOO')
 })

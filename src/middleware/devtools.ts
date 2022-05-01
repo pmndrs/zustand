@@ -1,4 +1,5 @@
 import type {} from '@redux-devtools/extension'
+import type { Draft } from 'immer'
 import {
   PartialState,
   SetState,
@@ -47,13 +48,54 @@ type TakeTwo<T> = T extends []
 type WithDevtools<S> = Write<Cast<S, object>, StoreSetStateWithAction<S>>
 
 type StoreSetStateWithAction<S> = S extends {
+  getState: () => infer T
   setState: (...a: infer A) => infer Sr
 }
-  ? {
-      setState(
-        ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
-      ): Sr
-    }
+  ? A extends [
+      T | Partial<T> | ((state: T) => T | Partial<T>),
+      (boolean | undefined)?
+    ]
+    ? {
+        setState<R extends boolean | undefined>(
+          partial:
+            | (R extends true
+                ? T
+                : R extends false | undefined
+                ? Partial<T>
+                : T | Partial<T>)
+            | ((
+                state: T
+              ) => R extends true
+                ? T
+                : R extends false | undefined
+                ? Partial<T>
+                : T | Partial<T>),
+          replace?: R,
+          actionType?: string | { type: unknown }
+        ): Sr
+      }
+    : A extends [
+        T | Partial<T> | ((state: Draft<T>) => void),
+        (boolean | undefined)?
+      ]
+    ? {
+        setState<R extends boolean | undefined>(
+          nextStateOrUpdater:
+            | (R extends true
+                ? T
+                : R extends false | undefined
+                ? Partial<T>
+                : T | Partial<T>)
+            | ((state: Draft<T>) => void),
+          shouldReplace?: R,
+          actionType?: string | { type: unknown }
+        ): Sr
+      }
+    : {
+        setState(
+          ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
+        ): Sr
+      }
   : never
 
 interface DevtoolsOptions {
