@@ -58,18 +58,8 @@ type StoreDevtools<S> = S extends {
     ? {
         setState<R extends boolean | undefined>(
           partial:
-            | (R extends true
-                ? T
-                : R extends false | undefined
-                ? Partial<T>
-                : T | Partial<T>)
-            | ((
-                state: T
-              ) => R extends true
-                ? T
-                : R extends false | undefined
-                ? Partial<T>
-                : T | Partial<T>),
+            | (R extends true ? T : T | Partial<T>)
+            | ((state: T) => R extends true ? T : T | Partial<T>),
           replace?: R,
           action?: string | { type: unknown }
         ): Sr
@@ -81,11 +71,7 @@ type StoreDevtools<S> = S extends {
     ? {
         setState<R extends boolean | undefined>(
           nextStateOrUpdater:
-            | (R extends true
-                ? T
-                : R extends false | undefined
-                ? Partial<T>
-                : T | Partial<T>)
+            | (R extends true ? T : T | Partial<T>)
             | ((state: Draft<T>) => void),
           shouldReplace?: R,
           action?: string | { type: unknown }

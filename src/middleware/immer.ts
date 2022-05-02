@@ -41,11 +41,9 @@ type StoreImmer<S> = S extends {
 }
   ? {
       setState<R extends boolean | undefined = false>(
-        nextStateOrUpdater: R extends true
-          ? T
-          : R extends false | undefined
-          ? Partial<T>
-          : T | Partial<T> | ((state: Draft<T>) => void),
+        nextStateOrUpdater:
+          | (R extends true ? T : T | Partial<T>)
+          | ((state: Draft<T>) => void),
         shouldReplace?: R,
         ...a: SkipTwo<A>
       ): Sr
