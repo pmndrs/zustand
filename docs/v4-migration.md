@@ -2,7 +2,7 @@
 
 If you're not using the typed version (either via TypeScript or via JSDoc) then there are no breaking changes for you and hence no migration is needed either.
 
-Also it's recommended to first read the new [TypeScript Guide](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md), it'll be easier to understand the migration.
+Also it's recommended to first read the new [TypeScript Guide](./typescript.md), it'll be easier to understand the migration.
 
 In addition to this migration guide you can also check the diff of the test files in the repo from v3 to v4.
 
@@ -74,7 +74,7 @@ If you're using `StateCreator` you're likely authoring a middleware or using the
 
 ### Migration
 
-Replace `PartialState<T, ...>` with `PartialState<T>` and preferably turn on [`--exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes)/
+Replace `PartialState<T, ...>` with `PartialState<T>` and preferably turn on [`--exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes).
 
 We're no longer using the trick to disallow `{ foo: undefined }` to be assigned to `Partial<{ foo: string }>` instead now we're relying on the users to turn on `--exactOptionalPropertyTypes`.
 
