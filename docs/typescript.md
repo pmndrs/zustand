@@ -226,7 +226,7 @@ const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
   return f(loggedSet, get, store)
 }
 
-export const logger = loggerImpl as unknown as Foo
+export const logger = loggerImpl as unknown as Logger
 
 type PopArgument<T extends (...a: never[]) => unknown> =
   T extends (...a: [...infer A, infer _]) => infer R
