@@ -2,62 +2,19 @@
 
 ## Pre-requisites
 
-There are a couple of pre-requisites to testing Zustand in order to have the best experience while doing so.
-First you need to mock the `create` function in order to reset the store after each tests,
-which will give you a pure testing enviroment.
+All you have to do is impot `zustand/setup-tests` for your store to be reset after each test.
+This is usually done withing your `setupTests.(j|t)s` file. Or something along those lines.
+If you don't have one visit this: https://jestjs.io/docs/configuration#setupfilesafterenv-array.
+
+We need to do this because we want all of our tests to be independent of each other.
+This means that the result from our current test wont be affected by our previous one.
 
 ```ts
-// This code lives in: src(?)/__mocks__/zustand/index.ts
-import actualCreate from 'zustand';
-import type {
-  StateCreator,
-  State,
-  StoreMutatorIdentifier,
-} from 'zustand/vanilla';
-import { act } from 'react-dom/test-utils';
+// setupTests.ts
 
-// a variable to hold reset functions for all stores declared in the app
-const storeResetFns =
-  new Set<VoidFunction>();
-
-// when creating a store, we get its initial state, create a reset function and add it in the set
-const create = <
-  T extends State,
-  Mos extends [
-    StoreMutatorIdentifier,
-    unknown
-  ][] = []
->(
-  createState: StateCreator<T, [], Mos>
-) => {
-  const store = actualCreate(
-    createState
-  );
-  const initialState = store.getState();
-  storeResetFns.add(() =>
-    store.setState(initialState, true)
-  );
-  return store;
-};
-
-// Reset all stores after each test run
-afterEach(() => {
-  act(() =>
-    storeResetFns.forEach(resetFn =>
-      resetFn()
-    )
-  );
-});
-
-export default create;
+import '@testing-library/jest-dom'
+import 'zustand/setup-tests'
 ```
-
-The way you can mock a dependency depends on your test runner.
-
-In jest, you can create a `__mocks__/zustand.ts` and place the code there. If your app is using zustand/vanilla instead
-of zustand, then you'll have to place the above code in `__mocks__/zustand/vanilla.ts`
-
-If you use JavaScript, instead of TypeScript change the extensions to `.js` and remove the type definitions.
 
 ## Best practices
 
@@ -151,7 +108,7 @@ a count and it needs to increment, decrement and reset said count.
 Pretty simple tests, this is how they'd look like:
 
 ```ts
-// store/counter.spec.ts
+// store/counter.store.spec.ts
 import {
   act,
   renderHook,
@@ -243,16 +200,14 @@ import { CounterPage } from './counter.page';
 import { useCounter } from '../store/counter.store';
 
 // let's mock the whole counter, so we don't worry about it
-jest.mock('../store/counter', () => ({
+jest.mock('../store/counter.store', () => ({
   useCounter: jest.fn(),
 }));
 
 // make sure we add types to it since we
 // don't do type unsafety around these parts
 const mockedCounter =
-  useCounter as unknown as jest.MockedFn<
-    typeof useCounter
-  >;
+  useCounter as unknown as jest.MockedFn<typeof useCounter>;
 
 describe('CounterPage', () => {
   // we make sure to clean up the dom tree after
