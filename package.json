@@ -204,6 +204,9 @@
     "react": ">=16.8"
   },
   "peerDependenciesMeta": {
+    "@testing-library/react": {
+      "optional": true
+    },
     "immer": {
       "optional": true
     },
