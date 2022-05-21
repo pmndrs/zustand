@@ -34,7 +34,7 @@ export { Group } from 'three/src/objects/Group.js'
 //export { DataTexture } from 'three/src/textures/DataTexture.js'
 export class DataTexture {}
 //export { DataTexture2DArray } from 'three/src/textures/DataTexture2DArray.js'
-//export { DataTexture3D } from 'three/src/textures/DataTexture3D.js'
+export { DataTexture3D } from 'three/src/textures/DataTexture3D.js'
 //export { CompressedTexture } from 'three/src/textures/CompressedTexture.js'
 //export { CubeTexture } from 'three/src/textures/CubeTexture.js'
 //export { CanvasTexture } from 'three/src/textures/CanvasTexture.js'
@@ -135,7 +135,6 @@ export class InstancedInterleavedBuffer {}
 export class InterleavedBuffer {}
 //export { InstancedBufferAttribute } from 'three/src/core/InstancedBufferAttribute.js'
 export * from 'three/src/core/BufferAttribute.js'
-export { Face3 } from 'three/src/core/Face3.js'
 export { Object3D } from 'three/src/core/Object3D.js'
 //export { Raycaster } from 'three/src/core/Raycaster.js'
 export class Raycaster {
