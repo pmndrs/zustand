@@ -26,7 +26,6 @@ describe('Counter Store', () => {
       result.current.decrement();
       result.current.decrement();
     });
-    console.log({result});
     expect(result.current.count).toBe(-4);
   });
 
