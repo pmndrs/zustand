@@ -4,7 +4,7 @@ import actualCreate from './'
 
 // maps use more memory than sets, but we can use them for
 // easier memory management via disposing (edge case, but worth noting)
-// not many people are going to destroy stores anyways, but what the heck
+// not many people are going to destroy stores, but what the heck
 const pool = new Map<string, VoidFunction>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
