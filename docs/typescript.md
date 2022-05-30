@@ -173,7 +173,7 @@ const useStore = create<BearState>()(myMiddlewares((set) => ({
 
 Imagine you had to write this hypothetical middleware...
 
-```js
+```ts
 import create from "zustand"
 
 const foo = (f, bar) => (set, get, store) => {
@@ -243,7 +243,7 @@ const useStore = create<BearState>()(logger((set) => ({
 
 ### Middleware that changes the store type
 
-```js
+```ts
 import create, { State, StateCreator, StoreMutatorIdentifier, Mutate, StoreApi } from "zustand"
 
 type Foo =
