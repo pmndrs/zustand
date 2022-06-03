@@ -51,7 +51,7 @@ If you're not passing any type parameters to `create` then there is no migration
 
 ### Migration
 
-If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#authoring-middlewares-and-advanced-usage) sections.
+If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#common-recipes) sections.
 
 ## `PartialState` (from `zustand` and `zustand/vanilla`)
 
