@@ -182,7 +182,7 @@ describe('CounterPage', () => {
         decrement: jest.fn(),
         reset: jest.fn(),
       }
-    })
+    })x
     render(<CounterPage />)
     expect(screen.getByTestId('counter-page')).toBeTruthy()
   })
