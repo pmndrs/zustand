@@ -17,7 +17,8 @@ jobs:
           cache: yarn
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
-      - run: cd examples && yarn install --frozen-lockfile --check-files
+      - run: cd examples/site && yarn install --frozen-lockfile --check-files
+      - run: cd examples/react-jest && yarn install --frozen-lockfile --check-files
       - name: Lint
         run: yarn eslint:ci
       - name: Type

@@ -201,7 +201,8 @@
   },
   "peerDependencies": {
     "immer": ">=9.0",
-    "react": ">=16.8"
+    "react": ">=16.8",
+    "@testing-library/react": ">=13.0.0"
   },
   "peerDependenciesMeta": {
     "@testing-library/react": {
