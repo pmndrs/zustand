@@ -22,11 +22,11 @@
       "import": "./esm/vanilla.mjs",
       "default": "./vanilla.js"
     },
-    "./setup-tests": {
-      "types": "./setup-tests.d.ts",
-      "module": "./esm/setup-tests.js",
-      "import": "./esm/setup-tests.mjs",
-      "default": "./setup-tests.js"
+    "./setup-jest": {
+      "types": "./setup-jest.d.ts",
+      "module": "./esm/setup-jest.js",
+      "import": "./esm/setup-jest.mjs",
+      "default": "./setup-jest.js"
     },
     "./middleware": {
       "types": "./middleware.d.ts",
@@ -57,10 +57,10 @@
   "scripts": {
     "prebuild": "shx rm -rf dist",
     "build": "concurrently -m 8 'yarn:build:* -c'",
-    "dev": "yarn build && concurrently -m 8 'yarn:build:* -w -c \"./rollup.config.dev.js\"'",
+    "dev": "concurrently -m 8 'yarn:build:* -c -w'",
     "build:base": "rollup ",
     "build:vanilla": "rollup --config-vanilla",
-    "build:setup-tests": "rollup --config-setup-tests",
+    "build:setup-jest": "rollup --config-setup-jest",
     "build:middleware": "rollup --config-middleware",
     "build:middleware:immer": "rollup --config-middleware_immer",
     "build:shallow": "rollup --config-shallow",
@@ -201,7 +201,8 @@
   },
   "peerDependencies": {
     "immer": ">=9.0",
-    "react": ">=16.8"
+    "react": ">=16.8",
+    "@testing-library/react": ">=13.0.0"
   },
   "peerDependenciesMeta": {
     "@testing-library/react": {
