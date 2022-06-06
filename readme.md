@@ -529,6 +529,51 @@ const useStore = create<BearState>()(devtools(persist((set) => ({
 
 A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md).
 
+## Map and Set Usage
+
+You need to wrap Maps and Sets inside an object, and when you want it's update to be reflected (e.g. in React),
+one way you can do it is calling the setState on it:
+
+```js
+import create from "zustand";
+
+const useFooBar = create(() => ({
+  foo: new Map(),
+  bar: new Set(),
+}));
+
+const { getState: getFooBar, setState: setFooBar } =
+	useFooBar;
+  
+function doSomething() {
+  const { foo, bar } = getFooBar();
+
+  // use foo/bar...
+  // Here, the `.set()` function will update them, no need to call setState on them:
+  bar.set("bar");
+  foo.set("foo", "bar");
+  foo.delete("foo");
+  
+  // If you want to update some React component that uses `useFooBar`, you have to call setState
+  // to let React know that an update happened:
+  setFooBar({ foo, set });
+  // You never need to create a new Map or Set to update them!
+}
+```
+
+This will not work if you want to tell React there was an update:
+
+```js
+import create from "zustand";
+
+const useFoo = create(() => new Map());
+
+// everything else corrected to follow the example above...
+
+// The setState will not communicate React that there was an update,
+// You need to wrap it inside an object!
+```
+
 ## Best practices
   
 * You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
