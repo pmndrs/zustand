@@ -12,7 +12,7 @@ const { getState: getFooBar, setState: setFooBar } = useFooBar;
   
 function doSomething() {
   // Following React's best practices, you should create a new Map/Set when updating them:
-  const foo = new Map(getFooBar().foo);
+  const foo = new Map(useFooBar.getState().foo);
   const bar = new Set(getFooBar().bar);
   
   // use foo/bar...
