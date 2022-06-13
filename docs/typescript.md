@@ -131,6 +131,8 @@ const useStore = create(combine({ bears: 0 }, (set) => ({
   So `combine` trades-off a little type-safety for the convience of not having to write a type for state. Hence you should use `combine` accordingly, usually it's not a big deal and it's okay to use it.
 </details>
 
+Also note that we're not using the curried version when using `combine` because `combine` "creates" the state. When using a middleware that creates the state, it's not necessary to use the curried version because the state now can be inferred. Another middleware that creates state is `redux`. So when using `combine`, `redux` or any other custom middleware that creates the state, it's not recommended to use the curried version.
+
 ## Using middlewares
 
 You don't have to do anything special to use middlewares in TypeScript.
