@@ -68,6 +68,8 @@
     "build:shallow": "rollup -c --config-shallow",
     "build:context": "rollup -c --config-context",
     "postbuild": "yarn copy",
+    "prettier": "prettier '*.{js,json,md}' '{src,tests,docs}/**/*.{ts,tsx,md,mdx}' --write",
+    "prettier:ci": "prettier '*.{js,json,md}' '{src,tests,docs}/**/*.{ts,tsx,md,mdx}' --list-different",
     "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "eslint:ci": "eslint '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "pretest": "tsc --noEmit",
@@ -75,7 +77,7 @@
     "test:ci": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\""
+    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined;\""
   },
   "engines": {
     "node": ">=12.7.0"
@@ -87,11 +89,6 @@
     "bracketSameLine": true,
     "tabWidth": 2,
     "printWidth": 80
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": [
-      "prettier --write"
-    ]
   },
   "repository": {
     "type": "git",
@@ -183,12 +180,10 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.5.0",
-    "husky": "^7.0.4",
     "immer": "^9.0.12",
     "jest": "^28.0.3",
     "jest-environment-jsdom": "^28.0.2",
     "json": "^11.0.0",
-    "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",

@@ -18,6 +18,8 @@ jobs:
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
       - run: cd examples && yarn install --frozen-lockfile --check-files
+      - name: Prettier
+        run: yarn prettier:ci
       - name: Lint
         run: yarn eslint:ci
       - name: Type

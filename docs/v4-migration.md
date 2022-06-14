@@ -106,7 +106,7 @@ If you're not passing any type parameters to `useStore` then there is no migrati
 
 ## `UseBoundStore` (from `zustand` and `zustand/react`)
 
-### Change 
+### Change
 
 ```diff
 - type UseBoundStore<
