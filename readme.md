@@ -53,7 +53,7 @@ function Controls() {
 * Simple and un-opinionated
 * Makes hooks the primary means of consuming state
 * Doesn't wrap your app in context providers
-* [Can inform components transiently (without causing render)](#transient-updates-for-often-occuring-state-changes)
+* [Can inform components transiently (without causing render)](#transient-updates-for-often-occurring-state-changes)
 
 ### Why zustand over context?
 
@@ -198,7 +198,7 @@ const unsub5 = useStore.subscribe(state => state.paw, console.log, { fireImmedia
 
 ## Using zustand without React
 
-Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
+Zustand core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
 
 ```jsx
 import create from 'zustand/vanilla'
@@ -218,7 +218,7 @@ const useStore = create(vanillaStore)
 
 :warning: Note that middlewares that modify `set` or `get` are not applied to `getState` and `setState`.
 
-## Transient updates (for often occuring state-changes)
+## Transient updates (for often occurring state-changes)
 
 The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
@@ -350,7 +350,7 @@ const useStore = create(devtools(redux(reducer, initialState)))
 
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.  
   
-Name store: `devtools(store, {name: "MyStore"})`, which will create a seperate instance named "MyStore" in the devtools.
+Name store: `devtools(store, {name: "MyStore"})`, which will create a separate instance named "MyStore" in the devtools.
 
 Serialize options: `devtools(store, { serialize: { options: true } })`.
   

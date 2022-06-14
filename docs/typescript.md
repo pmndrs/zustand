@@ -128,7 +128,7 @@ const useStore = create(combine({ bears: 0 }, (set) => ({
 
   It's not a lie lie because `{ bears: number }` is still a subtype `{ bears: number, increase: (by: number) => void }`, so in most cases there won't be a problem. Just you have to be careful while using replace. For eg `set({ bears: 0 }, true)` would compile but will be unsound as it'll delete the `increase` function. (If you set from "outside" ie `useStore.setState({ bears: 0 }, true)` then it won't compile because the "outside" store knows that `increase` is missing.) Another instance where you should be careful you're doing `Object.keys`, `Object.keys(get())` will return `["bears", "increase"]` and not `["bears"]` (the return type of `get` can make you fall for this).
 
-  So `combine` trades-off a little type-safety for the convience of not having to write a type for state. Hence you should use `combine` accordingly, usually it's not a big deal and it's okay to use it.
+  So `combine` trades-off a little type-safety for the convenience of not having to write a type for state. Hence you should use `combine` accordingly, usually it's not a big deal and it's okay to use it.
 </details>
 
 Also note that we're not using the curried version when using `combine` because `combine` "creates" the state. When using a middleware that creates the state, it's not necessary to use the curried version because the state now can be inferred. Another middleware that creates state is `redux`. So when using `combine`, `redux` or any other custom middleware that creates the state, it's not recommended to use the curried version.
@@ -184,7 +184,7 @@ const foo = (f, bar) => (set, get, store) => {
 }
 
 const useStore = create(foo(() => ({ bears: 0 }), "hello"))
-console.log(store.foo.toUpperCase())
+console.log(useStore.foo.toUpperCase())
 ```
 
 Yes, if you didn't know Zustand middlewares do and are allowed to mutate the store. But how could we possibly encode the mutation on the type-level? That is to say how could do we type `foo` so that this code compiles?
@@ -223,7 +223,7 @@ const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
     set(...a)
     console.log(...(name ? [`${name}:`] : []), get())
   }
-  store.setState = loggedState
+  store.setState = loggedSet
 
   return f(loggedSet, get, store)
 }
@@ -296,7 +296,7 @@ type Cast<T, U> =
 // ---
 
 const useStore = create(foo(() => ({ bears: 0 }), "hello"))
-console.log(store.foo.toUpperCase())
+console.log(useStore.foo.toUpperCase())
 ```
 
 ### `create` without curried workaround
