@@ -2,7 +2,7 @@
 
 ## Basic usage
 
-When using TypeScript you just have to make a tiny change that instead of writing `create(...)` you'll have to write `create<T>()(...)` where `T` would be type of the state so as to annotate it. Example...
+The difference when using TypeScript is instead of writing `create(...)`, you have to write `create<T>()(...)` where `T` would be type of the state so as to annotate it. Example...
 
 ```ts
 import create from 'zustand'
