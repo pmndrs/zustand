@@ -4,15 +4,15 @@ import { NamedSet } from './devtools'
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
-type Action = {
+interface Action {
   type: unknown
 }
 
-type ReduxState<A extends Action> = {
+interface ReduxState<A extends Action> {
   dispatch: StoreRedux<A>['dispatch']
 }
 
-type StoreRedux<A extends Action> = {
+interface StoreRedux<A extends Action> {
   dispatch: (a: A) => A
   dispatchFromDevtools: true
 }
