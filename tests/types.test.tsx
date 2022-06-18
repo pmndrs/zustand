@@ -111,7 +111,9 @@ type AssertEqual<Type, Expected> = Type extends Expected
   : never
 
 it('should have correct (partial) types for setState', () => {
-  type Count = { count: number }
+  interface Count {
+    count: number
+  }
 
   const store = create<Count>((set) => ({
     count: 0,
@@ -137,7 +139,10 @@ it('should have correct (partial) types for setState', () => {
 })
 
 it('should allow for different partial keys to be returnable from setState', () => {
-  type State = { count: number; something: string }
+  interface State {
+    count: number
+    something: string
+  }
 
   const store = create<State>(() => ({
     count: 0,

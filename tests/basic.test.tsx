@@ -37,7 +37,7 @@ it('creates a store hook and api object', () => {
   `)
 })
 
-type CounterState = {
+interface CounterState {
   count: number
   inc: () => void
 }
@@ -185,8 +185,13 @@ it('can batch updates', async () => {
 })
 
 it('can update the selector', async () => {
-  type State = { one: string; two: string }
-  type Props = { selector: StateSelector<State, string> }
+  interface State {
+    one: string
+    two: string
+  }
+  interface Props {
+    selector: StateSelector<State, string>
+  }
   const useStore = create<State>(() => ({
     one: 'one',
     two: 'two',
@@ -204,8 +209,12 @@ it('can update the selector', async () => {
 })
 
 it('can update the equality checker', async () => {
-  type State = { value: number }
-  type Props = { equalityFn: EqualityChecker<State> }
+  interface State {
+    value: number
+  }
+  interface Props {
+    equalityFn: EqualityChecker<State>
+  }
   const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
   const selector: StateSelector<State, State> = (s) => s
@@ -238,8 +247,10 @@ it('can update the equality checker', async () => {
 })
 
 it('can call useStore with progressively more arguments', async () => {
-  type State = { value: number }
-  type Props = {
+  interface State {
+    value: number
+  }
+  interface Props {
     selector?: StateSelector<State, number>
     equalityFn?: EqualityChecker<number>
   }
@@ -283,7 +294,9 @@ it('can call useStore with progressively more arguments', async () => {
 
 it('can throw an error in selector', async () => {
   console.error = jest.fn()
-  type State = { value: string | number }
+  interface State {
+    value: string | number
+  }
 
   const initialState: State = { value: 'foo' }
   const useStore = create<State>(() => initialState)
@@ -328,7 +341,9 @@ it('can throw an error in selector', async () => {
 
 it('can throw an error in equality checker', async () => {
   console.error = jest.fn()
-  type State = { value: string | number }
+  interface State {
+    value: string | number
+  }
 
   const initialState: State = { value: 'foo' }
   const useStore = create(() => initialState)
@@ -373,7 +388,7 @@ it('can throw an error in equality checker', async () => {
 })
 
 it('can get the store', () => {
-  type State = {
+  interface State {
     value: number
     getState1: () => State
     getState2: () => State
@@ -389,7 +404,7 @@ it('can get the store', () => {
 })
 
 it('can set the store', () => {
-  type State = {
+  interface State {
     value: number
     setState1: SetState<State>
     setState2: SetState<State>
@@ -438,7 +453,10 @@ it('can destroy the store', () => {
 })
 
 it('only calls selectors when necessary', async () => {
-  type State = { a: number; b: number }
+  interface State {
+    a: number
+    b: number
+  }
   const useStore = create<State>(() => ({ a: 0, b: 0 }))
   const { setState } = useStore
   let inlineSelectorCallCount = 0
@@ -474,10 +492,12 @@ it('only calls selectors when necessary', async () => {
 })
 
 it('ensures parent components subscribe before children', async () => {
-  type State = {
+  interface State {
     children: { [key: string]: { text: string } }
   }
-  type Props = { id: string }
+  interface Props {
+    id: string
+  }
   const useStore = create<State>(() => ({
     children: {
       '1': { text: 'child 1' },

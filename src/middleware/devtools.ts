@@ -16,7 +16,7 @@ declare module '../vanilla' {
 }
 
 // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
-type Message = {
+interface Message {
   type: string
   payload?: any
   state?: any
