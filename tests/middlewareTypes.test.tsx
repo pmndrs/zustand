@@ -9,7 +9,7 @@ import {
 import { immer } from 'zustand/middleware/immer'
 import createVanilla from 'zustand/vanilla'
 
-type CounterState = {
+interface CounterState {
   count: number
   inc: () => void
 }
@@ -597,7 +597,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
   })
 
   it('#631', () => {
-    type MyState = {
+    interface MyState {
       foo: number | null
     }
     const useStore = create<MyState>()(
@@ -622,7 +622,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
   })
 
   it('#650', () => {
-    type MyState = {
+    interface MyState {
       token: string | undefined
       authenticated: boolean
       authenticate: (username: string, password: string) => Promise<void>

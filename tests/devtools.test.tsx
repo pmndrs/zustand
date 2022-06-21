@@ -26,9 +26,9 @@ beforeEach(() => {
 })
 
 it('connects to the extension by passing the options and initializes', () => {
-  const options = { name: 'test', foo: 'bar', enabled: true }
+  const options = { name: 'test', foo: 'bar' }
   const initialState = { count: 0 }
-  create(devtools(() => initialState, options))
+  create(devtools(() => initialState, { enabled: true, ...options }))
 
   expect(extensionConnector.connect).toHaveBeenLastCalledWith(options)
   expect(extension.init).toHaveBeenLastCalledWith(initialState)
