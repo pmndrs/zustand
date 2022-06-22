@@ -16,7 +16,7 @@ function doSomething() {
   // Following React's best practices, you should create a new Map/Set when updating them:
   useFooBar.setState(prev => ({
     foo: new Map(prev.foo).set("newKey", "newValue"),
-    bar: new Set(prev.bar).set("newKey"),
+    bar: new Set(prev.bar).add("newKey"),
   }));
 }
 ```
