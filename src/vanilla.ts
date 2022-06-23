@@ -9,15 +9,18 @@ export type StateListener<T> = (state: T, previousState: T) => void
  * @deprecated Use `StateListener<T>` instead of `StateSliceListener<T>`.
  */
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
-export interface Subscribe<T extends State> {
-  (listener: StateListener<T>): () => void
-}
+export type Subscribe<T extends State> = {
+  _(listener: StateListener<T>): () => void
+}['_']
 
 export type SetState<T extends State> = {
   _(
-    partial: T | Partial<T> | ((state: T) => T | Partial<T>),
+    partial: T | Partial<T> | BivariantStateComputer<T>,
     replace?: boolean | undefined
   ): void
+}['_']
+export type BivariantStateComputer<T> = {
+  _(state: T): T | Partial<T>
 }['_']
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
