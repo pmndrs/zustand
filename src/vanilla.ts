@@ -19,7 +19,7 @@ export type SetState<T extends State> = {
     replace?: boolean | undefined
   ): void
 }['_']
-export type BivariantStateComputer<T> = {
+type BivariantStateComputer<T> = {
   _(state: T): T | Partial<T>
 }['_']
 export type GetState<T extends State> = () => T
