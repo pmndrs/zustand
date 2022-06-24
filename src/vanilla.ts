@@ -9,9 +9,9 @@ export type StateListener<T> = (state: T, previousState: T) => void
  * @deprecated Use `StateListener<T>` instead of `StateSliceListener<T>`.
  */
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
-export type Subscribe<T extends State> = {
-  _(listener: StateListener<T>): () => void
-}['_']
+export interface Subscribe<T extends State> {
+  (listener: StateListener<T>): () => void
+}
 
 export type SetState<T extends State> = {
   _(
