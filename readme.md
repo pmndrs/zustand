@@ -570,7 +570,7 @@ A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blo
 
 ## Best practices
 
-- You may wonder how to organize your code for better maintenance: [Splitting the store into seperate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
+- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
 - Recommended usage for this unopinionated library: [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
 
 <details>
