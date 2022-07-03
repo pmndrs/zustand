@@ -423,7 +423,7 @@ If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice
 
 - `devtools` — `["zustand/devtools", never]`
 - `persist` — `["zustand/persist", YourPersistedState]`<br/>
-  `YourPersistedState` is the type of state you're wanting to persist, ie the return type of `options.partialize`, if you're not passing `partialize` options the `YourPersistedState` becomes `Partial<YourState>`. Also [sometimes](https://github.com/pmndrs/zustand/issues/980#issuecomment-1162289836) passing actual `PersistedState` won't work, in those cases try passing `unknown`.
+  `YourPersistedState` is the type of state you're going to persist, ie the return type of `options.partialize`, if you're not passing `partialize` options the `YourPersistedState` becomes `Partial<YourState>`. Also [sometimes](https://github.com/pmndrs/zustand/issues/980#issuecomment-1162289836) passing actual `PersistedState` won't work, in those cases try passing `unknown`.
 - `immer` — `["zustand/immer", never]`
 - `subscribeWithSelector` — `["zustand/subscribeWithSelector", never]`
 - `redux` — `["zustand/redux", YourAction]`
