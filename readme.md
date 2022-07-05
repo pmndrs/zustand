@@ -31,8 +31,6 @@ npm install zustand # or yarn add zustand
 - Renders components only on changes
 - Centralized, action-based state management
 
----
-
 # Quick Start
 
 ## First create a store
