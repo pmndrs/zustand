@@ -18,6 +18,23 @@ You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/ex
 npm install zustand # or yarn add zustand
 ```
 
+### Why zustand over redux?
+
+- Simple and un-opinionated
+- Makes hooks the primary means of consuming state
+- Doesn't wrap your app in context providers
+- [Can inform components transiently (without causing render)](#transient-updates-for-often-occurring-state-changes)
+
+### Why zustand over context?
+
+- Less boilerplate
+- Renders components only on changes
+- Centralized, action-based state management
+
+---
+
+# Quick Start
+
 ## First create a store
 
 Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function _merges_ state.
@@ -47,21 +64,6 @@ function Controls() {
   return <button onClick={increasePopulation}>one up</button>
 }
 ```
-
-### Why zustand over redux?
-
-- Simple and un-opinionated
-- Makes hooks the primary means of consuming state
-- Doesn't wrap your app in context providers
-- [Can inform components transiently (without causing render)](#transient-updates-for-often-occurring-state-changes)
-
-### Why zustand over context?
-
-- Less boilerplate
-- Renders components only on changes
-- Centralized, action-based state management
-
----
 
 # Recipes
 
