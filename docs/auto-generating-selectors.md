@@ -62,8 +62,7 @@ const bears = useStore.use.bears()
 const increase = useStore.use.increase()
 ```
 
-## Libraries
+## 3rd-party Libraries
 
-- Or you can just `npm i auto-zustand-selectors-hook`
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook)
 - [zustood](https://github.com/udecode/zustood)
