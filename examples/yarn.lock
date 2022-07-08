@@ -2356,7 +2356,7 @@ babel-plugin-jest-hoist@^24.9.0:
   dependencies:
     "@types/babel__traverse" "^7.0.6"
 
-babel-plugin-macros@2.8.0, babel-plugin-macros@^2.8.0:
+babel-plugin-macros@2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-macros/-/babel-plugin-macros-2.8.0.tgz#0f958a7cc6556b1e65344465d99111a1e5e10138"
   integrity sha512-SEP5kJpfGYqYKpBrj5XU3ahw5p5GOHJ0U5ssOSQ/WBVdwkD2Dzlce95exQTs3jOVWPPKLBN2rlEWkCK7dSmLvg==
@@ -8793,13 +8793,6 @@ raw-body@2.4.0:
     http-errors "1.7.2"
     iconv-lite "0.4.24"
     unpipe "1.0.0"
-
-raw.macro@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/raw.macro/-/raw.macro-0.4.2.tgz#1954f9a36465d9400a76b8b68438e4ec8582acd6"
-  integrity sha512-Z+zKtCweyJ3lGYdUNq/BQwfzqQE2wrXjz0RNEes5nDniPpjvBw64sKYFXStJSfmZUmiBxv4DsN1lto982UAhFQ==
-  dependencies:
-    babel-plugin-macros "^2.8.0"
 
 react-app-polyfill@^1.0.6:
   version "1.0.6"
