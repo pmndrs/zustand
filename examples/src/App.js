@@ -1,4 +1,3 @@
-import React from 'react'
 import create from 'zustand'
 import CodePreview from './components/CodePreview'
 import Backdrop from './components/Backdrop'
