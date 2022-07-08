@@ -16,7 +16,6 @@
     "react-three-fiber": "^4.2.20",
     "three": "^0.120.1",
     "threejs-meshline": "^2.0.11",
-    "web-vitals": "^0.2.2",
     "zustand": "^3.0.0"
   },
   "scripts": {
