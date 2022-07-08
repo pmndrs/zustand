@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function () {
+export default function Details() {
   return (
     <>
       <a href="https://github.com/pmndrs/zustand" className="top-right" children="Github" />
