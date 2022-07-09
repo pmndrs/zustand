@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Plane, useAspect, useTextureLoader } from 'drei'
 import { useFrame } from 'react-three-fiber'
 import Fireflies from './Fireflies'

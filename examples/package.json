@@ -9,7 +9,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-postprocessing": "^1.1.4",
-    "react-scripts": "3.4.3",
     "react-three-fiber": "^4.2.20",
     "three": "^0.120.1",
     "threejs-meshline": "^2.0.11",
@@ -49,8 +48,8 @@
     "@testing-library/react": "^10.4.3",
     "@testing-library/user-event": "^12.0.11",
     "customize-cra": "^1.0.0",
-    "customize-cra-react-refresh": "^1.1.0",
-    "react-app-rewired": "^2.1.6",
+    "react-app-rewired": "^2.2.1",
+    "react-scripts": "^5.0.1",
     "webpack-bundle-analyzer": "^3.8.0"
   }
 }
