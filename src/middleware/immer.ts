@@ -18,6 +18,7 @@ declare module '../vanilla' {
 }
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Cast<T, U> = T extends U ? T : U
 type SkipTwo<T> = T extends []
   ? []
   : T extends [unknown]
@@ -32,22 +33,21 @@ type SkipTwo<T> = T extends []
   ? A
   : never
 
-type WithImmer<S> = S extends {
+type WithImmer<S> = Write<Cast<S, object>, StoreImmer<S>>
+
+type StoreImmer<S> = S extends {
   getState: () => infer T
   setState: infer SetState
 }
-  ? Write<
-      S,
-      SetState extends (...a: infer A) => infer Sr
-        ? {
-            setState(
-              nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
-              shouldReplace?: boolean | undefined,
-              ...a: SkipTwo<A>
-            ): Sr
-          }
-        : never
-    >
+  ? SetState extends (...a: infer A) => infer Sr
+    ? {
+        setState(
+          nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
+          shouldReplace?: boolean | undefined,
+          ...a: SkipTwo<A>
+        ): Sr
+      }
+    : never
   : never
 
 type PopArgument<T extends (...a: never[]) => unknown> = T extends (

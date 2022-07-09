@@ -9,7 +9,7 @@ export type StateListener<T> = (state: T, previousState: T) => void
  * @deprecated Use `StateListener<T>` instead of `StateSliceListener<T>`.
  */
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
-export type Subscribe<T extends State> = {
+export interface Subscribe<T extends State> {
   (listener: StateListener<T>): () => void
 }
 
@@ -21,7 +21,7 @@ export type SetState<T extends State> = {
 }['_']
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
-export type StoreApi<T extends State> = {
+export interface StoreApi<T extends State> {
   setState: SetState<T>
   getState: GetState<T>
   subscribe: Subscribe<T>
@@ -40,7 +40,7 @@ export type StateCreator<
   $$storeMutations: Mis
 ) => U) & { $$storeMutators?: Mos }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface
 export interface StoreMutators<S, A> {}
 export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
 
@@ -52,7 +52,7 @@ export type Mutate<S, Ms> = Ms extends []
 
 type Get<T, K, F = never> = K extends keyof T ? T[K] : F
 
-type CreateStore = {
+interface CreateStore {
   <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): Mutate<StoreApi<T>, Mos>

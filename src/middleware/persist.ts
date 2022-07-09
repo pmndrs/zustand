@@ -5,15 +5,18 @@ import {
   StoreMutatorIdentifier,
 } from '../vanilla'
 
-export type StateStorage = {
+export interface StateStorage {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
   removeItem: (name: string) => void | Promise<void>
 }
 
-type StorageValue<S> = { state: S; version?: number }
+interface StorageValue<S> {
+  state: S
+  version?: number
+}
 
-export type PersistOptions<S, PersistedState = S> = {
+export interface PersistOptions<S, PersistedState = S> {
   /** Name of the storage (must be unique) */
   name: string
   /**
@@ -74,7 +77,7 @@ export type PersistOptions<S, PersistedState = S> = {
 
 type PersistListener<S> = (state: S) => void
 
-type StorePersist<S extends State, Ps> = {
+interface StorePersist<S extends State, Ps> {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
@@ -85,7 +88,7 @@ type StorePersist<S extends State, Ps> = {
   }
 }
 
-type Thenable<Value> = {
+interface Thenable<Value> {
   then<V>(
     onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
   ): Thenable<V>
