@@ -333,4 +333,18 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-export const persist = persistImpl as unknown as Persist
+const persist = persistImpl as unknown as Persist
+
+const persistSuscribe = (key: string, callback: (n?: any) => void) => {
+  const storageEventCallback = (e: StorageEvent) => {
+    if (e.key === key && e.newValue) {
+      callback(JSON.parse(e.newValue))
+    }
+  }
+  window.addEventListener('storage', storageEventCallback)
+  return () => {
+    window.removeEventListener('storage', storageEventCallback)
+  }
+}
+
+export { persist, persistSuscribe }
