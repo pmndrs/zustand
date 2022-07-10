@@ -7,22 +7,14 @@ Although zustand is an unopinionated library, here's one of the recommended usag
   - Define dispatch functions at the root level of the store to update one or more store slices
 
 ```js
-const createBearSlice = (set) => ({
-  bears: 0,
-  addBear: () => set((state) => ({ bears: state.bears + 1 })),
-})
-
-const createFishSlice = (set) => ({
-  fishes: 0,
-  addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
-})
-
-const useStore = create()((...a) => ({
-  ...createBearSlice(...a),
-  ...createFishSlice(...a),
+const useStore = create((set) => ({
+  storeSliceA: ...,
+  storeSliceB: ...,
+  storeSliceC: ...,
+  dispatchX: () => set(...),
+  dispatchY: () => set(...),
 }))
 ```
-
 
 See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#interdependent-slices-pattern) for how to define a store with separate slices.
 
