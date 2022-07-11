@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from 'react'
+import { Suspense, useRef } from 'react'
 import { Canvas } from 'react-three-fiber'
 import Effects from './Effects'
 import Scene from './Scene'

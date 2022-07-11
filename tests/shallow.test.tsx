@@ -37,4 +37,20 @@ describe('shallow', () => {
 
     expect(shallow([{ foo: 'bar' }], [{ foo: 'bar', asd: 123 }])).toBe(false)
   })
+
+  it('compares functions', () => {
+    function firstFnCompare() {
+      return { foo: 'bar' }
+    }
+
+    function secondFnCompare() {
+      return { foo: 'bar' }
+    }
+
+    expect(shallow(firstFnCompare, firstFnCompare)).toBe(true)
+
+    expect(shallow(secondFnCompare, secondFnCompare)).toBe(true)
+
+    expect(shallow(firstFnCompare, secondFnCompare)).toBe(false)
+  })
 })
