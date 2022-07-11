@@ -9,10 +9,12 @@ export default function CopyButton({ code, ...props }) {
   const [isCopied, setIsCopied] = useState(false)
 
   const handleCopy = () => {
-    copyToClipboard(code)
-    setIsCopied(true)
-    setTimeout(() => setIsCopied(false), 3000)
+    copyToClipboard(code).then(() => {
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 3000)
+    })
   }
+  
 
   return (
     <>
