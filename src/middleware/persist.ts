@@ -296,14 +296,6 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   hydrate()
 
-  const storageEventCallback = (e: StorageEvent) => {
-    if (e.key === options.name && e.newValue) {
-      hydrate()
-    }
-  }
-
-  window.addEventListener('storage', storageEventCallback)
-
   return stateFromStorage || configResult
 }
 
@@ -342,3 +334,16 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   : never
 
 export const persist = persistImpl as unknown as Persist
+
+export const suscribeEventChangeWithDOM = (
+  key: string,
+  callback: (n: any) => void
+) => {
+  const storageEventCallback = (e: StorageEvent) => {
+    if (e.key === key && e.newValue) {
+      callback(JSON.parse(e.newValue))
+    }
+  }
+
+  window.addEventListener('storage', storageEventCallback)
+}
