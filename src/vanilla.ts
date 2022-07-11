@@ -15,12 +15,9 @@ export interface Subscribe<T extends State> {
 
 export type SetState<T extends State> = {
   _(
-    partial: T | Partial<T> | BivariantStateComputer<T>,
+    partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
     replace?: boolean | undefined
   ): void
-}['_']
-type BivariantStateComputer<T> = {
-  _(state: T): T | Partial<T>
 }['_']
 export type GetState<T extends State> = () => T
 export type Destroy = () => void
