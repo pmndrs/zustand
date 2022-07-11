@@ -1,4 +1,9 @@
 function shallow<
+  T extends (...args: unknown[]) => unknown,
+  U extends (...args: unknown[]) => unknown
+>(objA: T, objB: U): boolean
+
+function shallow<
   T extends string | number | boolean,
   U extends string | number | boolean
 >(objA: T, objB: U): boolean
