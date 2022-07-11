@@ -85,6 +85,7 @@ interface StorePersist<S extends State, Ps> {
     hasHydrated: () => boolean
     onHydrate: (fn: PersistListener<S>) => () => void
     onFinishHydration: (fn: PersistListener<S>) => () => void
+    getOptions: () => Partial<PersistOptions<S, Ps>>
   }
 }
 
@@ -276,6 +277,9 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     clearStorage: () => {
       storage?.removeItem(options.name)
     },
+    getOptions: () => {
+      return options
+    },
     rehydrate: () => hydrate() as Promise<void>,
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
@@ -346,4 +350,23 @@ export const suscribeEventChangeWithDOM = (
   }
 
   window.addEventListener('storage', storageEventCallback)
+}
+
+export const withStorageDOMEvent = (store: {
+  persist: {
+    getOptions: () => { name: string }
+    rehydrate: () => Promise<void>
+  }
+}) => {
+  const storageEventCallback = (e: StorageEvent) => {
+    if (e.key === store.persist.getOptions().name && e.newValue) {
+      store.persist.rehydrate()
+    }
+  }
+
+  window.addEventListener('storage', storageEventCallback)
+
+  return () => {
+    window.removeEventListener('storage', storageEventCallback)
+  }
 }
