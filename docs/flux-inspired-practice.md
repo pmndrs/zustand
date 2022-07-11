@@ -2,9 +2,9 @@
 
 Although zustand is an unopinionated library, here's one of the recommended usages:
 
-  - Create one single store
-  - Define a store only with `set`
-  - Define dispatch functions at the root level of the store to update one or more store slices
+- Create one single store
+- Define a store only with `set`
+- Define dispatch functions at the root level of the store to update one or more store slices
 
 ```js
 const useStore = create((set) => ({
@@ -19,6 +19,7 @@ const useStore = create((set) => ({
 See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#interdependent-slices-pattern) for how to define a store with separate slices.
 
 ## Flux like patterns / "Dispatching" actions
+
 If you can't live without redux-like reducers, you can define a `dispatch` function on the root level of the store like store
 
 ```typescript
