@@ -372,7 +372,7 @@ const useStore = create<BearSlice & FishSlice>()((...a) => ({
 }))
 ```
 
-If you have some middlewares then replace `StateCreator<MySlice, [], []>` with `StateCreator<MySlice, Mutators, []>`. Eg if you're using `devtools` then it'll be `StateCreator<MySlice, [["zustand/devtools", never]], []>`.
+If you have some middlewares then replace `StateCreator<MySlice, [], []>` with `StateCreator<MySlice, Mutators, []>`. Eg if you're using `devtools` then it'll be `StateCreator<MySlice, [["zustand/devtools", never]], []>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
 Also you can even write `StateCreator<MySlice>` instead of `StateCreator<MySlice, [], []>` as the second and third parameter have `[]` as their default value.
 
@@ -417,4 +417,14 @@ const useStore = create<BearSlice & FishSlice>()((...a) => ({
 }))
 ```
 
-If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. Eg if you're using `devtools` then it'll be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`.
+If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. Eg if you're using `devtools` then it'll be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
+
+## Middlewares and their mutators reference
+
+- `devtools` — `["zustand/devtools", never]`
+- `persist` — `["zustand/persist", YourPersistedState]`<br/>
+  `YourPersistedState` is the type of state you're going to persist, ie the return type of `options.partialize`, if you're not passing `partialize` options the `YourPersistedState` becomes `Partial<YourState>`. Also [sometimes](https://github.com/pmndrs/zustand/issues/980#issuecomment-1162289836) passing actual `PersistedState` won't work, in those cases try passing `unknown`.
+- `immer` — `["zustand/immer", never]`
+- `subscribeWithSelector` — `["zustand/subscribeWithSelector", never]`
+- `redux` — `["zustand/redux", YourAction]`
+- `combine` — no mutator as `combine` doesn't mutate the store
