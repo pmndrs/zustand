@@ -11,27 +11,28 @@ However, writing these could be tedious, but you can auto-generate them
 ## create the following function: `createSelectors`
 
 ```typescript
-import { State, StoreApi, UseBoundStore } from 'zustand'
+import { State, StoreApi, UseBoundStore } from "zustand";
 
-interface Selectors<StoreType> {
-  use: {
-    [key in keyof StoreType]: () => StoreType[key]
+type WithSelectors<S> = S extends { getState: () => infer T }
+  ? S & { use: { [K in keyof T]: () => T[K] } }
+  : never
+
+type CreateSelectors =
+  <S extends UseBoundStore<StoreApi<State>>>
+  (s: S) =>
+    WithSelectors<S>
+
+const createSelectors: CreateSelectors = _store => {
+  type S = typeof _store
+  type T = S extends { getState: () => infer T } ? T : never
+
+  let store = _store as WithSelectors<S>
+  store.use = {}
+  for (let k of Object.keys(store.getState())) {
+    ;(store.use as any)[k] = () => store(s => s[k as keyof typeof s])
   }
-}
 
-export default function createSelectors<StoreType extends State>(
-  store: UseBoundStore<StoreType, StoreApi<StoreType>>
-) {
-  // Casting to any to allow adding a new property
-  ;(store as any).use = {}
-
-  Object.keys(store.getState()).forEach((key) => {
-    const selector = (state: StoreType) => state[key as keyof StoreType]
-    ;(store as any).use[key] = () => store(selector)
-  })
-
-  return store as UseBoundStore<StoreType, StoreApi<StoreType>> &
-    Selectors<StoreType>
+  return store
 }
 ```
 
@@ -44,11 +45,11 @@ interface BearState {
   increment: () => void
 }
 
-const useStoreBase = create<BearState>((set) => ({
+const useStoreBase = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
-  increment: () => set((state) => state.increase(1)),
-}))
+  increment: () => set((state) => ({ bears: state.bears += 1 }))
+}));
 ```
 
 ## Apply that function to your store:
