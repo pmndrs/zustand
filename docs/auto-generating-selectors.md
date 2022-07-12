@@ -20,7 +20,7 @@ interface Selectors<StoreType> {
 }
 
 export default function createSelectors<StoreType extends State>(
-  store: UseBoundStore<StoreType, StoreApi<StoreType>>
+  store: UseBoundStore<StoreApi<StoreType>>
 ) {
   // Casting to any to allow adding a new property
   ;(store as any).use = {}
@@ -30,7 +30,7 @@ export default function createSelectors<StoreType extends State>(
     ;(store as any).use[key] = () => store(selector)
   })
 
-  return store as UseBoundStore<StoreType, StoreApi<StoreType>> &
+  return store as UseBoundStore<StoreApi<StoreType>> &
     Selectors<StoreType>
 }
 ```
