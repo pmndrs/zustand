@@ -172,7 +172,8 @@ useStore.destroy()
 
 // You can of course use the hook as you always would
 function Component() {
-  const paw = useStore(state => state.paw)
+  const paw = useStore((state) => state.paw)
+}
 ```
 
 ### Using subscribe with selector
