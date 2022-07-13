@@ -1,6 +1,6 @@
 import { forwardRef } from 'react'
-import { useThree } from 'react-three-fiber'
-import { EffectComposer, DepthOfField, Vignette } from 'react-postprocessing'
+import { useThree } from '@react-three/fiber'
+import { EffectComposer, DepthOfField, Vignette } from '@react-three/postprocessing'
 
 const Effects = forwardRef((props, ref) => {
   const {

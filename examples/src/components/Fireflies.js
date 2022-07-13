@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { useRef, useMemo } from 'react'
-import { extend, useFrame } from 'react-three-fiber'
+import { extend, useFrame } from '@react-three/fiber'
 import * as meshline from 'threejs-meshline'
 
 extend(meshline)

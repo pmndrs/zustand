@@ -1,5 +1,5 @@
-import { shaderMaterial } from 'drei'
-import { extend } from 'react-three-fiber'
+import { shaderMaterial } from '@react-three/drei'
+import { extend } from '@react-three/fiber'
 
 const LayerMaterial = shaderMaterial(
   { textr: null, movementVector: [0, 0, 0], scaleFactor: 1, factor: 0, wiggle: 0, time: 0 },
