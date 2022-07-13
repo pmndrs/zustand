@@ -525,8 +525,8 @@ You can use the `persist` api to create your own implementation, similar to what
 ```ts
 export const detectStorageEventChange = (name: string, rehydrate: () => Promise<void>) => {
   const storageEventCallback = (e: StorageEvent) => {
-    if (e.key === store.persist.getOptions().name && e.newValue) {
-      store.persist.rehydrate()
+    if (e.key === name && e.newValue) {
+      rehydrate()
     }
   }
 
