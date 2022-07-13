@@ -298,6 +298,18 @@ export const useStore = create(
 
 The persist api enables you to do numbers of interactions with the persist middleware from inside or outside a React component.
 
+### `getOptions`
+
+> Schema: `() => Partial<PersistOptions>`
+
+This method can you get the options of the middleware.
+
+For example, it can be used to obtain the storage name:
+
+```ts
+useStore.persist.getOptions().name
+```
+
 ### `setOptions`
 
 > Schema: `(newOptions: PersistOptions) => void`
