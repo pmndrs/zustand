@@ -118,12 +118,14 @@ And now `T` gets inferred and you get to annotate `E` too. Zustand has the same 
 Alternatively you can also use `combine` which infers the state instead of you having to type it...
 
 ```ts
-import create from "zustand"
-import { combine } from "zustand/middleware"
+import create from 'zustand'
+import { combine } from 'zustand/middleware'
 
-const useStore = create(combine({ bears: 0 }, (set) => ({
-  increase: (by: number) => set((state) => ({ bears: state.bears + by })),
-}))
+const useStore = create(
+  combine({ bears: 0 }, (set) => ({
+    increase: (by: number) => set((state) => ({ bears: state.bears + by })),
+  }))
+)
 ```
 
 <details>
