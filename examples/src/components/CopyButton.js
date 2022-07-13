@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { copyToClipboard } from '../utils/copy-to-clipboard'
 
 /* 
@@ -7,14 +7,15 @@ of a separate button component and with the added utility
 */
 export default function CopyButton({ code, ...props }) {
   const [isCopied, setIsCopied] = useState(false)
+  const timer = useRef()
 
-  const handleCopy = () => {
+  const handleCopy =  useCallback(()  => {
+    clearTimeout(timer.current)
     copyToClipboard(code).then(() => {
       setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 3000)
+      timer.current = setTimeout(() => setIsCopied(false), 3000)
     })
-  }
-  
+  }, [code])
 
   return (
     <>
