@@ -171,9 +171,9 @@ unsub1()
 useStore.destroy()
 
 // You can of course use the hook as you always would
-function Component() {
+const Component = () => {
   const paw = useStore((state) => state.paw)
-}
+  ...
 ```
 
 ### Using subscribe with selector
@@ -241,13 +241,14 @@ The subscribe function allows components to bind to a state-portion without forc
 ```jsx
 const useStore = create(set => ({ scratches: 0, ... }))
 
-function Component() {
+const Component = () => {
   // Fetch initial state
   const scratchRef = useRef(useStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
   useEffect(() => useStore.subscribe(
     state => (scratchRef.current = state.scratches)
   ), [])
+  ...
 ```
 
 ## Sick of reducers and changing nested state? Use Immer!
@@ -436,7 +437,6 @@ const Component = () => {
   const store = useContext(StoreContext)
   const slice = useStore(store, selector)
   ...
-}
 ```
 
 Alternatively, a special `createContext` is provided since v3.5,
@@ -460,7 +460,6 @@ const Component = () => {
   const state = useStore()
   const slice = useStore(selector)
   ...
-}
 ```
 
 <details>
