@@ -12,8 +12,8 @@ import leaves2Url from '../resources/leaves2.png'
 import '../materials/layerMaterial'
 
 export default function Scene({ dof }) {
-  const scaleN = useAspect(16, 10, 0.21)
-  const scaleW = useAspect(22, 10, 0.21)
+  const scaleN = useAspect(16, 10, 1.05)
+  const scaleW = useAspect(22, 10, 1.05)
   const textures = useTexture([bgUrl, starsUrl, groundUrl, bearUrl, leaves1Url, leaves2Url])
   const subject = useRef()
   const group = useRef()
