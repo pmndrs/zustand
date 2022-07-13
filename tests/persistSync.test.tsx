@@ -381,6 +381,23 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
+  it('can access the persist api options', () => {
+    const storage = {
+      getItem: () => null,
+      setItem: jest.fn(),
+      removeItem: () => {},
+    }
+
+    const useStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        getStorage: () => storage,
+      })
+    )
+    expect(useStore.persist.getOptions().name).toBeDefined()
+    expect(useStore.persist.getOptions().name).toBe('test-storage')
+  })
+
   it('can change the options through the api', () => {
     const setItemSpy = jest.fn()
 
