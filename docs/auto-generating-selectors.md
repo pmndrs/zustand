@@ -23,10 +23,7 @@ type CreateSelectors =
     WithSelectors<S>
 
 const createSelectors: CreateSelectors = _store => {
-  type S = typeof _store
-  type T = S extends { getState: () => infer T } ? T : never
-
-  let store = _store as WithSelectors<S>
+  let store = _store as WithSelector<typeof _store>
   store.use = {}
   for (let k of Object.keys(store.getState())) {
     ;(store.use as any)[k] = () => store(s => s[k as keyof typeof s])
