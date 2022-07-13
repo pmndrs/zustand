@@ -338,35 +338,3 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   : never
 
 export const persist = persistImpl as unknown as Persist
-
-export const suscribeEventChangeWithDOM = (
-  key: string,
-  callback: (n: any) => void
-) => {
-  const storageEventCallback = (e: StorageEvent) => {
-    if (e.key === key && e.newValue) {
-      callback(JSON.parse(e.newValue))
-    }
-  }
-
-  window.addEventListener('storage', storageEventCallback)
-}
-
-export const withStorageDOMEvent = (store: {
-  persist: {
-    getOptions: () => { name: string }
-    rehydrate: () => Promise<void>
-  }
-}) => {
-  const storageEventCallback = (e: StorageEvent) => {
-    if (e.key === store.persist.getOptions().name && e.newValue) {
-      store.persist.rehydrate()
-    }
-  }
-
-  window.addEventListener('storage', storageEventCallback)
-
-  return () => {
-    window.removeEventListener('storage', storageEventCallback)
-  }
-}
