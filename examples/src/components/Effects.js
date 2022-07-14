@@ -8,7 +8,7 @@ const Effects = forwardRef((props, ref) => {
   } = useThree()
   return (
     <EffectComposer multisampling={0}>
-      <DepthOfField ref={ref} bokehScale={4} focalLength={0.1} resolutionX={width / 2} resolutionY={height / 2} />
+      <DepthOfField ref={ref} bokehScale={4} focalLength={0.1} resolutionX={width * 3} resolutionY={height * 3} />
       <Vignette />
     </EffectComposer>
   )
