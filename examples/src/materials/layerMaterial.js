@@ -32,7 +32,7 @@ const LayerMaterial = shaderMaterial(
       vec2 uv = vUv / scaleFactor + movementVector.xy * factor;
       vec4 color = texture2D(textr, uv);
       if (color.a < 0.1) discard;
-      gl_FragColor = vec4(color.rgb, .1);
+      gl_FragColor = color;
     }`
 )
 
