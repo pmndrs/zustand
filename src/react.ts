@@ -12,7 +12,7 @@ import createStore, {
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type WithReact<S extends StoreApi<State>> = S & {
+export type WithReact<S extends StoreApi<State>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
