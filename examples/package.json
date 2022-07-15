@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "drei": "^0.0.72",
+    "@react-three/drei": "^9.17.1",
+    "@react-three/fiber": "^8.1.0",
+    "@react-three/postprocessing": "^2.4.6",
+    "meshline": "^2.0.4",
     "prism-react-renderer": "^1.2.1",
     "prismjs": "1.23.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-postprocessing": "^1.1.4",
-    "react-three-fiber": "^4.2.20",
-    "three": "^0.120.1",
-    "threejs-meshline": "^2.0.11",
+    "three": "^0.141.0",
     "zustand": "^3.0.0"
   },
   "scripts": {
