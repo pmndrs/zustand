@@ -1,6 +1,7 @@
 import {
   Component as ClassComponent,
   ReactNode,
+  version as reactVersion,
   useEffect,
   useLayoutEffect,
   useState,
@@ -144,6 +145,40 @@ it('only re-renders if selected state has changed', async () => {
 })
 
 it('re-renders with useLayoutEffect', async () => {
+  if (!/^18./.test(reactVersion)) {
+    return
+  }
+
+  const useStore = create(() => ({ state: false }))
+
+  function Component() {
+    const { state } = useStore()
+    useLayoutEffect(() => {
+      useStore.setState({ state: true })
+    }, [])
+    return <>{`${state}`}</>
+  }
+
+  /**
+   * require is using here because the following will fail on react version
+   * under 18.
+   *
+   * > `import { createRoot } from 'react-dom/client'`
+   */
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { createRoot } = require('react-dom/client')
+
+  const container = document.createElement('div')
+  const root = createRoot(container)
+
+  act(() => root.render(<Component />))
+  await waitFor(() => {
+    expect(container.innerHTML).toBe('true')
+  })
+  act(() => root.unmount())
+})
+
+it('re-renders with useLayoutEffect using legacy render method', async () => {
   const useStore = create(() => ({ state: false }))
 
   function Component() {
