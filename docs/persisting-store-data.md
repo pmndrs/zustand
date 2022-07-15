@@ -516,14 +516,12 @@ export const useStore = create(
 )
 ```
 
-### How can add storage event listener?
-
-There's a fiew different ways to do this.
+### How can I rehydrate on storage event?
 
 You can use the `persist` api to create your own implementation, similar to what we see below
 
 ```ts
-export const detectStorageEventChange = (name: string, rehydrate: () => Promise<void>) => {
+export const withStorageDOMEvents = (name: string, rehydrate: () => Promise<void>) => {
   const storageEventCallback = (e: StorageEvent) => {
     if (e.key === name && e.newValue) {
       rehydrate()
@@ -538,28 +536,5 @@ export const detectStorageEventChange = (name: string, rehydrate: () => Promise<
 }
 
 const useStore = create(persist(...))
-detectStorageEventChange(useStore.persist.getOptions().name, useStore.persist.rehydrate())
-```
-
-You can also create a custom `useDetectStorageEventChange` hook:
-
-```ts
-export const useDetectStorageEventChange = (name: string, rehydrate: () => Promise<void>) => {
-  useEffect(() => {
-    const storageEventCallback = (e: StorageEvent) => {
-      if (e.key === name && e.newValue) {
-        rehydrate()
-      }
-    }
-
-    window.addEventListener('storage', storageEventCallback)
-
-    return () => {
-      window.removeEventListener('storage', storageEventCallback)
-    }
-  }, [])
-}
-
-const useStore = create(persist(...))
-useDetectStorageEventChange(useStore.persist.getOptions().name, useStore.persist.rehydrate())
+withStorageDOMEvents(useStore.persist.getOptions().name, useStore.persist.rehydrate())
 ```

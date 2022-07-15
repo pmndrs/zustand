@@ -381,7 +381,7 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
-  it('can access the persist api options', () => {
+  it('can access the options through the api', () => {
     const storage = {
       getItem: () => null,
       setItem: jest.fn(),
