@@ -521,10 +521,13 @@ export const useStore = create(
 You can use the `persist` api to create your own implementation, similar to what we see below
 
 ```ts
-export const withStorageDOMEvents = (name: string, rehydrate: () => Promise<void>) => {
+
+type StoreWithPersist = Mutate<StoreApi<State>, [["zustand/persist", unknown]]>
+
+export const withStorageDOMEvents = (store: StoreWithPersist) => {
   const storageEventCallback = (e: StorageEvent) => {
-    if (e.key === name && e.newValue) {
-      rehydrate()
+    if (e.key === store.persist.getOptions().name && e.newValue) {
+      store.persist.rehydrate()
     }
   }
 
@@ -536,5 +539,5 @@ export const withStorageDOMEvents = (name: string, rehydrate: () => Promise<void
 }
 
 const useStore = create(persist(...))
-withStorageDOMEvents(useStore.persist.getOptions().name, useStore.persist.rehydrate())
+withStorageDOMEvents(useStore)
 ```
