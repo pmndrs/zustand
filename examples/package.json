@@ -51,6 +51,6 @@
     "customize-cra": "^1.0.0",
     "react-app-rewired": "^2.2.1",
     "react-scripts": "^5.0.1",
-    "webpack-bundle-analyzer": "^3.8.0"
+    "webpack-bundle-analyzer": "^4.5.0"
   }
 }
