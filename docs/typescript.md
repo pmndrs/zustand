@@ -345,40 +345,7 @@ const useStore = create<
 })))
 ```
 
-### Independent slices pattern
-
-```ts
-import create, { StateCreator } from 'zustand'
-
-interface BearSlice {
-  bears: number
-  addBear: () => void
-}
-const createBearSlice: StateCreator<BearSlice, [], []> = (set) => ({
-  bears: 0,
-  addBear: () => set((state) => ({ bears: state.bears + 1 })),
-})
-
-interface FishSlice {
-  fishes: number
-  addFish: () => void
-}
-const createFishSlice: StateCreator<FishSlice, [], []> = (set) => ({
-  fishes: 0,
-  addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
-})
-
-const useStore = create<BearSlice & FishSlice>()((...a) => ({
-  ...createBearSlice(...a),
-  ...createFishSlice(...a),
-}))
-```
-
-If you have some middlewares then replace `StateCreator<MySlice, [], []>` with `StateCreator<MySlice, Mutators, []>`. Eg if you're using `devtools` then it'll be `StateCreator<MySlice, [["zustand/devtools", never]], []>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
-
-Also you can even write `StateCreator<MySlice>` instead of `StateCreator<MySlice, [], []>` as the second and third parameter have `[]` as their default value.
-
-### Interdependent slices pattern
+### Slices pattern
 
 ```ts
 import create, { StateCreator } from 'zustand'
