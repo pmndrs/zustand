@@ -39,7 +39,6 @@
     "semi": false,
     "trailingComma": "es5",
     "singleQuote": true,
-    "jsxBracketSameLine": true,
     "tabWidth": 2,
     "printWidth": 120
   },
