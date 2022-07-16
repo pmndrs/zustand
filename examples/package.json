@@ -17,6 +17,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
+    "build:analyze": "BUNDLE_ANALYZE=true yarn build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },

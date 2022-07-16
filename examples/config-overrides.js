@@ -1,6 +1,6 @@
-const { override } = require('customize-cra')
+const { addWebpackPlugin, override } = require('customize-cra')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = override(
-  //addWebpackPlugin(new BundleAnalyzerPlugin())
+  process.env.BUNDLE_ANALYZE === 'true' ? addWebpackPlugin(new BundleAnalyzerPlugin()) : undefined
 )
