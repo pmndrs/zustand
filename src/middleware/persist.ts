@@ -303,7 +303,7 @@ type Persist = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  U = Partial<T>
+  U = T
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/persist', unknown]], Mcs>,
   options?: PersistOptions<T, U>

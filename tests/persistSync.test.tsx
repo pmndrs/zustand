@@ -394,6 +394,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
+        partialize: (s) => s as Partial<typeof s>,
       })
     )
 
