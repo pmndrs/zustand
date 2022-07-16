@@ -15,7 +15,7 @@ export interface Subscribe<T extends State> {
 
 export type SetState<T extends State> = {
   _(
-    partial: T | Partial<T> | ((state: T) => T | Partial<T>),
+    partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
     replace?: boolean | undefined
   ): void
 }['_']
