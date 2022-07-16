@@ -18,3 +18,7 @@ backdrop
     camera: { zoom: 5, position: [0, 0, 200], far: 300, near: 0 },
   })
   .render(<Backdrop />)
+
+window.addEventListener('resize', () => {
+  backdrop.configure({ width: window.innerWidth, height: window.innerHeight })
+})
