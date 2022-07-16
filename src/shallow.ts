@@ -1,4 +1,24 @@
-export default function shallow<T, U>(objA: T, objB: U) {
+function shallow<
+  T extends (...args: unknown[]) => unknown,
+  U extends (...args: unknown[]) => unknown
+>(objA: T, objB: U): boolean
+
+function shallow<
+  T extends string | number | boolean,
+  U extends string | number | boolean
+>(objA: T, objB: U): boolean
+
+function shallow<T extends unknown[], U extends unknown[]>(
+  objA: T,
+  objB: U
+): boolean
+
+function shallow<
+  T extends Record<string, unknown>,
+  U extends Record<string, unknown>
+>(objA: T, objB: U): boolean
+
+function shallow<T, U>(objA: T, objB: U) {
   if (Object.is(objA, objB)) {
     return true
   }
@@ -24,3 +44,5 @@ export default function shallow<T, U>(objA: T, objB: U) {
   }
   return true
 }
+
+export default shallow
