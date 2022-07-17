@@ -1,5 +1,9 @@
 import { useDebugValue } from 'react'
-import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
+// import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
+// This doesn't work in ESM, because use-sync-external-store only exposes CJS.
+// See: https://github.com/pmndrs/valtio/issues/452
+// The following is a workaround until ESM is supported.
+import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
 import createStore, {
   EqualityChecker,
   Mutate,
@@ -9,6 +13,8 @@ import createStore, {
   StoreApi,
   StoreMutatorIdentifier,
 } from './vanilla'
+
+const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
