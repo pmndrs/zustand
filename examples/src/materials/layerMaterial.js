@@ -1,5 +1,5 @@
-import { shaderMaterial } from 'drei'
-import { extend } from 'react-three-fiber'
+import { shaderMaterial } from '@react-three/drei'
+import { extend } from '@react-three/fiber'
 
 const LayerMaterial = shaderMaterial(
   { textr: null, movementVector: [0, 0, 0], scaleFactor: 1, factor: 0, wiggle: 0, time: 0 },
@@ -32,7 +32,7 @@ const LayerMaterial = shaderMaterial(
       vec2 uv = vUv / scaleFactor + movementVector.xy * factor;
       vec4 color = texture2D(textr, uv);
       if (color.a < 0.1) discard;
-      gl_FragColor = vec4(color.rgb, .1);
+      gl_FragColor = color;
     }`
 )
 

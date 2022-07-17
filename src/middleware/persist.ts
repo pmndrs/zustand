@@ -85,6 +85,7 @@ interface StorePersist<S extends State, Ps> {
     hasHydrated: () => boolean
     onHydrate: (fn: PersistListener<S>) => () => void
     onFinishHydration: (fn: PersistListener<S>) => () => void
+    getOptions: () => Partial<PersistOptions<S, Ps>>
   }
 }
 
@@ -276,6 +277,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     clearStorage: () => {
       storage?.removeItem(options.name)
     },
+    getOptions: () => options,
     rehydrate: () => hydrate() as Promise<void>,
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
@@ -303,7 +305,7 @@ type Persist = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  U = Partial<T>
+  U = T
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/persist', unknown]], Mcs>,
   options?: PersistOptions<T, U>
