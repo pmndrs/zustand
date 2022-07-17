@@ -11,23 +11,23 @@ However, writing these could be tedious, but you can auto-generate them
 ## create the following function: `createSelectors`
 
 ```typescript
-import { State, StoreApi, UseBoundStore } from "zustand";
+import { State, StoreApi, UseBoundStore } from 'zustand'
 
 type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
-  : never;
+  : never
 
 const createSelectors = <S extends UseBoundStore<StoreApi<State>>>(
   _store: S
 ) => {
-  let store = _store as WithSelectors<typeof _store>;
-  store.use = {};
+  let store = _store as WithSelectors<typeof _store>
+  store.use = {}
   for (let k of Object.keys(store.getState())) {
-    (store.use as any)[k] = () => store((s) => s[k as keyof typeof s]);
+    ;(store.use as any)[k] = () => store((s) => s[k as keyof typeof s])
   }
 
-  return store;
-};
+  return store
+}
 ```
 
 ## If you have a store like this:
@@ -42,8 +42,8 @@ interface BearState {
 const useStoreBase = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
-  increment: () => set((state) => ({ bears: state.bears + 1 }))
-}));
+  increment: () => set((state) => ({ bears: state.bears + 1 })),
+}))
 ```
 
 ## Apply that function to your store:
