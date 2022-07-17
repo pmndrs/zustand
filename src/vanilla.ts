@@ -1,26 +1,61 @@
 export type State = object
+
+/**
+ * @deprecated Use `Partial<T> | ((s: T) => Partial<T>)` instead of `PartialState<T>`
+ */
 export type PartialState<T extends State> =
   | Partial<T>
   | ((state: T) => Partial<T>)
-export type StateSelector<T extends State, U> = (state: T) => U
-export type EqualityChecker<T> = (state: T, newState: T) => boolean
-export type StateListener<T> = (state: T, previousState: T) => void
+
 /**
- * @deprecated Use `StateListener<T>` instead of `StateSliceListener<T>`.
+ * @deprecated Use `(s: T) => U` instead of `StateSelector<T, U>`
+ */
+export type StateSelector<T extends State, U> = (state: T) => U
+
+/**
+ * @deprecated Use `(a: T, b: T) => boolean` instead of `EqualityChecker<T>`
+ */
+export type EqualityChecker<T> = (state: T, newState: T) => boolean
+
+/**
+ * @deprecated Use `(state: T, previousState: T) => void` instead of `StateListener<T>`
+ */
+export type StateListener<T> = (state: T, previousState: T) => void
+
+/**
+ * @deprecated Use `(slice: T, previousSlice: T) => void` instead of `StateSliceListener<T>`.
  */
 export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
+
+/**
+ * @deprecated Use `(listener: (state: T) => void) => void` instead of `Subscribe<T>`.
+ */
 export interface Subscribe<T extends State> {
-  (listener: StateListener<T>): () => void
+  (listener: (state: T, previousState: T) => void): () => void
 }
 
+/**
+ * @deprecated You might be looking for `StateCreator`, if not then
+ * use `StoreApi<T>['setState']` instead of `SetState<T>`.
+ */
 export type SetState<T extends State> = {
   _(
     partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
     replace?: boolean | undefined
   ): void
 }['_']
+
+/**
+ * @deprecated You might be looking for `StateCreator`, if not then
+ * use `StoreApi<T>['getState']` instead of `GetState<T>`.
+ */
 export type GetState<T extends State> = () => T
+
+/**
+ * @deprecated Use `StoreApi<T>['destroy']` instead of `GetState<T>`.
+ */
 export type Destroy = () => void
+
 export interface StoreApi<T extends State> {
   setState: SetState<T>
   getState: GetState<T>
