@@ -1,7 +1,8 @@
 import * as THREE from 'three'
+import { PlaneBufferGeometry } from 'three'
 import { useRef, useState } from 'react'
 import { Plane, useAspect, useTexture } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, extend } from '@react-three/fiber'
 import Fireflies from './Fireflies'
 import bgUrl from '../resources/bg.jpg'
 import starsUrl from '../resources/stars.png'
@@ -10,6 +11,9 @@ import bearUrl from '../resources/bear.png'
 import leaves1Url from '../resources/leaves1.png'
 import leaves2Url from '../resources/leaves2.png'
 import '../materials/layerMaterial'
+
+// PlaneBufferGeometry is needed for Plane
+extend({ PlaneBufferGeometry })
 
 export default function Scene({ dof }) {
   const scaleN = useAspect(16, 10, 1.05)
