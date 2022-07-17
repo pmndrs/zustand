@@ -42,7 +42,7 @@ interface BearState {
 const useStoreBase = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
-  increment: () => set((state) => ({ bears: state.bears += 1 }))
+  increment: () => set((state) => ({ bears: state.bears + 1 }))
 }));
 ```
 
