@@ -1,6 +1,5 @@
 import create from 'zustand'
 import CodePreview from './components/CodePreview'
-import Backdrop from './components/Backdrop'
 import Details from './components/Details'
 import code from './resources/code'
 
@@ -21,17 +20,14 @@ function Counter() {
 
 export default function App() {
   return (
-    <>
-      <Backdrop />
-      <div className="main">
-        <div className="code">
-          <div className="code-container">
-            <CodePreview code={code} />
-            <Counter />
-          </div>
+    <div className="main">
+      <div className="code">
+        <div className="code-container">
+          <CodePreview code={code} />
+          <Counter />
         </div>
-        <Details />
       </div>
-    </>
+      <Details />
+    </div>
   )
 }
