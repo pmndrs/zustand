@@ -10,8 +10,7 @@ export default function Backdrop() {
       className="canvas-container"
       orthographic
       gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, alpha: false, depth: false }}
-      camera={{ zoom: 5, position: [0, 0, 200], far: 300, near: 0 }}
-    >
+      camera={{ zoom: 5, position: [0, 0, 200], far: 300, near: 0 }}>
       <Suspense fallback={null}>
         <Scene dof={dof} />
       </Suspense>
