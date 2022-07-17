@@ -16,7 +16,7 @@ const useStore = create((set) => ({
 }))
 ```
 
-See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#interdependent-slices-pattern) for how to define a store with separate slices.
+See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#slices-pattern) for how to define a store with separate slices.
 
 ## Flux like patterns / "Dispatching" actions
 
