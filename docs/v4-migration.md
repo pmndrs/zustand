@@ -199,9 +199,9 @@ If you're not passing any type parameters then there is no migration needed. If 
 
 If you're passing any type parameters, then remove it. Next, if you're passing the `partialize` option then there's no further steps required for migration.
 
-But if you're not passing the `partialize` option then you might be seeing some errors because now the type of partialized state is `T` instead of `Partial<T>` which is in alignment with the runtime behavior ie default `partialize` value ie `s => s`, in that case you should fix the errors because they might be indicative of unsound code.
+But if you're not passing the `partialize` option then you might be seeing some compilation errors. If you're not seeing any compilation errors then there's no further steps requierd for migration.
 
-To be clear the runtime behavior has not changed, the types have gotten more correct, but if your partialised state is truly `Partial<T>` then you can pass the `partialized` option as `s => s as Partial<typeof s>`. You can do this for a quickfix too.
+But if you're seeing some compilation errors—because now the type of partialized state is `T` instead of `Partial<T>` which is in alignment with the runtime behavior of default `partialize` being `s => s`—then in that case you should fix the errors because they might be indicative of unsound code. To be clear the runtime behavior has not changed, the types have gotten more correct, but if your partialised state is truly `Partial<T>` then you can pass the `partialize` option as `s => s as Partial<typeof s>`. You can do this for a quickfix too.
 
 ## `redux` (from `zustand/middleware`)
 
