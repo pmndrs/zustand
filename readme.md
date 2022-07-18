@@ -18,6 +18,8 @@ You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/ex
 npm install zustand # or yarn add zustand
 ```
 
+:warning: This readme is written for JavaScript users. If you are TypeScript users, don't miss [TypeScript Usage](#typescript-usage).
+
 ## First create a store
 
 Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function _merges_ state.
@@ -566,43 +568,14 @@ const useStore = create<BearState>()(
 )
 ```
 
-A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md).
+A more complete TypeScript guide is [here](docs/typescript.md).
 
 ## Best practices
 
-- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](https://github.com/pmndrs/zustand/wiki/Splitting-the-store-into-separate-slices).
-- Recommended usage for this unopinionated library: [Flux inspired practice](https://github.com/pmndrs/zustand/wiki/Flux-inspired-practice).
-
-<details>
-<summary>Calling actions outside a React event handler in pre React 18</summary>
-
-<br/>
-
-Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
-In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
-
-```jsx
-import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
-
-const useStore = create((set) => ({
-  fishes: 0,
-  increaseFishes: () => set((prev) => ({ fishes: prev.fishes + 1 })),
-}))
-
-const nonReactCallback = () => {
-  unstable_batchedUpdates(() => {
-    useStore.getState().increaseFishes()
-  })
-}
-```
-
-More details: https://github.com/pmndrs/zustand/issues/302
-
-</details>
-
-## Testing
-
-For information regarding testing with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
+- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](docs/typescript.md#slices-pattern).
+- Recommended usage for this unopinionated library: [Flux inspired practice](docs/flux-inspired-practice.md).
+- [Calling actions outside a React event handler in pre React 18](docs/event-handler-in-pre-react-18.md).
+- Testing: [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
 
 ## 3rd-Party Libraries
 
