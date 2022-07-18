@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/runtime": "^7.18.9",
     "@react-three/drei": "^9.17.1",
     "@react-three/fiber": "^8.1.0",
     "@react-three/postprocessing": "^2.4.6",
