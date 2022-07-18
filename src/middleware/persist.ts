@@ -11,7 +11,7 @@ export interface StateStorage {
   removeItem: (name: string) => void | Promise<void>
 }
 
-interface StorageValue<S> {
+export interface StorageValue<S> {
   state: S
   version?: number
 }
@@ -77,7 +77,7 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-interface StorePersist<S extends State, Ps> {
+export interface StorePersist<S extends State, Ps> {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
