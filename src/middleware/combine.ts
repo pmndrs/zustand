@@ -2,7 +2,7 @@ import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type Write<T, U> = Omit<T, keyof U> & U
 
-type Combine = <
+export type Combine = <
   T extends State,
   U extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],

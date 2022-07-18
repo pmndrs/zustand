@@ -75,7 +75,7 @@ interface DevtoolsOptions {
       }
 }
 
-type Devtools = <
+export type Devtools = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []

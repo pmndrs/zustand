@@ -2,7 +2,7 @@
 import { Draft, produce } from 'immer'
 import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
-type Immer = <
+export type Immer = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
