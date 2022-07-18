@@ -197,7 +197,7 @@ If you're not passing any type parameters then there is no migration needed. If 
 
 ### Migration
 
-If you're passing any type parameters, then remove it. Next, if you're passing the `partialize` option then there's no further steps required for migration.
+If you're passing any type parameters, then remove them because they will be inferred. Next, if you're passing the `partialize` option then there's no further steps required for migration.
 
 But if you're not passing the `partialize` option then you might be seeing some compilation errors. If you're not seeing any compilation errors then there's no further steps requierd for migration.
 
