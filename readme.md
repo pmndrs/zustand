@@ -574,8 +574,8 @@ A more complete TypeScript guide is [here](docs/typescript.md).
 
 - You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](docs/typescript.md#slices-pattern).
 - Recommended usage for this unopinionated library: [Flux inspired practice](docs/flux-inspired-practice.md).
-- [Calling actions outside a React event handler in pre React 18](docs/event-handler-in-pre-react-18.md)
-- [Testing](https://github.com/pmndrs/zustand/wiki/Testing).
+- [Calling actions outside a React event handler in pre React 18](docs/event-handler-in-pre-react-18.md).
+- Testing: [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
 
 ## 3rd-Party Libraries
 
