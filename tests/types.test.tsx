@@ -14,7 +14,7 @@ import create, {
 } from 'zustand'
 
 it('can use exposed types', () => {
-  interface ExampleState {
+  type ExampleState = {
     num: number
     numGet: () => number
     numGetState: () => number
@@ -111,9 +111,7 @@ type AssertEqual<Type, Expected> = Type extends Expected
   : never
 
 it('should have correct (partial) types for setState', () => {
-  interface Count {
-    count: number
-  }
+  type Count = { count: number }
 
   const store = create<Count>((set) => ({
     count: 0,
@@ -139,7 +137,7 @@ it('should have correct (partial) types for setState', () => {
 })
 
 it('should allow for different partial keys to be returnable from setState', () => {
-  interface State {
+  type State = {
     count: number
     something: string
   }

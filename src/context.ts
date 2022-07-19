@@ -14,7 +14,7 @@ import {
   useStore,
 } from 'zustand'
 
-interface UseContextStore<S extends StoreApi<State>> {
+type UseContextStore<S extends StoreApi<State>> = {
   (): ExtractState<S>
   <U>(
     selector: StateSelector<ExtractState<S>, U>,

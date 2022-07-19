@@ -56,7 +56,7 @@ export type UseBoundStore<S extends WithReact<StoreApi<State>>> = {
   ): U
 } & S
 
-interface Create {
+type Create = {
   <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): UseBoundStore<Mutate<StoreApi<T>, Mos>>

@@ -30,7 +30,7 @@ export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 /**
  * @deprecated Use `(listener: (state: T) => void) => void` instead of `Subscribe<T>`.
  */
-export interface Subscribe<T extends State> {
+export type Subscribe<T extends State> = {
   (listener: (state: T, previousState: T) => void): () => void
 }
 
@@ -87,7 +87,7 @@ export type Mutate<S, Ms> = Ms extends []
 
 type Get<T, K, F = never> = K extends keyof T ? T[K] : F
 
-interface CreateStore {
+type CreateStore = {
   <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): Mutate<StoreApi<T>, Mos>

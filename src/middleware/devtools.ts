@@ -16,7 +16,7 @@ declare module '../vanilla' {
 }
 
 // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
-interface Message {
+type Message = {
   type: string
   payload?: any
   state?: any
@@ -56,7 +56,7 @@ type StoreDevtools<S> = S extends {
     }
   : never
 
-interface DevtoolsOptions {
+export interface DevtoolsOptions {
   enabled?: boolean
   anonymousActionType?: string
   name?: string

@@ -11,7 +11,7 @@ export interface StateStorage {
   removeItem: (name: string) => void | Promise<void>
 }
 
-interface StorageValue<S> {
+type StorageValue<S> = {
   state: S
   version?: number
 }
@@ -77,7 +77,7 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-interface StorePersist<S extends State, Ps> {
+type StorePersist<S extends State, Ps> = {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
@@ -89,7 +89,7 @@ interface StorePersist<S extends State, Ps> {
   }
 }
 
-interface Thenable<Value> {
+type Thenable<Value> = {
   then<V>(
     onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
   ): Thenable<V>
