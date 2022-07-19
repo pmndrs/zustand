@@ -1,3 +1,4 @@
+import create from 'zustand'
 import shallow from 'zustand/shallow'
 
 describe('shallow', () => {
@@ -52,5 +53,18 @@ describe('shallow', () => {
     expect(shallow(secondFnCompare, secondFnCompare)).toBe(true)
 
     expect(shallow(firstFnCompare, secondFnCompare)).toBe(false)
+  })
+})
+
+describe('types', () => {
+  it('works with useStore and array selector (#1107)', () => {
+    const useStore = create(() => ({
+      villages: [] as { name: string }[],
+    }))
+    const Component = () => {
+      const villages = useStore((state) => state.villages, shallow)
+      return <>{villages.length}</>
+    }
+    expect(Component).toBeDefined()
   })
 })
