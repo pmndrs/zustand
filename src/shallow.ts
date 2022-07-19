@@ -1,6 +1,6 @@
 function shallow<
-  T extends (...args: unknown[]) => unknown,
-  U extends (...args: unknown[]) => unknown
+  T extends (...args: any[]) => any,
+  U extends (...args: any[]) => any
 >(objA: T, objB: U): boolean
 
 function shallow<
@@ -8,15 +8,12 @@ function shallow<
   U extends string | number | boolean
 >(objA: T, objB: U): boolean
 
-function shallow<T extends unknown[], U extends unknown[]>(
+function shallow<T extends any[], U extends any[]>(objA: T, objB: U): boolean
+
+function shallow<T extends Record<string, any>, U extends Record<string, any>>(
   objA: T,
   objB: U
 ): boolean
-
-function shallow<
-  T extends Record<string, unknown>,
-  U extends Record<string, unknown>
->(objA: T, objB: U): boolean
 
 function shallow<T, U>(objA: T, objB: U) {
   if (Object.is(objA, objB)) {
