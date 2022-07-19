@@ -15,7 +15,7 @@ afterEach(() => {
   console.error = consoleError
 })
 
-interface CounterState {
+type CounterState = {
   count: number
   inc: () => void
 }
