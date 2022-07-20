@@ -1,7 +1,4 @@
-function shallow<T>(
-  objA: T,
-  objB: T
-) {
+function shallow<T>(objA: T, objB: T) {
   if (Object.is(objA, objB)) {
     return true
   }
