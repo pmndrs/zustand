@@ -67,4 +67,29 @@ describe('types', () => {
     }
     expect(Component).toBeDefined()
   })
+
+  it('works with useStore and string selector (#1107)', () => {
+    const useStore = create(() => ({
+      refetchTimestamp: '',
+    }))
+    const Component = () => {
+      const refetchTimestamp = useStore(
+        (state) => state.refetchTimestamp,
+        shallow
+      )
+      return <>{refetchTimestamp.toUpperCase()}</>
+    }
+    expect(Component).toBeDefined()
+  })
+})
+
+describe('unsupported cases', () => {
+  it('date', () => {
+    expect(
+      shallow(
+        new Date('2022-07-19T00:00:00.000Z'),
+        new Date('2022-07-20T00:00:00.000Z')
+      )
+    ).not.toBe(false)
+  })
 })

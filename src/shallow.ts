@@ -1,11 +1,3 @@
-function shallow<T extends (...args: any[]) => any>(objA: T, objB: T): boolean
-
-function shallow<T extends string | number | boolean>(objA: T, objB: T): boolean
-
-function shallow<T extends any[]>(objA: T, objB: T): boolean
-
-function shallow<T extends Record<string, any>>(objA: T, objB: T): boolean
-
 function shallow<T>(objA: T, objB: T) {
   if (Object.is(objA, objB)) {
     return true
