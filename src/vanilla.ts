@@ -61,9 +61,9 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 
 const createStoreImpl: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
-  type StateListener = (state: TState, prevState: TState) => void
+  type Listener = (state: TState, prevState: TState) => void
   let state: TState
-  const listeners: Set<StateListener> = new Set()
+  const listeners: Set<Listener> = new Set()
 
   const setState: SetStateInternal<TState> = (partial, replace) => {
     // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
@@ -83,9 +83,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 
   const getState: () => TState = () => state
 
-  const subscribe: (listener: StateListener) => () => void = (
-    listener: StateListener
-  ) => {
+  const subscribe: (listener: Listener) => () => void = (listener) => {
     listeners.add(listener)
     // Unsubscribe
     return () => listeners.delete(listener)

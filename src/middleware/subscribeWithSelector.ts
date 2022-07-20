@@ -53,12 +53,10 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =
   (fn) => (set, get, api) => {
     type S = ReturnType<typeof fn>
-    type StateListener = (state: S, previousState: S) => void
-    const origSubscribe = api.subscribe as (
-      listener: StateListener
-    ) => () => void
+    type Listener = (state: S, previousState: S) => void
+    const origSubscribe = api.subscribe as (listener: Listener) => () => void
     api.subscribe = ((selector: any, optListener: any, options: any) => {
-      let listener: StateListener = selector // if no selector
+      let listener: Listener = selector // if no selector
       if (optListener) {
         const equalityFn = options?.equalityFn || Object.is
         let currentSlice = selector(api.getState())
