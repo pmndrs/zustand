@@ -5,11 +5,8 @@ import { useDebugValue } from 'react'
 // The following is a workaround until ESM is supported.
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
 import createStore, {
-  EqualityChecker,
   Mutate,
-  State,
   StateCreator,
-  StateSelector,
   StoreApi,
   StoreMutatorIdentifier,
 } from './vanilla'
@@ -18,24 +15,22 @@ const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type WithReact<S extends StoreApi<State>> = S & {
+type WithReact<S extends StoreApi> = S & {
   getServerState?: () => ExtractState<S>
 }
 
-export function useStore<S extends WithReact<StoreApi<State>>>(
-  api: S
-): ExtractState<S>
+export function useStore<S extends WithReact<StoreApi>>(api: S): ExtractState<S>
 
-export function useStore<S extends WithReact<StoreApi<State>>, U>(
+export function useStore<S extends WithReact<StoreApi>, U>(
   api: S,
-  selector: StateSelector<ExtractState<S>, U>,
-  equalityFn?: EqualityChecker<U>
+  selector: (state: ExtractState<S>) => U,
+  equalityFn?: (a: U, b: U) => boolean
 ): U
 
-export function useStore<TState extends State, StateSlice>(
+export function useStore<TState extends object, StateSlice>(
   api: WithReact<StoreApi<TState>>,
-  selector: StateSelector<TState, StateSlice> = api.getState as any,
-  equalityFn?: EqualityChecker<StateSlice>
+  selector: (state: TState) => StateSlice = api.getState as any,
+  equalityFn?: (a: StateSlice, b: StateSlice) => boolean
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
@@ -48,25 +43,25 @@ export function useStore<TState extends State, StateSlice>(
   return slice
 }
 
-export type UseBoundStore<S extends WithReact<StoreApi<State>>> = {
+export type UseBoundStore<S extends WithReact<StoreApi>> = {
   (): ExtractState<S>
   <U>(
-    selector: StateSelector<ExtractState<S>, U>,
-    equals?: EqualityChecker<U>
+    selector: (state: ExtractState<S>) => U,
+    equals?: (a: U, b: U) => boolean
   ): U
 } & S
 
 type Create = {
-  <T extends State, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  <T extends object, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): UseBoundStore<Mutate<StoreApi<T>, Mos>>
-  <T extends State>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  <T extends object>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
-  <S extends StoreApi<State>>(store: S): UseBoundStore<S>
+  <S extends StoreApi>(store: S): UseBoundStore<S>
 }
 
-const createImpl = <T extends State>(createState: StateCreator<T, [], []>) => {
+const createImpl = <T extends object>(createState: StateCreator<T, [], []>) => {
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
 
@@ -78,7 +73,7 @@ const createImpl = <T extends State>(createState: StateCreator<T, [], []>) => {
   return useBoundStore
 }
 
-const create = (<T extends State>(
+const create = (<T extends object>(
   createState: StateCreator<T, [], []> | undefined
 ) => (createState ? createImpl(createState) : createImpl)) as Create
 

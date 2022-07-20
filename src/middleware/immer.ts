@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/named
 import { Draft, produce } from 'immer'
-import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
+import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type Immer = <
-  T extends State,
+  T extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -56,7 +56,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-type ImmerImpl = <T extends State>(
+type ImmerImpl = <T extends object>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>
 ) => PopArgument<StateCreator<T, [], []>>
 

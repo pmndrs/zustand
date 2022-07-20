@@ -1,10 +1,10 @@
-import { State, StateCreator, StoreMutatorIdentifier } from '../vanilla'
+import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type Write<T, U> = Omit<T, keyof U> & U
 
 type Combine = <
-  T extends State,
-  U extends State,
+  T extends object,
+  U extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
