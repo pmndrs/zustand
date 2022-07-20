@@ -1,12 +1,5 @@
 import type {} from '@redux-devtools/extension'
-import {
-  PartialState,
-  SetState,
-  State,
-  StateCreator,
-  StoreApi,
-  StoreMutatorIdentifier,
-} from '../vanilla'
+import { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
 
 declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -76,7 +69,7 @@ export interface DevtoolsOptions {
 }
 
 type Devtools = <
-  T extends State,
+  T extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -91,7 +84,7 @@ declare module '../vanilla' {
   }
 }
 
-type DevtoolsImpl = <T extends State>(
+type DevtoolsImpl = <T extends object>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
   devtoolsOptions?: DevtoolsOptions
 ) => PopArgument<StateCreator<T, [], []>>
@@ -102,12 +95,13 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-export type NamedSet<T extends State> = WithDevtools<StoreApi<T>>['setState']
+export type NamedSet<T extends object> = WithDevtools<StoreApi<T>>['setState']
 
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
     type S = ReturnType<typeof fn>
+    type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
     const { enabled, anonymousActionType, ...options } = devtoolsOptions
     let extensionConnector:
@@ -145,7 +139,7 @@ const devtoolsImpl: DevtoolsImpl =
       )
       return r
     }
-    const setStateFromDevtools: SetState<S> = (...a) => {
+    const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
       isRecording = false
       set(...a)
@@ -193,11 +187,11 @@ const devtoolsImpl: DevtoolsImpl =
             )
             return
           }
-          return parseJsonThen<{ type: unknown; state?: PartialState<S> }>(
+          return parseJsonThen<{ type: unknown; state?: PartialState }>(
             message.payload,
             (action) => {
               if (action.type === '__setState') {
-                setStateFromDevtools(action.state as PartialState<S>)
+                setStateFromDevtools(action.state as PartialState)
                 return
               }
 
