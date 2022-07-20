@@ -1,4 +1,4 @@
-function shallow<T extends string | number | boolean | Record<string, any>>(
+function shallow<T>(
   objA: T,
   objB: T
 ) {
