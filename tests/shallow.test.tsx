@@ -82,3 +82,14 @@ describe('types', () => {
     expect(Component).toBeDefined()
   })
 })
+
+describe('unsupported cases', () => {
+  it('date', () => {
+    expect(
+      shallow(
+        new Date('2022-07-19T00:00:00.000Z'),
+        new Date('2022-07-20T00:00:00.000Z')
+      )
+    ).not.toBe(false)
+  })
+})
