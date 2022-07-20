@@ -67,4 +67,18 @@ describe('types', () => {
     }
     expect(Component).toBeDefined()
   })
+
+  it('works with useStore and string selector (#1107)', () => {
+    const useStore = create(() => ({
+      refetchTimestamp: '',
+    }))
+    const Component = () => {
+      const refetchTimestamp = useStore(
+        (state) => state.refetchTimestamp,
+        shallow
+      )
+      return <>{refetchTimestamp.toUpperCase()}</>
+    }
+    expect(Component).toBeDefined()
+  })
 })
