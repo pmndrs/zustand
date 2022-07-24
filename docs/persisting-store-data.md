@@ -11,7 +11,7 @@ Quick example:
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export const useStore = create(
+export const useFishStore = create(
   persist(
     (set, get) => ({
       fishes: 0,
@@ -44,7 +44,7 @@ Simply pass a function that returns the storage you want to use.
 Example:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       // ...
@@ -78,7 +78,7 @@ Since the only way to store an object in a storage is via a string, you can use 
 For example, if you want to store your state in base64:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       // ...
@@ -104,7 +104,7 @@ If you pass a custom serialize function, you will most likely need to pass a cus
 To continue the example above, you could deserialize the base64 value using the following:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       // ...
@@ -128,7 +128,7 @@ Enables you to omit some of the state's fields to be stored in the storage.
 You could omit multiple fields using the following:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       foo: 0,
@@ -148,7 +148,7 @@ export const useStore = create(
 Or you could allow only specific fields using the following:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       foo: 0,
@@ -171,7 +171,7 @@ This option enables you to pass a listener function that will be called when the
 Example:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       // ...
@@ -218,7 +218,7 @@ The migrate function takes the persisted state and the version number as argumen
 For instance, if you want to rename a field, you can use the following:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       newField: 0, // let's say this field was named otherwise in version 0
@@ -275,7 +275,7 @@ The shallow merge will erase the `baz` field from the `foo` object.
 One way to fix this would be to give a custom deep merge function:
 
 ```ts
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       foo: {
@@ -307,7 +307,7 @@ This method can you get the options of the middleware.
 For example, it can be used to obtain the storage name:
 
 ```ts
-useStore.persist.getOptions().name
+useBoundStore.persist.getOptions().name
 ```
 
 ### `setOptions`
@@ -319,7 +319,7 @@ This method enables you to change the middleware options. Note that the new opti
 For instance, this can be used to change the storage name:
 
 ```ts
-useStore.persist.setOptions({
+useBoundStore.persist.setOptions({
   name: 'new-name',
 })
 ```
@@ -327,7 +327,7 @@ useStore.persist.setOptions({
 Or even to change the storage engine:
 
 ```ts
-useStore.persist.setOptions({
+useBoundStore.persist.setOptions({
   getStorage: () => sessionStorage,
 })
 ```
@@ -339,7 +339,7 @@ useStore.persist.setOptions({
 This can be used to fully clear the persisted value in the storage.
 
 ```ts
-useStore.persist.clearStorage()
+useBoundStore.persist.clearStorage()
 ```
 
 ### `rehydrate`
@@ -350,17 +350,17 @@ In some cases, you might want to trigger a rehydration manually.
 This can be done by calling the `rehydrate` method.
 
 ```ts
-await useStore.persist.rehydrate()
+await useBoundStore.persist.rehydrate()
 ```
 
 ### `hasHydrated`
 
 > Schema: `() => boolean`
 
-This is a non-reactive getter to know if the storage has been hydrated (note that this does update when calling `useStore.persist.rehydrate()`).
+This is a non-reactive getter to know if the storage has been hydrated (note that this does update when calling `useBoundStore.persist.rehydrate()`).
 
 ```ts
-useStore.persist.hasHydrated()
+useBoundStore.persist.hasHydrated()
 ```
 
 ### `onHydrate`
@@ -370,7 +370,7 @@ useStore.persist.hasHydrated()
 The given listener will be called when the hydration process starts.
 
 ```ts
-const unsub = useStore.persist.onHydrate((state) => {
+const unsub = useBoundStore.persist.onHydrate((state) => {
   console.log('hydration starts')
 })
 
@@ -385,7 +385,7 @@ unsub()
 The given listener will be called when the hydration process ends.
 
 ```ts
-const unsub = useStore.persist.onFinishHydration((state) => {
+const unsub = useBoundStore.persist.onFinishHydration((state) => {
   console.log('hydration finished')
 })
 
@@ -420,7 +420,7 @@ There's a fiew different ways to do this.
 You can use the `onRehydrateStorage` option to update a field in the store:
 
 ```ts
-const useStore = create(
+const useBoundStore = create(
   persist(
     (set, get) => ({
       // ...
@@ -441,7 +441,7 @@ const useStore = create(
 );
 
 export default function App() {
-  const hasHydrated = useStore(state => state._hasHydrated);
+  const hasHydrated = useBoundStore(state => state._hasHydrated);
 
   if (!hasHydrated) {
     return <p>Loading...</p>
@@ -456,16 +456,16 @@ export default function App() {
 You can also create a custom `useHydration` hook:
 
 ```ts
-const useStore = create(persist(...))
+const useBoundStore = create(persist(...))
 
 const useHydration = () => {
-  const [hydrated, setHydrated] = useState(useStore.persist.hasHydrated)
+  const [hydrated, setHydrated] = useState(useBoundStore.persist.hasHydrated)
 
   useEffect(() => {
-    const unsubHydrate = useStore.persist.onHydrate(() => setHydrated(false)) // Note: this is just in case you want to take into account manual rehydrations. You can remove this if you don't need it/don't want it.
-    const unsubFinishHydration = useStore.persist.onFinishHydration(() => setHydrated(true))
+    const unsubHydrate = useBoundStore.persist.onHydrate(() => setHydrated(false)) // Note: this is just in case you want to take into account manual rehydrations. You can remove this if you don't need it/don't want it.
+    const unsubFinishHydration = useBoundStore.persist.onFinishHydration(() => setHydrated(true))
 
-    setHydrated(useStore.persist.hasHydrated())
+    setHydrated(useBoundStore.persist.hasHydrated())
 
     return () => {
       unsubHydrate()
@@ -502,7 +502,7 @@ const storage: StateStorage = {
   },
 }
 
-export const useStore = create(
+export const useBoundStore = create(
   persist(
     (set, get) => ({
       fishes: 0,
@@ -538,6 +538,6 @@ export const withStorageDOMEvents = (store: StoreWithPersist) => {
   }
 }
 
-const useStore = create(persist(...))
-withStorageDOMEvents(useStore)
+const useBoundStore = create(persist(...))
+withStorageDOMEvents(useBoundStore)
 ```

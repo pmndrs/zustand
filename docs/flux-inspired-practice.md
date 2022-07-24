@@ -7,7 +7,7 @@ Although zustand is an unopinionated library, here's one of the recommended usag
 - Define dispatch functions at the root level of the store to update one or more store slices
 
 ```js
-const useStore = create((set) => ({
+const useBoundStore = create((set) => ({
   storeSliceA: ...,
   storeSliceB: ...,
   storeSliceC: ...,
@@ -34,12 +34,12 @@ const reducer = (state, { type, by = 1 }) => {
   }
 }
 
-const useStore = create((set) => ({
+const useGrumpyStore = create((set) => ({
   grumpiness: 0,
   dispatch: (args) => set((state) => reducer(state, args)),
 }))
 
-const dispatch = useStore((state) => state.dispatch)
+const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
@@ -48,7 +48,7 @@ Or, just use our redux-middleware. It wires up your main-reducer, sets initial s
 ```typescript
 import { redux } from 'zustand/middleware'
 
-const useStore = create(redux(reducer, initialState))
+const useReduxStore = create(redux(reducer, initialState))
 ```
 
 Another way to update the store could be in functions wrapping the state functions. These could also handle side-effects of actions, for example for HTTP-calls. For using Zustand in a none-reactive way see [the readme](https://github.com/pmndrs/zustand#readingwriting-state-and-reacting-to-changes-outside-of-components)

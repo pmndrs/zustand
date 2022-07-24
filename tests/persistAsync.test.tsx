@@ -50,7 +50,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(
         () => ({
           count: 0,
@@ -65,7 +65,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count, name } = useStore()
+      const { count, name } = useBoundStore()
       return (
         <div>
           count: {count}, name: {name}
@@ -94,7 +94,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -103,7 +103,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
@@ -123,21 +123,21 @@ describe('persist middleware with async configuration', () => {
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
-      const useStore = create(
+      const useBoundStore = create(
         persist(() => ({ count: 0 }), {
           name: 'test-storage',
           getStorage: () => storage,
           onRehydrateStorage: () => onRehydrateStorageSpy,
         })
       )
-      return { useStore, onRehydrateStorageSpy }
+      return { useBoundStore, onRehydrateStorageSpy }
     }
 
     // Initialize from empty storage
-    const { useStore, onRehydrateStorageSpy } = createStore()
+    const { useBoundStore, onRehydrateStorageSpy } = createStore()
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
@@ -148,7 +148,7 @@ describe('persist middleware with async configuration', () => {
     })
 
     // Write something to the store
-    act(() => useStore.setState({ count: 42 }))
+    act(() => useBoundStore.setState({ count: 42 }))
     await findByText('count: 42')
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
@@ -158,11 +158,11 @@ describe('persist middleware with async configuration', () => {
     // Create the same store a second time and check if the persisted state
     // is loaded correctly
     const {
-      useStore: useStore2,
+      useBoundStore: useBoundStore2,
       onRehydrateStorageSpy: onRehydrateStorageSpy2,
     } = createStore()
     function Counter2() {
-      const { count } = useStore2()
+      const { count } = useBoundStore2()
       return <div>count: {count}</div>
     }
 
@@ -188,7 +188,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
@@ -199,7 +199,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
@@ -228,7 +228,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create<{
+    const useBoundStore = create<{
       count: number
       name: string
       setName: (name: string) => void
@@ -249,7 +249,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Component() {
-      const { count, setName, name } = useStore()
+      const { count, setName, name } = useBoundStore()
       useEffect(() => {
         setName('test')
       }, [setName])
@@ -266,7 +266,7 @@ describe('persist middleware with async configuration', () => {
     await findByText('count: 42')
     await findByText('name: test')
 
-    expect(useStore.getState()).toEqual(
+    expect(useBoundStore.getState()).toEqual(
       expect.objectContaining({
         count: 42,
         name: 'test',
@@ -287,7 +287,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
@@ -297,7 +297,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
@@ -324,7 +324,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
@@ -337,7 +337,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
@@ -367,7 +367,7 @@ describe('persist middleware with async configuration', () => {
 
     const unstorableMethod = () => {}
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0, unstorableMethod }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -376,7 +376,7 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
@@ -407,7 +407,7 @@ describe('persist middleware with async configuration', () => {
 
     const unstorableMethod = () => {}
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -424,14 +424,14 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
     const { findByText } = render(<Counter />)
 
     await findByText('count: 1')
-    expect(useStore.getState()).toEqual({
+    expect(useBoundStore.getState()).toEqual({
       count: 1,
       actions: {
         unstorableMethod,
@@ -451,7 +451,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -460,14 +460,14 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count } = useStore()
+      const { count } = useBoundStore()
       return <div>count: {count}</div>
     }
 
     const { findByText } = render(<Counter />)
 
     await findByText('count: 1')
-    expect(useStore.getState()).toEqual({
+    expect(useBoundStore.getState()).toEqual({
       count: 1,
     })
   })
@@ -481,7 +481,7 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -489,8 +489,8 @@ describe('persist middleware with async configuration', () => {
     )
 
     storage.getItem = async () => storageValue
-    await useStore.persist.rehydrate()
-    expect(useStore.getState()).toEqual({
+    await useBoundStore.persist.rehydrate()
+    expect(useBoundStore.getState()).toEqual({
       count: 1,
     })
   })
@@ -502,17 +502,19 @@ describe('persist middleware with async configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
       })
     )
-    expect(useStore.persist.hasHydrated()).toBe(false)
-    await new Promise((resolve) => useStore.persist.onFinishHydration(resolve))
-    expect(useStore.persist.hasHydrated()).toBe(true)
+    expect(useBoundStore.persist.hasHydrated()).toBe(false)
+    await new Promise((resolve) =>
+      useBoundStore.persist.onFinishHydration(resolve)
+    )
+    expect(useBoundStore.persist.hasHydrated()).toBe(true)
 
-    await useStore.persist.rehydrate()
-    expect(useStore.persist.hasHydrated()).toBe(true)
+    await useBoundStore.persist.rehydrate()
+    expect(useBoundStore.persist.hasHydrated()).toBe(true)
   })
 })
