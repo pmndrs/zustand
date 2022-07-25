@@ -1,6 +1,6 @@
 # 3rd Party Libraries
 
-Zustand provides bear necessities for state management which is great for most projects; however, some users wish to extend the library's feature set. This can be done using 3rd-party libraries created by the community. 
+Zustand provides bear necessities for state management which is great for most projects; however, some users wish to extend the library's feature set. This can be done using 3rd-party libraries created by the community.
 
 > Disclaimer: These libraries may have bugs, limited maintenance, or other limitations and are not officially recommended by pmndrs or the zustand maintainers. This list is to provide a good starting point for someone looking to extend zustand's feature set.
 
