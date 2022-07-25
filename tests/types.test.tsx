@@ -1,17 +1,4 @@
-import create, {
-  Destroy,
-  EqualityChecker,
-  GetState,
-  PartialState,
-  SetState,
-  State,
-  StateCreator,
-  StateListener,
-  StateSelector,
-  StoreApi,
-  Subscribe,
-  UseBoundStore,
-} from 'zustand'
+import create, { StateCreator, StoreApi, UseBoundStore } from 'zustand'
 
 it('can use exposed types', () => {
   type ExampleState = {
@@ -22,23 +9,25 @@ it('can use exposed types', () => {
     numSetState: (v: number) => void
   }
 
-  const listener: StateListener<ExampleState> = (state) => {
+  const listener = (state: ExampleState) => {
     if (state) {
       const value = state.num * state.numGet() * state.numGetState()
       state.numSet(value)
       state.numSetState(value)
     }
   }
-  const selector: StateSelector<ExampleState, number> = (state) => state.num
-  const partial: PartialState<ExampleState> = {
+  const selector = (state: ExampleState) => state.num
+  const partial: Partial<ExampleState> = {
     num: 2,
     numGet: () => 2,
   }
-  const partialFn: PartialState<ExampleState> = (state) => ({
+  const partialFn: (state: ExampleState) => Partial<ExampleState> = (
+    state
+  ) => ({
     ...state,
     num: 2,
   })
-  const equalityFn: EqualityChecker<ExampleState> = (state, newState) =>
+  const equalityFn = (state: ExampleState, newState: ExampleState) =>
     state !== newState
 
   const storeApi = create<ExampleState>((set, get) => ({
@@ -72,16 +61,18 @@ it('can use exposed types', () => {
   })
 
   function checkAllTypes(
-    _getState: GetState<ExampleState>,
-    _partialState: PartialState<ExampleState>,
-    _setState: SetState<ExampleState>,
-    _state: State,
-    _stateListener: StateListener<ExampleState>,
-    _stateSelector: StateSelector<ExampleState, number>,
+    _getState: StoreApi<ExampleState>['getState'],
+    _partialState:
+      | Partial<ExampleState>
+      | ((s: ExampleState) => Partial<ExampleState>),
+    _setState: StoreApi<ExampleState>['setState'],
+    _state: object,
+    _stateListener: (state: ExampleState, previousState: ExampleState) => void,
+    _stateSelector: (state: ExampleState) => number,
     _storeApi: StoreApi<ExampleState>,
-    _subscribe: Subscribe<ExampleState>,
-    _destroy: Destroy,
-    _equalityFn: EqualityChecker<ExampleState>,
+    _subscribe: StoreApi<ExampleState>['subscribe'],
+    _destroy: StoreApi<ExampleState>['destroy'],
+    _equalityFn: (a: ExampleState, b: ExampleState) => boolean,
     _stateCreator: StateCreator<ExampleState>,
     _useStore: UseBoundStore<StoreApi<ExampleState>>
   ) {
@@ -122,7 +113,10 @@ it('should have correct (partial) types for setState', () => {
     c: () => set({ count: 1 }),
   }))
 
-  const setState: AssertEqual<typeof store.setState, SetState<Count>> = true
+  const setState: AssertEqual<
+    typeof store.setState,
+    StoreApi<Count>['setState']
+  > = true
   expect(setState).toEqual(true)
 
   // ok, should not error
@@ -147,7 +141,10 @@ it('should allow for different partial keys to be returnable from setState', () 
     something: 'foo',
   }))
 
-  const setState: AssertEqual<typeof store.setState, SetState<State>> = true
+  const setState: AssertEqual<
+    typeof store.setState,
+    StoreApi<State>['setState']
+  > = true
   expect(setState).toEqual(true)
 
   // ok, should not error

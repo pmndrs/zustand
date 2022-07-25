@@ -7,7 +7,7 @@ import {
 } from 'react'
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import ReactDOM from 'react-dom'
-import create, { EqualityChecker, SetState, StateSelector } from 'zustand'
+import create, { StoreApi } from 'zustand'
 
 const consoleError = console.error
 afterEach(() => {
@@ -186,7 +186,7 @@ it('can batch updates', async () => {
 
 it('can update the selector', async () => {
   type State = { one: string; two: string }
-  type Props = { selector: StateSelector<State, string> }
+  type Props = { selector: (state: State) => string }
   const useStore = create<State>(() => ({
     one: 'one',
     two: 'two',
@@ -205,10 +205,10 @@ it('can update the selector', async () => {
 
 it('can update the equality checker', async () => {
   type State = { value: number }
-  type Props = { equalityFn: EqualityChecker<State> }
+  type Props = { equalityFn: (a: State, b: State) => boolean }
   const useStore = create<State>(() => ({ value: 0 }))
   const { setState } = useStore
-  const selector: StateSelector<State, State> = (s) => s
+  const selector = (s: State) => s
 
   let renderCount = 0
   function Component({ equalityFn }: Props) {
@@ -240,8 +240,8 @@ it('can update the equality checker', async () => {
 it('can call useStore with progressively more arguments', async () => {
   type State = { value: number }
   type Props = {
-    selector?: StateSelector<State, number>
-    equalityFn?: EqualityChecker<number>
+    selector?: (state: State) => number
+    equalityFn?: (a: number, b: number) => boolean
   }
 
   const useStore = create<State>(() => ({ value: 0 }))
@@ -288,7 +288,7 @@ it('can throw an error in selector', async () => {
   const initialState: State = { value: 'foo' }
   const useStore = create<State>(() => initialState)
   const { setState } = useStore
-  const selector: StateSelector<State, string | void> = (s) =>
+  const selector = (s: State) =>
     // @ts-expect-error This function is supposed to throw an error
     s.value.toUpperCase()
 
@@ -333,8 +333,8 @@ it('can throw an error in equality checker', async () => {
   const initialState: State = { value: 'foo' }
   const useStore = create(() => initialState)
   const { setState } = useStore
-  const selector: StateSelector<State, State> = (s) => s
-  const equalityFn: EqualityChecker<State> = (a, b) =>
+  const selector = (s: State) => s
+  const equalityFn = (a: State, b: State) =>
     // @ts-expect-error This function is supposed to throw an error
     a.value.trim() === b.value.trim()
 
@@ -391,8 +391,8 @@ it('can get the store', () => {
 it('can set the store', () => {
   type State = {
     value: number
-    setState1: SetState<State>
-    setState2: SetState<State>
+    setState1: StoreApi<State>['setState']
+    setState2: StoreApi<State>['setState']
   }
 
   const { setState, getState } = create<State>((set) => ({
