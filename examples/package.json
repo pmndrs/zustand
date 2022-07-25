@@ -3,29 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.0",
-    "@testing-library/react": "^10.4.3",
-    "@testing-library/user-event": "^12.0.11",
-    "drei": "^0.0.72",
-    "postprocessing": "^6.16.0",
+    "@babel/runtime": "^7.18.9",
+    "@react-three/drei": "^9.17.1",
+    "@react-three/fiber": "^8.1.0",
+    "@react-three/postprocessing": "^2.4.6",
+    "meshline": "^2.0.4",
     "prism-react-renderer": "^1.2.1",
     "prismjs": "1.23.0",
-    "raw.macro": "^0.4.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-postprocessing": "^1.1.4",
-    "react-scripts": "3.4.3",
-    "react-spring": "^8.0.27",
-    "react-three-fiber": "^4.2.20",
-    "react-three-gui": "^0.1.5",
-    "three": "^0.125.0",
-    "threejs-meshline": "^2.0.11",
-    "web-vitals": "^0.2.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.141.0",
     "zustand": "^3.0.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
+    "build:analyze": "BUNDLE_ANALYZE=true yarn build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
@@ -48,14 +41,18 @@
     "semi": false,
     "trailingComma": "es5",
     "singleQuote": true,
-    "jsxBracketSameLine": true,
+    "bracketSameLine": true,
     "tabWidth": 2,
     "printWidth": 120
   },
   "devDependencies": {
+    "@react-three/babel": "^0.1.1",
+    "@testing-library/jest-dom": "^5.11.0",
+    "@testing-library/react": "^10.4.3",
+    "@testing-library/user-event": "^12.0.11",
     "customize-cra": "^1.0.0",
-    "customize-cra-react-refresh": "^1.1.0",
-    "react-app-rewired": "^2.1.6",
-    "webpack-bundle-analyzer": "^3.8.0"
+    "react-app-rewired": "^2.2.1",
+    "react-scripts": "^5.0.1",
+    "webpack-bundle-analyzer": "^4.5.0"
   }
 }

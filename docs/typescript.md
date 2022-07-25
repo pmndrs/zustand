@@ -118,12 +118,14 @@ And now `T` gets inferred and you get to annotate `E` too. Zustand has the same 
 Alternatively you can also use `combine` which infers the state instead of you having to type it...
 
 ```ts
-import create from "zustand"
-import { combine } from "zustand/middleware"
+import create from 'zustand'
+import { combine } from 'zustand/middleware'
 
-const useStore = create(combine({ bears: 0 }, (set) => ({
-  increase: (by: number) => set((state) => ({ bears: state.bears + by })),
-}))
+const useStore = create(
+  combine({ bears: 0 }, (set) => ({
+    increase: (by: number) => set((state) => ({ bears: state.bears + by })),
+  }))
+)
 ```
 
 <details>
@@ -343,40 +345,7 @@ const useStore = create<
 })))
 ```
 
-### Independent slices pattern
-
-```ts
-import create, { StateCreator } from 'zustand'
-
-interface BearSlice {
-  bears: number
-  addBear: () => void
-}
-const createBearSlice: StateCreator<BearSlice, [], []> = (set) => ({
-  bears: 0,
-  addBear: () => set((state) => ({ bears: state.bears + 1 })),
-})
-
-interface FishSlice {
-  fishes: number
-  addFish: () => void
-}
-const createFishSlice: StateCreator<FishSlice, [], []> = (set) => ({
-  fishes: 0,
-  addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
-})
-
-const useStore = create<BearSlice & FishSlice>()((...a) => ({
-  ...createBearSlice(...a),
-  ...createFishSlice(...a),
-}))
-```
-
-If you have some middlewares then replace `StateCreator<MySlice, [], []>` with `StateCreator<MySlice, Mutators, []>`. Eg if you're using `devtools` then it'll be `StateCreator<MySlice, [["zustand/devtools", never]], []>`.
-
-Also you can even write `StateCreator<MySlice>` instead of `StateCreator<MySlice, [], []>` as the second and third parameter have `[]` as their default value.
-
-### Interdependent slices pattern
+### Slices pattern
 
 ```ts
 import create, { StateCreator } from 'zustand'
@@ -417,4 +386,14 @@ const useStore = create<BearSlice & FishSlice>()((...a) => ({
 }))
 ```
 
-If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. Eg if you're using `devtools` then it'll be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`.
+If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. Eg if you're using `devtools` then it'll be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
+
+## Middlewares and their mutators reference
+
+- `devtools` — `["zustand/devtools", never]`
+- `persist` — `["zustand/persist", YourPersistedState]`<br/>
+  `YourPersistedState` is the type of state you're going to persist, ie the return type of `options.partialize`, if you're not passing `partialize` options the `YourPersistedState` becomes `Partial<YourState>`. Also [sometimes](https://github.com/pmndrs/zustand/issues/980#issuecomment-1162289836) passing actual `PersistedState` won't work, in those cases try passing `unknown`.
+- `immer` — `["zustand/immer", never]`
+- `subscribeWithSelector` — `["zustand/subscribeWithSelector", never]`
+- `redux` — `["zustand/redux", YourAction]`
+- `combine` — no mutator as `combine` doesn't mutate the store

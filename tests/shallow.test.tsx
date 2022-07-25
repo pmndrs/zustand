@@ -1,3 +1,4 @@
+import create from 'zustand'
 import shallow from 'zustand/shallow'
 
 describe('shallow', () => {
@@ -36,5 +37,59 @@ describe('shallow', () => {
     ).toBe(false)
 
     expect(shallow([{ foo: 'bar' }], [{ foo: 'bar', asd: 123 }])).toBe(false)
+  })
+
+  it('compares functions', () => {
+    function firstFnCompare() {
+      return { foo: 'bar' }
+    }
+
+    function secondFnCompare() {
+      return { foo: 'bar' }
+    }
+
+    expect(shallow(firstFnCompare, firstFnCompare)).toBe(true)
+
+    expect(shallow(secondFnCompare, secondFnCompare)).toBe(true)
+
+    expect(shallow(firstFnCompare, secondFnCompare)).toBe(false)
+  })
+})
+
+describe('types', () => {
+  it('works with useStore and array selector (#1107)', () => {
+    const useStore = create(() => ({
+      villages: [] as { name: string }[],
+    }))
+    const Component = () => {
+      const villages = useStore((state) => state.villages, shallow)
+      return <>{villages.length}</>
+    }
+    expect(Component).toBeDefined()
+  })
+
+  it('works with useStore and string selector (#1107)', () => {
+    const useStore = create(() => ({
+      refetchTimestamp: '',
+    }))
+    const Component = () => {
+      const refetchTimestamp = useStore(
+        (state) => state.refetchTimestamp,
+        shallow
+      )
+      return <>{refetchTimestamp.toUpperCase()}</>
+    }
+    expect(Component).toBeDefined()
+  })
+})
+
+describe('unsupported cases', () => {
+  it('date', () => {
+    expect(
+      shallow(
+        new Date('2022-07-19T00:00:00.000Z'),
+        new Date('2022-07-20T00:00:00.000Z')
+      )
+    ).not.toBe(false)
   })
 })

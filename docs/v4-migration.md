@@ -159,7 +159,7 @@ Use `typeof MyContext.useStore` instead
 
 Replace `createContext<T>()` with `createContext<StoreApi<T>>()` and `createContext<T, S>()` with `createContext<S>()`.
 
-## `combine`, `devtools`, `persist`, `subscribeWithSelector` (from `zustand/middleware`)
+## `combine`, `devtools`, `subscribeWithSelector` (from `zustand/middleware`)
 
 ### Change
 
@@ -174,11 +174,6 @@ Replace `createContext<T>()` with `createContext<StoreApi<T>>()` and `createCont
 + devtools:
 +   <T, Mps, Mcs>(...) => ...
 
-- persist:
--   <T, U>(...) => ...
-+ persist:
-+   <T, U, Mps, Mcs>(...) => ...
-
 - subscribeWithSelector:
 -   <T>(...) => ...
 + subscribeWithSelector:
@@ -188,6 +183,25 @@ Replace `createContext<T>()` with `createContext<StoreApi<T>>()` and `createCont
 ### Migration
 
 If you're not passing any type parameters then there is no migration needed. If you're passing any type parameters, remove them as are inferred.
+
+## `persist` (from `zustand/middleware`)
+
+### Change
+
+```diff
+- persist:
+-   <T, U = Partial<T>>(...) => ...
++ persist:
++   <T, Mps, Mcs, U = T>(...) => ...
+```
+
+### Migration
+
+If you're passing any type parameters, then remove them because they will be inferred. Next, if you're passing the `partialize` option then there's no further steps required for migration.
+
+But if you're not passing the `partialize` option then you might be seeing some compilation errors. If you're not seeing any compilation errors then there's no further steps requierd for migration.
+
+But if you're seeing some compilation errors—because now the type of partialized state is `T` instead of `Partial<T>` which is in alignment with the runtime behavior of default `partialize` being `s => s`—then in that case you should fix the errors because they might be indicative of unsound code. To be clear the runtime behavior has not changed, the types have gotten more correct, but if your partialised state is truly `Partial<T>` then you can pass the `partialize` option as `s => s as Partial<typeof s>`. You can do this for a quickfix too.
 
 ## `redux` (from `zustand/middleware`)
 

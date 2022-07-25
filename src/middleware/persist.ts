@@ -1,9 +1,4 @@
-import {
-  State,
-  StateCreator,
-  StoreApi,
-  StoreMutatorIdentifier,
-} from '../vanilla'
+import { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
 
 export interface StateStorage {
   getItem: (name: string) => string | null | Promise<string | null>
@@ -11,7 +6,7 @@ export interface StateStorage {
   removeItem: (name: string) => void | Promise<void>
 }
 
-interface StorageValue<S> {
+type StorageValue<S> = {
   state: S
   version?: number
 }
@@ -36,7 +31,7 @@ export interface PersistOptions<S, PersistedState = S> {
   serialize?: (state: StorageValue<S>) => string | Promise<string>
   /**
    * Use a custom deserializer.
-   * Must return an object matching StorageValue<State>
+   * Must return an object matching StorageValue<S>
    *
    * @param str The storage's current value.
    * @default JSON.parse
@@ -77,7 +72,7 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-interface StorePersist<S extends State, Ps> {
+type StorePersist<S extends object, Ps> = {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
@@ -85,10 +80,11 @@ interface StorePersist<S extends State, Ps> {
     hasHydrated: () => boolean
     onHydrate: (fn: PersistListener<S>) => () => void
     onFinishHydration: (fn: PersistListener<S>) => () => void
+    getOptions: () => Partial<PersistOptions<S, Ps>>
   }
 }
 
-interface Thenable<Value> {
+type Thenable<Value> = {
   then<V>(
     onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
   ): Thenable<V>
@@ -276,6 +272,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     clearStorage: () => {
       storage?.removeItem(options.name)
     },
+    getOptions: () => options,
     rehydrate: () => hydrate() as Promise<void>,
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
@@ -300,10 +297,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 }
 
 type Persist = <
-  T extends State,
+  T extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  U = Partial<T>
+  U = T
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/persist', unknown]], Mcs>,
   options?: PersistOptions<T, U>
@@ -319,10 +316,10 @@ type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
 type WithPersist<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StorePersist<Cast<T, State>, A>>
+  ? Write<S, StorePersist<Cast<T, object>, A>>
   : never
 
-type PersistImpl = <T extends State>(
+type PersistImpl = <T extends object>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
   options: PersistOptions<T, T>
 ) => PopArgument<StateCreator<T, [], []>>

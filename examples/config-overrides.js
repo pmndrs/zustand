@@ -1,13 +1,9 @@
-const { addWebpackPlugin, addWebpackAlias, override } = require('customize-cra')
-const { addReactRefresh } = require('customize-cra-react-refresh')
+const { addWebpackPlugin, override, addBabelPlugin } = require('customize-cra')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const path = require('path')
 
-module.exports = override(
-  addWebpackAlias({
-    three$: path.resolve('./src/utils/three.js'),
-    '../../../build/three.module.js': path.resolve('./src/utils/three.js'),
-  }),
-  addReactRefresh()
-  //addWebpackPlugin(new BundleAnalyzerPlugin())
-)
+const overrides = [
+  addBabelPlugin('module:@react-three/babel'),
+  process.env.BUNDLE_ANALYZE === 'true' ? addWebpackPlugin(new BundleAnalyzerPlugin()) : undefined,
+]
+
+module.exports = override(...overrides.filter((config) => config))

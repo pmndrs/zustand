@@ -1,4 +1,4 @@
-export default function shallow<T, U>(objA: T, objB: U) {
+function shallow<T>(objA: T, objB: T) {
   if (Object.is(objA, objB)) {
     return true
   }
@@ -17,10 +17,12 @@ export default function shallow<T, U>(objA: T, objB: U) {
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i] as string) ||
-      !Object.is(objA[keysA[i] as keyof T], objB[keysA[i] as keyof U])
+      !Object.is(objA[keysA[i] as keyof T], objB[keysA[i] as keyof T])
     ) {
       return false
     }
   }
   return true
 }
+
+export default shallow
