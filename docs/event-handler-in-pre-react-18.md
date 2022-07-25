@@ -6,14 +6,14 @@ In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates
 ```jsx
 import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
 
-const useStore = create((set) => ({
+const useFishStore = create((set) => ({
   fishes: 0,
   increaseFishes: () => set((prev) => ({ fishes: prev.fishes + 1 })),
 }))
 
 const nonReactCallback = () => {
   unstable_batchedUpdates(() => {
-    useStore.getState().increaseFishes()
+    useFishStore.getState().increaseFishes()
   })
 }
 ```

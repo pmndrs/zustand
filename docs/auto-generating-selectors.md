@@ -39,7 +39,7 @@ interface BearState {
   increment: () => void
 }
 
-const useStoreBase = create<BearState>()((set) => ({
+const useBearStoreBase = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
   increment: () => set((state) => ({ bears: state.bears + 1 })),
@@ -49,17 +49,17 @@ const useStoreBase = create<BearState>()((set) => ({
 ## Apply that function to your store:
 
 ```typescript
-const useStore = createSelectors(useStoreBase)
+const useBearStore = createSelectors(useBearStoreBase)
 ```
 
 ## Now the selectors are auto generated:
 
 ```typescript
 // get the property
-const bears = useStore.use.bears()
+const bears = useBearStore.use.bears()
 
 // get the action
-const increase = useStore.use.increment()
+const increase = useBearStore.use.increment()
 ```
 
 ## Live Demo
