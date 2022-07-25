@@ -96,7 +96,10 @@ const { nuts, honey } = useBearStore(
 )
 
 // Array pick, re-renders the component when either state.nuts or state.honey change
-const [nuts, honey] = useBearStore((state) => [state.nuts, state.honey], shallow)
+const [nuts, honey] = useBearStore(
+  (state) => [state.nuts, state.honey],
+  shallow
+)
 
 // Mapped picks, re-renders the component when state.treats changes in order, count or keys
 const treats = useBearStore((state) => Object.keys(state.treats), shallow)
