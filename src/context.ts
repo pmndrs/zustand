@@ -6,19 +6,13 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import {
-  EqualityChecker,
-  State,
-  StateSelector,
-  StoreApi,
-  useStore,
-} from 'zustand'
+import { StoreApi, useStore } from 'zustand'
 
-type UseContextStore<S extends StoreApi<State>> = {
+type UseContextStore<S extends StoreApi> = {
   (): ExtractState<S>
   <U>(
-    selector: StateSelector<ExtractState<S>, U>,
-    equalityFn?: EqualityChecker<U>
+    selector: (state: ExtractState<S>) => U,
+    equalityFn?: (a: U, b: U) => boolean
   ): U
 }
 
@@ -26,7 +20,7 @@ type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
 
-function createContext<S extends StoreApi<State>>() {
+function createContext<S extends StoreApi>() {
   const ZustandContext = reactCreateContext<S | undefined>(undefined)
 
   const Provider = ({
@@ -50,8 +44,8 @@ function createContext<S extends StoreApi<State>>() {
   }
 
   const useBoundStore = (<StateSlice = ExtractState<S>>(
-    selector?: StateSelector<ExtractState<S>, StateSlice>,
-    equalityFn?: EqualityChecker<StateSlice>
+    selector?: (state: ExtractState<S>) => StateSlice,
+    equalityFn?: (a: StateSlice, b: StateSlice) => boolean
   ) => {
     const store = useContext(ZustandContext)
     if (!store) {
@@ -61,7 +55,7 @@ function createContext<S extends StoreApi<State>>() {
     }
     return useStore(
       store,
-      selector as StateSelector<ExtractState<S>, StateSlice>,
+      selector as (state: ExtractState<S>) => StateSlice,
       equalityFn
     )
   }) as UseContextStore<S>

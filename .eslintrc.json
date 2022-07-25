@@ -46,7 +46,6 @@
     ],
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "jest/consistent-test-it": [
       "error",

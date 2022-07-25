@@ -1,7 +1,8 @@
 import * as THREE from 'three'
-import React, { useRef, useState } from 'react'
-import { Plane, useAspect, useTextureLoader } from 'drei'
-import { useFrame } from 'react-three-fiber'
+import { PlaneBufferGeometry } from 'three'
+import { useRef, useState } from 'react'
+import { Plane, useAspect, useTexture } from '@react-three/drei'
+import { useFrame, extend } from '@react-three/fiber'
 import Fireflies from './Fireflies'
 import bgUrl from '../resources/bg.jpg'
 import starsUrl from '../resources/stars.png'
@@ -11,10 +12,13 @@ import leaves1Url from '../resources/leaves1.png'
 import leaves2Url from '../resources/leaves2.png'
 import '../materials/layerMaterial'
 
+// PlaneBufferGeometry is needed for Plane
+extend({ PlaneBufferGeometry })
+
 export default function Scene({ dof }) {
-  const scaleN = useAspect('cover', 1600, 1000, 0.21)
-  const scaleW = useAspect('cover', 2200, 1000, 0.21)
-  const textures = useTextureLoader([bgUrl, starsUrl, groundUrl, bearUrl, leaves1Url, leaves2Url])
+  const scaleN = useAspect(16, 10, 1.05)
+  const scaleW = useAspect(22, 10, 1.05)
+  const textures = useTexture([bgUrl, starsUrl, groundUrl, bearUrl, leaves1Url, leaves2Url])
   const subject = useRef()
   const group = useRef()
   const layersRef = useRef([])
@@ -32,10 +36,10 @@ export default function Scene({ dof }) {
 
   useFrame((state, delta) => {
     dof.current.target = focusVector.lerp(subject.current.position, 0.05)
-    movementVector.lerp(tempVector.set(state.mouse.x, state.mouse.y * 0.2, 0), 0.2)
-    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, state.mouse.x * 20, 0.2)
-    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.mouse.y / 10, 0.2)
-    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -state.mouse.x / 2, 0.2)
+    movementVector.lerp(tempVector.set(state.pointer.x, state.pointer.y * 0.2, 0), 0.2)
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, state.pointer.x * 20, 0.2)
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.pointer.y / 10, 0.2)
+    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -state.pointer.x / 2, 0.2)
     layersRef.current[4].uniforms.time.value = layersRef.current[5].uniforms.time.value += delta
   }, 1)
 

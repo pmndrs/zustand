@@ -1,13 +1,7 @@
-import {
-  State,
-  StateCreator,
-  StateListener,
-  StoreMutatorIdentifier,
-  Subscribe,
-} from '../vanilla'
+import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type SubscribeWithSelector = <
-  T extends State,
+  T extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -22,7 +16,7 @@ type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
 type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
-  ? Write<S, StoreSubscribeWithSelector<Cast<T, State>>>
+  ? Write<S, StoreSubscribeWithSelector<Cast<T, object>>>
   : never
 
 declare module '../vanilla' {
@@ -32,7 +26,7 @@ declare module '../vanilla' {
   }
 }
 
-type StoreSubscribeWithSelector<T extends State> = {
+type StoreSubscribeWithSelector<T extends object> = {
   subscribe: {
     (listener: (selectedState: T, previousSelectedState: T) => void): () => void
     <U>(
@@ -46,7 +40,7 @@ type StoreSubscribeWithSelector<T extends State> = {
   }
 }
 
-type SubscribeWithSelectorImpl = <T extends State>(
+type SubscribeWithSelectorImpl = <T extends object>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>
 ) => PopArgument<StateCreator<T, [], []>>
 
@@ -59,9 +53,10 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =
   (fn) => (set, get, api) => {
     type S = ReturnType<typeof fn>
-    const origSubscribe = api.subscribe as Subscribe<S>
+    type Listener = (state: S, previousState: S) => void
+    const origSubscribe = api.subscribe as (listener: Listener) => () => void
     api.subscribe = ((selector: any, optListener: any, options: any) => {
-      let listener: StateListener<S> = selector // if no selector
+      let listener: Listener = selector // if no selector
       if (optListener) {
         const equalityFn = options?.equalityFn || Object.is
         let currentSlice = selector(api.getState())

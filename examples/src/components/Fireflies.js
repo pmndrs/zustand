@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import React, { useRef, useMemo } from 'react'
-import { extend, useFrame } from 'react-three-fiber'
-import * as meshline from 'threejs-meshline'
+import { useRef, useMemo } from 'react'
+import { extend, useFrame } from '@react-three/fiber'
+import * as meshline from 'meshline'
 
 extend(meshline)
 
@@ -12,7 +12,7 @@ function Fatline({ curve, width, color }) {
   useFrame((state, delta) => (material.current.uniforms.dashOffset.value -= delta / 100))
   return (
     <mesh>
-      <meshLine attach="geometry" vertices={curve} />
+      <meshLine attach="geometry" points={curve} />
       <meshLineMaterial
         attach="material"
         ref={material}
