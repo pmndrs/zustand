@@ -579,7 +579,7 @@ A more complete TypeScript guide is [here](docs/typescript.md).
 
 ## 3rd-Party Libraries
 
-Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit the dedicated [Wiki page](https://github.com/pmndrs/zustand/wiki/3rd-Party-Libraries).
+Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit [the doc](docs/3rd-party-libraries.md).
 
 ## Comparison with other libraries
 
