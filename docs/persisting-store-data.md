@@ -541,3 +541,31 @@ export const withStorageDOMEvents = (store: StoreWithPersist) => {
 const useBoundStore = create(persist(...))
 withStorageDOMEvents(useBoundStore)
 ```
+
+### How do I use with TypeScript?
+
+Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`.
+
+```tsx
+import create from 'zustand'
+import { persist } from 'zustand/middleware'
+
+interface MyState {
+  fishes: number
+  addAFish: () => void
+}
+
+export const useFishStore = create<MyState>()(
+  persist(
+    (set, get) => ({
+      fishes: 0,
+      addAFish: () => set({ fishes: get().fishes + 1 }),
+    }),
+    {
+      name: 'food-storage', // name of item in the storage (must be unique)
+      getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
+      partialize: (state) => ({ fishes: state.fishes }),
+    }
+  )
+)
+```
