@@ -25,6 +25,8 @@ export const useFishStore = create(
 )
 ```
 
+⚠️ This readme is written for JavaScript users. Basic TypeScript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`. A more complete TypeScript guide is [here](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md).
+
 See [Options](#Options) for more details.
 
 ## Options
