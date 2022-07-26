@@ -27,7 +27,7 @@ Your store is a hook! You can put anything in it: primitives, objects, functions
 ```jsx
 import create from 'zustand'
 
-const useStore = create((set) => ({
+const useBearStore = create((set) => ({
   bears: 0,
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   removeAllBears: () => set({ bears: 0 }),
@@ -40,12 +40,12 @@ Use the hook anywhere, no providers needed. Select your state and the component 
 
 ```jsx
 function BearCounter() {
-  const bears = useStore((state) => state.bears)
+  const bears = useBearStore((state) => state.bears)
   return <h1>{bears} around here ...</h1>
 }
 
 function Controls() {
-  const increasePopulation = useStore((state) => state.increasePopulation)
+  const increasePopulation = useBearStore((state) => state.increasePopulation)
   return <button onClick={increasePopulation}>one up</button>
 }
 ```
@@ -72,7 +72,7 @@ function Controls() {
 You can, but bear in mind that it will cause the component to update on every state change!
 
 ```jsx
-const state = useStore()
+const state = useBearStore()
 ```
 
 ## Selecting multiple state slices
@@ -80,8 +80,8 @@ const state = useStore()
 It detects changes with strict-equality (old === new) by default, this is efficient for atomic state picks.
 
 ```jsx
-const nuts = useStore((state) => state.nuts)
-const honey = useStore((state) => state.honey)
+const nuts = useBearStore((state) => state.nuts)
+const honey = useBearStore((state) => state.honey)
 ```
 
 If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
@@ -90,22 +90,25 @@ If you want to construct a single object with multiple state-picks inside, simil
 import shallow from 'zustand/shallow'
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
-const { nuts, honey } = useStore(
+const { nuts, honey } = useBearStore(
   (state) => ({ nuts: state.nuts, honey: state.honey }),
   shallow
 )
 
 // Array pick, re-renders the component when either state.nuts or state.honey change
-const [nuts, honey] = useStore((state) => [state.nuts, state.honey], shallow)
+const [nuts, honey] = useBearStore(
+  (state) => [state.nuts, state.honey],
+  shallow
+)
 
 // Mapped picks, re-renders the component when state.treats changes in order, count or keys
-const treats = useStore((state) => Object.keys(state.treats), shallow)
+const treats = useBearStore((state) => Object.keys(state.treats), shallow)
 ```
 
 For more control over re-rendering, you may provide any custom equality function.
 
 ```jsx
-const treats = useStore(
+const treats = useBearStore(
   (state) => state.treats,
   (oldTreats, newTreats) => compare(oldTreats, newTreats)
 )
@@ -118,7 +121,7 @@ The `set` function has a second argument, `false` by default. Instead of merging
 ```jsx
 import omit from 'lodash-es/omit'
 
-const useStore = create((set) => ({
+const useFishStore = create((set) => ({
   salmon: 1,
   tuna: 2,
   deleteEverything: () => set({}, true), // clears the entire store, actions included
@@ -131,7 +134,7 @@ const useStore = create((set) => ({
 Just call `set` when you're ready, zustand doesn't care if your actions are async or not.
 
 ```jsx
-const useStore = create((set) => ({
+const useFishStore = create((set) => ({
   fishies: {},
   fetch: async (pond) => {
     const response = await fetch(pond)
@@ -145,7 +148,7 @@ const useStore = create((set) => ({
 `set` allows fn-updates `set(state => result)`, but you still have access to state outside of it through `get`.
 
 ```jsx
-const useStore = create((set, get) => ({
+const useSoundStore = create((set, get) => ({
   sound: "grunt",
   action: () => {
     const sound = get().sound
@@ -159,22 +162,22 @@ const useStore = create((set, get) => ({
 Sometimes you need to access state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
 
 ```jsx
-const useStore = create(() => ({ paw: true, snout: true, fur: true }))
+const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
 
 // Getting non-reactive fresh state
-const paw = useStore.getState().paw
+const paw = useDogStore.getState().paw
 // Listening to all changes, fires synchronously on every change
-const unsub1 = useStore.subscribe(console.log)
+const unsub1 = useDogStore.subscribe(console.log)
 // Updating state, will trigger listeners
-useStore.setState({ paw: false })
+useDogStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
 // Destroying the store (removing all listeners)
-useStore.destroy()
+useDogStore.destroy()
 
 // You can of course use the hook as you always would
 const Component = () => {
-  const paw = useStore((state) => state.paw)
+  const paw = useDogStore((state) => state.paw)
   ...
 ```
 
@@ -191,25 +194,25 @@ subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubs
 
 ```js
 import { subscribeWithSelector } from 'zustand/middleware'
-const useStore = create(
+const useDogStore = create(
   subscribeWithSelector(() => ({ paw: true, snout: true, fur: true }))
 )
 
 // Listening to selected changes, in this case when "paw" changes
-const unsub2 = useStore.subscribe((state) => state.paw, console.log)
+const unsub2 = useDogStore.subscribe((state) => state.paw, console.log)
 // Subscribe also exposes the previous value
-const unsub3 = useStore.subscribe(
+const unsub3 = useDogStore.subscribe(
   (state) => state.paw,
   (paw, previousPaw) => console.log(paw, previousPaw)
 )
 // Subscribe also supports an optional equality function
-const unsub4 = useStore.subscribe(
+const unsub4 = useDogStore.subscribe(
   (state) => [state.paw, state.fur],
   console.log,
   { equalityFn: shallow }
 )
 // Subscribe and fire immediately
-const unsub5 = useStore.subscribe((state) => state.paw, console.log, {
+const unsub5 = useDogStore.subscribe((state) => state.paw, console.log, {
   fireImmediately: true,
 })
 ```
@@ -231,7 +234,7 @@ You can even consume an existing vanilla store with React:
 import create from 'zustand'
 import vanillaStore from './vanillaStore'
 
-const useStore = create(vanillaStore)
+const useBoundStore = create(vanillaStore)
 ```
 
 :warning: Note that middlewares that modify `set` or `get` are not applied to `getState` and `setState`.
@@ -241,13 +244,13 @@ const useStore = create(vanillaStore)
 The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
 ```jsx
-const useStore = create(set => ({ scratches: 0, ... }))
+const useScratchStore = create(set => ({ scratches: 0, ... }))
 
 const Component = () => {
   // Fetch initial state
-  const scratchRef = useRef(useStore.getState().scratches)
+  const scratchRef = useRef(useScratchStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
-  useEffect(() => useStore.subscribe(
+  useEffect(() => useScratchStore.subscribe(
     state => (scratchRef.current = state.scratches)
   ), [])
   ...
@@ -260,7 +263,7 @@ Reducing nested structures is tiresome. Have you tried [immer](https://github.co
 ```jsx
 import produce from 'immer'
 
-const useStore = create((set) => ({
+const useLushStore = create((set) => ({
   lush: { forest: { contains: { a: 'bear' } } },
   clearForest: () =>
     set(
@@ -270,7 +273,7 @@ const useStore = create((set) => ({
     ),
 }))
 
-const clearForest = useStore((state) => state.clearForest)
+const clearForest = useLushStore((state) => state.clearForest)
 clearForest()
 ```
 
@@ -293,7 +296,7 @@ const log = (config) => (set, get, api) =>
     api
   )
 
-const useStore = create(
+const useBeeStore = create(
   log((set) => ({
     bees: false,
     setBees: (input) => set({ bees: input }),
@@ -309,7 +312,7 @@ You can persist your store's data using any kind of storage.
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const useStore = create(
+const useFishStore = create(
   persist(
     (set, get) => ({
       fishes: 0,
@@ -333,7 +336,7 @@ Immer is available as middleware too.
 import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
-const useStore = create(
+const useBeeStore = create(
   immer((set) => ({
     bees: 0,
     addBees: (by) =>
@@ -358,12 +361,12 @@ const reducer = (state, { type, by = 1 }) => {
   }
 }
 
-const useStore = create((set) => ({
+const useGrumpyStore = create((set) => ({
   grumpiness: 0,
   dispatch: (args) => set((state) => reducer(state, args)),
 }))
 
-const dispatch = useStore((state) => state.dispatch)
+const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
@@ -372,7 +375,7 @@ Or, just use our redux-middleware. It wires up your main-reducer, sets initial s
 ```jsx
 import { redux } from 'zustand/middleware'
 
-const useStore = create(redux(reducer, initialState))
+const useGrumpyStore = create(redux(reducer, initialState))
 ```
 
 ## Redux devtools
@@ -381,9 +384,9 @@ const useStore = create(redux(reducer, initialState))
 import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
-const useStore = create(devtools(store))
+const usePlainStore = create(devtools(store))
 // Usage with a redux store, it will log full action types
-const useStore = create(devtools(redux(reducer, initialState)))
+const useReduxStore = create(devtools(redux(reducer, initialState)))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.
@@ -558,7 +561,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useStore = create<BearState>()(
+const useBearStore = create<BearState>()(
   devtools(
     persist((set) => ({
       bears: 0,

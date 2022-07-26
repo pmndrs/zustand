@@ -12,7 +12,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useStore = create<BearState>()((set) => ({
+const useBearStore = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
@@ -59,7 +59,7 @@ The thing is Zustand is lying in it's type, the simplest way to prove it by show
 ```ts
 import create from 'zustand/vanilla'
 
-const useStore = create<{ foo: number }>()((_, get) => ({
+const useBoundStore = create<{ foo: number }>()((_, get) => ({
   foo: get().foo,
 }))
 ```
@@ -121,7 +121,7 @@ Alternatively you can also use `combine` which infers the state instead of you h
 import create from 'zustand'
 import { combine } from 'zustand/middleware'
 
-const useStore = create(
+const useBearStore = create(
   combine({ bears: 0 }, (set) => ({
     increase: (by: number) => set((state) => ({ bears: state.bears + by })),
   }))
@@ -133,9 +133,9 @@ const useStore = create(
 
   <br/>
 
-We achieve the inference by lying a little in the types of `set`, `get` and `store` that you receive as parameters. The lie is that they're typed in a way as if the state is the first parameter only when in fact the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. So for example `get` from the second parameter has type `() => { bears: number }` and that's a lie as it should be `() => { bears: number, increase: (by: number) => void }`. And `useStore` still has the correct type, ie for example `useStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
+We achieve the inference by lying a little in the types of `set`, `get` and `store` that you receive as parameters. The lie is that they're typed in a way as if the state is the first parameter only when in fact the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. So for example `get` from the second parameter has type `() => { bears: number }` and that's a lie as it should be `() => { bears: number, increase: (by: number) => void }`. And `useBoundStore` still has the correct type, ie for example `useBoundStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
 
-It's not a lie lie because `{ bears: number }` is still a subtype `{ bears: number, increase: (by: number) => void }`, so in most cases there won't be a problem. Just you have to be careful while using replace. For eg `set({ bears: 0 }, true)` would compile but will be unsound as it'll delete the `increase` function. (If you set from "outside" ie `useStore.setState({ bears: 0 }, true)` then it won't compile because the "outside" store knows that `increase` is missing.) Another instance where you should be careful you're doing `Object.keys`, `Object.keys(get())` will return `["bears", "increase"]` and not `["bears"]` (the return type of `get` can make you fall for this).
+It's not a lie lie because `{ bears: number }` is still a subtype `{ bears: number, increase: (by: number) => void }`, so in most cases there won't be a problem. Just you have to be careful while using replace. For eg `set({ bears: 0 }, true)` would compile but will be unsound as it'll delete the `increase` function. (If you set from "outside" ie `useBoundStore.setState({ bears: 0 }, true)` then it won't compile because the "outside" store knows that `increase` is missing.) Another instance where you should be careful you're doing `Object.keys`, `Object.keys(get())` will return `["bears", "increase"]` and not `["bears"]` (the return type of `get` can make you fall for this).
 
 So `combine` trades-off a little type-safety for the convenience of not having to write a type for state. Hence you should use `combine` accordingly, usually it's not a big deal and it's okay to use it.
 
@@ -156,7 +156,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useStore = create<BearState>()(
+const useBearStore = create<BearState>()(
   devtools(
     persist((set) => ({
       bears: 0,
@@ -179,7 +179,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useStore = create<BearState>()(
+const useBearStore = create<BearState>()(
   myMiddlewares((set) => ({
     bears: 0,
     increase: (by) => set((state) => ({ bears: state.bears + by })),
@@ -199,8 +199,8 @@ const foo = (f, bar) => (set, get, store) => {
   return f(set, get, store)
 }
 
-const useStore = create(foo(() => ({ bears: 0 }), 'hello'))
-console.log(useStore.foo.toUpperCase())
+const useBearStore = create(foo(() => ({ bears: 0 }), 'hello'))
+console.log(useBearStore.foo.toUpperCase())
 ```
 
 Yes, if you didn't know Zustand middlewares do and are allowed to mutate the store. But how could we possibly encode the mutation on the type-level? That is to say how could do we type `foo` so that this code compiles?
@@ -251,7 +251,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 
 // ---
 
-const useStore = create<BearState>()(
+const useBearStore = create<BearState>()(
   logger(
     (set) => ({
       bears: 0,
@@ -317,8 +317,8 @@ type Cast<T, U> = T extends U ? T : U
 
 // ---
 
-const useStore = create(foo(() => ({ bears: 0 }), 'hello'))
-console.log(useStore.foo.toUpperCase())
+const useBearStore = create(foo(() => ({ bears: 0 }), 'hello'))
+console.log(useBearStore.foo.toUpperCase())
 ```
 
 ### `create` without curried workaround
@@ -333,7 +333,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useStore = create<
+const useBearStore = create<
   BearState,
   [
     ['zustand/persist', BearState],
@@ -380,7 +380,7 @@ const createFishSlice: StateCreator<
   addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
 })
 
-const useStore = create<BearSlice & FishSlice>()((...a) => ({
+const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
   ...createBearSlice(...a),
   ...createFishSlice(...a),
 }))

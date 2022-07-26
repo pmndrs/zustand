@@ -57,23 +57,23 @@ describe('shallow', () => {
 })
 
 describe('types', () => {
-  it('works with useStore and array selector (#1107)', () => {
-    const useStore = create(() => ({
+  it('works with useBoundStore and array selector (#1107)', () => {
+    const useBoundStore = create(() => ({
       villages: [] as { name: string }[],
     }))
     const Component = () => {
-      const villages = useStore((state) => state.villages, shallow)
+      const villages = useBoundStore((state) => state.villages, shallow)
       return <>{villages.length}</>
     }
     expect(Component).toBeDefined()
   })
 
-  it('works with useStore and string selector (#1107)', () => {
-    const useStore = create(() => ({
+  it('works with useBoundStore and string selector (#1107)', () => {
+    const useBoundStore = create(() => ({
       refetchTimestamp: '',
     }))
     const Component = () => {
-      const refetchTimestamp = useStore(
+      const refetchTimestamp = useBoundStore(
         (state) => state.refetchTimestamp,
         shallow
       )

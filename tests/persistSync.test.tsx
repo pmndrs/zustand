@@ -46,7 +46,7 @@ describe('persist middleware with sync configuration', () => {
     }
 
     const onRehydrateStorageSpy = jest.fn()
-    const useStore = create(
+    const useBoundStore = create(
       persist(
         () => ({
           count: 0,
@@ -60,7 +60,10 @@ describe('persist middleware with sync configuration', () => {
       )
     )
 
-    expect(useStore.getState()).toEqual({ count: 42, name: 'test-storage' })
+    expect(useBoundStore.getState()).toEqual({
+      count: 42,
+      name: 'test-storage',
+    })
     expect(onRehydrateStorageSpy).toBeCalledWith(
       { count: 42, name: 'test-storage' },
       undefined
@@ -93,24 +96,24 @@ describe('persist middleware with sync configuration', () => {
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
-      const useStore = create(
+      const useBoundStore = create(
         persist(() => ({ count: 0 }), {
           name: 'test-storage',
           getStorage: () => storage,
           onRehydrateStorage: () => onRehydrateStorageSpy,
         })
       )
-      return { useStore, onRehydrateStorageSpy }
+      return { useBoundStore, onRehydrateStorageSpy }
     }
 
     // Initialize from empty storage
-    const { useStore, onRehydrateStorageSpy } = createStore()
-    expect(useStore.getState()).toEqual({ count: 0 })
+    const { useBoundStore, onRehydrateStorageSpy } = createStore()
+    expect(useBoundStore.getState()).toEqual({ count: 0 })
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
 
     // Write something to the store
-    useStore.setState({ count: 42 })
-    expect(useStore.getState()).toEqual({ count: 42 })
+    useBoundStore.setState({ count: 42 })
+    expect(useBoundStore.getState()).toEqual({ count: 42 })
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
       JSON.stringify({ state: { count: 42 }, version: 0 })
@@ -119,10 +122,10 @@ describe('persist middleware with sync configuration', () => {
     // Create the same store a second time and check if the persisted state
     // is loaded correctly
     const {
-      useStore: useStore2,
+      useBoundStore: useBoundStore2,
       onRehydrateStorageSpy: onRehydrateStorageSpy2,
     } = createStore()
-    expect(useStore2.getState()).toEqual({ count: 42 })
+    expect(useBoundStore2.getState()).toEqual({ count: 42 })
     expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
   })
 
@@ -141,7 +144,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
@@ -151,7 +154,7 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    expect(useStore.getState()).toEqual({ count: 99 })
+    expect(useBoundStore.getState()).toEqual({ count: 99 })
     expect(migrateSpy).toBeCalledWith({ count: 42 }, 12)
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
@@ -176,7 +179,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
@@ -185,7 +188,7 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    expect(useStore.getState()).toEqual({ count: 0 })
+    expect(useBoundStore.getState()).toEqual({ count: 0 })
     expect(console.error).toHaveBeenCalled()
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
   })
@@ -203,7 +206,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
@@ -215,7 +218,7 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    expect(useStore.getState()).toEqual({ count: 0 })
+    expect(useBoundStore.getState()).toEqual({ count: 0 })
     expect(onRehydrateStorageSpy).toBeCalledWith(
       undefined,
       new Error('migrate error')
@@ -237,7 +240,7 @@ describe('persist middleware with sync configuration', () => {
 
     const unstorableMethod = () => {}
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0, unstorableMethod }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -247,7 +250,7 @@ describe('persist middleware with sync configuration', () => {
 
     const expectedState = { count: 1, unstorableMethod }
 
-    expect(useStore.getState()).toEqual(expectedState)
+    expect(useBoundStore.getState()).toEqual(expectedState)
     expect(onRehydrateStorageSpy).toBeCalledWith(expectedState, undefined)
   })
 
@@ -267,7 +270,7 @@ describe('persist middleware with sync configuration', () => {
 
     const unstorableMethod = () => {}
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -283,7 +286,7 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    expect(useStore.getState()).toEqual({
+    expect(useBoundStore.getState()).toEqual({
       count: 1,
       actions: {
         unstorableMethod,
@@ -303,7 +306,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -311,7 +314,7 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    expect(useStore.getState()).toEqual({
+    expect(useBoundStore.getState()).toEqual({
       count: 1,
     })
   })
@@ -325,7 +328,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(
         () => ({
           object: {
@@ -359,7 +362,7 @@ describe('persist middleware with sync configuration', () => {
       )
     )
 
-    useStore.setState({})
+    useBoundStore.setState({})
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
       JSON.stringify({
@@ -388,14 +391,14 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
       })
     )
-    expect(useStore.persist.getOptions().name).toBeDefined()
-    expect(useStore.persist.getOptions().name).toBe('test-storage')
+    expect(useBoundStore.persist.getOptions().name).toBeDefined()
+    expect(useBoundStore.persist.getOptions().name).toBe('test-storage')
   })
 
   it('can change the options through the api', () => {
@@ -407,7 +410,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -415,20 +418,20 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    useStore.setState({})
+    useBoundStore.setState({})
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
       '{"state":{"count":0},"version":0}'
     )
 
-    useStore.persist.setOptions({
+    useBoundStore.persist.setOptions({
       name: 'test-storage-2',
       partialize: (state) =>
         Object.fromEntries(
           Object.entries(state).filter(([key]) => key !== 'count')
         ),
     })
-    useStore.setState({})
+    useBoundStore.setState({})
     expect(setItemSpy).toBeCalledWith(
       'test-storage-2',
       '{"state":{},"version":0}'
@@ -444,14 +447,14 @@ describe('persist middleware with sync configuration', () => {
       removeItem: removeItemSpy,
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
       })
     )
 
-    useStore.persist.clearStorage()
+    useBoundStore.persist.clearStorage()
     expect(removeItemSpy).toBeCalledWith('test-storage')
   })
 
@@ -464,7 +467,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
@@ -472,8 +475,8 @@ describe('persist middleware with sync configuration', () => {
     )
 
     storage.getItem = () => storageValue
-    useStore.persist.rehydrate()
-    expect(useStore.getState()).toEqual({
+    useBoundStore.persist.rehydrate()
+    expect(useBoundStore.getState()).toEqual({
       count: 1,
     })
   })
@@ -485,17 +488,17 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
       })
     )
 
-    expect(useStore.persist.hasHydrated()).toBe(true)
+    expect(useBoundStore.persist.hasHydrated()).toBe(true)
 
-    await useStore.persist.rehydrate()
-    expect(useStore.persist.hasHydrated()).toBe(true)
+    await useBoundStore.persist.rehydrate()
+    expect(useBoundStore.persist.hasHydrated()).toBe(true)
   })
 
   it('can wait for rehydration through the api', async () => {
@@ -513,23 +516,23 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const useStore = create(
+    const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         getStorage: () => storage,
       })
     )
 
-    const hydrateUnsub1 = useStore.persist.onHydrate(onHydrateSpy1)
-    useStore.persist.onHydrate(onHydrateSpy2)
+    const hydrateUnsub1 = useBoundStore.persist.onHydrate(onHydrateSpy1)
+    useBoundStore.persist.onHydrate(onHydrateSpy2)
 
-    const finishHydrationUnsub1 = useStore.persist.onFinishHydration(
+    const finishHydrationUnsub1 = useBoundStore.persist.onFinishHydration(
       onFinishHydrationSpy1
     )
-    useStore.persist.onFinishHydration(onFinishHydrationSpy2)
+    useBoundStore.persist.onFinishHydration(onFinishHydrationSpy2)
 
     storage.getItem = () => storageValue1
-    await useStore.persist.rehydrate()
+    await useBoundStore.persist.rehydrate()
     expect(onHydrateSpy1).toBeCalledWith({ count: 0 })
     expect(onHydrateSpy2).toBeCalledWith({ count: 0 })
     expect(onFinishHydrationSpy1).toBeCalledWith({ count: 1 })
@@ -539,7 +542,7 @@ describe('persist middleware with sync configuration', () => {
     finishHydrationUnsub1()
 
     storage.getItem = () => storageValue2
-    await useStore.persist.rehydrate()
+    await useBoundStore.persist.rehydrate()
     expect(onHydrateSpy1).not.toBeCalledTimes(2)
     expect(onHydrateSpy2).toBeCalledWith({ count: 1 })
     expect(onFinishHydrationSpy1).not.toBeCalledTimes(2)
