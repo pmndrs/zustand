@@ -27,7 +27,7 @@ export function useStore<S extends WithReact<StoreApi>, U>(
   equalityFn?: (a: U, b: U) => boolean
 ): U
 
-export function useStore<TState extends object, StateSlice>(
+export function useStore<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
   selector: (state: TState) => StateSlice = api.getState as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean
@@ -52,16 +52,16 @@ export type UseBoundStore<S extends WithReact<StoreApi>> = {
 } & S
 
 type Create = {
-  <T extends object, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  <T, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): UseBoundStore<Mutate<StoreApi<T>, Mos>>
-  <T extends object>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
   <S extends StoreApi>(store: S): UseBoundStore<S>
 }
 
-const createImpl = <T extends object>(createState: StateCreator<T, [], []>) => {
+const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
 
@@ -73,8 +73,7 @@ const createImpl = <T extends object>(createState: StateCreator<T, [], []>) => {
   return useBoundStore
 }
 
-const create = (<T extends object>(
-  createState: StateCreator<T, [], []> | undefined
-) => (createState ? createImpl(createState) : createImpl)) as Create
+const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
+  createState ? createImpl(createState) : createImpl) as Create
 
 export default create
