@@ -1,7 +1,7 @@
 import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 import { NamedSet } from './devtools'
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Write<T, U> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
 type Action = {
@@ -17,10 +17,10 @@ type StoreRedux<A extends Action> = {
   dispatchFromDevtools: true
 }
 
-type WithRedux<S, A> = Write<Cast<S, object>, StoreRedux<Cast<A, Action>>>
+type WithRedux<S, A> = Write<S, StoreRedux<Cast<A, Action>>>
 
 type Redux = <
-  T extends object,
+  T,
   A extends Action,
   Cms extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -40,7 +40,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-type ReduxImpl = <T extends object, A extends Action>(
+type ReduxImpl = <T, A extends Action>(
   reducer: (state: T, action: A) => T,
   initialState: T
 ) => PopArgument<StateCreator<T & ReduxState<A>, [], []>>
