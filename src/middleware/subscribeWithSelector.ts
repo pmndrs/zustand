@@ -1,7 +1,7 @@
 import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type SubscribeWithSelector = <
-  T extends object,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -12,11 +12,11 @@ type SubscribeWithSelector = <
   >
 ) => StateCreator<T, Mps, [['zustand/subscribeWithSelector', never], ...Mcs]>
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
+type Write<T, U> = Omit<T, keyof U> & U
 type Cast<T, U> = T extends U ? T : U
 
 type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
-  ? Write<S, StoreSubscribeWithSelector<Cast<T, object>>>
+  ? Write<S, StoreSubscribeWithSelector<Cast<T, unknown>>>
   : never
 
 declare module '../vanilla' {
@@ -26,7 +26,7 @@ declare module '../vanilla' {
   }
 }
 
-type StoreSubscribeWithSelector<T extends object> = {
+type StoreSubscribeWithSelector<T> = {
   subscribe: {
     (listener: (selectedState: T, previousSelectedState: T) => void): () => void
     <U>(
