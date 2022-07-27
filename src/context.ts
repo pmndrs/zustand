@@ -8,7 +8,7 @@ import {
 } from 'react'
 import { StoreApi, useStore } from 'zustand'
 
-type UseContextStore<S extends StoreApi> = {
+type UseContextStore<S extends StoreApi<unknown>> = {
   (): ExtractState<S>
   <U>(
     selector: (state: ExtractState<S>) => U,
@@ -20,7 +20,7 @@ type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
 
-function createContext<S extends StoreApi>() {
+function createContext<S extends StoreApi<unknown>>() {
   const ZustandContext = reactCreateContext<S | undefined>(undefined)
 
   const Provider = ({

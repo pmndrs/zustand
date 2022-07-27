@@ -15,13 +15,15 @@ const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type WithReact<S extends StoreApi> = S & {
+type WithReact<S extends StoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
-export function useStore<S extends WithReact<StoreApi>>(api: S): ExtractState<S>
+export function useStore<S extends WithReact<StoreApi<unknown>>>(
+  api: S
+): ExtractState<S>
 
-export function useStore<S extends WithReact<StoreApi>, U>(
+export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
   equalityFn?: (a: U, b: U) => boolean
@@ -43,7 +45,7 @@ export function useStore<TState, StateSlice>(
   return slice
 }
 
-export type UseBoundStore<S extends WithReact<StoreApi>> = {
+export type UseBoundStore<S extends WithReact<StoreApi<unknown>>> = {
   (): ExtractState<S>
   <U>(
     selector: (state: ExtractState<S>) => U,
@@ -58,7 +60,7 @@ type Create = {
   <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
-  <S extends StoreApi>(store: S): UseBoundStore<S>
+  <S extends StoreApi<unknown>>(store: S): UseBoundStore<S>
 }
 
 const createImpl = <T>(createState: StateCreator<T, [], []>) => {

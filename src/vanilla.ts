@@ -5,7 +5,7 @@ type SetStateInternal<T> = {
   ): void
 }['_']
 
-export interface StoreApi<T = unknown> {
+export interface StoreApi<T> {
   setState: SetStateInternal<T>
   getState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
