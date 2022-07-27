@@ -15,8 +15,7 @@ type Message = {
   state?: any
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
+type Write<T, U> = Omit<T, keyof U> & U
 type TakeTwo<T> = T extends []
   ? [undefined, undefined]
   : T extends [unknown]
@@ -37,7 +36,7 @@ type TakeTwo<T> = T extends []
   ? [A0?, A1?]
   : never
 
-type WithDevtools<S> = Write<Cast<S, object>, StoreDevtools<S>>
+type WithDevtools<S> = Write<S, StoreDevtools<S>>
 
 type StoreDevtools<S> = S extends {
   setState: (...a: infer A) => infer Sr
@@ -69,7 +68,7 @@ export interface DevtoolsOptions {
 }
 
 type Devtools = <
-  T extends object,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -84,7 +83,7 @@ declare module '../vanilla' {
   }
 }
 
-type DevtoolsImpl = <T extends object>(
+type DevtoolsImpl = <T>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
   devtoolsOptions?: DevtoolsOptions
 ) => PopArgument<StateCreator<T, [], []>>
@@ -95,7 +94,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-export type NamedSet<T extends object> = WithDevtools<StoreApi<T>>['setState']
+export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
