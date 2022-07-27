@@ -13,10 +13,9 @@ type SubscribeWithSelector = <
 ) => StateCreator<T, Mps, [['zustand/subscribeWithSelector', never], ...Mcs]>
 
 type Write<T, U> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
 
 type WithSelectorSubscribe<S> = S extends { getState: () => infer T }
-  ? Write<S, StoreSubscribeWithSelector<Cast<T, unknown>>>
+  ? Write<S, StoreSubscribeWithSelector<T>>
   : never
 
 declare module '../vanilla' {

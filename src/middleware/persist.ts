@@ -313,10 +313,9 @@ declare module '../vanilla' {
 }
 
 type Write<T, U> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
 
 type WithPersist<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StorePersist<Cast<T, unknown>, A>>
+  ? Write<S, StorePersist<T, A>>
   : never
 
 type PersistImpl = <T>(
