@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Zustand",
+  "name": "🐻 Bear necessities for state management in React",
   "icons": [
     {
       "src": "favicon.ico",
