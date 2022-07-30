@@ -1,5 +1,6 @@
+import * as THREE from 'three'
 import { createRoot } from 'react-dom/client'
-import { createRoot as createCanvasRoot, events } from '@react-three/fiber'
+import { createRoot as createCanvasRoot, events, extend } from '@react-three/fiber'
 import './styles.css'
 import App from './App'
 import Backdrop from './components/Backdrop'
@@ -7,6 +8,9 @@ import Backdrop from './components/Backdrop'
 const root = createRoot(document.getElementById('root'))
 
 root.render(<App />)
+
+// https://docs.pmnd.rs/react-three-fiber/api/canvas#custom-canvas
+extend(THREE)
 
 const backdrop = createCanvasRoot(document.getElementById('backdrop'))
 
