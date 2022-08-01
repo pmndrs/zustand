@@ -12,7 +12,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useBearStore = create<BearState>()((set) => ({
+const useBoundStore = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
@@ -380,7 +380,7 @@ const createFishSlice: StateCreator<
   addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
 })
 
-const useBearStore = create<BearSlice & FishSlice>()((...a) => ({
+const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
   ...createBearSlice(...a),
   ...createFishSlice(...a),
 }))
