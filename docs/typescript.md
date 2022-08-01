@@ -12,7 +12,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useBoundStore = create<BearState>()((set) => ({
+const useBearStore = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
@@ -59,7 +59,7 @@ The thing is Zustand is lying in it's type, the simplest way to prove it by show
 ```ts
 import create from 'zustand/vanilla'
 
-const useBearStore = create<{ foo: number }>()((_, get) => ({
+const useBoundStore = create<{ foo: number }>()((_, get) => ({
   foo: get().foo,
 }))
 ```
