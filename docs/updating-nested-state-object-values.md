@@ -11,7 +11,7 @@ type State = {
       obj: { count: number }
     }
   }
- }
+}
 ```
 
 It requires some effort to update the count value immutably.

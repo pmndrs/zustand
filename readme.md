@@ -22,7 +22,7 @@ npm install zustand # or yarn add zustand
 
 ## First create a store
 
-Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function _merges_ state.
+Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/immutable-state-and-merging.md) to help it.
 
 ```jsx
 import create from 'zustand'

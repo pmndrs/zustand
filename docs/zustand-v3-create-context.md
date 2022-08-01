@@ -3,7 +3,7 @@
 A special `createContext` is provided since v3.5,
 which avoids misusing the store hook.
 
-*Note*: This function will likely be deprecated in v4 and removed in v5.
+**Note**: This function will likely be deprecated in v4 and removed in v5.
 
 ```jsx
 import create from 'zustand'
