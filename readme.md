@@ -18,7 +18,7 @@ You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/ex
 npm install zustand # or yarn add zustand
 ```
 
-:warning: This readme is written for JavaScript users. If you are TypeScript users, don't miss [TypeScript Usage](#typescript-usage).
+:warning: This readme is written for JavaScript users. If you are a TypeScript user, don't miss [TypeScript Usage](#typescript-usage).
 
 ## First create a store
 
