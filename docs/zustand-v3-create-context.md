@@ -1,4 +1,7 @@
-# createContext from zustand/context
+---
+title: createContext from zustand/context
+nav: 11
+---
 
 A special `createContext` is provided since v3.5,
 which avoids misusing the store hook.

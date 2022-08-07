@@ -1,4 +1,7 @@
-# Practice with no store actions
+---
+title: Practice with no store actions
+nav: 9
+---
 
 The recommended usage in the Readme is to colocate actions within the store.
 

@@ -1,4 +1,7 @@
-# Immutable state and merging
+---
+title: Immutable state and merging
+nav: 2
+---
 
 Like `useState`, we need to update state immutably.
 
