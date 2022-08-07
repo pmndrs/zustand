@@ -1,0 +1,78 @@
+---
+title: Testing
+description: How to test your new store
+nav: 2
+---
+
+## Resetting state between tests in **react-dom**
+
+When running tests, the stores are not automatically reset before each test run.
+
+Thus, there can be cases where the state of one test can affect another. To make sure all tests run with a pristine store state, you can mock `zustand` during testing and replace it with the following code:
+
+```jsx
+import actualCreate from 'zustand'
+// const actualCreate = jest.requireActual('zustand') // if using jest
+import { act } from 'react-dom/test-utils'
+
+// a variable to hold reset functions for all stores declared in the app
+const storeResetFns = new Set()
+
+// when creating a store, we get its initial state, create a reset function and add it in the set
+const create = (createState) => {
+  const store = actualCreate(createState)
+  const initialState = store.getState()
+  storeResetFns.add(() => store.setState(initialState, true))
+  return store
+}
+
+// Reset all stores after each test run
+beforeEach(() => {
+  act(() => storeResetFns.forEach((resetFn) => resetFn()))
+})
+
+export default create
+```
+
+The way you can mock a dependency depends on your test runner.
+
+In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place the code there. If your app is using `zustand/vanilla` instead of `zustand`, then you'll have to place the above code in `__mocks__/zustand/vanilla.js`.
+
+## Resetting state between tests in **react-native** and **jest**
+
+in the `__mocks__/zustand.js` (the `__mocks__` directory should be adjacent to node_modules, unless you configured roots to point to a folder other than the project root [jest docs: mocking node modules](https://jestjs.io/docs/manual-mocks#mocking-node-modules)):
+
+```js
+import { act } from '@testing-library/react-native'
+const actualCreate = jest.requireActual('zustand')
+
+// a variable to hold reset functions for all stores declared in the app
+const storeResetFns = new Set()
+
+// when creating a store, we get its initial state, create a reset function and add it in the set
+const create = (createState) => {
+  const store = actualCreate.default(createState)
+  const initialState = store.getState()
+  storeResetFns.add(() => {
+    store.setState(initialState, true)
+  })
+  return store
+}
+
+// Reset all stores after each test run
+beforeEach(async () => {
+  await act(() =>
+    storeResetFns.forEach((resetFn) => {
+      resetFn()
+    })
+  )
+})
+
+export default create
+```
+
+If the `jest.config.js` has `automock: false`, then you need to do the following in `jest.setup.js`:
+
+```js
+jest.mock('zustand')
+```
