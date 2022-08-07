@@ -1,4 +1,7 @@
-# TypeScript Guide
+---
+title: TypeScript Guide
+nav: 4
+---
 
 ## Basic usage
 
