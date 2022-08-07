@@ -36,7 +36,10 @@ For instance, if you want to construct a single object with multiple state-picks
 import shallow from 'zustand/shallow'
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
-const { nuts, honey } = useStore((state) => ({ nuts: state.nuts, honey: state.honey }), shallow)
+const { nuts, honey } = useStore(
+  (state) => ({ nuts: state.nuts, honey: state.honey }),
+  shallow
+)
 
 // Array pick, re-renders the component when either state.nuts or state.honey change
 const [nuts, honey] = useStore((state) => [state.nuts, state.honey], shallow)
@@ -219,7 +222,8 @@ const log = (config) => (set, get, api) =>
   )
 
 // Turn the set method into an immer proxy
-const immer = (config) => (set, get, api) => config((fn) => set(produce(fn)), get, api)
+const immer = (config) => (set, get, api) =>
+  config((fn) => set(produce(fn)), get, api)
 
 const useStore = create(
   log(
