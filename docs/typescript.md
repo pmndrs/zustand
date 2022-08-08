@@ -349,16 +349,21 @@ const useBearStore = create<
 ```
 
 ### Slices pattern
+You can divide your store into different files if your store getting bigger and harder to maintain.
 
+#### Example
+In this example, I want to separate "Bears" store and "Fish" store, and then bounding two of them into one store.
 ```ts
-import create, { StateCreator } from 'zustand'
+// store-bears.ts
+import { StateCreator } from "zustand";
+import { FishSlice } from "./store-fish";
 
-interface BearSlice {
-  bears: number
-  addBear: () => void
-  eatFish: () => void
+export interface BearSlice {
+  bears: number;
+  addBear: () => void;
+  eatFish: () => void;
 }
-const createBearSlice: StateCreator<
+export const createBearSlice: StateCreator<
   BearSlice & FishSlice,
   [],
   [],
@@ -367,13 +372,20 @@ const createBearSlice: StateCreator<
   bears: 0,
   addBear: () => set((state) => ({ bears: state.bears + 1 })),
   eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
-})
+});
+```
+    
+```ts
+// store-fish.ts
+import create, { StateCreator } from "zustand";
+import { BearSlice } from "./store-bears";
 
-interface FishSlice {
-  fishes: number
-  addFish: () => void
+export interface FishSlice {
+  fishes: number;
+  addFish: () => void;
 }
-const createFishSlice: StateCreator<
+
+export const createFishSlice: StateCreator<
   BearSlice & FishSlice,
   [],
   [],
@@ -381,15 +393,101 @@ const createFishSlice: StateCreator<
 > = (set) => ({
   fishes: 0,
   addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
-})
+});
 
-const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
-  ...createBearSlice(...a),
-  ...createFishSlice(...a),
-}))
+```
+```ts
+// store.ts
+import create from "zustand";
+import { createFishSlice, FishSlice } from "./store-fish";
+import { BearSlice, createBearSlice } from "./store-bears";
+
+const useBoundStore = create<BearSlice & FishSlice>()(
+    (...a) => ({
+      ...createBearSlice(...a),
+      ...createFishSlice(...a),
+    })
+);
+```
+```ts
+// Usage in component
+import { useBoundStore } from './store'
+    
+const BearsComponent = () => {
+  const bears = useBoundStore(state => state.bears)
+  return (
+    <div>
+      Total number of bears: {bears}
+    </div>
+  )
+}
 ```
 
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. Eg if you're using `devtools` then it'll be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
+    
+#### Example
+In this code below, you want to add "devtools" middleware in your "store". You will see some errors in the process. But after you finish the setup, the errors will be disapear because the "mutators reference" are all connected with "create" function to create the store and bounding all "state creator"
+```ts
+// store-bears.ts
+import { StateCreator } from "zustand";
+import { FishSlice } from "./store-fish";
+
+export interface BearSlice {
+  bears: number;
+  addBear: () => void;
+  eatFish: () => void;
+}
+export const createBearSlice: StateCreator<
+  BearSlice & FishSlice,
+  [["zustand/devtools", never]], // <----- Updated
+  [],
+  BearSlice
+> = (set) => ({
+  bears: 0,
+  addBear: () => set((state) => ({ bears: state.bears + 1 })),
+  eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
+});
+```
+    
+```ts
+// store-fish.ts
+import create, { StateCreator } from "zustand";
+import { BearSlice } from "./store-bears";
+
+export interface FishSlice {
+  fishes: number;
+  addFish: () => void;
+}
+
+export const createFishSlice: StateCreator<
+  BearSlice & FishSlice,
+  [["zustand/devtools", never]], // <----- Updated
+  [],
+  FishSlice
+> = (set) => ({
+  fishes: 0,
+  addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+});
+
+```
+```ts
+// store.ts
+import create from "zustand";
+import { createFishSlice, FishSlice } from "./store-fish";
+import { BearSlice, createBearSlice } from "./store-bears";
+import { devtools } from "zustand/middleware"; // <------ added
+
+const useBoundStore = create<BearSlice & FishSlice>()(
+  devtools( // <------ added
+    (...a) => ({
+      ...createBearSlice(...a),
+      ...createFishSlice(...a),
+    })
+  ) // <------ added
+);
+
+```
+
 
 ## Middlewares and their mutators reference
 
