@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import ReactDOM from 'react-dom'
+import { Root, createRoot } from 'react-dom/client'
 import create, { StoreApi } from 'zustand'
 
 const consoleError = console.error
@@ -154,12 +155,17 @@ it('re-renders with useLayoutEffect', async () => {
     return <>{`${state}`}</>
   }
 
-  const container = document.createElement('div')
-  ReactDOM.render(<Component />, container)
+  let root: Root
+  let container: HTMLElement
+  act(() => {
+    container = document.createElement('div')
+    root = createRoot(container)
+    root.render(<Component />)
+  })
   await waitFor(() => {
     expect(container.innerHTML).toBe('true')
   })
-  ReactDOM.unmountComponentAtNode(container)
+  await act(() => root.unmount())
 })
 
 it('can batch updates', async () => {
