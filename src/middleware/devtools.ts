@@ -44,7 +44,10 @@ type StoreDevtools<S> = S extends {
 }
   ? {
       setState(
-        ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
+        ...a: [
+          ...a: TakeTwo<A>,
+          actionType?: string | { type: unknown; payload?: unknown }
+        ]
       ): Sr
     }
   : never

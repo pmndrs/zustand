@@ -78,26 +78,45 @@ describe('If there is no extension installed...', () => {
     expect(console.warn).not.toBeCalled()
   })
 })
-
 describe('When state changes...', () => {
-  it("sends { type: setStateName || 'anonymous` } as the action with current state", () => {
-    const api = create(
-      devtools(() => ({ count: 0, foo: 'bar' }), {
-        name: 'testOptionsName',
-        enabled: true,
-      })
-    )
-    api.setState({ count: 10 }, false, 'testSetStateName')
+  it("sends { type: 'testSetStateName' } as the action with current state", () => {
+    const { setState } = createTestState()
+    setState({ count: 10 }, false, 'testSetStateName')
     expect(extension.send).toHaveBeenLastCalledWith(
       { type: 'testSetStateName' },
       { count: 10, foo: 'bar' }
     )
-    api.setState({ count: 5, foo: 'baz' }, true)
+  })
+
+  it("sends { type: 'testSetStateName', payload: 15 } as the action with current state", () => {
+    const { setState } = createTestState()
+    setState({ count: 15 }, false, {
+      type: 'testSetStateName',
+      payload: 15,
+    })
+    expect(extension.send).toHaveBeenLastCalledWith(
+      { type: 'testSetStateName', payload: 15 },
+      { count: 15, foo: 'bar' }
+    )
+  })
+
+  it("sends { type: 'anonymous' } as the action with current state", () => {
+    const { setState } = createTestState()
+    setState({ count: 5, foo: 'baz' }, true)
     expect(extension.send).toHaveBeenLastCalledWith(
       { type: 'anonymous' },
       { count: 5, foo: 'baz' }
     )
   })
+
+  function createTestState() {
+    return create(
+      devtools(() => ({ count: 0, foo: 'bar' }), {
+        name: 'testOptionsName',
+        enabled: true,
+      })
+    )
+  }
 })
 
 describe('when it receives an message of type...', () => {

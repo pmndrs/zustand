@@ -412,6 +412,19 @@ const createBearSlice = (set, get) => ({
 })
 ```
 
+You can also log action's type along with its payload:
+
+```jsx
+const createBearSlice = (set, get) => ({
+  addFishes: (count) =>
+    set(
+      (prev) => ({ fishes: prev.fishes + count }),
+      false,
+      { type: 'bear/addFishes', payload: count }
+    ),
+})
+```
+
 If an action type is not provided, it is defaulted to "anonymous". You can customize this default value by providing an `anonymousActionType` parameter:
 
 ```jsx
