@@ -125,11 +125,12 @@ Sometimes you need to access state in a non-reactive way, or act upon the store.
 
 If you need to subscribe with selector, subscribeWithSelector middleware will help.
 With this middleware subscribe accepts an additional signature:
-```jsx 
+
+```jsx
 subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubscribe
 ```
 
-```jsx 
+```jsx
 import { subscribeWithSelector } from 'zustand/middleware'
 const useStore = create(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
 
