@@ -417,11 +417,10 @@ You can also log action's type along with its payload:
 ```jsx
 const createBearSlice = (set, get) => ({
   addFishes: (count) =>
-    set(
-      (prev) => ({ fishes: prev.fishes + count }),
-      false,
-      { type: 'bear/addFishes', count }
-    ),
+    set((prev) => ({ fishes: prev.fishes + count }), false, {
+      type: 'bear/addFishes',
+      count,
+    }),
 })
 ```
 
