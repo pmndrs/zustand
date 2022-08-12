@@ -43,11 +43,8 @@ type StoreDevtools<S> = S extends {
   setState: (...a: infer A) => infer Sr
 }
   ? {
-      setState(
-        ...a: [
-          ...a: TakeTwo<A>,
-          action?: string | { type: unknown; [key: string]: unknown }
-        ]
+      setState<AT extends string | { type: unknown; [key: string]: unknown }>(
+        ...a: [...a: TakeTwo<A>, action?: AT]
       ): Sr
     }
   : never
