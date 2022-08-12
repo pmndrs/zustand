@@ -420,7 +420,7 @@ const createBearSlice = (set, get) => ({
     set(
       (prev) => ({ fishes: prev.fishes + count }),
       false,
-      { type: 'bear/addFishes', payload: count }
+      { type: 'bear/addFishes', count }
     ),
 })
 ```
