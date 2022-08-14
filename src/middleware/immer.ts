@@ -26,11 +26,11 @@ type SkipTwo<T> = T extends []
   : T extends [unknown?]
   ? []
   : T extends [unknown, unknown, ...infer A]
-  ? A
+  ? A[]
   : T extends [unknown, unknown?, ...infer A]
-  ? A
+  ? A[]
   : T extends [unknown?, unknown?, ...infer A]
-  ? A
+  ? A[]
   : never
 
 type WithImmer<S> = Write<Cast<S, object>, StoreImmer<S>>
@@ -39,12 +39,12 @@ type StoreImmer<S> = S extends {
   getState: () => infer T
   setState: infer SetState
 }
-  ? SetState extends (...a: infer A) => infer Sr
+  ? SetState extends (...a: infer Sa) => infer Sr
     ? {
-        setState(
+        setState<A extends string | { type: unknown }>(
           nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
           shouldReplace?: boolean | undefined,
-          ...a: SkipTwo<A>
+          ...a: [...a: SkipTwo<Sa>, action?: A]
         ): Sr
       }
     : never
