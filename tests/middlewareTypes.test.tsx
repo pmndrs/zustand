@@ -266,13 +266,9 @@ describe('counter state spec (double middleware)', () => {
         immer((set, get) => ({
           count: 0,
           inc: () =>
-            set(
-              (state) => {
-                state.count = get().count + 1
-              },
-              false,
-              { type: 'inc', by: 1 }
-            ),
+            set((state) => {
+              state.count = get().count + 1
+            }),
         })),
         { name: 'prefix' }
       )
