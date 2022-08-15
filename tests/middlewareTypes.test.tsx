@@ -267,35 +267,6 @@ describe('counter state spec (double middleware)', () => {
           (set, get) => ({
             count: 0,
             inc: () =>
-              set((state) => {
-                state.count = get().count + 1
-              }),
-          }),
-          { name: 'prefix' }
-        )
-      )
-    )
-    const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      return <></>
-    }
-    TestComponent
-  })
-
-  it('immer & devtools, action with type and payload', () => {
-    __DEV__ = false
-    const useBoundStore = create<CounterState>()(
-      immer(
-        devtools(
-          (set, get) => ({
-            count: 0,
-            inc: () =>
               set(
                 (state) => {
                   state.count = get().count + 1
