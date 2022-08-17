@@ -467,7 +467,7 @@ const useBearStore = create<BearState>()(
         increase: (by) => set((state) => ({ bears: state.bears + by })),
       }),
       {
-        name: 'bear-storage'
+        name: 'bear-storage',
       }
     )
   )
