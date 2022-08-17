@@ -1,4 +1,4 @@
-import create, { StoreApi, UseBoundStore } from 'zustand'
+import create, { StoreApi } from 'zustand'
 import {
   combine,
   devtools,
