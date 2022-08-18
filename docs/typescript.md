@@ -190,6 +190,8 @@ const useBearStore = create<BearState>()(
 )
 ```
 
+Also it's recommended to use `devtools` middleware as last as possible, in particular after `immer` middleware, ie it should be `immer(devtools(...))` and not `devtools(immer(...))`. The reason being that `devtools` mutates the `setState` and adds a type parameter on it, which could get lost if other middlewares (like `immer`) mutate `setState` before `devtools`.
+
 ## Authoring middlewares and advanced usage
 
 Imagine you had to write this hypothetical middleware...
