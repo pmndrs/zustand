@@ -1,4 +1,4 @@
-import type {} from '@redux-devtools/extension'
+import type { Config } from '@redux-devtools/extension'
 import { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
 
 declare module '../vanilla' {
@@ -51,23 +51,9 @@ type StoreDevtools<S> = S extends {
 const isObjectWithTypeProperty = (x: unknown): x is { type: unknown } =>
   x !== null && typeof x === 'object' && 'type' in x
 
-export interface DevtoolsOptions {
+export interface DevtoolsOptions extends Config {
   enabled?: boolean
   anonymousActionType?: string
-  name?: string
-  serialize?:
-    | boolean
-    | {
-        date?: boolean
-        regex?: boolean
-        undefined?: boolean
-        nan?: boolean
-        infinity?: boolean
-        error?: boolean
-        symbol?: boolean
-        map?: boolean
-        set?: boolean
-      }
 }
 
 type Devtools = <
