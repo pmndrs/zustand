@@ -170,7 +170,7 @@ const useBearStore = create<BearState>()(
 ```
 
 Just make sure you're using them immediately inside `create` so as to make the contextual inference work. Doing something even remotely fancy like the following `myMiddlewares` would require more advanced types.
-
+    
 ```ts
 import create from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
@@ -189,6 +189,8 @@ const useBearStore = create<BearState>()(
   }))
 )
 ```
+    
+Also it's recommended to use `devtools` middleware as last as possible, in particular after `immer` middleware, ie it should be `immer(devtools(...))` and not `devtools(immer(...))`. The reason being that `devtools` mutates the `setState` and adds a type parameter on it, which could get lost if other middlewares (like `immer`) mutate `setState` before `devtools`.
 
 ## Authoring middlewares and advanced usage
 
