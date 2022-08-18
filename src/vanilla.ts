@@ -108,9 +108,9 @@ export default createStore
 // ---------------------------------------------------------
 
 /**
- * @deprecated Use `object` instead of `State`
+ * @deprecated Use `unknown` instead of `State`
  */
-export type State = object
+export type State = unknown
 
 /**
  * @deprecated Use `Partial<T> | ((s: T) => Partial<T>)` instead of `PartialState<T>`
