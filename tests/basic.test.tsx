@@ -5,7 +5,7 @@ import {
   useLayoutEffect,
   useState,
 } from 'react'
-import { act, fireEvent, render, waitFor } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import create, { StoreApi } from 'zustand'
 
@@ -141,25 +141,6 @@ it('only re-renders if selected state has changed', async () => {
 
   expect(counterRenderCount).toBe(2)
   expect(controlRenderCount).toBe(1)
-})
-
-it('re-renders with useLayoutEffect', async () => {
-  const useBoundStore = create(() => ({ state: false }))
-
-  function Component() {
-    const { state } = useBoundStore()
-    useLayoutEffect(() => {
-      useBoundStore.setState({ state: true })
-    }, [])
-    return <>{`${state}`}</>
-  }
-
-  const container = document.createElement('div')
-  ReactDOM.render(<Component />, container)
-  await waitFor(() => {
-    expect(container.innerHTML).toBe('true')
-  })
-  ReactDOM.unmountComponentAtNode(container)
 })
 
 it('can batch updates', async () => {

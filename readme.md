@@ -18,11 +18,11 @@ You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/ex
 npm install zustand # or yarn add zustand
 ```
 
-:warning: This readme is written for JavaScript users. If you are TypeScript users, don't miss [TypeScript Usage](#typescript-usage).
+:warning: This readme is written for JavaScript users. If you are a TypeScript user, don't miss [TypeScript Usage](#typescript-usage).
 
 ## First create a store
 
-Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function _merges_ state.
+Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/immutable-state-and-merging.md) to help it.
 
 ```jsx
 import create from 'zustand'
@@ -277,7 +277,7 @@ const clearForest = useLushStore((state) => state.clearForest)
 clearForest()
 ```
 
-[Alternatively, there are some other solutions.](https://github.com/pmndrs/zustand/wiki/Updating-nested-state-object-values)
+[Alternatively, there are some other solutions.](./docs/updating-nested-state-object-values.md)
 
 ## Middleware
 
@@ -412,6 +412,18 @@ const createBearSlice = (set, get) => ({
 })
 ```
 
+You can also log action's type along with its payload:
+
+```jsx
+const createBearSlice = (set, get) => ({
+  addFishes: (count) =>
+    set((prev) => ({ fishes: prev.fishes + count }), false, {
+      type: 'bear/addFishes',
+      count,
+    }),
+})
+```
+
 If an action type is not provided, it is defaulted to "anonymous". You can customize this default value by providing an `anonymousActionType` parameter:
 
 ```jsx
@@ -444,109 +456,7 @@ const Component = () => {
   ...
 ```
 
-Alternatively, a special `createContext` is provided since v3.5,
-which avoids misusing the store hook.
-
-```jsx
-import create from 'zustand'
-import createContext from 'zustand/context'
-
-const { Provider, useStore } = createContext()
-
-const createStore = () => create(...)
-
-const App = () => (
-  <Provider createStore={createStore}>
-    ...
-  </Provider>
-)
-
-const Component = () => {
-  const state = useStore()
-  const slice = useStore(selector)
-  ...
-```
-
-<details>
-  <summary>createContext usage in real components</summary>
-
-```jsx
-import create from "zustand";
-import createContext from "zustand/context";
-
-// Best practice: You can move the below createContext() and createStore to a separate file(store.js) and import the Provider, useStore here/wherever you need.
-
-const { Provider, useStore } = createContext();
-
-const createStore = () =>
-  create((set) => ({
-    bears: 0,
-    increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-    removeAllBears: () => set({ bears: 0 })
-  }));
-
-const Button = () => {
-  return (
-      {/** store() - This will create a store for each time using the Button component instead of using one store for all components **/}
-    <Provider createStore={createStore}>
-      <ButtonChild />
-    </Provider>
-  );
-};
-
-const ButtonChild = () => {
-  const state = useStore();
-  return (
-    <div>
-      {state.bears}
-      <button
-        onClick={() => {
-          state.increasePopulation();
-        }}
-      >
-        +
-      </button>
-    </div>
-  );
-};
-
-export default function App() {
-  return (
-    <div className="App">
-      <Button />
-      <Button />
-    </div>
-  );
-}
-```
-
-</details>
-
-<details>
-  <summary>createContext usage with initialization from props</summary>
-
-```tsx
-import create from 'zustand'
-import createContext from 'zustand/context'
-
-const { Provider, useStore } = createContext()
-
-export default function App({ initialBears }) {
-  return (
-    <Provider
-      createStore={() =>
-        create((set) => ({
-          bears: initialBears,
-          increase: () => set((state) => ({ bears: state.bears + 1 })),
-        }))
-      }>
-      <Button />
-    </Provider>
-  )
-}
-```
-
-</details>
+[Alternatively, a special createContext is provided.](./docs/zustand-v3-create-context.md)
 
 ## TypeScript Usage
 
@@ -563,10 +473,15 @@ interface BearState {
 
 const useBearStore = create<BearState>()(
   devtools(
-    persist((set) => ({
-      bears: 0,
-      increase: (by) => set((state) => ({ bears: state.bears + by })),
-    }))
+    persist(
+      (set) => ({
+        bears: 0,
+        increase: (by) => set((state) => ({ bears: state.bears + by })),
+      }),
+      {
+        name: 'bear-storage',
+      }
+    )
   )
 )
 ```

@@ -39,11 +39,11 @@ type TakeTwo<T> = T extends []
 type WithDevtools<S> = Write<S, StoreDevtools<S>>
 
 type StoreDevtools<S> = S extends {
-  setState: (...a: infer A) => infer Sr
+  setState: (...a: infer Sa) => infer Sr
 }
   ? {
-      setState(
-        ...a: [...a: TakeTwo<A>, actionType?: unknown | { type: unknown }]
+      setState<A extends string | { type: unknown }>(
+        ...a: [...a: TakeTwo<Sa>, action?: A]
       ): Sr
     }
   : never

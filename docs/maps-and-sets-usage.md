@@ -1,4 +1,7 @@
-## Map and Set Usage
+---
+title: Map and Set Usage
+nav: 13
+---
 
 You need to wrap Maps and Sets inside an object, and when you want it's update to be reflected (e.g. in React),
 you do it by calling the setState on it:

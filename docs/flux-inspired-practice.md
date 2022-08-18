@@ -1,4 +1,7 @@
-# Flux inspired practice
+---
+title: Flux inspired practice
+nav: 3
+---
 
 Although zustand is an unopinionated library, here's one of the recommended usages:
 
