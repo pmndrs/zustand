@@ -259,18 +259,24 @@ describe('counter state spec (double middleware)', () => {
     __DEV__ = savedDEV
   })
 
-  it('devtools & immer', () => {
+  it('immer & devtools', () => {
     __DEV__ = false
     const useBoundStore = create<CounterState>()(
-      devtools(
-        immer((set, get) => ({
-          count: 0,
-          inc: () =>
-            set((state) => {
-              state.count = get().count + 1
-            }),
-        })),
-        { name: 'prefix' }
+      immer(
+        devtools(
+          (set, get) => ({
+            count: 0,
+            inc: () =>
+              set(
+                (state) => {
+                  state.count = get().count + 1
+                },
+                false,
+                { type: 'inc', by: 1 }
+              ),
+          }),
+          { name: 'prefix' }
+        )
       )
     )
     const TestComponent = () => {
