@@ -3,7 +3,7 @@ import { Draft, produce } from 'immer'
 import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 
 type Immer = <
-  T extends object,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -17,8 +17,7 @@ declare module '../vanilla' {
   }
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
+type Write<T, U> = Omit<T, keyof U> & U
 type SkipTwo<T> = T extends []
   ? []
   : T extends [unknown]
@@ -33,7 +32,7 @@ type SkipTwo<T> = T extends []
   ? A
   : never
 
-type WithImmer<S> = Write<Cast<S, object>, StoreImmer<S>>
+type WithImmer<S> = Write<S, StoreImmer<S>>
 
 type StoreImmer<S> = S extends {
   getState: () => infer T
@@ -56,7 +55,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-type ImmerImpl = <T extends object>(
+type ImmerImpl = <T>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>
 ) => PopArgument<StateCreator<T, [], []>>
 

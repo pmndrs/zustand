@@ -576,3 +576,25 @@ it('ensures a subscriber is not mistakenly overwritten', async () => {
   expect((await findAllByText('count1: 1')).length).toBe(2)
   expect((await findAllByText('count2: 1')).length).toBe(1)
 })
+
+it('works with non-object state', async () => {
+  const useCount = create(() => 1)
+  const inc = () => useCount.setState((c) => c + 1)
+
+  const Counter = () => {
+    const count = useCount()
+    return (
+      <>
+        <div>count: {count}</div>
+        <button onClick={inc}>button</button>
+      </>
+    )
+  }
+
+  const { getByText, findByText } = render(<Counter />)
+
+  await findByText('count: 1')
+
+  fireEvent.click(getByText('button'))
+  await findByText('count: 2')
+})

@@ -72,7 +72,7 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-type StorePersist<S extends object, Ps> = {
+type StorePersist<S, Ps> = {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
@@ -297,7 +297,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 }
 
 type Persist = <
-  T extends object,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
   U = T
@@ -312,14 +312,13 @@ declare module '../vanilla' {
   }
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
+type Write<T, U> = Omit<T, keyof U> & U
 
 type WithPersist<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StorePersist<Cast<T, object>, A>>
+  ? Write<S, StorePersist<T, A>>
   : never
 
-type PersistImpl = <T extends object>(
+type PersistImpl = <T>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
   options: PersistOptions<T, T>
 ) => PopArgument<StateCreator<T, [], []>>
