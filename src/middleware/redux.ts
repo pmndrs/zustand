@@ -36,11 +36,18 @@ type ReduxImpl = <T, A>(
   initialState: T
 ) => PopArgument<StateCreator<T & ReduxState<A>, [], []>>
 
+const isObjectWithTypeProperty = (x: unknown): x is { type: unknown } =>
+  x !== null && typeof x === 'object' && 'type' in x
+
 const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {
   type S = typeof initial
   type A = Parameters<typeof reducer>[1]
   ;(api as any).dispatch = (action: A) => {
-    ;(set as NamedSet<S>)((state: S) => reducer(state, action), false, action)
+    ;(set as NamedSet<S>)(
+      (state: S) => reducer(state, action),
+      false,
+      isObjectWithTypeProperty(action) ? action : { type: action }
+    )
     return action
   }
   ;(api as any).dispatchFromDevtools = true
