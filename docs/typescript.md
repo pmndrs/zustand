@@ -170,7 +170,7 @@ const useBearStore = create<BearState>()(
 ```
 
 Just make sure you're using them immediately inside `create` so as to make the contextual inference work. Doing something even remotely fancy like the following `myMiddlewares` would require more advanced types.
-    
+
 ```ts
 import create from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
