@@ -108,9 +108,9 @@ export default createStore
 // ---------------------------------------------------------
 
 /**
- * @deprecated Use `object` instead of `State`
+ * @deprecated Use `unknown` instead of `State`
  */
-export type State = object
+export type State = unknown
 
 /**
  * @deprecated Use `Partial<T> | ((s: T) => Partial<T>)` instead of `PartialState<T>`
@@ -164,6 +164,6 @@ export type SetState<T extends State> = {
 export type GetState<T extends State> = () => T
 
 /**
- * @deprecated Use `StoreApi<T>['destroy']` instead of `GetState<T>`.
+ * @deprecated Use `StoreApi<T>['destroy']` instead of `Destroy`.
  */
 export type Destroy = () => void
