@@ -1,4 +1,4 @@
 contact_links:
   - name: Questions and Ideas
-    url: ../../discussions/new
+    url: https://github.com/pmndrs/zustand/discussions/new
     about: Please post questions and ideas here
