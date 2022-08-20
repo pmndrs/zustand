@@ -5,16 +5,16 @@ type Write<T, U> = Omit<T, keyof U> & U
 
 type Action = { type: unknown }
 
-type StoreRedux<A extends Action> = {
+type StoreRedux<A> = {
   dispatch: (a: A) => A
   dispatchFromDevtools: true
 }
 
-type ReduxState<A extends Action> = {
+type ReduxState<A> = {
   dispatch: StoreRedux<A>['dispatch']
 }
 
-type WithRedux<S, A extends Action> = Write<S, StoreRedux<A>>
+type WithRedux<S, A> = Write<S, StoreRedux<A>>
 
 type Redux = <
   T,
@@ -27,7 +27,7 @@ type Redux = <
 
 declare module '../vanilla' {
   interface StoreMutators<S, A> {
-    'zustand/redux': WithRedux<S, A & Action>
+    'zustand/redux': WithRedux<S, A>
   }
 }
 
