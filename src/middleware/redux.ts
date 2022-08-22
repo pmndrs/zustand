@@ -1,5 +1,5 @@
-import { StateCreator, StoreMutatorIdentifier } from '../vanilla'
-import { NamedSet } from './devtools'
+import type { StateCreator, StoreMutatorIdentifier } from '../vanilla'
+import type { NamedSet } from './devtools'
 
 type Write<T, U> = Omit<T, keyof U> & U
 

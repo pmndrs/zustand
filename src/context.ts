@@ -1,12 +1,13 @@
 import {
-  ReactNode,
   createElement,
   createContext as reactCreateContext,
   useContext,
   useMemo,
   useRef,
 } from 'react'
-import { StoreApi, useStore } from 'zustand'
+import type { ReactNode } from 'react'
+import { useStore } from 'zustand'
+import type { StoreApi } from 'zustand'
 
 type UseContextStore<S extends StoreApi<unknown>> = {
   (): ExtractState<S>

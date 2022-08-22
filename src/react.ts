@@ -4,7 +4,8 @@ import { useDebugValue } from 'react'
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
-import createStore, {
+import createStore from './vanilla'
+import type {
   Mutate,
   StateCreator,
   StoreApi,
