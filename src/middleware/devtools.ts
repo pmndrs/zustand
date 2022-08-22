@@ -48,9 +48,6 @@ type StoreDevtools<S> = S extends {
     }
   : never
 
-const isObjectWithTypeProperty = (x: unknown): x is { type: unknown } =>
-  x !== null && typeof x === 'object' && 'type' in x
-
 export interface DevtoolsOptions extends Config {
   enabled?: boolean
   anonymousActionType?: string
@@ -120,9 +117,9 @@ const devtoolsImpl: DevtoolsImpl =
       extension.send(
         nameOrAction === undefined
           ? { type: anonymousActionType || 'anonymous' }
-          : isObjectWithTypeProperty(nameOrAction)
-          ? nameOrAction
-          : { type: nameOrAction },
+          : typeof nameOrAction === 'string'
+          ? { type: nameOrAction }
+          : nameOrAction,
         get()
       )
       return r
