@@ -1,6 +1,6 @@
 ---
 title: TypeScript Guide
-nav: 4
+nav: 9
 ---
 
 ## Basic usage

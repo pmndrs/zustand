@@ -4,11 +4,12 @@ description: How to use Zustand
 nav: 0
 ---
 
-:warning: This doc is still under construction. https://github.com/pmndrs/zustand/discussions/1033
+⚠️ This doc is still under construction. https://github.com/pmndrs/zustand/discussions/1033
 
 <p align="center">
-  <img width="500" src="https://docs.pmnd.rs/zustand-resources/bear.png" />
+  <img width="600" src="https://github.com/pmndrs/zustand/raw/main/bear.jpg" />
 </p>
+
 A small, fast and scalable bearbones state-management solution. Has a comfy api based
 on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit
 and flux-like.
@@ -21,7 +22,7 @@ You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
 npm install zustand
 ```
 
-### First create a store
+## First create a store
 
 Your store is a hook! You can put anything in it: primitives, objects, functions. The `set` function _merges_ state.
 
@@ -35,7 +36,7 @@ const useStore = create((set) => ({
 }))
 ```
 
-### Then bind your components, and that's it!
+## Then bind your components, and that's it!
 
 Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
 
@@ -50,12 +51,3 @@ function Controls() {
   return <button onClick={increasePopulation}>one up</button>
 }
 ```
-
-#### Why zustand over react-redux?
-
-- Simple and un-opinionated
-- Makes hooks the primary means of consuming state
-- Doesn't wrap your app in context providers
-- [Can inform components transiently (without causing render)](recipes#transient-updates-for-often-occurring-state-changes)
-
----
