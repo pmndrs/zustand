@@ -1,6 +1,6 @@
 ---
 title: Auto Generating Selectors
-nav: 12
+nav: 7
 ---
 
 It is recommended to use selectors when using either the properties or actions from the store.

@@ -1,6 +1,6 @@
 ---
 title: Practice with no store actions
-nav: 9
+nav: 8
 ---
 
 The recommended usage in the Readme is to colocate actions within the store.
