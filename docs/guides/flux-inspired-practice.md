@@ -3,11 +3,11 @@ title: Flux inspired practice
 nav: 6
 ---
 
-Although zustand is an unopinionated library, here's one of the recommended usages:
+Although zustand is an unopinionated library, here are some patterns we recommend:
 
-- Create one single store
-- Define a store only with `set`
-- Define dispatch functions at the root level of the store to update one or more store slices
+- Create a single store
+- Always use `set` to define a store
+- Define your dispatch functions at the root level of the store to update one or more store slices
 
 ```js
 const useBoundStore = create((set) => ({
@@ -19,7 +19,7 @@ const useBoundStore = create((set) => ({
 }))
 ```
 
-See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#slices-pattern) for how to define a store with separate slices.
+See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/guides/typescript.md#slices-pattern) for how to define a store with separate slices.
 
 ## Flux like patterns / "Dispatching" actions
 
