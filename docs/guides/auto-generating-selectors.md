@@ -55,7 +55,7 @@ Apply that function to your store:
 const useBearStore = createSelectors(useBearStoreBase)
 ```
 
-Now the selectors are auto generated:
+Now the selectors are auto generated and you can access them directly:
 
 ```typescript
 // get the property
