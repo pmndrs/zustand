@@ -22,7 +22,7 @@ npm install zustand # or yarn add zustand
 
 ## First create a store
 
-Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/immutable-state-and-merging.md) to help it.
+Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/guides/immutable-state-and-merging.md) to help it.
 
 ```jsx
 import create from 'zustand'
@@ -277,7 +277,7 @@ const clearForest = useLushStore((state) => state.clearForest)
 clearForest()
 ```
 
-[Alternatively, there are some other solutions.](./docs/updating-nested-state-object-values.md)
+[Alternatively, there are some other solutions.](./docs/guides/updating-nested-state-object-values.md)
 
 ## Middleware
 
@@ -326,7 +326,7 @@ const useFishStore = create(
 )
 ```
 
-[See the full documentation for this middleware.](https://github.com/pmndrs/zustand/wiki/Persisting-the-store's-data)
+[See the full documentation for this middleware.](./docs/integrations/persisting-store-data.md)
 
 ## Immer middleware
 
@@ -456,7 +456,7 @@ const Component = () => {
   ...
 ```
 
-[Alternatively, a special createContext is provided.](./docs/zustand-v3-create-context.md)
+[Alternatively, a special createContext is provided.](./docs/previous-versions/zustand-v3-create-context.md)
 
 ## TypeScript Usage
 
@@ -490,14 +490,14 @@ A more complete TypeScript guide is [here](docs/guides/typescript.md).
 
 ## Best practices
 
-- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](docs/typescript.md#slices-pattern).
-- Recommended usage for this unopinionated library: [Flux inspired practice](docs/flux-inspired-practice.md).
-- [Calling actions outside a React event handler in pre React 18](docs/event-handler-in-pre-react-18.md).
-- Testing: [Wiki page](https://github.com/pmndrs/zustand/wiki/Testing).
+- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/guides/typescript.md#slices-pattern).
+- Recommended usage for this unopinionated library: [Flux inspired practice](./docs/guides/flux-inspired-practice.md).
+- [Calling actions outside a React event handler in pre React 18](./docs/guides/event-handler-in-pre-react-18.md).
+- [Testing](./docs/guides/testing.mdx)
 
 ## 3rd-Party Libraries
 
-Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit [the doc](docs/3rd-party-libraries.md).
+Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit [the doc](./docs/integrations/3rd-party-libraries.md).
 
 ## Comparison with other libraries
 
