@@ -6,15 +6,7 @@ nav: 2
 
 ## Redux
 
-In some use cases, the developer experience can be similar in Zustand and Redux.
-Both are based on one-way data flow. In one-way data flow, we dispatch action,
-which represents a command to update a state, and after the state is updated
-with action, the new state is propagated to where it's needed.
-
-On the other hand, they differ in how to update states. Redux is based on
-reducers. While updating states with reducers is a strict method, it leads to
-more predictability. Zustand takes a flexible approach and it doesn't
-necessarily use reducers to update states.
+### State Model
 
 ```tsx
 import create from 'zustand'
@@ -72,6 +64,8 @@ const useCountStore = create<State & Actions>((set) => ({
 ```ts
 
 ```
+
+### Render Optimization
 
 ## Valtio
 
