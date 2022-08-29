@@ -76,4 +76,5 @@ export const resetAllSlices = () => {
 
 ## CodeSandbox Demo
 
-https://codesandbox.io/s/zustand-how-to-reset-state-demo-gtu0qe
+- Basic: https://codesandbox.io/s/zustand-how-to-reset-state-basic-demo-rrqyon
+- Advanced: https://codesandbox.io/s/zustand-how-to-reset-state-advanced-demo-gtu0qe
