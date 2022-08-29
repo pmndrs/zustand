@@ -38,7 +38,7 @@ const useSlice = create<State & Actions>((set, get) => ({
   },
 
   reset: () => {
-    set({ ...initialState })
+    set(initialState)
   },
 }))
 ```
