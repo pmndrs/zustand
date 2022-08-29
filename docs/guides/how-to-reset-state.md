@@ -73,3 +73,7 @@ export const resetAllSlices = () => {
   }
 }
 ```
+
+## CodeSandbox Demo
+
+https://codesandbox.io/s/zustand-how-to-reset-state-demo-gtu0qe
