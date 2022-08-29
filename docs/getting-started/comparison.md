@@ -6,7 +6,13 @@ nav: 2
 
 ## Redux
 
+Zustand and Redux are state management libraries for React. Here are some
+differences between these two libraries.
+
 ### State Model
+
+There are no big difference between Zustand and Redux. Both are base on
+immutable state model.
 
 ```tsx
 import create from 'zustand'
@@ -25,6 +31,13 @@ const useCountStore = create<State & Actions>((set) => ({
   increment: (qty: number) => set((state) => ({ count: state.count + qty })),
   decrement: (qty: number) => set((state) => ({ count: state.count - qty })),
 }))
+
+const Component = () => {
+  const count = useCountStore((state) => state.count)
+  const increment = useCountStore((state) => state.increment)
+  const decrement = useCountStore((state) => state.decrement)
+  // ...
+}
 ```
 
 ```ts
@@ -59,10 +72,45 @@ const useCountStore = create<State & Actions>((set) => ({
   count: 0,
   dispatch: (action: Action) => set((state) => countReducer(state, action)),
 }))
+
+const Component = () => {
+  const count = useCountStore((state) => state.count)
+  const dispatch = useCountStore((state) => state.dispatch)
+  // ...
+}
 ```
 
 ```ts
+import { createStore } from 'redux'
+import { useSelector, useDispatch } from 'react-redux'
 
+type State = {
+  count: number
+}
+
+type Action = {
+  type: 'increment' | 'decrement'
+  qty: number
+}
+
+const countReducer = (state: State, action: Action) => {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + action.qty }
+    case 'decrement':
+      return { count: state.count - action.qty }
+    default:
+      return state
+  }
+}
+
+const countStore = createStore(countReducer)
+
+const Component = () => {
+  const count = useSelector((state) => state.count)
+  const dispatch = useDispatch()
+  // ...
+}
 ```
 
 ### Render Optimization
@@ -102,12 +150,11 @@ render optimizations through selectors.
 import create from 'zustand'
 
 const useStore = create(() => ({
-  count1: 0,
-  count2: 1,
+  count: 0,
 }))
 
 const Component = () => {
-  const count1 = useStore((state) => state.count1)
+  const count = useStore((state) => state.count)
   // ...
 }
 ```
@@ -116,16 +163,23 @@ const Component = () => {
 import { proxy, useSnapshot } from 'valtio'
 
 const state = proxy({
-  count1: 0,
-  count2: 0,
+  count: 0,
 })
 
 const Component = () => {
-  const { count1 } = useSnapshot(state)
+  const { count } = useSnapshot(state)
   // ...
 }
 ```
 
 ## Jotai
 
+### State Model
+
+### Render Optimization
+
 ## Recoil
+
+### State Model
+
+### Render Optimization
