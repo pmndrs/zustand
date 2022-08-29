@@ -6,8 +6,9 @@ nav: 18
 The following pattern can be used to reset the state to its initial value.
 
 ```ts
-//define types for state values and actions separately
+import create from 'zustand'
 
+// define types for state values and actions separately
 type State = {
   salmon: number
   tuna: number
@@ -19,13 +20,13 @@ type Actions = {
   reset: () => void
 }
 
-//define the initial state
-const initalState: State = {
+// define the initial state
+const initialState: State = {
   salmon: 0,
   tuna: 0,
 }
 
-//create store
+// create store
 const useSlice = create<State & Actions>((set, get) => ({
   ...initialState,
 
@@ -46,23 +47,17 @@ const useSlice = create<State & Actions>((set, get) => ({
 Resetting multiple stores at once instead of individual stores
 
 ```ts
-import actualCreate, {
-  GetState,
-  SetState,
-  State,
-  StateCreator,
-  StoreApi,
-  UseBoundStore,
-} from 'zustand'
+import _create, { StateCreator, StoreApi, UseBoundStore } from 'zustand'
 
 const resetters: (() => void)[] = []
 
-export const create: typeof actualCreate = <TState extends State>(
-  createState:
-    | StateCreator<TState, SetState<TState>, GetState<TState>, any>
-    | StoreApi<TState>
-): UseBoundStore<TState, StoreApi<TState>> => {
-  const slice = actualCreate(createState)
+export const create = <TState extends unknown>(
+  createState: StateCreator<TState> | StoreApi<TState>
+): UseBoundStore<StoreApi<TState>> => {
+  // We need to use createState as never to support StateCreator<TState> and
+  // StoreApi<TState> at the same time.
+  // We also need to re-type slice to UseBoundStore<StoreApi<TState>>
+  const slice: UseBoundStore<StoreApi<TState>> = _create(createState as never)
   const initialState = slice.getState()
 
   resetters.push(() => {
