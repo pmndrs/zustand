@@ -3,9 +3,9 @@ title: Immutable state and merging
 nav: 5
 ---
 
-Like `useState`, we need to update state immutably.
+Like with React's `useState`, we need to update state immutably.
 
-Here's a typical example.
+Here's a typical example:
 
 ```jsx
 import create from 'zustand'
@@ -16,15 +16,15 @@ const useCountStore = create((set) => ({
 }))
 ```
 
-The `set` function is to update state in store.
-Because the state is immutable, it should have been this:
+The `set` function is to update state in the store.
+Because the state is immutable, it should have been like this:
 
 ```js
 set((state) => ({ ...state, count: state.count + 1 }))
 ```
 
-As this happens very often, `set` actually merges state, and
-we can skip `...state` part:
+However, as this is a common pattern, `set` actually merges state, and
+we can skip the `...state` part:
 
 ```js
 set((state) => ({ count: state.count + 1 }))
@@ -32,8 +32,8 @@ set((state) => ({ count: state.count + 1 }))
 
 ## Nested objects
 
-The `set` function merges state only one level.
-If you have a nested object, you need to merge them explicitly.
+The `set` function merges state at only one level.
+If you have a nested object, you need to merge them explicitly. You will use the spread operator pattern like so:
 
 ```jsx
 import create from 'zustand'
@@ -47,12 +47,12 @@ const useCountStore = create((set) => ({
 }))
 ```
 
-For complex use cases, consider using some libraries that helps immutable updates.
-Refer [Updating nested state object values](./updating-nested-state-object-values.md).
+For complex use cases, consider using some libraries that help with immutable updates.
+You can refer to [Updating nested state object values](./updating-nested-state-object-values.md).
 
 ## Replace flag
 
-To disable the merging behavior, you can specify `replace` boolean value to `set`.
+To disable the merging behavior, you can specify a `replace` boolean value for `set` like so:
 
 ```js
 set((state) => newState, true)

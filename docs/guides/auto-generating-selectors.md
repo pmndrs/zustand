@@ -3,13 +3,13 @@ title: Auto Generating Selectors
 nav: 7
 ---
 
-It is recommended to use selectors when using either the properties or actions from the store.
+We recommend using selectors when using either the properties or actions from the store. You can access values from the store like so:
 
 ```typescript
 const bears = useBearStore((state) => state.bears)
 ```
 
-However, writing these could be tedious, but you can auto-generate them
+However, writing these could be tedious. If that is the case for you, you can auto-generate your selectors.
 
 ## create the following function: `createSelectors`
 
@@ -33,7 +33,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<State>>>(
 }
 ```
 
-## If you have a store like this:
+If you have a store like this:
 
 ```typescript
 interface BearState {
@@ -49,13 +49,13 @@ const useBearStoreBase = create<BearState>()((set) => ({
 }))
 ```
 
-## Apply that function to your store:
+Apply that function to your store:
 
 ```typescript
 const useBearStore = createSelectors(useBearStoreBase)
 ```
 
-## Now the selectors are auto generated:
+Now the selectors are auto generated and you can access them directly:
 
 ```typescript
 // get the property
@@ -67,7 +67,7 @@ const increase = useBearStore.use.increment()
 
 ## Live Demo
 
-for a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-9i0ob3?file=/src/store.ts:396-408)
+For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-9i0ob3?file=/src/store.ts:396-408).
 
 ## 3rd-party Libraries
 

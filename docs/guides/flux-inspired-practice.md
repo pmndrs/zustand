@@ -3,11 +3,11 @@ title: Flux inspired practice
 nav: 6
 ---
 
-Although zustand is an unopinionated library, here's one of the recommended usages:
+Although zustand is an unopinionated library, here are some patterns we recommend:
 
-- Create one single store
-- Define a store only with `set`
-- Define dispatch functions at the root level of the store to update one or more store slices
+- Create a single store;
+- Always use `set` to define a store;
+- Define your dispatch functions at the root level of the store to update one or more store slices.
 
 ```js
 const useBoundStore = create((set) => ({
@@ -19,11 +19,11 @@ const useBoundStore = create((set) => ({
 }))
 ```
 
-See [Splitting the store into separate slices](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#slices-pattern) for how to define a store with separate slices.
+See [Splitting the store into separate slices](./typescript.md#slices-pattern) for how to define a store with separate slices.
 
-## Flux like patterns / "Dispatching" actions
+## Flux like patterns / "dispatching" actions
 
-If you can't live without redux-like reducers, you can define a `dispatch` function on the root level of the store like store
+If you can't live without redux-like reducers, you can define a `dispatch` function on the root level of the store like so:
 
 ```typescript
 const types = { increase: 'INCREASE', decrease: 'DECREASE' }
@@ -46,7 +46,7 @@ const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Try [this](https://codesandbox.io/s/amazing-kepler-swxol) example.
+You could also use our redux-middleware. It wires up your main reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Check [this example](https://codesandbox.io/s/amazing-kepler-swxol).
 
 ```typescript
 import { redux } from 'zustand/middleware'
@@ -54,4 +54,4 @@ import { redux } from 'zustand/middleware'
 const useReduxStore = create(redux(reducer, initialState))
 ```
 
-Another way to update the store could be in functions wrapping the state functions. These could also handle side-effects of actions, for example for HTTP-calls. For using Zustand in a none-reactive way see [the readme](https://github.com/pmndrs/zustand#readingwriting-state-and-reacting-to-changes-outside-of-components)
+Another way to update the store could be through functions wrapping the state functions. These could also handle side-effects of actions. For example, with HTTP-calls. To use Zustand in a none-reactive way, see [the readme](https://github.com/pmndrs/zustand#readingwriting-state-and-reacting-to-changes-outside-of-components).

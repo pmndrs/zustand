@@ -8,7 +8,7 @@ nav: 10
 
 When running tests, the stores are not automatically reset before each test run.
 
-Thus, there can be cases where the state of one test can affect another. To make sure all tests run with a pristine store state, you can mock `zustand` during testing and replace it with the following code:
+Thus, there can be cases where the state of one test can affect another. To make sure all tests run with a pristine store state, you can mock `zustand` during testing and use the following code to create your store:
 
 ```jsx
 import actualCreate from 'zustand'
@@ -34,13 +34,13 @@ beforeEach(() => {
 export default create
 ```
 
-The way you can mock a dependency depends on your test runner.
+The way you mock a dependency depends on your test runner/library.
 
-In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place the code there. If your app is using `zustand/vanilla` instead of `zustand`, then you'll have to place the above code in `__mocks__/zustand/vanilla.js`.
+In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place the code in that file. If your app is using `zustand/vanilla` instead of `zustand`, then you'll have to place the above code in `__mocks__/zustand/vanilla.js`.
 
 ## Resetting state between tests in **react-native** and **jest**
 
-in the `__mocks__/zustand.js` (the `__mocks__` directory should be adjacent to node_modules, unless you configured roots to point to a folder other than the project root [jest docs: mocking node modules](https://jestjs.io/docs/manual-mocks#mocking-node-modules)):
+You should use the following code in the `__mocks__/zustand.js` file (the `__mocks__` directory should be adjacent to node_modules, placed in the same folder as node_modules, unless you configured roots to point to a folder other than the project root [jest docs: mocking node modules](https://jestjs.io/docs/manual-mocks#mocking-node-modules)):
 
 ```js
 import { act } from '@testing-library/react-native'
