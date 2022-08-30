@@ -167,7 +167,6 @@ differences between these two libraries.
 
 There is a major difference between Zustand and Valtio. Zustand is based on the
 immutable state model, while Valtio is based on the mutable state model.
-The contract in the immutable state model is that objects cannot be changed once created
 
 ```ts
 import create from 'zustand'
