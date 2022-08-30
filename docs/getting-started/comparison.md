@@ -31,11 +31,6 @@ const useCountStore = create<State & Actions>((set) => ({
   increment: (qty: number) => set((state) => ({ count: state.count + qty })),
   decrement: (qty: number) => set((state) => ({ count: state.count - qty })),
 }))
-
-const Component = () => {
-  const store = useCountStore()
-  // ...
-}
 ```
 
 ```ts
@@ -70,11 +65,6 @@ const useCountStore = create<State & Actions>((set) => ({
   count: 0,
   dispatch: (action: Action) => set((state) => countReducer(state, action)),
 }))
-
-const Component = () => {
-  const store = useCountStore()
-  // ...
-}
 ```
 
 ```ts
@@ -102,12 +92,6 @@ const countReducer = (state: State, action: Action) => {
 }
 
 const countStore = createStore(countReducer)
-
-const Component = () => {
-  const count = useSelector((state) => state)
-  const dispatch = useDispatch()
-  // ...
-}
 ```
 
 ### Render Optimization
@@ -189,6 +173,7 @@ The contract in the immutable state model is that objects cannot be changed once
 import create from 'zustand'
 
 const store = create(() => ({ obj: { count: 0 } }))
+
 store.setState((prev) => ({ obj: { count: prev.obj.count + 1 } })
 ```
 
@@ -196,24 +181,25 @@ store.setState((prev) => ({ obj: { count: prev.obj.count + 1 } })
 import { proxy } from 'valtio'
 
 const state = proxy({ obj: { count: 0 } })
+
 state.obj.count += 1
 ```
 
 ### Render Optimization
 
-The other difference between Valtio and Zustand is, Valtio made render
+The other difference between Zustand and Valtio is: Valtio makes render
 optimizations through property access. But, with Zustand you need to do manual
 render optimizations through selectors.
 
 ```ts
 import create from 'zustand'
 
-const useStore = create(() => ({
+const useCountStore = create(() => ({
   count: 0,
 }))
 
 const Component = () => {
-  const count = useStore((state) => state.count)
+  const count = useCountStore((state) => state.count)
   // ...
 }
 ```
@@ -233,12 +219,134 @@ const Component = () => {
 
 ## Jotai
 
+Zustand and Jotai are state management libraries for React. Here are some
+differences between these two libraries.
+
 ### State Model
 
+There is a major difference between Zustand and Jotai. Zustand is a single
+store, while Jotai consits of primitive atoms and allows composing them
+together.
+
+```ts
+import create from 'zustand'
+
+type State = {
+  count: number
+}
+
+const useCountStore = create<State>((set) => ({
+  count: 0,
+  updateCount: (countCallback: (count: State['count']) => State['count']) =>
+    set((state) => ({ count: countCallback(state.count) })),
+}))
+```
+
+```ts
+import { atom } from 'jotai'
+
+const countAtom = atom<number>(0)
+```
+
 ### Render Optimization
+
+The other difference between Zustand and Jotai is: Jotai makes render
+optimizations through atom dependency. But, with Zustand you need to do manual
+render optimizations through selectors.
+
+```ts
+import create from 'zustand'
+
+type State = {
+  count: number
+}
+
+const useCountStore = create<State>((set) => ({
+  count: 0,
+  updateCount: (countCallback: (count: State['count']) => State['count']) =>
+    set((state) => ({ count: countCallback(state.count) })),
+}))
+
+const Component = () => {
+  const count = useCountStore((state) => state.count)
+  const updateCount = useCountStore((state) => state.updateCount)
+  // ...
+}
+```
+
+```ts
+import { atom, useAtom } from 'jotai'
+
+const countAtom = atom<number>(0)
+
+const Component = () => {
+  const [count, updateCount] = useAtom(countAtom)
+  // ...
+}
+```
 
 ## Recoil
 
+Zustand and Recoil are state management libraries for React. Here are some
+differences between these two libraries.
+
 ### State Model
 
+```ts
+import create from 'zustand'
+
+type State = {
+  count: number
+}
+
+const useCountStore = create<State>((set) => ({
+  count: 0,
+  setCount: (countCallback: (count: State['count']) => State['count']) =>
+    set((state) => ({ count: countCallback(state.count) })),
+}))
+```
+
+```ts
+import { atom } from 'recoil'
+
+const count = atom({
+  key: 'count',
+  default: 0,
+})
+```
+
 ### Render Optimization
+
+```ts
+import create from 'zustand'
+
+type State = {
+  count: number
+}
+
+const useCountStore = create<State>((set) => ({
+  count: 0,
+  setCount: (countCallback: (count: State['count']) => State['count']) =>
+    set((state) => ({ count: countCallback(state.count) })),
+}))
+
+const Component = () => {
+  const count = useCountStore((state) => state.count)
+  const setCount = useCountStore((state) => state.setCount)
+  // ...
+}
+```
+
+```ts
+import { atom, useRecoilState } from 'recoil'
+
+const countAtom = atom({
+  key: 'count',
+  default: 0,
+})
+
+const Component = () => {
+  const [count, setCount] = useRecoilState(countAtom)
+  // ...
+}
+```
