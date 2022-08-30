@@ -28,7 +28,7 @@ const useBearStore = create<BearState>()((set) => ({
 
 **TLDR**: Because state generic `T` is invariant.
 
-Consider this minimal version `create...`
+Consider this minimal version `create`:
 
 ```ts
 declare const create: <T>(f: (get: () => T) => T) => T
