@@ -40,7 +40,7 @@ const Component = () => {
 }
 ```
 
-```ts
+```tsx
 import create from 'zustand'
 
 type State = {
@@ -80,7 +80,7 @@ const Component = () => {
 }
 ```
 
-```ts
+```tsx
 import { createStore } from 'redux'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -146,7 +146,7 @@ The other difference between Valtio and Zustand is, Valtio made render
 optimizations through property access. But, with Zustand you need to do manual
 render optimizations through selectors.
 
-```ts
+```tsx
 import create from 'zustand'
 
 const useStore = create(() => ({
@@ -159,7 +159,7 @@ const Component = () => {
 }
 ```
 
-```ts
+```tsx
 import { proxy, useSnapshot } from 'valtio'
 
 const state = proxy({
