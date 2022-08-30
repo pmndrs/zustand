@@ -583,37 +583,37 @@ The combination of both creates the problem outlined in [persist's `merge` optio
 Using e.g. [ramda's `mergeDeepLeft` function](https://ramdajs.com/docs/#mergeDeepLeft) solves this issue. (15 times slower than a shallow merge, but 5 times faster than other deep merge functions, [source](https://www.measurethat.net/Benchmarks/ShowResult/328761))
 
 ```js
-import create from "zustand";
-import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
-import { mergeDeepLeft } from "ramda";
+import create from 'zustand'
+import { persist } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
+import { mergeDeepLeft } from 'ramda'
 
 const createBearSlice = (set, get) => ({
-    bears: 0,
-    setBear: (payload) =>
-        set((state) => {
-            state.BearSlice.bears = payload;
-        }),
-});
+  bears: 0,
+  setBear: (payload) =>
+    set((state) => {
+      state.BearSlice.bears = payload
+    }),
+})
 
 const createFishSlice = (set, get) => ({
-    fishes: 0,
-    setFish: (payload) =>
-        set((state) => {
-            state.FishSlice.fishes = payload;
-        }),
-});
+  fishes: 0,
+  setFish: (payload) =>
+    set((state) => {
+      state.FishSlice.fishes = payload
+    }),
+})
 
 const store = create((set, get) => ({
-    BearSlice: createBearSlice(set, get), // nested state objects with actions
-    FishSlice: createFishSlice(set, get), // nested state objects with actions
-}));
+  BearSlice: createBearSlice(set, get), // nested state objects with actions
+  FishSlice: createFishSlice(set, get), // nested state objects with actions
+}))
 
 const useStore = create(
-    persist(immer(store), {
-        name: "zustand",
-        merge: (persistedState, currentState) =>
-            mergeDeepLeft(persistedState, currentState),
-    })
-);
+  persist(immer(store), {
+    name: 'zustand',
+    merge: (persistedState, currentState) =>
+      mergeDeepLeft(persistedState, currentState),
+  })
+)
 ```
