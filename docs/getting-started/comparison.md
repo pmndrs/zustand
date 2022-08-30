@@ -14,7 +14,7 @@ differences between these two libraries.
 There are no big difference between Zustand and Redux. Both are base on
 immutable state model.
 
-```tsx
+```ts
 import create from 'zustand'
 
 type State = {
@@ -40,7 +40,7 @@ const Component = () => {
 }
 ```
 
-```tsx
+```ts
 import create from 'zustand'
 
 type State = {
@@ -80,7 +80,7 @@ const Component = () => {
 }
 ```
 
-```tsx
+```ts
 import { createStore } from 'redux'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -146,7 +146,7 @@ The other difference between Valtio and Zustand is, Valtio made render
 optimizations through property access. But, with Zustand you need to do manual
 render optimizations through selectors.
 
-```tsx
+```ts
 import create from 'zustand'
 
 const useStore = create(() => ({
@@ -159,7 +159,7 @@ const Component = () => {
 }
 ```
 
-```tsx
+```ts
 import { proxy, useSnapshot } from 'valtio'
 
 const state = proxy({
