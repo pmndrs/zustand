@@ -291,6 +291,9 @@ differences between these two libraries.
 
 ### State Model
 
+The major difference is the same as Zustand and Jotai. Also, Recoil depends on
+atom string keys instead of atom object referential identities.
+
 ```ts
 import create from 'zustand'
 
@@ -315,6 +318,10 @@ const count = atom({
 ```
 
 ### Render Optimization
+
+The other difference between Zustand and Recoil is: Recoil makes render
+optimizations through atom dependency. But, with Zustand you need to do manual
+render optimizations through selectors.
 
 ```ts
 import create from 'zustand'
