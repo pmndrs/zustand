@@ -33,9 +33,7 @@ const useCountStore = create<State & Actions>((set) => ({
 }))
 
 const Component = () => {
-  const count = useCountStore((state) => state.count)
-  const increment = useCountStore((state) => state.increment)
-  const decrement = useCountStore((state) => state.decrement)
+  const store = useCountStore()
   // ...
 }
 ```
@@ -74,8 +72,71 @@ const useCountStore = create<State & Actions>((set) => ({
 }))
 
 const Component = () => {
+  const store = useCountStore()
+  // ...
+}
+```
+
+```ts
+import { createStore } from 'redux'
+import { useSelector, useDispatch } from 'react-redux'
+
+type State = {
+  count: number
+}
+
+type Action = {
+  type: 'increment' | 'decrement'
+  qty: number
+}
+
+const countReducer = (state: State, action: Action) => {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + action.qty }
+    case 'decrement':
+      return { count: state.count - action.qty }
+    default:
+      return state
+  }
+}
+
+const countStore = createStore(countReducer)
+
+const Component = () => {
+  const count = useSelector((state) => state)
+  const dispatch = useDispatch()
+  // ...
+}
+```
+
+### Render Optimization
+
+There are no difference between Zustand and Redux. In both you need to do manual
+render optimizations through selectors.
+
+```ts
+import create from 'zustand'
+
+type State = {
+  count: number
+}
+
+type Actions = {
+  increment: (qty: number) => void
+  decrement: (qty: number) => void
+}
+
+const useCountStore = create<State & Actions>((set) => ({
+  count: 0,
+  increment: (qty: number) => set((state) => ({ count: state.count + qty })),
+  decrement: (qty: number) => set((state) => ({ count: state.count - qty })),
+}))
+
+const Component = () => {
   const count = useCountStore((state) => state.count)
-  const dispatch = useCountStore((state) => state.dispatch)
+  const increment = useCountStore((state) => state.increment)
+  const decrement = useCountStore((state) => state.decrement)
   // ...
 }
 ```
@@ -112,8 +173,6 @@ const Component = () => {
   // ...
 }
 ```
-
-### Render Optimization
 
 ## Valtio
 
