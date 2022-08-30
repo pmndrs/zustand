@@ -3,8 +3,8 @@ title: Map and Set Usage
 nav: 12
 ---
 
-You need to wrap Maps and Sets inside an object, and when you want it's update to be reflected (e.g. in React),
-you do it by calling the setState on it:
+You need to wrap Maps and Sets inside an object. When you want its update to be reflected (e.g. in React),
+you do it by calling `setState` on it:
 
 **You can view a codesandbox here: https://codesandbox.io/s/late-https-bxz9qy**
 

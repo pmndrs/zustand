@@ -3,7 +3,7 @@ title: Updating nested state object values
 nav: 4
 ---
 
-## Deep nested object
+## Deeply nested object
 
 If you have a deep state object like this:
 
@@ -21,7 +21,7 @@ It requires some effort to update the count value immutably.
 
 ## Normal approach
 
-The normal approach is to copy state object with `...`:
+The normal approach is to copy state object with the spread operator `...` like so:
 
 ```ts
   normalInc: () =>
@@ -43,7 +43,7 @@ This is very long!
 
 ## With immer
 
-Many people use [immer](https://github.com/immerjs/immer) to update nested values:
+Many people use [immer](https://github.com/immerjs/immer) to update nested values. You can use immer to shorten your state updates for deeply nested object like this:
 
 ```ts
   immerInc: () =>
@@ -54,14 +54,14 @@ What a reduction!
 
 ## With optics-ts
 
-There's another option with [optics-ts](https://github.com/akheron/optics-ts/):
+There is another option with [optics-ts](https://github.com/akheron/optics-ts/):
 
 ```ts
   opticsInc: () =>
     set(O.modify(O.optic<State>().path("deep.nested.obj.count"))((c) => c + 1)),
 ```
 
-Unlike immer, optics-ts doesn't use proxies nor mutation syntax.
+Unlike immer, optics-ts does not use proxies or mutation syntax.
 
 ## With ramda
 
@@ -72,7 +72,7 @@ You can also use [ramda](https://ramdajs.com/):
     set(R.over(R.lensPath(["deep", "nested", "obj", "count"]), (c) => c + 1)),
 ```
 
-This works with types as well as optics-ts.
+Both ramda and optics-ts also work with types.
 
 ## CodeSandbox Demo
 

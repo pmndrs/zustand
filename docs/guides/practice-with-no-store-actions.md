@@ -3,7 +3,7 @@ title: Practice with no store actions
 nav: 8
 ---
 
-The recommended usage in the Readme is to colocate actions within the store.
+The recommended usage is to colocate actions and states within the store (let your actions be located together with your state).
 
 For example:
 
@@ -36,7 +36,7 @@ export const setText = (text) => useBoundStore.setState({ text })
 
 This has a few advantages:
 
-- It doesn't require a hook to call an action,
-- It facilitates code splitting,
+- It does not require a hook to call an action;
+- It facilitates code splitting.
 
-While this pattern doesn't offer any downsides, some may prefer the documented approach in the Readme due to its encapsulated nature.
+While this pattern does not offer any downsides, some may prefer colocating due to its encapsulated nature.
