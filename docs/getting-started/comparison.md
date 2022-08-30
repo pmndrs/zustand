@@ -12,7 +12,7 @@ differences between these two libraries.
 ### State Model
 
 There are no big difference between Zustand and Redux. Both are base on
-immutable state model.
+immutable state model. Also, Redux needs to wrap you app in context providers.
 
 ```ts
 import create from 'zustand'
@@ -291,8 +291,9 @@ differences between these two libraries.
 
 ### State Model
 
-The major difference is the same as Zustand and Jotai. Also, Recoil depends on
-atom string keys instead of atom object referential identities.
+The major difference is the same as Zustand and Jotai is: Recoil depends on
+atom string keys instead of atom object referential identities. Also, Recoil
+needs to wrap your app in a context provider.
 
 ```ts
 import create from 'zustand'
