@@ -55,7 +55,7 @@ const x = createFoo((_) => 'hello')
 
 Here again, `x` is `unknown` instead of `string`.
 
-One could argue that it is impossible to write an implementation for `createFoo`, and that would be true. But then it is also impossible to write Zustand's `create...`. However, Zustand exists.
+One could argue that it is impossible to write an implementation for `createFoo`, and that would be true. But then it is also impossible to write Zustand's `create(...)`. However, Zustand exists.
 
 The thing is Zustand is lying in its type. The simplest way to prove it is by showing unsoundness. Consider this example:
 
