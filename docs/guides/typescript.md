@@ -132,7 +132,7 @@ const useBearStore = create(
 ```
 
 <details>
-  <summary>Be careful</summary>
+  <summary>Be a little careful</summary>
 
   <br/>
 
