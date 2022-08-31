@@ -222,8 +222,8 @@ const Component = () => {
 
 ### State Model
 
-There is a major difference between Zustand and Valtio. Zustand is based on the
-immutable state model, while Valtio is based on the mutable state model.
+There is a major differences between Zustand and Valtio. Zustand is based on
+the immutable state model, while Valtio is based on the mutable state model.
 
 ```ts
 import create from 'zustand'
