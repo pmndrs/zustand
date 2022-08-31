@@ -4,14 +4,18 @@ description:
 nav: 2
 ---
 
-## Redux
+Zustand is one of many state management libraries for React. On this page we
+will discuss Zustand in comparison to some of these libraries, including Redux,
+Valtio, Jotai, and Recoil.
 
-Zustand and Redux are state management libraries for React. Here are some
-differences between these two libraries.
+Each library has its own strengths and weaknesses, and we will compare key
+differences and similarities between each.
+
+## Redux
 
 ### State Model
 
-There are no big difference between Zustand and Redux. Both are base on
+There are no big differences between Zustand and Redux. Both are based on
 immutable state model. Also, Redux needs to wrap you app in context providers.
 
 ```ts
@@ -94,10 +98,32 @@ const countReducer = (state: State, action: Action) => {
 const countStore = createStore(countReducer)
 ```
 
+```ts
+import { createSlice, configureStore } from '@reduxjs/toolkit'
+
+const countSlice = createSlice({
+  name: 'count',
+  initialState: { value: 0 },
+  reducers: {
+    incremented: (state, qty: number) => {
+      // Redux Toolkit does not mutate the state, it use Immer library behind
+      // scenes allow us to have something called "draft state".
+      state.value += qty
+    },
+    decremented: (state, qty: number) => {
+      state.value -= qty
+    },
+  },
+})
+
+const countStore = configureStore({ reducer: countSlice.reducer })
+```
+
 ### Render Optimization
 
-There are no difference between Zustand and Redux. In both you need to do manual
-render optimizations through selectors.
+When it comes to render optimizations within your app, there are no major
+differences in approach between Zustand and Redux. In both libraries it is
+recommended that you manually apply render optimizations by using selectors.
 
 ```ts
 import create from 'zustand'
@@ -158,10 +184,41 @@ const Component = () => {
 }
 ```
 
-## Valtio
+```ts
+import { useSelector } from 'react-redux'
+import type { TypedUseSelectorHook } from 'react-redux'
+import { createSlice, configureStore } from '@reduxjs/toolkit'
 
-Zustand and Valtio are state management libraries for React. Here are some
-differences between these two libraries.
+const countSlice = createSlice({
+  name: 'count',
+  initialState: { value: 0 },
+  reducers: {
+    incremented: (state, qty: number) => {
+      // Redux Toolkit does not mutate the state, it use Immer library behind
+      // scenes allow us to have something called "draft state".
+      state.value += qty
+    },
+    decremented: (state, qty: number) => {
+      state.value -= qty
+    },
+  },
+})
+
+const countStore = configureStore({ reducer: countSlice.reducer })
+
+const useAppSelector: TypedUseSelectorHook<typeof countStore.getState> =
+  useSelector
+
+const useAppDispatch: () => typeof countStore.dispatch = useDispatch
+
+const Component = () => {
+  const count = useAppSelector((state) => state.count.value)
+  const dispatch = useAppDispatch()
+  // ...
+}
+```
+
+## Valtio
 
 ### State Model
 
@@ -186,9 +243,9 @@ state.obj.count += 1
 
 ### Render Optimization
 
-The other difference between Zustand and Valtio is: Valtio makes render
-optimizations through property access. But, with Zustand you need to do manual
-render optimizations through selectors.
+The other difference between Zustand and Valtio is Valtio makes render
+optimizations through property access. While Zustand it is recommended that you
+manually apply render optimizations by using selectors.
 
 ```ts
 import create from 'zustand'
@@ -218,14 +275,13 @@ const Component = () => {
 
 ## Jotai
 
-Zustand and Jotai are state management libraries for React. Here are some
-differences between these two libraries.
-
 ### State Model
 
-There is a major difference between Zustand and Jotai. Zustand is a single
-store, while Jotai consits of primitive atoms and allows composing them
-together.
+There are two major difference between Zustand and Jotai. The first one is
+Zustand is a single store, while Jotai consists of primitive atoms and allows
+composing them together. The last one is Zustand store is global in memory, but
+Jotai atoms are not (are difinitions that do not hold values) and that's why
+you can use it outside React.
 
 ```ts
 import create from 'zustand'
@@ -285,9 +341,6 @@ const Component = () => {
 ```
 
 ## Recoil
-
-Zustand and Recoil are state management libraries for React. Here are some
-differences between these two libraries.
 
 ### State Model
 
