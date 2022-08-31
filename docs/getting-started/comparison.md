@@ -280,7 +280,7 @@ const Component = () => {
 There are two major differences between Zustand and Jotai. The first one is
 Zustand is a single store, while Jotai consists of primitive atoms and allows
 composing them together. The last one is Zustand store is global in memory, but
-Jotai atoms are not (are difinitions that do not hold values) and that's why
+Jotai atoms are not (are definitions that do not hold values) and that's why
 you can use it outside React.
 
 ```ts
