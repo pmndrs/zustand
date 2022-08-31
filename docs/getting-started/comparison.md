@@ -222,7 +222,7 @@ const Component = () => {
 
 ### State Model
 
-There is a major differences between Zustand and Valtio. Zustand is based on
+There is a major difference between Zustand and Valtio. Zustand is based on
 the immutable state model, while Valtio is based on the mutable state model.
 
 ```ts
@@ -277,11 +277,11 @@ const Component = () => {
 
 ### State Model
 
-There are two major difference between Zustand and Jotai. The first one is
+There are two major differences between Zustand and Jotai. The first one is
 Zustand is a single store, while Jotai consists of primitive atoms and allows
 composing them together. The last one is Zustand store is global in memory, but
 Jotai atoms are not (are difinitions that do not hold values) and that's why
-you can not use it outside React.
+you can use it outside React.
 
 ```ts
 import create from 'zustand'
