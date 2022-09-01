@@ -61,7 +61,7 @@ Here again, `x` is `unknown` instead of `string`.
 In some sense this inference failure is not a problem because value of type `<T>(f: (t: T) => T) => T` cannot be written. That is to say you can't write the real runtime implementation of `createFoo`. Let's try it...
 
 ```js
-const createFoo = f => f(/* ? */)
+const createFoo = (f) => f(/* ? */)
 ```
 
 `createFoo` needs to return the returned value of `f`. And to do that we first have to call `f`. And to call it we have to pass a value of type `T`. And to pass a value of type `T` we first have to produce it. But how can we produce a value of type `T` when we don't even know what is `T`? The only way to produce a value of type `T` is to call `f` but then to call `f` itself we need a value of type `T`. So you see it's impossible to actually write `createFoo`.
@@ -83,7 +83,8 @@ This code compiles. But when we run it, we'll get an exception: "Uncaught TypeEr
 And of course Zustand failed because it's impossible to implement `create` the way types promise (in the same way it's impossible to implement `createFoo`). In other words we don't have a type to express the actual `create` we have implemented. We can't type `get` as `() => T | undefined` because it would cause inconveince and it still won't be correct as `get` is indeed `() => T` eventually just if called synchronously it would be `() => undefined`. What we need is some kind of TypeScript feature that allows us to type `get` as `(() => T) | WhenSync<() => undefined>`, which of course is extremly far-fetched.
 
 So we have two problems: lack of inference and unsoundness. Lack of inference can be solved if TypeScript can improves its inference for invariants. Unsoundness can be solved if TypeScript introduces something like `WhenSync`. To work around lack of inference we manually annotate the state type. And we can't work around unsoundness, but it's not a big deal because it's not much, calling `get` synchronously anyway doesn't make sense.
-    </details>
+</details>
+
 </details>
 
 <details>
