@@ -61,7 +61,7 @@ There is another option with [optics-ts](https://github.com/akheron/optics-ts/):
     set(O.modify(O.optic<State>().path("deep.nested.obj.count"))((c) => c + 1)),
 ```
 
-Unlike immer, optics-ts does not use proxies or mutation syntax.
+Unlike immer, optics-ts doesn't use proxies or mutation syntax.
 
 ## With ramda
 
