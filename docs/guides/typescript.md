@@ -58,7 +58,7 @@ Here again, `x` is `unknown` instead of `string`.
   <details>
     <summary>More about the inference</summary><br>
     
-In some sense this inference failure is not a problem because value of type `<T>(f: (t: T) => T) => T` cannot be written. That is to say you can't write the real runtime implementation of `createFoo`. Let's try it...
+In some sense this inference failure is not a problem because a value of type `<T>(f: (t: T) => T) => T` cannot be written. That is to say you can't write the real runtime implementation of `createFoo`. Let's try it...
 
 ```js
 const createFoo = (f) => f(/* ? */)
