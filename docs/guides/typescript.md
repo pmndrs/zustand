@@ -78,7 +78,7 @@ const useBoundStore = create<{ foo: number }>()((_, get) => ({
 }))
 ```
 
-This code compiles. But when we run it, we'll get an exception: "Uncaught TypeError: Cannot read properties of undefined (reading 'foo')". This is because `get` would return `undefined` before the initial state is created (hence you shouldn't call `get` when creating the initial state). The types promise `get` will never return `undefined` but it does initially, which means Zustand failed to implement it.
+This code compiles. But if we run it, we'll get an exception: "Uncaught TypeError: Cannot read properties of undefined (reading 'foo')". This is because `get` would return `undefined` before the initial state is created (hence you shouldn't call `get` when creating the initial state). The types promise `get` will never return `undefined` but it does initially, which means Zustand failed to implement it.
 
 And of course Zustand failed because it's impossible to implement `create` the way types promise (in the same way it's impossible to implement `createFoo`). In other words we don't have a type to express the actual `create` we have implemented. We can't type `get` as `() => T | undefined` because it would cause inconveince and it still won't be correct as `get` is indeed `() => T` eventually just if called synchronously it would be `() => undefined`. What we need is some kind of TypeScript feature that allows us to type `get` as `(() => T) | WhenSync<() => undefined>`, which of course is extremly far-fetched.
 
