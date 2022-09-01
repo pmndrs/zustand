@@ -148,7 +148,7 @@ Note that we don't use the curried version when using `combine` because `combine
 
 ## Using middlewares
 
-You don't have to do anything special to use middlewares in TypeScript.
+You do not have to do anything special to use middlewares in TypeScript.
 
 ```ts
 import create from 'zustand'
@@ -401,4 +401,4 @@ If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice
 - `immer` — `["zustand/immer", never]`
 - `subscribeWithSelector` — `["zustand/subscribeWithSelector", never]`
 - `redux` — `["zustand/redux", YourAction]`
-- `combine` — no mutator as `combine` doesn't mutate the store
+- `combine` — no mutator as `combine` does not mutate the store
