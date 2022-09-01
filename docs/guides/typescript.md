@@ -44,20 +44,31 @@ const x = create((get) => ({
 // }
 ```
 
-Here, if you look at the type of `f` in `create`, i.e. `(get: () => T) => T`, it returns `T`. However, it also "takes" `T` via `get`. Typescript wonders where `T` comes from, like that chicken or egg problem. At the end TypeScript, gives up and infers `T` as `unknown`.
+Here, if you look at the type of `f` in `create`, i.e. `(get: () => T) => T`, it "gives" `T` via return (making it covariant), but it also "takes" `T` via `get` (making it contravariant). "So where does `T` come from?" TypeScript wonders. It's like that chicken or egg problem. At the end TypeScript, gives up and infers `T` as `unknown`.
 
-So, as long as the generic to be inferred is invariant, TypeScript will be unable to infer it. Another simple example would be this:
+So, as long as the generic to be inferred is invariant (i.e. both covariant and contravariant), TypeScript will be unable to infer it. Another simple example would be this:
 
 ```ts
-declare const createFoo: <T>(f: (t: T) => T) => T
+const createFoo = {} as <T>(f: (t: T) => T) => T
 const x = createFoo((_) => 'hello')
 ```
 
 Here again, `x` is `unknown` instead of `string`.
 
-One could argue that it is impossible to write an implementation for `createFoo`, and that would be true. But then it is also impossible to write Zustand's `create(...)`. However, Zustand exists.
+  <details>
+    <summary>More about the inference</summary><br>
+    
+In some sense this inference failure is not a problem because value of type `<T>(f: (t: T) => T) => T` cannot be written. That is to say you can't write the real runtime implementation of `createFoo`. Let's try it...
 
-The thing is Zustand is lying in its type. The simplest way to prove it is by showing unsoundness. Consider this example:
+```js
+const createFoo = f => f(/* ? */)
+```
+
+`createFoo` needs to return the returned value of `f`. And to do that we first have to call `f`. And to call it we have to pass a value of type `T`. And to pass a value of type `T` we first have to produce it. But how can we produce a value of type `T` when we don't even know what is `T`? The only way to produce a value of type `T` is to call `f` but then to call `f` itself we need a value of type `T`. So you see it's impossible to actually write `createFoo`.
+
+So what we're saying is, the inference failure in case of `createFoo` is not a problem because it's impossible to implement `createFoo`. But what about the inference failure in case of `create`? That also is not a problem because it's impossible to implement `create too`. Wait a minute, if it's impossible to implement `create` then how does Zustand implement it? The answer is, it doesn't.
+
+Zustand lies that it implemented `create`'s type, it implemented only the most part of it. Here's a simple proof by showing unsoundness. Consider the following code:
 
 ```ts
 import create from 'zustand/vanilla'
@@ -67,10 +78,12 @@ const useBoundStore = create<{ foo: number }>()((_, get) => ({
 }))
 ```
 
-This code compiles. However, you will get an exception when you run it: "Uncaught TypeError: Cannot read properties of undefined (reading 'foo')". This is because `get` would return `undefined` before the initial state is created (hence you should not call `get` when creating the initial state). But the types tell that get is `() => { foo: number }`, which is exactly the lie I was taking about. That value is eventually `get`, but first it is `() => undefined`.
+This code compiles. But when we run it, we'll get an exception: "Uncaught TypeError: Cannot read properties of undefined (reading 'foo')". This is because `get` would return `undefined` before the initial state is created (hence you shouldn't call `get` when creating the initial state). The types promise `get` will never return `undefined` but it does initially, which means Zustand failed to implement it.
 
-Long story short, Zustand has a strange runtime behavior that can not be typed in a sound and inferrable way. We could make it inferrable with the right TypeScript features. However, those do not exist yet. And the strange behaviour is not a problem.
+And of course Zustand failed because it's impossible to implement `create` the way types promise (in the same way it's impossible to implement `createFoo`). In other words we don't have a type to express the actual `create` we have implemented. We can't type `get` as `() => T | undefined` because it would cause inconveince and it still won't be correct as `get` is indeed `() => T` eventually just if called synchronously it would be `() => undefined`. What we need is some kind of TypeScript feature that allows us to type `get` as `(() => T) | WhenSync<() => undefined>`, which of course is extremly far-fetched.
 
+So we have two problems: lack of inference and unsoundness. Lack of inference can be solved if TypeScript can improves its inference for invariants. Unsoundness can be solved if TypeScript introduces something like `WhenSync`. To work around lack of inference we manually annotate the state type. And we can't work around unsoundness, but it's not a big deal because it's not much, calling `get` synchronously anyway doesn't make sense.
+    </details>
 </details>
 
 <details>
