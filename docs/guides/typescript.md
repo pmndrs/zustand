@@ -5,7 +5,7 @@ nav: 9
 
 ## Basic usage
 
-The difference when using TypeScript is that instead of typing `create(...)`, you have to type `create<T>()(...)`. `T` would have a type of the state to annotate it. For example:
+The difference when using TypeScript is that instead of writing `create(...)`, you have to write `create<T>()(...)` where `T` is the type of the state to annotate it. For example:
 
 ```ts
 import create from 'zustand'
@@ -22,7 +22,7 @@ const useBearStore = create<BearState>()((set) => ({
 ```
 
 <details>
-  <summary>Why can we not simply infer the type from the initial state?</summary>
+  <summary>Why can't we simply infer the type from the initial state?</summary>
 
   <br/>
 
@@ -44,9 +44,9 @@ const x = create((get) => ({
 // }
 ```
 
-Here, if you look at the type of `f` in `create`, i.e. `(get: () => T) => T`, it returns `T`. However, it also "takes" `T` via `get`. Typescript wonders where `T` comes from, like that chicken or egg problem. At the end TypeScript, gives up and infers `T` as `unknown`.
+Here, if you look at the type of `f` in `create`, i.e. `(get: () => T) => T`, it "gives" `T` via return (making it covariant), but it also "takes" `T` via `get` (making it contravariant). "So where does `T` come from?" TypeScript wonders. It's like that chicken or egg problem. At the end TypeScript, gives up and infers `T` as `unknown`.
 
-So, as long as the generic to be inferred is invariant, TypeScript will be unable to infer it. Another simple example would be this:
+So, as long as the generic to be inferred is invariant (i.e. both covariant and contravariant), TypeScript will be unable to infer it. Another simple example would be this:
 
 ```ts
 declare const createFoo: <T>(f: (t: T) => T) => T
@@ -55,7 +55,7 @@ const x = createFoo((_) => 'hello')
 
 Here again, `x` is `unknown` instead of `string`.
 
-One could argue that it is impossible to write an implementation for `createFoo`, and that would be true. But then it is also impossible to write Zustand's `create(...)`. However, Zustand exists.
+One could argue that it is impossible to write an implementation for `createFoo`, and that would be true. But then it is also impossible to write Zustand's `create` as a type. However, Zustand exists. So what do we mean by that?
 
 The thing is Zustand is lying in its type. The simplest way to prove it is by showing unsoundness. Consider this example:
 
@@ -67,9 +67,9 @@ const useBoundStore = create<{ foo: number }>()((_, get) => ({
 }))
 ```
 
-This code compiles. However, you will get an exception when you run it: "Uncaught TypeError: Cannot read properties of undefined (reading 'foo')". This is because `get` would return `undefined` before the initial state is created (hence you should not call `get` when creating the initial state). But the types tell that get is `() => { foo: number }`, which is exactly the lie I was taking about. That value is eventually `get`, but first it is `() => undefined`.
+This code compiles. However, you will get an exception when you run it: "Uncaught TypeError: Cannot read properties of undefined (reading 'foo')". This is because `get` would return `undefined` before the initial state is created (hence you shouldn't call `get` when creating the initial state). But the types tell that `get` is of type `() => { foo: number }`, which is exactly the lie I was taking about. The type of `get` is eventually that, but first it is `() => undefined`.
 
-Long story short, Zustand has a strange runtime behavior that can not be typed in a sound and inferrable way. We could make it inferrable with the right TypeScript features. However, those do not exist yet. And the strange behaviour is not a problem.
+Long story short, Zustand has a bit type-theoretically wild runtime behavior, which can't be typed in a sound and inferrable way with the currently available TypeScript features. To workaround the lack of inferrence, we provide the state type via a type parameter, and the tiny bit of unsoundness isn't a problem.
 
 </details>
 
@@ -93,7 +93,7 @@ const main = async () => {
 }
 ```
 
-Here, `T` is inferred to be a `string` and `E` is inferred to be `unknown`. You might want to annotate `E` as `Foo`, because you are certain of the shape of error `doSomething()` would throw. However, you can not do that. You can either pass all generics or none. Along with annotating `E` as `Foo`, you will also have to annotate `T` as `string` even though it gets inferred anyway. The solution is to make a curried version of `withError` that does nothing at runtime. Its purpose is to just allow you annotate `E`.
+Here, `T` is inferred to be a `string` and `E` is inferred to be `unknown`. You might want to annotate `E` as `Foo`, because you are certain of the shape of error `doSomething()` would throw. However, you can't do that. You can either pass all generics or none. Along with annotating `E` as `Foo`, you will also have to annotate `T` as `string` even though it gets inferred anyway. The solution is to make a curried version of `withError` that does nothing at runtime. Its purpose is to just allow you annotate `E`.
 
 ```ts
 declare const withError: {
@@ -136,15 +136,15 @@ const useBearStore = create(
 
   <br/>
 
-We achieve the inference by lying a little in the types of `set`, `get`, and `store` that you receive as parameters. The lie is that they are typed as if the state is the first parameter. In fact, the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. For example, `get` from the second parameter has type `() => { bears: number }` and that is a lie as it should be `() => { bears: number, increase: (by: number) => void }`. And `useBearStore` still has the correct type; for example, `useBearStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
+We achieve the inference by lying a little in the types of `set`, `get`, and `store` that you receive as parameters. The lie is that they're typed as if the state is the first parameter, when in fact the state is the shallow-merge (`{ ...a, ...b }`) of both first parameter and the second parameter's return. For example, `get` from the second parameter has type `() => { bears: number }` and that is a lie as it should be `() => { bears: number, increase: (by: number) => void }`. And `useBearStore` still has the correct type; for example, `useBearStore.getState` is typed as `() => { bears: number, increase: (by: number) => void }`.
 
-It is technically not lie because `{ bears: number }` is still a subtype of `{ bears: number, increase: (by: number) => void }`. Therefore, there will be no problem in most cases. You should just be careful while using replace. For example, `set({ bears: 0 }, true)` would compile but will be incorrect as it will delete the `increase` function. If you set from "outside" i.e. `useBearStore.setState({ bears: 0 }, true)` then it will not compile because the "outside" store knows that `increase` is missing. Another instance where you should be careful is if you use `Object.keys`. `Object.keys(get())` will return `["bears", "increase"]` and not `["bears"]` (the return type of `get` can make you fall for this).
+It isn't really a lie because `{ bears: number }` is still a subtype of `{ bears: number, increase: (by: number) => void }`. Therefore, there will be no problem in most cases. You should just be careful while using replace. For example, `set({ bears: 0 }, true)` would compile but will be unsound as it will delete the `increase` function. Another instance where you should be careful is if you use `Object.keys`. `Object.keys(get())` will return `["bears", "increase"]` and not `["bears"]`. The return type of `get` can make you fall for these mistakes.
 
 `combine` trades off a little type-safety for the convenience of not having to write a type for state. Hence, you should use `combine` accordingly. It is fine in most cases and you can use it conveniently.
 
 </details>
 
-Note that we do not use the curried version when using `combine` because `combine` "creates" the state. When using a middleware that creates the state, it is not necessary to use the curried version because the state now can be inferred. Another middleware that creates state is `redux`. So when using `combine`, `redux`, or any other custom middleware that creates the state, we do not recommend using the curried version.
+Note that we don't use the curried version when using `combine` because `combine` "creates" the state. When using a middleware that creates the state, it isn't necessary to use the curried version because the state now can be inferred. Another middleware that creates state is `redux`. So when using `combine`, `redux`, or any other custom middleware that creates the state, we don't recommend using the curried version.
 
 ## Using middlewares
 
@@ -190,7 +190,7 @@ const useBearStore = create<BearState>()(
 )
 ```
 
-Also, we recommend using `devtools` middleware as an argument, rather than passing arguments to it. For example, when you use it with `immer` as a middleware, it should be `immer(devtools(...))` and not `devtools(immer(...))`. This is because`devtools` mutates the `setState` and adds a type parameter on it, which could get lost if other middlewares (like `immer`) mutates `setState` before `devtools`.
+Also, we recommend using `devtools` middleware as last as possible. For example, when you use it with `immer` as a middleware, it should be `immer(devtools(...))` and not `devtools(immer(...))`. This is because`devtools` mutates the `setState` and adds a type parameter on it, which could get lost if other middlewares (like `immer`) also mutate `setState` before `devtools`. Hence using `devtools` at the end makes sure that no middlewares mutate `setState` before it.
 
 ## Authoring middlewares and advanced usage
 
@@ -210,13 +210,13 @@ console.log(useBearStore.foo.toUpperCase())
 
 Zustand middlewares can mutate the store. But how could we possibly encode the mutation on the type-level? That is to say how could do we type `foo` so that this code compiles?
 
-For a usual statically typed language, this is impossible. However, with TypeScript, Zustand has something called a "higher kind mutator" that makes this possible. If you are dealing with complex type problems, like typing a middleware or using the `StateCreator` type, you will have to understand this implementation detail. For this, you can [check out #710](https://github.com/pmndrs/zustand/issues/710).
+For a usual statically typed language, this is impossible. But thanks to TypeScript, Zustand has something called a "higher-kinded mutator" that makes this possible. If you are dealing with complex type problems, like typing a middleware or using the `StateCreator` type, you will have to understand this implementation detail. For this, you can [check out #710](https://github.com/pmndrs/zustand/issues/710).
 
 If you are eager to know what the answer is to this particular problem then you can [see it here](#middleware-that-changes-the-store-type).
 
 ## Common recipes
 
-### Middleware that does not change the store type
+### Middleware that doesn't change the store type
 
 ```ts
 import create, { State, StateCreator, StoreMutatorIdentifier } from 'zustand'
@@ -328,7 +328,7 @@ console.log(useBearStore.foo.toUpperCase())
 
 ### `create` without curried workaround
 
-The recommended way to use `create` is using the curried workaround like so: `create<T>()(...)`. This is because it enables you to infer the store type. But if for some reason you do not want to use the workaround, you can pass the type parameters like the following. Note that in some cases, this acts as an assertion instead of annotation, so we do not recommend it.
+The recommended way to use `create` is using the curried workaround like so: `create<T>()(...)`. This is because it enables you to infer the store type. But if for some reason you do not want to use the workaround, you can pass the type parameters like the following. Note that in some cases, this acts as an assertion instead of annotation, so we don't recommend it.
 
 ```ts
 import create from "zustand"
