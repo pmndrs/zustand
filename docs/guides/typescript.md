@@ -66,7 +66,7 @@ const createFoo = (f) => f(/* ? */)
 
 `createFoo` needs to return the returned value of `f`. And to do that we first have to call `f`. And to call it we have to pass a value of type `T`. And to pass a value of type `T` we first have to produce it. But how can we produce a value of type `T` when we don't even know what is `T`? The only way to produce a value of type `T` is to call `f` but then to call `f` itself we need a value of type `T`. So you see it's impossible to actually write `createFoo`.
 
-So what we're saying is, the inference failure in case of `createFoo` is not a problem because it's impossible to implement `createFoo`. But what about the inference failure in case of `create`? That also is not a problem because it's impossible to implement `create too`. Wait a minute, if it's impossible to implement `create` then how does Zustand implement it? The answer is, it doesn't.
+So what we're saying is, the inference failure in case of `createFoo` is not a problem because it's impossible to implement `createFoo`. But what about the inference failure in case of `create`? That also is not a problem because it's impossible to implement `create` too. Wait a minute, if it's impossible to implement `create` then how does Zustand implement it? The answer is, it doesn't.
 
 Zustand lies that it implemented `create`'s type, it implemented only the most part of it. Here's a simple proof by showing unsoundness. Consider the following code:
 
