@@ -340,7 +340,7 @@ const dispatch = useStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Try [this](https://codesandbox.io/s/amazing-kepler-swxol) example.
+Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api.
 
 ```jsx
 import { redux } from 'zustand/middleware'

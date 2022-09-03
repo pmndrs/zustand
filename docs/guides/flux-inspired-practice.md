@@ -19,7 +19,7 @@ const useBoundStore = create((set) => ({
 }))
 ```
 
-See [Splitting the store into separate slices](./typescript.md#slices-pattern) for how to define a store with separate slices.
+See [Splitting the store into separate slices](/zustand/guides/typescript#slices-pattern) for how to define a store with separate slices.
 
 ## Flux like patterns / "dispatching" actions
 
@@ -46,7 +46,7 @@ const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-You could also use our redux-middleware. It wires up your main reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Check [this example](https://codesandbox.io/s/amazing-kepler-swxol).
+You could also use our redux-middleware. It wires up your main reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api.
 
 ```typescript
 import { redux } from 'zustand/middleware'
