@@ -44,7 +44,7 @@ function createContext<S extends StoreApi<unknown>>() {
     )
   }
 
-  const useBoundStore = (<StateSlice = ExtractState<S>>(
+  const useContextStore: UseContextStore<S> = <StateSlice = ExtractState<S>>(
     selector?: (state: ExtractState<S>) => StateSlice,
     equalityFn?: (a: StateSlice, b: StateSlice) => boolean
   ) => {
@@ -59,7 +59,7 @@ function createContext<S extends StoreApi<unknown>>() {
       selector as (state: ExtractState<S>) => StateSlice,
       equalityFn
     )
-  }) as UseContextStore<S>
+  }
 
   const useStoreApi = () => {
     const store = useContext(ZustandContext)
@@ -68,21 +68,12 @@ function createContext<S extends StoreApi<unknown>>() {
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
-    return useMemo(
-      () =>
-        ({
-          getState: store.getState,
-          setState: store.setState,
-          subscribe: store.subscribe,
-          destroy: store.destroy,
-        } as WithoutCallSignature<S>),
-      [store]
-    )
+    return useMemo<WithoutCallSignature<S>>(() => ({ ...store }), [store])
   }
 
   return {
     Provider,
-    useStore: useBoundStore,
+    useStore: useContextStore,
     useStoreApi,
   }
 }
