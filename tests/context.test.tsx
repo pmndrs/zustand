@@ -1,6 +1,7 @@
 import {
   Component as ClassComponent,
   ReactNode,
+  StrictMode,
   useCallback,
   useEffect,
   useState,
@@ -36,9 +37,11 @@ it('creates and uses context store', async () => {
   }
 
   const { findByText } = render(
-    <Provider createStore={createStore}>
-      <Counter />
-    </Provider>
+    <>
+      <Provider createStore={createStore}>
+        <Counter />
+      </Provider>
+    </>
   )
 
   await findByText('count: 1')
@@ -61,9 +64,11 @@ it('uses context store with selectors', async () => {
   }
 
   const { findByText } = render(
-    <Provider createStore={createStore}>
-      <Counter />
-    </Provider>
+    <>
+      <Provider createStore={createStore}>
+        <Counter />
+      </Provider>
+    </>
   )
 
   await findByText('count: 1')
@@ -105,9 +110,11 @@ it('uses context store api', async () => {
   }
 
   const { findByText } = render(
-    <Provider createStore={createStore}>
-      <Counter />
-    </Provider>
+    <>
+      <Provider createStore={createStore}>
+        <Counter />
+      </Provider>
+    </>
   )
 
   await findByText('count: 1')
@@ -139,9 +146,11 @@ it('throws error when not using provider', async () => {
   }
 
   const { findByText } = render(
-    <ErrorBoundary>
-      <Component />
-    </ErrorBoundary>
+    <StrictMode>
+      <ErrorBoundary>
+        <Component />
+      </ErrorBoundary>
+    </StrictMode>
   )
   await findByText('errored')
 })

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { act, render, waitFor } from '@testing-library/react'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -73,7 +73,11 @@ describe('persist middleware with async configuration', () => {
       )
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 0, name: empty')
     await findByText('count: 42, name: test-storage')
@@ -107,7 +111,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 0')
     await waitFor(() => {
@@ -141,7 +149,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
     await findByText('count: 0')
     await waitFor(() => {
       expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
@@ -166,7 +178,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText: findByText2 } = render(<Counter2 />)
+    const { findByText: findByText2 } = render(
+      <StrictMode>
+        <Counter2 />
+      </StrictMode>
+    )
     await findByText2('count: 42')
     await waitFor(() => {
       expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
@@ -203,7 +219,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 0')
     await findByText('count: 99')
@@ -261,7 +281,11 @@ describe('persist middleware with async configuration', () => {
       )
     }
 
-    const { findByText } = render(<Component />)
+    const { findByText } = render(
+      <StrictMode>
+        <Component />
+      </StrictMode>
+    )
 
     await findByText('count: 42')
     await findByText('name: test')
@@ -301,7 +325,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 0')
     await waitFor(() => {
@@ -341,7 +369,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 0')
     await waitFor(() => {
@@ -380,7 +412,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 0')
     await waitFor(() => {
@@ -428,7 +464,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 1')
     expect(useBoundStore.getState()).toEqual({
@@ -464,7 +504,11 @@ describe('persist middleware with async configuration', () => {
       return <div>count: {count}</div>
     }
 
-    const { findByText } = render(<Counter />)
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
 
     await findByText('count: 1')
     expect(useBoundStore.getState()).toEqual({
