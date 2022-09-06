@@ -543,7 +543,7 @@ const hashStorage: StateStorage = {
     searchParams.delete(key)
     location.hash = searchParams.toString()
   },
-};
+}
 
 export const useBoundStore = create(
   persist(
@@ -554,8 +554,8 @@ export const useBoundStore = create(
     {
       name: 'food-storage', // unique name
       getStorage: () => hashStorage,
-    },
-  ),
+    }
+  )
 )
 ```
 
