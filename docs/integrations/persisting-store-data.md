@@ -519,46 +519,6 @@ export const useBoundStore = create(
 )
 ```
 
-### How can I connect state to URL hash.
-
-If you want to connect store to URL hash, you can create your own hash storage.
-
-```ts
-import create from 'zustand'
-import { persist, StateStorage } from 'zustand/middleware'
-
-const hashStorage: StateStorage = {
-  getItem: (key): string => {
-    const searchParams = new URLSearchParams(location.hash.slice(1))
-    const storedValue = searchParams.get(key)
-    return JSON.parse(storedValue)
-  },
-  setItem: (key, newValue): void => {
-    const searchParams = new URLSearchParams(location.hash.slice(1))
-    searchParams.set(key, JSON.stringify(newValue))
-    location.hash = searchParams.toString()
-  },
-  removeItem: (key): void => {
-    const searchParams = new URLSearchParams(location.hash.slice(1))
-    searchParams.delete(key)
-    location.hash = searchParams.toString()
-  },
-}
-
-export const useBoundStore = create(
-  persist(
-    (set, get) => ({
-      fishes: 0,
-      addAFish: () => set({ fishes: get().fishes + 1 }),
-    }),
-    {
-      name: 'food-storage', // unique name
-      getStorage: () => hashStorage,
-    }
-  )
-)
-```
-
 ### How can I rehydrate on storage event?
 
 You can use the `persist` api to create your own implementation, similar to what we see below
