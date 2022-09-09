@@ -92,12 +92,6 @@ type TakeTwo<T> = T extends []
   ? [...a0: T, a1: undefined]
   : T extends [unknown?]
   ? [...a0: T, a1: undefined]
-  : T extends [unknown, unknown]
-  ? T
-  : T extends [unknown, unknown?]
-  ? T
-  : T extends [unknown?, unknown?]
-  ? T
   : T extends [infer A0, infer A1, ...unknown[]]
   ? [A0, A1]
   : T extends [infer A0, (infer A1)?, ...unknown[]]
