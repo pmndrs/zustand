@@ -18,18 +18,14 @@ declare module '../vanilla' {
 }
 
 type Write<T, U> = Omit<T, keyof U> & U
-type SkipTwo<T> = T extends []
-  ? []
-  : T extends [unknown]
-  ? []
-  : T extends [unknown?]
-  ? []
-  : T extends [unknown, unknown, ...infer A]
+type SkipTwo<T> = T extends [unknown, unknown, ...infer A]
   ? A
   : T extends [unknown, unknown?, ...infer A]
   ? A
   : T extends [unknown?, unknown?, ...infer A]
   ? A
+  : T extends unknown[]
+  ? []
   : never
 
 type WithImmer<S> = Write<S, StoreImmer<S>>
