@@ -1,4 +1,7 @@
-# 3rd Party Libraries
+---
+title: 3rd Party Libraries
+nav: 14
+---
 
 Zustand provides bear necessities for state management which is great for most projects; however, some users wish to extend the library's feature set. This can be done using 3rd-party libraries created by the community.
 

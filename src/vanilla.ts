@@ -5,7 +5,7 @@ type SetStateInternal<T> = {
   ): void
 }['_']
 
-export interface StoreApi<T extends object = object> {
+export interface StoreApi<T> {
   setState: SetStateInternal<T>
   getState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
@@ -21,7 +21,7 @@ export type Mutate<S, Ms> = Ms extends []
   : never
 
 export type StateCreator<
-  T extends object,
+  T,
   Mis extends [StoreMutatorIdentifier, unknown][] = [],
   Mos extends [StoreMutatorIdentifier, unknown][] = [],
   U = T
@@ -37,17 +37,17 @@ export interface StoreMutators<S, A> {}
 export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
 
 type CreateStore = {
-  <T extends object, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  <T, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ): Mutate<StoreApi<T>, Mos>
 
-  <T extends object>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => Mutate<StoreApi<T>, Mos>
 }
 
 type CreateStoreImpl = <
-  T extends object,
+  T,
   Mos extends [StoreMutatorIdentifier, unknown][] = []
 >(
   initializer: StateCreator<T, [], Mos>
@@ -74,9 +74,10 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
         : partial
     if (nextState !== state) {
       const previousState = state
-      state = replace
-        ? (nextState as TState)
-        : Object.assign({}, state, nextState)
+      state =
+        replace ?? typeof nextState !== 'object'
+          ? (nextState as TState)
+          : Object.assign({}, state, nextState)
       listeners.forEach((listener) => listener(state, previousState))
     }
   }
@@ -107,9 +108,9 @@ export default createStore
 // ---------------------------------------------------------
 
 /**
- * @deprecated Use `object` instead of `State`
+ * @deprecated Use `unknown` instead of `State`
  */
-export type State = object
+export type State = unknown
 
 /**
  * @deprecated Use `Partial<T> | ((s: T) => Partial<T>)` instead of `PartialState<T>`
@@ -163,6 +164,6 @@ export type SetState<T extends State> = {
 export type GetState<T extends State> = () => T
 
 /**
- * @deprecated Use `StoreApi<T>['destroy']` instead of `GetState<T>`.
+ * @deprecated Use `StoreApi<T>['destroy']` instead of `Destroy`.
  */
 export type Destroy = () => void

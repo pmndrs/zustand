@@ -1,5 +1,75 @@
 import type {} from '@redux-devtools/extension'
-import { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
+import type { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
+
+// Copy types to avoid import type { Config } from '@redux-devtools/extension'
+// https://github.com/pmndrs/zustand/issues/1205
+type Action<T = any> = {
+  type: T
+}
+type ActionCreator<A, P extends any[] = any[]> = {
+  (...args: P): A
+}
+type EnhancerOptions = {
+  name?: string
+  actionCreators?:
+    | ActionCreator<any>[]
+    | {
+        [key: string]: ActionCreator<any>
+      }
+  latency?: number
+  maxAge?: number
+  serialize?:
+    | boolean
+    | {
+        options?:
+          | undefined
+          | boolean
+          | {
+              date?: true
+              regex?: true
+              undefined?: true
+              error?: true
+              symbol?: true
+              map?: true
+              set?: true
+              function?: true | ((fn: (...args: any[]) => any) => string)
+            }
+        replacer?: (key: string, value: unknown) => any
+        reviver?: (key: string, value: unknown) => any
+        immutable?: any
+        refs?: any
+      }
+  actionSanitizer?: <A extends Action>(action: A, id: number) => A
+  stateSanitizer?: <S>(state: S, index: number) => S
+  actionsBlacklist?: string | string[]
+  actionsWhitelist?: string | string[]
+  actionsDenylist?: string | string[]
+  actionsAllowlist?: string | string[]
+  predicate?: <S, A extends Action>(state: S, action: A) => boolean
+  shouldRecordChanges?: boolean
+  pauseActionType?: string
+  autoPause?: boolean
+  shouldStartLocked?: boolean
+  shouldHotReload?: boolean
+  shouldCatchErrors?: boolean
+  features?: {
+    pause?: boolean
+    lock?: boolean
+    persist?: boolean
+    export?: boolean | 'custom'
+    import?: boolean | 'custom'
+    jump?: boolean
+    skip?: boolean
+    reorder?: boolean
+    dispatch?: boolean
+    test?: boolean
+  }
+  trace?: boolean | (<A extends Action>(action: A) => string)
+  traceLimit?: number
+}
+type Config = EnhancerOptions & {
+  type?: string
+}
 
 declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,8 +85,7 @@ type Message = {
   state?: any
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
+type Write<T, U> = Omit<T, keyof U> & U
 type TakeTwo<T> = T extends []
   ? [undefined, undefined]
   : T extends [unknown]
@@ -37,39 +106,25 @@ type TakeTwo<T> = T extends []
   ? [A0?, A1?]
   : never
 
-type WithDevtools<S> = Write<Cast<S, object>, StoreDevtools<S>>
+type WithDevtools<S> = Write<S, StoreDevtools<S>>
 
 type StoreDevtools<S> = S extends {
-  setState: (...a: infer A) => infer Sr
+  setState: (...a: infer Sa) => infer Sr
 }
   ? {
-      setState(
-        ...a: [...a: TakeTwo<A>, actionType?: string | { type: unknown }]
+      setState<A extends string | { type: unknown }>(
+        ...a: [...a: TakeTwo<Sa>, action?: A]
       ): Sr
     }
   : never
 
-export interface DevtoolsOptions {
+export interface DevtoolsOptions extends Config {
   enabled?: boolean
   anonymousActionType?: string
-  name?: string
-  serialize?:
-    | boolean
-    | {
-        date?: boolean
-        regex?: boolean
-        undefined?: boolean
-        nan?: boolean
-        infinity?: boolean
-        error?: boolean
-        symbol?: boolean
-        map?: boolean
-        set?: boolean
-      }
 }
 
 type Devtools = <
-  T extends object,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -84,7 +139,7 @@ declare module '../vanilla' {
   }
 }
 
-type DevtoolsImpl = <T extends object>(
+type DevtoolsImpl = <T>(
   storeInitializer: PopArgument<StateCreator<T, [], []>>,
   devtoolsOptions?: DevtoolsOptions
 ) => PopArgument<StateCreator<T, [], []>>
@@ -95,7 +150,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-export type NamedSet<T extends object> = WithDevtools<StoreApi<T>>['setState']
+export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
