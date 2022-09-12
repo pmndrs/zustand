@@ -50,7 +50,9 @@ Many people use [immer](https://github.com/immerjs/immer) to update nested value
     set(produce((state: State) => { ++state.deep.nested.obj.count })),
 ```
 
-What a reduction!
+What a reduction!. [Please take note of the gotchas listed here](./gotchas.md).
+
+
 
 ## With optics-ts
 
