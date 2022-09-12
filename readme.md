@@ -15,11 +15,8 @@ Don't disregard it because it's cute. It has quite the claws, lots of time was s
 You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/examples).
 
 ```bash 
-npm installation:
 npm install zustand
-yarn installation:
 yarn add zustand
-pnpm installation:
 pnpm install zustand
 ```
 
