@@ -8,7 +8,7 @@ In cases that model [dependency injection](), such as when a store should be ini
 > **Note**: *Because the store returned by* `create` *is a hook, passing it to a context provider may violate the* [Rules of Hooks](https://reactjs.org/docs/hooks-rules.html).
 
 ## Store creator with `createStore`
----
+
 ```ts
 import { createStore } from 'zustand';
 
@@ -35,7 +35,7 @@ const createBearStore = (initProps?: Partial<BearProps>) => {
 ```
 
 ## Basic component usage
----
+
 ```tsx
 // Provider implementation
 import { useRef } from 'react';
@@ -69,7 +69,7 @@ function BasicConsumer() {
 ```
 
 ## Common patterns
----
+
 ### Wrapping the context provider
 ```tsx
 // Provider Wraper
