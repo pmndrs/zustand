@@ -1,14 +1,11 @@
 ---
-title:
+title: initialize-state-with-props
 # nav: N
 ---
 
-<!-- In cases where React.context is required for dependency injection, or when a store should be initialized from component props, the recommended approach is to use a vanilla store. -->
-
-In cases that model [dependency injection](), such as when a store should be initialized with component props, the recommended approach is to use a vanilla store with React.context.
+In cases that model [dependency injection](), such as when a store should be initialized with props from a component, the recommended approach is to use a vanilla store with React.context.
 
 > **Note**: *Because the store returned by* `create` *is a hook, passing it to a context provider may violate the* [Rules of Hooks](https://reactjs.org/docs/hooks-rules.html).
-
 
 ## Store creator with `createStore`
 ---
