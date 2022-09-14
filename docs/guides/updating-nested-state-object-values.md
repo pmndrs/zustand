@@ -1,6 +1,6 @@
 ---
 title: Updating nested state object values
-nav: 4
+nav: 3
 ---
 
 ## Deeply nested object

@@ -1,6 +1,6 @@
 ---
 title: Immutable state and merging
-nav: 5
+nav: 4
 ---
 
 Like with React's `useState`, we need to update state immutably.

@@ -1,6 +1,6 @@
 ---
 title: Persist middleware
-nav: 15
+nav: 17
 ---
 
 The persist middleware enables you to store your Zustand state in a storage (e.g. `localStorage`, `AsyncStorage`, `IndexedDB`, etc...) thus persisting it's data.

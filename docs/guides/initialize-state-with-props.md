@@ -1,6 +1,6 @@
 ---
 title: Initialize state with props
-# nav: N
+nav: 14
 ---
 
 In cases where [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) is needed, such as when a store should be initialized with props from a component, the recommended approach is to use a vanilla store with React.context.

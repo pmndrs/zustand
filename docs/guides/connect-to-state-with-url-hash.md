@@ -1,6 +1,6 @@
 ---
 title: Connect to state with URL hash
-nav: 15
+nav: 12
 ---
 
 ## State is connected with URL hash
