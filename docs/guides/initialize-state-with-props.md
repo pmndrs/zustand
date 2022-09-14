@@ -1,5 +1,5 @@
 ---
-title: initialize-state-with-props
+title: Initialize state with props
 # nav: N
 ---
 
@@ -74,7 +74,7 @@ function BasicConsumer() {
 ### Wrapping the context provider
 
 ```tsx
-// Provider Wraper
+// Provider wrapper
 import { useRef } from 'react'
 
 type BearProviderProps = React.PropsWithChildren<BearProps>
@@ -106,7 +106,7 @@ function useBearContext<T>(
 ```
 
 ```tsx
-// Consumer usage with hook
+// Consumer usage of the custom hook
 function CommonConsumer() {
   const bears = useBearContext((s) => s.bears)
   const addBear = useBearContext((s) => s.addBear)
@@ -122,7 +122,7 @@ function CommonConsumer() {
 ### Complete example
 
 ```tsx
-// Provider Wrapper usage with Hook
+// Provider wrapper & custom hook consumer
 function App2() {
   return (
     <BearProvider bears={2}>
