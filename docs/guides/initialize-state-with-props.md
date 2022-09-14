@@ -86,7 +86,7 @@ function BearProvider({ children, ...props }: BearProviderProps) {
 }
 ```
 
-### Extracting context logic into custom hook
+### Extracting context logic into a custom hook
 
 ```tsx
 // Mimic the hook returned by `create`
