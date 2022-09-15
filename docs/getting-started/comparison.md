@@ -248,7 +248,7 @@ state.obj.count += 1
 ### Render Optimization
 
 The other difference between Zustand and Valtio is Valtio makes render
-optimizations through property access. While Zustand it is recommended that you
+optimizations through property access. However, with Zustand it is recommended that you
 manually apply render optimizations by using selectors.
 
 ```ts
@@ -320,7 +320,7 @@ const countAtom = atom<number>(0)
 ### Render Optimization
 
 The other difference between Zustand and Jotai is: Jotai makes render
-optimizations through atom dependency. While Zustand it is recommended that you
+optimizations through atom dependency. However, with Zustand it is recommended that you
 manually apply render optimizations by using selectors.
 
 ```ts
@@ -396,7 +396,7 @@ const count = atom({
 ### Render Optimization
 
 The other difference between Zustand and Recoil is: Recoil makes render
-optimizations through atom dependency. While Zustand it is recommended that you
+optimizations through atom dependency. However, with Zustand it is recommended that you
 manually apply render optimizations by using selectors.
 
 ```ts
