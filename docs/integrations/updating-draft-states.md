@@ -7,7 +7,37 @@ The immer middleware enables you to use an immutable state in more convenient
 way. Also, with `Immer` you can simplify handling immutable data structures on
 `Zustand`.
 
-Quick example:
+Updating simple states
+
+```ts
+import create from 'zustand'
+import { immer } from 'zustand/middleware/immer'
+
+type State = {
+  count: number
+}
+
+type Actions = {
+  increment: (qty: number) => void
+  decrement: (qty: number) => void
+}
+
+export const useCountStore = create(
+  immer<State & Actions>((set) => ({
+    count: 0,
+    increment: (qty: number) =>
+      set((state) => {
+        state.count += qty
+      }),
+    decrement: (qty: number) =>
+      set((state) => {
+        state.count -= qty
+      }),
+  }))
+)
+```
+
+Updating a complex states
 
 ```ts
 import create from 'zustand'
@@ -20,15 +50,15 @@ interface Todo {
 }
 
 type State = {
-  todos: Todo[]
+  todos: Record<string, Todo>
 }
 
 type Actions = {
   toggleTodo: (todoId: string) => void
 }
 
-export const useTodoStore = create<State & Actions>(
-  immer((set) => ({
+export const useTodoStore = create(
+  immer<State & Actions>((set) => ({
     todos: {
       '82471c5f-4207-4b1d-abcb-b98547e01a3e': {
         id: '82471c5f-4207-4b1d-abcb-b98547e01a3e',
@@ -69,9 +99,14 @@ using `Zustand` with `Ìmmer`.
 If you are using `Immer`, make sure you are actually following the rules of
 [Immer](https://immerjs.github.io/immer/pitfalls).
 
-For example, you have to add `[immerable] = true` for 
+For example, you have to add `[immerable] = true` for
 [class objects](https://immerjs.github.io/immer/complex-objects) to work. If
 you don't to this, `Immer` will still mutate the object, but not as a proxy, so
-it will also update the current state. `Zustand` checks if the state has 
-actually changed, so since both the current state as well as the next state are 
-equal  (if you don't do it correctly), it will skip calling the subscriptions.
+it will also update the current state. `Zustand` checks if the state has
+actually changed, so since both the current state as well as the next state are
+equal (if you don't do it correctly), it will skip calling the subscriptions.
+
+## CodeSandbox Demo
+
+- Basic: https://codesandbox.io/s/zustand-updating-draft-states-basic-demo-zkp22g
+- Advanced: https://codesandbox.io/s/zustand-updating-draft-states-advanced-demo-3znqzk
