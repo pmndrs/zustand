@@ -82,7 +82,11 @@ function BearProvider({ children, ...props }: BearProviderProps) {
   if (!storeRef.current) {
     storeRef.current = createBearStore(props)
   }
-  return <BearContext.Provider value={storeRef.current} children={children} />
+  return (
+    <BearContext.Provider value={storeRef.current}>
+      {children}
+    </BearContext.Provider>
+  )
 }
 ```
 
