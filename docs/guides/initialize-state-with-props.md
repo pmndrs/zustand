@@ -35,7 +35,7 @@ const createBearStore = (initProps?: Partial<BearProps>) => {
 ## Creating a context with `React.createContext`
 
 ```ts
-import React, { createContext } from 'react'
+import { createContext } from 'react';
 
 export const BearContext = createContext<BearStore | null>(null)
 ```
