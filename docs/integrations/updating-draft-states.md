@@ -3,7 +3,7 @@ title: Immer middleware
 nav: 16
 ---
 
-The immer middleware enables you to use an immutable state in more convenient
+The immer middleware enables you to use an immutable state in a more convenient
 way. Also, with `Immer` you can simplify handling immutable data structures on
 `Zustand`.
 
@@ -92,7 +92,7 @@ export const useTodoStore = create(
 ## Gotchas
 
 On this page we can find some things that we need to keep in mind when we are
-using `Zustand` with `Ìmmer`.
+using `Zustand` with `Immer`.
 
 ### My subscriptions aren't being called
 
