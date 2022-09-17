@@ -31,6 +31,7 @@ const createBearStore = (initProps?: Partial<BearProps>) => {
   }))
 }
 ```
+
 ## Creating a context with `React.createContext`
 
 ```ts

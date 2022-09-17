@@ -68,7 +68,7 @@
     "build:shallow": "rollup -c --config-shallow",
     "build:context": "rollup -c --config-context",
     "postbuild": "yarn copy",
-    "prettier": "prettier '*.{js,json,md}' '{examples/src,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --write",
+    "prettier": "prettier \"*.{js,json,md}\" \"{examples/src,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
     "prettier:ci": "prettier '*.{js,json,md}' '{examples/src,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
     "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "eslint:ci": "eslint '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",

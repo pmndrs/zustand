@@ -93,7 +93,7 @@ So we have two problems: lack of inference and unsoundness. Lack of inference ca
 
   <br/>
 
-  **TLDR**: It is a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571).
+**TLDR**: It is a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571).
 
 Imagine you have a scenario like this:
 
