@@ -1,6 +1,6 @@
 ---
 title: v4 Migrations
-nav: 18
+nav: 19
 ---
 
 If you're not using the typed version (either via TypeScript or via JSDoc) then there are no breaking changes for you and hence no migration is needed either.

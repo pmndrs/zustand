@@ -1,6 +1,6 @@
 ---
 title: Practice with no store actions
-nav: 8
+nav: 7
 ---
 
 The recommended usage is to colocate actions and states within the store (let your actions be located together with your state).

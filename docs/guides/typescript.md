@@ -1,6 +1,6 @@
 ---
 title: TypeScript Guide
-nav: 9
+nav: 8
 ---
 
 ## Basic usage
@@ -57,7 +57,7 @@ Here again, `x` is `unknown` instead of `string`.
 
   <details>
     <summary>More about the inference (just for the people curious and interested in TypeScript)</summary>
-    
+
 In some sense this inference failure is not a problem because a value of type `<T>(f: (t: T) => T) => T` cannot be written. That is to say you can't write the real runtime implementation of `createFoo`. Let's try it:
 
 ```js
@@ -92,8 +92,8 @@ So we have two problems: lack of inference and unsoundness. Lack of inference ca
   <summary>Why that currying `()(...)`?</summary>
 
   <br/>
-  
-  **TLDR**: It is a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571).
+
+**TLDR**: It is a workaround for [microsoft/TypeScript#10571](https://github.com/microsoft/TypeScript/issues/10571).
 
 Imagine you have a scenario like this:
 
