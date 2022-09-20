@@ -1,11 +1,11 @@
 ---
 title: v4 Migrations
-nav: 17
+nav: 19
 ---
 
 If you're not using the typed version (either via TypeScript or via JSDoc) then there are no breaking changes for you and hence no migration is needed either.
 
-Also it's recommended to first read the new [TypeScript Guide](./typescript.md), it'll be easier to understand the migration.
+Also it's recommended to first read the new [TypeScript Guide](../guides/typescript.md), it'll be easier to understand the migration.
 
 In addition to this migration guide you can also check the diff of the test files in the repo from v3 to v4.
 
@@ -54,7 +54,7 @@ If you're not passing any type parameters to `create` then there is no migration
 
 ### Migration
 
-If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](https://github.com/pmndrs/zustand/blob/main/docs/typescript.md#common-recipes) sections.
+If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](../guides/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](../guides/typescript.md#common-recipes) sections.
 
 ## `PartialState` (from `zustand` and `zustand/vanilla`)
 

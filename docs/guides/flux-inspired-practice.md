@@ -1,6 +1,6 @@
 ---
 title: Flux inspired practice
-nav: 6
+nav: 5
 ---
 
 Although zustand is an unopinionated library, here are some patterns we recommend:
@@ -46,7 +46,7 @@ const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-You could also use our redux-middleware. It wires up your main reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api. Check [this example](https://codesandbox.io/s/amazing-kepler-swxol).
+You could also use our redux-middleware. It wires up your main reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api.
 
 ```typescript
 import { redux } from 'zustand/middleware'

@@ -16,7 +16,7 @@ differences and similarities between each.
 ### State Model
 
 There are no big differences between Zustand and Redux. Both are based on
-immutable state model. Also, Redux needs to wrap you app in context providers.
+immutable state model. Also, Redux needs to wrap your app in context providers.
 
 ```ts
 import create from 'zustand'
