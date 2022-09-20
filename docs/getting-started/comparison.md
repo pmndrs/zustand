@@ -248,8 +248,8 @@ state.obj.count += 1
 ### Render Optimization
 
 The other difference between Zustand and Valtio is Valtio makes render
-optimizations through property access. However, with Zustand it is recommended that you
-manually apply render optimizations by using selectors.
+optimizations through property access. However, with Zustand it is recommended
+that you manually apply render optimizations by using selectors.
 
 ```ts
 import create from 'zustand'
@@ -331,7 +331,9 @@ type State = {
 }
 
 type Actions = {
-  updateCount: (countCallback: (count: State['count']) => State['count']) => void
+  updateCount: (
+    countCallback: (count: State['count']) => State['count']
+  ) => void
 }
 
 const useCountStore = create<State & Actions>((set) => ({
