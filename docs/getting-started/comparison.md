@@ -331,7 +331,7 @@ type State = {
 }
 
 type Actions = {
-  setCount: (countCallback: (count: State['count']) => State['count']) => void
+  updateCount: (countCallback: (count: State['count']) => State['count']) => void
 }
 
 const useCountStore = create<State & Actions>((set) => ({
