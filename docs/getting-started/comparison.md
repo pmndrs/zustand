@@ -228,7 +228,11 @@ the immutable state model, while Valtio is based on the mutable state model.
 ```ts
 import create from 'zustand'
 
-const store = create(() => ({ obj: { count: 0 } }))
+type State = {
+  obj: { count: number }
+}
+
+const store = create<State>(() => ({ obj: { count: 0 } }))
 
 store.setState((prev) => ({ obj: { count: prev.obj.count + 1 } })
 ```
@@ -244,13 +248,17 @@ state.obj.count += 1
 ### Render Optimization
 
 The other difference between Zustand and Valtio is Valtio makes render
-optimizations through property access. While Zustand it is recommended that you
-manually apply render optimizations by using selectors.
+optimizations through property access. However, with Zustand it is recommended
+that you manually apply render optimizations by using selectors.
 
 ```ts
 import create from 'zustand'
 
-const useCountStore = create(() => ({
+type State = {
+  count: number
+}
+
+const useCountStore = create<State>(() => ({
   count: 0,
 }))
 
@@ -290,9 +298,15 @@ type State = {
   count: number
 }
 
-const useCountStore = create<State>((set) => ({
+type Actions = {
+  updateCount: (
+    countCallback: (count: State['count']) => State['count']
+  ) => void
+}
+
+const useCountStore = create<State & Actions>((set) => ({
   count: 0,
-  updateCount: (countCallback: (count: State['count']) => State['count']) =>
+  updateCount: (countCallback) =>
     set((state) => ({ count: countCallback(state.count) })),
 }))
 ```
@@ -306,8 +320,8 @@ const countAtom = atom<number>(0)
 ### Render Optimization
 
 The other difference between Zustand and Jotai is: Jotai makes render
-optimizations through atom dependency. But, with Zustand you need to do manual
-render optimizations through selectors.
+optimizations through atom dependency. However, with Zustand it is recommended that you
+manually apply render optimizations by using selectors.
 
 ```ts
 import create from 'zustand'
@@ -316,9 +330,15 @@ type State = {
   count: number
 }
 
-const useCountStore = create<State>((set) => ({
+type Actions = {
+  updateCount: (
+    countCallback: (count: State['count']) => State['count']
+  ) => void
+}
+
+const useCountStore = create<State & Actions>((set) => ({
   count: 0,
-  updateCount: (countCallback: (count: State['count']) => State['count']) =>
+  updateCount: (countCallback) =>
     set((state) => ({ count: countCallback(state.count) })),
 }))
 
@@ -355,9 +375,13 @@ type State = {
   count: number
 }
 
-const useCountStore = create<State>((set) => ({
+type Actions = {
+  setCount: (countCallback: (count: State['count']) => State['count']) => void
+}
+
+const useCountStore = create<State & Actions>((set) => ({
   count: 0,
-  setCount: (countCallback: (count: State['count']) => State['count']) =>
+  setCount: (countCallback) =>
     set((state) => ({ count: countCallback(state.count) })),
 }))
 ```
@@ -374,8 +398,8 @@ const count = atom({
 ### Render Optimization
 
 The other difference between Zustand and Recoil is: Recoil makes render
-optimizations through atom dependency. But, with Zustand you need to do manual
-render optimizations through selectors.
+optimizations through atom dependency. However, with Zustand it is recommended that you
+manually apply render optimizations by using selectors.
 
 ```ts
 import create from 'zustand'
@@ -384,9 +408,13 @@ type State = {
   count: number
 }
 
-const useCountStore = create<State>((set) => ({
+type Actions = {
+  setCount: (countCallback: (count: State['count']) => State['count']) => void
+}
+
+const useCountStore = create<State & Actions>((set) => ({
   count: 0,
-  setCount: (countCallback: (count: State['count']) => State['count']) =>
+  setCount: (countCallback) =>
     set((state) => ({ count: countCallback(state.count) })),
 }))
 
