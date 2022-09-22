@@ -1,9 +1,8 @@
 {
-  "name": "example",
+  "name": "demo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@babel/runtime": "^7.18.9",
     "@react-three/drei": "^9.17.1",
     "@react-three/fiber": "^8.1.0",
     "@react-three/postprocessing": "^2.4.6",
@@ -13,17 +12,19 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "three": "^0.141.0",
-    "zustand": "^3.0.0"
+    "zustand": "^4.0.0"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "build:analyze": "BUNDLE_ANALYZE=true yarn build",
-    "test": "react-app-rewired test",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
@@ -46,13 +47,9 @@
     "printWidth": 120
   },
   "devDependencies": {
-    "@react-three/babel": "^0.1.1",
-    "@testing-library/jest-dom": "^5.11.0",
-    "@testing-library/react": "^10.4.3",
-    "@testing-library/user-event": "^12.0.11",
-    "customize-cra": "^1.0.0",
-    "react-app-rewired": "^2.2.1",
-    "react-scripts": "^5.0.1",
-    "webpack-bundle-analyzer": "^4.5.0"
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react-scripts": "^5.0.1"
   }
 }

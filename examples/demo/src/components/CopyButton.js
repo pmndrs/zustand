@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef } from 'react'
 import { copyToClipboard } from '../utils/copy-to-clipboard'
 
-/* 
-Isolated logic for the entire copy functionality instead 
+/*
+Isolated logic for the entire copy functionality instead
 of a separate button component and with the added utility
 */
 export default function CopyButton({ code, ...props }) {
