@@ -1,7 +1,7 @@
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const createPersistantStore = (initialValue: string | null) => {
+const createPersistentStore = (initialValue: string | null) => {
   let state = initialValue
 
   const getItem = (): string | null => {
@@ -92,7 +92,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can persist state', () => {
-    const { storage, setItemSpy } = createPersistantStore(null)
+    const { storage, setItemSpy } = createPersistentStore(null)
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
