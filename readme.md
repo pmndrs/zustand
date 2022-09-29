@@ -430,7 +430,8 @@ If an action type is not provided, it is defaulted to "anonymous". You can custo
 devtools(..., { anonymousActionType: 'unknown', ... })
 ```
 
-If you wish to disable devtools (on production for instance). You can customize this setting by providing the `enabled` parameter: 
+If you wish to disable devtools (on production for instance). You can customize this setting by providing the `enabled` parameter:
+
 ```jsx
 devtools(..., { enabled: false, ... })
 ```
