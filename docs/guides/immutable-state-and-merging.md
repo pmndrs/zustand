@@ -48,7 +48,7 @@ const useCountStore = create((set) => ({
 ```
 
 For complex use cases, consider using some libraries that help with immutable updates.
-You can refer to [Updating nested state object values](./updating-nested-state-object-values.md).
+You can refer to [Updating nested state object values](./updating-state.md#deeply-nested-object).
 
 ## Replace flag
 

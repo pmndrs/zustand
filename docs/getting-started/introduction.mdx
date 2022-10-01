@@ -4,19 +4,22 @@ description: How to use Zustand
 nav: 0
 ---
 
-⚠️ This doc is still under construction. https://github.com/pmndrs/zustand/discussions/1033
+<Hint>
+  ⚠️ This doc is still under construction.
+  https://github.com/pmndrs/zustand/discussions/1033
+</Hint>
 
-<p align="center">
-  <img width="600" src="https://github.com/pmndrs/zustand/raw/main/bear.jpg" />
-</p>
+<div class="flex justify-center mb-4">
+  <img src="https://github.com/pmndrs/zustand/raw/main/bear.jpg" />
+</div>
 
-A small, fast and scalable bearbones state-management solution. Has a comfy api based
-on hooks, isn't boilerplatey or opinionated, but still just enough to be explicit
-and flux-like.
+A small, fast and scalable bearbones state-management solution. Zustand has a comfy api based on hooks. It isn't boilerplatey or opinionated, but still has enough to be explicit and flux-like.
 
-Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
+Don't disregard it because it's cute, it has claws! Lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [React concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
 You can try a live demo [here](https://codesandbox.io/s/dazzling-moon-itop4).
+
+## Installation
 
 ```bash
 npm install zustand
@@ -38,7 +41,7 @@ const useStore = create((set) => ({
 
 ## Then bind your components, and that's it!
 
-Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
+You can use the hook anywhere, without the need of providers. Select your state and the consuming component will re-render when that state changes.
 
 ```jsx
 function BearCounter() {
