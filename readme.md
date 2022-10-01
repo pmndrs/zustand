@@ -277,7 +277,7 @@ const clearForest = useLushStore((state) => state.clearForest)
 clearForest()
 ```
 
-[Alternatively, there are some other solutions.](./docs/guides/updating-nested-state-object-values.md)
+[Alternatively, there are some other solutions.](./docs/guides/updating-state.md#with-immer)
 
 ## Middleware
 
