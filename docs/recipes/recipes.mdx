@@ -379,6 +379,8 @@ import { devtools } from 'zustand/middleware'
 const useStore = create(devtools(store))
 // Usage with a redux store, it will log full action types
 const useStore = create(devtools(redux(reducer, initialState)))
+// Disabling devtools (for instance in production build)
+const useStore = create(devtools(store, { enabled: false }))
 ```
 
 devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.

@@ -430,6 +430,12 @@ If an action type is not provided, it is defaulted to "anonymous". You can custo
 devtools(..., { anonymousActionType: 'unknown', ... })
 ```
 
+If you wish to disable devtools (on production for instance). You can customize this setting by providing the `enabled` parameter:
+
+```jsx
+devtools(..., { enabled: false, ... })
+```
+
 ## React context
 
 The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the normal store is a hook, passing it as a normal context value may violate rules of hooks.
