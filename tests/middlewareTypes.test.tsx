@@ -1,5 +1,6 @@
 import create, { StoreApi } from 'zustand'
 import {
+  ReduxAction,
   combine,
   devtools,
   persist,
@@ -94,6 +95,51 @@ describe('counter state spec (single middleware)', () => {
     const _testSubtyping: StoreApi<object> = createVanilla(
       redux((x) => x, { count: 0 })
     )
+  })
+
+  it('should enforce type constraint when ReduxAction is used', () => {
+    type State = { count: number }
+    type FeatureEventActions = {
+      grumpiness: {
+        increase: number
+        decrease: number
+        reset: undefined
+      }
+    }
+
+    const useBoundStore = create(
+      redux<State, ReduxAction<FeatureEventActions>>(
+        // @ts-expect-error incorrect payload type for the 'grumpiness/reset' case.
+        (state: State, { type, payload }: ReduxAction<FeatureEventActions>) => {
+          switch (type) {
+            case 'grumpiness/increase':
+              return { count: state.count + payload }
+            case 'grumpiness/decrease':
+              return { count: state.count - payload }
+            case 'grumpiness/reset':
+              return { count: payload }
+          }
+        },
+        { count: 0 }
+      )
+    )
+
+    const TestComponent = () => {
+      useBoundStore.dispatch({ type: 'grumpiness/increase', payload: 10 })
+      // @ts-expect-error mispelled feature segment of type value
+      useBoundStore.dispatch({ type: 'grumpy/increase', payload: 10 })
+      // @ts-expect-error payload is required for given type value
+      useBoundStore.dispatch({ type: 'grumpiness/increase' })
+
+      useBoundStore.dispatch({
+        type: 'grumpiness/increase',
+        // @ts-expect-error incorrect type for payload
+        payload: { count: 10 },
+      })
+
+      useBoundStore.dispatch({ type: 'grumpiness/reset' })
+    }
+    TestComponent
   })
 
   it('devtools', () => {

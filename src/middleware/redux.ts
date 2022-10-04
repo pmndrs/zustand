@@ -1,12 +1,64 @@
 import type { StateCreator, StoreMutatorIdentifier } from '../vanilla'
 import type { NamedSet } from './devtools'
 
+type FeatureEventMap = Record<string, EventName>
+type Separator = '/'
+type EventName = Record<string, unknown>
+
+// Credit given [here](https://stackoverflow.com/a/50375286/648789).
+// prettier-ignore
+type UnionToIntersection<U> =
+  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void)
+    ? I
+    : never;
+
+type PayloadOptionalIfUndefined<TA> = TA extends ActionTypes<infer A>
+  ? A extends { type: infer T; payload: undefined }
+    ? { type: T; payload?: undefined }
+    : TA
+  : TA
+
+type ActionsIndex<
+  Type extends FeatureEventMap,
+  FeatureKey extends keyof Type = ''
+> = FeatureKey extends keyof Type
+  ? {
+      [EventKey in keyof Type[FeatureKey] as `${string &
+        FeatureKey}${Separator}${string &
+        EventKey}`]: Type[FeatureKey][EventKey]
+    }
+  : ActionsIndex<Type, keyof Type>
+
+type ActionsIntersect<Type extends FeatureEventMap> = UnionToIntersection<
+  ActionsIndex<Type>
+>
+
+/**
+ * To enforce typings for an `action` parameter of a `reducer` or `dispatch`.
+ *
+ * By doing so, conditional expressions evalutating the `type` property of `action` type, will have the `payload` type
+ * infered in the block scope of condition.
+ *
+ * For more information, see '[Flux like patterns / "dispatching" actions](https://github.com/pmndrs/zustand/blob/main/docs/guides/flux-inspired-practice.md)' section of docs.
+ *
+ * Credit given [here](https://stackoverflow.com/questions/73792053/typescript-argument-type-from-a-previous-argument-value).
+ */
+export type ReduxAction<Type extends FeatureEventMap> = {
+  [FeatureEvent in keyof ActionsIntersect<Type>]: {
+    type: FeatureEvent
+    payload: ActionsIntersect<Type>[FeatureEvent]
+  }
+}[keyof ActionsIntersect<Type>]
+
 type Write<T, U> = Omit<T, keyof U> & U
 
 type Action = { type: unknown }
 
+type ActionTypes<A> = A extends ReduxAction<infer T> ? ReduxAction<T> : A
+
 type StoreRedux<A> = {
-  dispatch: (a: A) => A
+  dispatch: (a: PayloadOptionalIfUndefined<ActionTypes<A>>) => ActionTypes<A>
+
   dispatchFromDevtools: true
 }
 
@@ -21,7 +73,7 @@ type Redux = <
   A extends Action,
   Cms extends [StoreMutatorIdentifier, unknown][] = []
 >(
-  reducer: (state: T, action: A) => T,
+  reducer: (state: T, action: ActionTypes<A>) => T,
   initialState: T
 ) => StateCreator<Write<T, ReduxState<A>>, Cms, [['zustand/redux', A]]>
 
@@ -38,7 +90,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   : never
 
 type ReduxImpl = <T, A extends Action>(
-  reducer: (state: T, action: A) => T,
+  reducer: (state: T, action: ActionTypes<A>) => T,
   initialState: T
 ) => PopArgument<StateCreator<T & ReduxState<A>, [], []>>
 
