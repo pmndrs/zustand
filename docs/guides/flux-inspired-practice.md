@@ -88,9 +88,9 @@ dispatch({ type: "grumpiness/increase", payload: 10 })
 ```
 
 The structure of this map type, `FeatureEventActions`, is premised on [Redux's recommendation for actions](https://redux.js.org/tutorials/fundamentals/part-3-state-actions-reducers#what-youve-learned):
- 
-  "_The type field should be a readable string, and is usually written as 'feature/eventName'_"
 
-For this example, 'grumpiness' and 'happiness' are features with event names of 'increase' and 'show all' respectively. Each event name is typed for what will be its `payload` type. Any `action` object of `ReduxAction<FeatureEventActions>`, either as a parameter of `reducer` or `dispatch`, has its `type` property constrained to what will be parsed by TypeScript. This will dictate the `payload` type. 
+"_The type field should be a readable string, and is usually written as 'feature/eventName'_"
+
+For this example, 'grumpiness' and 'happiness' are features with event names of 'increase' and 'show all' respectively. Each event name is typed for what will be its `payload` type. Any `action` object of `ReduxAction<FeatureEventActions>`, either as a parameter of `reducer` or `dispatch`, has its `type` property constrained to what will be parsed by TypeScript. This will dictate the `payload` type.
 
 By leveraging typings as above eliminates the need to use any type assertions in reducers. It also enforces only valid values for properties of `action` objects that can increase productively by eliminating mistakes by any developer.
