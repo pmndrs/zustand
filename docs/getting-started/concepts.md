@@ -4,4 +4,6 @@ description:
 nav: 1
 ---
 
-⚠️ This doc is still under construction. https://github.com/pmndrs/zustand/discussions/1033
+<Hint>
+  ⚠️ This doc is still under construction. https://github.com/pmndrs/zustand/discussions/1033
+</Hint>

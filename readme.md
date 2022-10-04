@@ -277,7 +277,7 @@ const clearForest = useLushStore((state) => state.clearForest)
 clearForest()
 ```
 
-[Alternatively, there are some other solutions.](./docs/guides/updating-nested-state-object-values.md)
+[Alternatively, there are some other solutions.](./docs/guides/updating-state.md#with-immer)
 
 ## Middleware
 
@@ -428,6 +428,12 @@ If an action type is not provided, it is defaulted to "anonymous". You can custo
 
 ```jsx
 devtools(..., { anonymousActionType: 'unknown', ... })
+```
+
+If you wish to disable devtools (on production for instance). You can customize this setting by providing the `enabled` parameter:
+
+```jsx
+devtools(..., { enabled: false, ... })
 ```
 
 ## React context
