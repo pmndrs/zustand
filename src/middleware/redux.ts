@@ -12,11 +12,12 @@ type UnionToIntersection<U> =
     ? I
     : never;
 
-type PayloadOptionalIfUndefined<TA> = TA extends ActionTypes<infer A>
-  ? A extends { type: infer T; payload: undefined }
-    ? { type: T; payload?: undefined }
-    : TA
-  : TA
+type PayloadOptionalIfUndefined<A> = A extends {
+  type: infer T
+  payload: undefined
+}
+  ? { type: T; payload?: undefined }
+  : A
 
 type ActionsIndex<
   Type extends FeatureEventMap,
@@ -54,10 +55,8 @@ type Write<T, U> = Omit<T, keyof U> & U
 
 type Action = { type: unknown }
 
-type ActionTypes<A> = A extends ReduxAction<infer T> ? ReduxAction<T> : A
-
 type StoreRedux<A> = {
-  dispatch: (a: PayloadOptionalIfUndefined<ActionTypes<A>>) => ActionTypes<A>
+  dispatch: (a: PayloadOptionalIfUndefined<A>) => A
 
   dispatchFromDevtools: true
 }
@@ -73,7 +72,7 @@ type Redux = <
   A extends Action,
   Cms extends [StoreMutatorIdentifier, unknown][] = []
 >(
-  reducer: (state: T, action: ActionTypes<A>) => T,
+  reducer: (state: T, action: A) => T,
   initialState: T
 ) => StateCreator<Write<T, ReduxState<A>>, Cms, [['zustand/redux', A]]>
 
@@ -90,7 +89,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   : never
 
 type ReduxImpl = <T, A extends Action>(
-  reducer: (state: T, action: ActionTypes<A>) => T,
+  reducer: (state: T, action: A) => T,
   initialState: T
 ) => PopArgument<StateCreator<T & ReduxState<A>, [], []>>
 
