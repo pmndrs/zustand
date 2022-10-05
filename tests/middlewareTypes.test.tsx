@@ -138,6 +138,9 @@ describe('counter state spec (single middleware)', () => {
       })
 
       useBoundStore.dispatch({ type: 'grumpiness/reset' })
+
+      // if desired, it still works the same as the line above
+      useBoundStore.dispatch({ type: 'grumpiness/reset', payload: undefined })
     }
     TestComponent
   })
