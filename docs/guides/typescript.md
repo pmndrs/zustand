@@ -406,6 +406,8 @@ const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
 }))
 ```
 
+A detailed explanation on the slices pattern can be found [here](./slices-pattern.md).
+
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. For example, if you are using `devtools` then it will be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
 ## Middlewares and their mutators reference
