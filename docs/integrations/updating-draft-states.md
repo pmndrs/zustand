@@ -3,9 +3,19 @@ title: Immer middleware
 nav: 16
 ---
 
-The immer middleware enables you to use an immutable state in a more convenient
+The [Immer](https://github.com/immerjs/immer) middleware enables you to use an immutable state in a more convenient
 way. Also, with `Immer` you can simplify handling immutable data structures on
 `Zustand`.
+
+## Installation
+
+In order to use the Immer middleware in `Zustand`, you will need to install `Immer` as a direct dependency.
+
+```bash
+npm install immer
+```
+
+## Usage
 
 Updating simple states
 
