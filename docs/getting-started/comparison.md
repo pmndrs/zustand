@@ -386,7 +386,7 @@ const Component = () => {
 ### State Model
 
 The difference between Zustand and Recoil is similar to that between Zustand and
-Recoil. Recoil depends on atom string keys instead of atom object referential
+Jotai. Recoil depends on atom string keys instead of atom object referential
 identities, additionally, Recoil needs to wrap your app in a context provider.
 
 **Zustand**
