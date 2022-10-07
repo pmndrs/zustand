@@ -85,18 +85,19 @@ type Message = {
   state?: any
 }
 
+type Cast<T, U> = T extends U ? T : U
 type Write<T, U> = Omit<T, keyof U> & U
-type TakeTwo<T> = T extends []
+type TakeTwo<T> = T extends { length: 0 }
   ? [undefined, undefined]
-  : T extends [unknown]
-  ? [...a0: T, a1: undefined]
-  : T extends [unknown?]
-  ? [...a0: T, a1: undefined]
-  : T extends [unknown, unknown]
+  : T extends { length: 1 }
+  ? [...a0: Cast<T, unknown[]>, a1: undefined]
+  : T extends { length: 0 | 1 }
+  ? [...a0: Cast<T, unknown[]>, a1: undefined]
+  : T extends { length: 2 }
   ? T
-  : T extends [unknown, unknown?]
+  : T extends { length: 1 | 2 }
   ? T
-  : T extends [unknown?, unknown?]
+  : T extends { length: 0 | 1 | 2 }
   ? T
   : T extends [infer A0, infer A1, ...unknown[]]
   ? [A0, A1]
