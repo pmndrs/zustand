@@ -1,6 +1,5 @@
 import create, { StoreApi } from 'zustand'
 import {
-  ReduxAction,
   combine,
   devtools,
   persist,
@@ -107,8 +106,57 @@ describe('counter state spec (single middleware)', () => {
       }
     }
 
+    type EventName = Record<string, unknown>
+    type FeatureEventMap = Record<string, EventName>
+    type Separator = '/'
+
+    // Credit given [here](https://stackoverflow.com/a/50375286/648789).
+    type UnionToIntersection<U> = (
+      U extends any ? (k: U) => void : never
+    ) extends (k: infer I) => void
+      ? I
+      : never
+
+    type PayloadOptionalIfUndefined<A> = A extends {
+      type: infer T
+      payload: undefined
+    }
+      ? { type: T; payload?: undefined }
+      : A
+
+    type ActionsIndex<
+      Type extends FeatureEventMap,
+      FeatureKey extends keyof Type = ''
+    > = FeatureKey extends keyof Type
+      ? {
+          [EventKey in keyof Type[FeatureKey] as `${string &
+            FeatureKey}${Separator}${string &
+            EventKey}`]: Type[FeatureKey][EventKey]
+        }
+      : ActionsIndex<Type, keyof Type>
+
+    type ActionsIntersect<Type extends FeatureEventMap> = UnionToIntersection<
+      ActionsIndex<Type>
+    >
+
+    // To enforce typings for an `action` parameter of a `reducer` or `dispatch`.
+    // By doing so, conditional expressions evalutating the `type` property of `action` type, will have the `payload` type
+    // infered in the block scope of condition.
+    // For more information, see '[Flux like patterns / "dispatching" actions](https://github.com/pmndrs/zustand/blob/main/docs/guides/flux-inspired-practice.md)' section of docs.
+    // Credit given [here](https://stackoverflow.com/questions/73792053/typescript-argument-type-from-a-previous-argument-value).
+    type ReduxAction<Type extends FeatureEventMap> = {
+      [FeatureEvent in keyof ActionsIntersect<Type>]: {
+        type: FeatureEvent
+        payload: ActionsIntersect<Type>[FeatureEvent]
+      }
+    }[keyof ActionsIntersect<Type>]
+
     const useBoundStore = create(
-      redux(
+      redux<
+        State,
+        PayloadOptionalIfUndefined<ReduxAction<FeatureEventActions>>,
+        ReduxAction<FeatureEventActions>
+      >(
         // @ts-expect-error incorrect payload type for the 'grumpiness/reset' case.
         (state: State, { type, payload }: ReduxAction<FeatureEventActions>) => {
           switch (type) {
