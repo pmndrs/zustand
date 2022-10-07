@@ -5,7 +5,7 @@ const exec = promisify(_exec)
 jest.setTimeout(30_000)
 
 it('tsc v4.3.5 --noEmit', async () => {
-  let tscOutput = (
+  const tscOutput = (
     await exec(
       './node_modules/typescript-4.3.5/bin/tsc --noEmit --pretty'
     ).catch((e) => Promise.resolve(e))
