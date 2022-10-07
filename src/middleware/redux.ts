@@ -5,32 +5,25 @@ type Write<T, U> = Omit<T, keyof U> & U
 
 type Action = { type: unknown }
 
-type StoreRedux<AIn, AOut> = {
-  dispatch: (a: AIn) => AOut
+type StoreRedux<A> = {
+  dispatch: (a: A) => A
   dispatchFromDevtools: true
 }
 
-type ReduxState<AIn, AOut> = {
-  dispatch: StoreRedux<AIn, AOut>['dispatch']
+type ReduxState<A> = {
+  dispatch: StoreRedux<A>['dispatch']
 }
 
-type WithRedux<S, A> = A extends [unknown, unknown]
-  ? Write<S, StoreRedux<A[0], A[1]>>
-  : never
+type WithRedux<S, A> = Write<S, StoreRedux<A>>
 
 type Redux = <
   T,
-  AIn extends Action,
-  AOut = AIn,
+  A extends Action,
   Cms extends [StoreMutatorIdentifier, unknown][] = []
 >(
-  reducer: (state: T, action: AIn) => T,
+  reducer: (state: T, action: A) => T,
   initialState: T
-) => StateCreator<
-  Write<T, ReduxState<AIn, AOut>>,
-  Cms,
-  [['zustand/redux', [AIn, AOut]]]
->
+) => StateCreator<Write<T, ReduxState<A>>, Cms, [['zustand/redux', A]]>
 
 declare module '../vanilla' {
   interface StoreMutators<S, A> {
@@ -44,10 +37,10 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
   ? (...a: A) => R
   : never
 
-type ReduxImpl = <T, AIn extends Action, AOut = AIn>(
-  reducer: (state: T, action: AIn) => T,
+type ReduxImpl = <T, A extends Action>(
+  reducer: (state: T, action: A) => T,
   initialState: T
-) => PopArgument<StateCreator<T & ReduxState<AIn, AOut>, [], []>>
+) => PopArgument<StateCreator<T & ReduxState<A>, [], []>>
 
 const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {
   type S = typeof initial

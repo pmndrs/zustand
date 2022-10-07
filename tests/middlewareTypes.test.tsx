@@ -154,8 +154,7 @@ describe('counter state spec (single middleware)', () => {
     const useBoundStore = create(
       redux<
         State,
-        PayloadOptionalIfUndefined<ReduxAction<FeatureEventActions>>,
-        ReduxAction<FeatureEventActions>
+        PayloadOptionalIfUndefined<ReduxAction<FeatureEventActions>>
       >(
         // @ts-expect-error incorrect payload type for the 'grumpiness/reset' case.
         (state: State, { type, payload }: ReduxAction<FeatureEventActions>) => {
