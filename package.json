@@ -73,7 +73,7 @@
     "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "eslint:ci": "eslint '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "tsc": "./node_modules/typescript/bin/tsc",
-    "pretest": "tsc --noEmit",
+    "pretest": "yarn tsc --noEmit",
     "test": "jest",
     "test:ci": "jest",
     "test:dev": "jest --watch --no-coverage",
