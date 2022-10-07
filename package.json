@@ -72,6 +72,7 @@
     "prettier:ci": "prettier '*.{js,json,md}' '{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
     "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "eslint:ci": "eslint '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
+    "tsc": "./node_modules/typescript/bin/tsc",
     "pretest": "tsc --noEmit",
     "test": "jest",
     "test:ci": "jest",
@@ -192,7 +193,8 @@
     "rollup-plugin-esbuild": "^4.9.3",
     "rollup-plugin-terser": "^7.0.2",
     "shx": "^0.3.4",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "typescript-4.3.5": "npm:typescript@4.3.5"
   },
   "resolutions": {
     "date-fns": "2.27.0"
