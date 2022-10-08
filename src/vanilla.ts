@@ -14,7 +14,7 @@ export interface StoreApi<T> {
 
 type Get<T, K, F = never> = K extends keyof T ? T[K] : F
 
-export type Mutate<S, Ms> = number extends Ms["length" & keyof Ms]
+export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]
   ? S
   : Ms extends []
   ? S
