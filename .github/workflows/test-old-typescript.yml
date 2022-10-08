@@ -22,6 +22,11 @@ jobs:
           - 4.2.3
           - 4.1.5
           - 4.0.5
+          - 3.9.7
+          - 3.8.3
+          - 3.7.5
+          - 3.6.3
+          - 3.5.1
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -33,7 +38,10 @@ jobs:
       - run: yarn build
       - name: Patch for Old TS
         run: |
+          sed -i~ '1s/^/import React from "react";/' tests/*.tsx
           sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
+          sed -i~ "s/\"jsx\": \"react-jsx\",/\"jsx\": \"react\",/" tsconfig.json
+          sed -i~ "s/\"noUncheckedIndexedAccess\": true,//" tsconfig.json
           sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
           sed -i~ "s/\"zustand\": \[\".\/src\/index.ts\"\],/\"zustand\": [\".\/dist\/index.d.ts\"],/" tsconfig.json
           sed -i~ "s/\"zustand\/\*\": \[\".\/src\/\*.ts\"\]/\"zustand\/*\": [\".\/dist\/*.d.ts\"]/" tsconfig.json
