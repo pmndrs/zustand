@@ -48,7 +48,7 @@ jobs:
       - name: Patch for Old TS
         if: ${{ matrix.typescript < 4.4 }}
         run: |
-          sed -i~ "s/\/]/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
+          sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
           sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
       - name: Test ${{ matrix.typescript }}
         run: |
