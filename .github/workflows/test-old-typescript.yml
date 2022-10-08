@@ -49,4 +49,5 @@ jobs:
       - name: Test ${{ matrix.typescript }}
         run: |
           yarn add -D typescript@${{ matrix.typescript }}
+          yarn add -D @types/jest@27.4.1
           yarn tsc --noEmit
