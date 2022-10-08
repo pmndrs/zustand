@@ -1,4 +1,4 @@
-name: Test Multiple Versions
+name: Test Old TypeScript
 
 on:
   push:
@@ -27,14 +27,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        react:
-          - 16.8.0
-          - 17.0.0
-          - 18.0.0
-          - 18.1.0
-          - 18.2.0
-          - 18.3.0-next-19e9a4c68-20220818
-          - 0.0.0-experimental-19e9a4c68-20220818
+        typescript:
+          - 4.8
+          - 4.7
+          - 4.6
+          - 4.5
+          - 4.4
+          - 4.3
+          - 4.2
+          - 4.1
+          - 4.0
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -43,16 +45,12 @@ jobs:
           cache: yarn
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
-      - name: Install legacy testing-library
-        if: ${{ startsWith(matrix.react, '16.') || startsWith(matrix.react, '17.') }}
-        run: yarn add -D @testing-library/react@12.1.4
-      - name: Patch for React 16
-        if: ${{ startsWith(matrix.react, '16.') }}
+      - name: Patch for Old TS
+        if: ${{ matrix.typescript < 4.4 }}
         run: |
-          sed -i~ '1s/^/import React from "react";/' tests/*.tsx
-          sed -i~ 's/automatic/classic/' babel.config.js
-          sed -i~ 's/automatic/classic/' .swcrc
-      - name: Test ${{ matrix.react }}
+          sed -i~ "s/\/]/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
+          sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
+      - name: Test ${{ matrix.typescript }}
         run: |
-          yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
+          yarn add -D typescript@${{ matrix.typescript }}
           yarn test:ci
