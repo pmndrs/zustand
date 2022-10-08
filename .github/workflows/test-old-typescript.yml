@@ -49,7 +49,9 @@ jobs:
         run: |
           sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
           sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
-          sed -i~ "s/\"include\": .*/\"include\": \[\"src/types.d.ts\", \"dist/**/*\", \"tests/**/*\"\]/" tsconfig.json
+          sed -i~ "s/\"zustand\": \[\".\/src\/index.ts\"\],/\"zustand\": [\".\/dist\/index.d.ts\"],/" tsconfig.json
+          sed -i~ "s/\"zustand\/\*\": \[\".\/src\/\*.ts\"\]/\"zustand\/*\": [\".\/dist\/*.d.ts\"]/" tsconfig.json
+          sed -i~ "s/\"include\": .*/\"include\": [\"src\/types.d.ts\", \"dist\/**\/*\", \"tests\/**\/*\"],/" tsconfig.json
       - name: Test ${{ matrix.typescript }}
         run: |
           yarn add -D typescript@${{ matrix.typescript }}
