@@ -28,15 +28,15 @@ jobs:
       fail-fast: false
       matrix:
         typescript:
-          - 4.8
-          - 4.7
-          - 4.6
-          - 4.5
-          - 4.4
-          - 4.3
-          - 4.2
-          - 4.1
-          - 4.0
+          - 4.8.4
+          - 4.7.4
+          - 4.6.4
+          - 4.5.5
+          - 4.4.4
+          - 4.3.5
+          - 4.2.3
+          - 4.1.5
+          - 4.0.5
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -46,11 +46,10 @@ jobs:
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
       - name: Patch for Old TS
-        if: ${{ matrix.typescript < 4.4 }}
         run: |
           sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
           sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
       - name: Test ${{ matrix.typescript }}
         run: |
           yarn add -D typescript@${{ matrix.typescript }}
-          yarn test:ci
+          yarn tsc --noEmit
