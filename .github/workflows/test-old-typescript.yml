@@ -7,21 +7,6 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-          cache: yarn
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-      - run: yarn install --frozen-lockfile --check-files
-      - name: Test Build # we don't have any other workflows to test build
-        run: yarn build
-      - name: Test Default
-        run: yarn test:ci
-
   test_matrix:
     runs-on: ubuntu-latest
     strategy:
@@ -45,6 +30,7 @@ jobs:
           cache: yarn
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
+      - run: yarn build
       - name: Patch for Old TS
         run: |
           sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
@@ -55,5 +41,4 @@ jobs:
       - name: Test ${{ matrix.typescript }}
         run: |
           yarn add -D typescript@${{ matrix.typescript }}
-          yarn build
           yarn tsc --noEmit
