@@ -72,7 +72,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
       typeof partial === 'function'
         ? (partial as (state: TState) => TState)(state)
         : partial
-    if (nextState !== state) {
+    if (!Object.is(nextState, state)) {
       const previousState = state
       state =
         replace ?? typeof nextState !== 'object'
