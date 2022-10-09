@@ -1,0 +1,43 @@
+name: Test Old TypeScript
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test_matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript:
+          - 4.8.4
+          - 4.7.4
+          - 4.6.4
+          - 4.5.5
+          - 4.4.4
+          - 4.3.5
+          - 4.2.3
+          - 4.1.5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - run: yarn build
+      - name: Patch for Old TS
+        run: |
+          sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
+          sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
+          sed -i~ "s/\"zustand\": \[\"\.\/src\/index\.ts\"\],/\"zustand\": [\".\/dist\/index.d.ts\"],/" tsconfig.json
+          sed -i~ "s/\"zustand\/\*\": \[\"\.\/src\/\*\.ts\"\]/\"zustand\/*\": [\".\/dist\/*.d.ts\"]/" tsconfig.json
+          sed -i~ "s/\"include\": .*/\"include\": [\"src\/types.d.ts\", \"dist\/**\/*\", \"tests\/**\/*\"],/" tsconfig.json
+      - name: Test ${{ matrix.typescript }}
+        run: |
+          yarn add -D typescript@${{ matrix.typescript }}
+          yarn tsc --noEmit
