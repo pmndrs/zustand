@@ -496,7 +496,7 @@ A more complete TypeScript guide is [here](docs/guides/typescript.md).
 
 ## Best practices
 
-- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/guides/typescript.md#slices-pattern).
+- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/guides/slices-pattern.md).
 - Recommended usage for this unopinionated library: [Flux inspired practice](./docs/guides/flux-inspired-practice.md).
 - [Calling actions outside a React event handler in pre React 18](./docs/guides/event-handler-in-pre-react-18.md).
 - [Testing](./docs/guides/testing.mdx)
