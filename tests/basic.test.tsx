@@ -22,11 +22,11 @@ it('creates a store hook and api object', () => {
     return { value: null }
   })
   expect({ params, result }).toMatchInlineSnapshot(`
-    Object {
-      "params": Array [
+    {
+      "params": [
         [Function],
         [Function],
-        Object {
+        {
           "destroy": [Function],
           "getState": [Function],
           "setState": [Function],
