@@ -19,7 +19,7 @@ const useBoundStore = create((set) => ({
 }))
 ```
 
-See [Splitting the store into separate slices](./typescript.md#slices-pattern) for how to define a store with separate slices.
+See [Splitting the store into separate slices](./slices-pattern.md) for how to define a store with separate slices.
 
 ## Flux like patterns / "dispatching" actions
 
