@@ -437,6 +437,17 @@ it('can set the store', () => {
   expect(getState().value).toBe(5)
 })
 
+it('both NaN should not update', () => {
+  const { setState, subscribe } = create<number>(() => NaN)
+
+  const fn = jest.fn()
+  subscribe(fn)
+
+  setState(NaN)
+
+  expect(fn).not.toBeCalled()
+})
+
 it('can set the store without merging', () => {
   const { setState, getState } = create<{ a: number } | { b: number }>(
     (_set) => ({
