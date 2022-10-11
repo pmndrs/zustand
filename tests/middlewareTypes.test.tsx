@@ -14,6 +14,39 @@ type CounterState = {
   inc: () => void
 }
 
+type FeatureEventActions = {
+  grumpiness: {
+    increase: number
+    decrease: number
+    reset: undefined
+  }
+}
+
+type EventName = Record<string, unknown>
+type FeatureEventMap = Record<string, EventName>
+type Separator = '/'
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never
+
+type ActionsIndex<
+  Type extends FeatureEventMap,
+  FeatureKey extends keyof Type = ''
+> = FeatureKey extends keyof Type
+  ? {
+      [EventKey in keyof Type[FeatureKey] as `${string &
+        FeatureKey}${Separator}${string &
+        EventKey}`]: Type[FeatureKey][EventKey]
+    }
+  : ActionsIndex<Type, keyof Type>
+
+type ActionsIntersect<Type extends FeatureEventMap> = UnionToIntersection<
+  ActionsIndex<Type>
+>
+
 describe('counter state spec (no middleware)', () => {
   it('no middleware', () => {
     const useBoundStore = create<CounterState>((set, get) => ({
@@ -96,53 +129,103 @@ describe('counter state spec (single middleware)', () => {
     )
   })
 
-  it('should enforce type constraint when ReduxAction is used', () => {
-    type State = { count: number }
-    type FeatureEventActions = {
-      grumpiness: {
-        increase: number
-        decrease: number
-        reset: undefined
-      }
+  it('should enforce type constraint when simple tuple is used', () => {
+    type Action = [
+      'grumpiness/increase' | 'grumpiness/decrease' | 'grumpiness/reset',
+      number | undefined
+    ]
+    const useBoundStore = create(
+      redux<{ count: number }, Action>(
+        (state: { count: number }, [type, payload]: Action) => {
+          switch (type) {
+            case 'grumpiness/increase':
+              if (typeof payload === 'number') {
+                return { count: state.count + payload }
+              }
+              break
+            case 'grumpiness/decrease':
+              if (typeof payload === 'number') {
+                return { count: state.count - payload }
+              }
+              break
+            case 'grumpiness/reset':
+              return { count: 0 }
+          }
+          return state
+        },
+        { count: 0 }
+      )
+    )
+
+    const TestComponent = () => {
+      useBoundStore.dispatch('grumpiness/increase', 2)
+      useBoundStore.dispatch('grumpiness/decrease', 1)
+      useBoundStore.dispatch('grumpiness/reset', undefined)
+      // @ts-expect-error misspelled feature segment of type value
+      useBoundStore.dispatch('grumpy/increase', 2)
+      // @ts-expect-error `redux` not configured for literal object
+      useBoundStore.dispatch({ type: 'grumpiness/reset' })
     }
+    TestComponent
+  })
 
-    type EventName = Record<string, unknown>
-    type FeatureEventMap = Record<string, EventName>
-    type Separator = '/'
+  it('should enforce type constraint when tuple is used', () => {
+    type PayloadOptionalIfUndefined<A> = A extends [infer T, undefined]
+      ? [type: T, payload?: undefined]
+      : A
 
-    // Credit given [here](https://stackoverflow.com/a/50375286/648789).
-    type UnionToIntersection<U> = (
-      U extends any ? (k: U) => void : never
-    ) extends (k: infer I) => void
-      ? I
-      : never
+    // Credit given [here](https://stackoverflow.com/questions/73792053/typescript-argument-type-from-a-previous-argument-value).
+    type ReduxAction<Type extends FeatureEventMap> = {
+      [FeatureEvent in keyof ActionsIntersect<Type>]: [
+        type: FeatureEvent,
+        payload: ActionsIntersect<Type>[FeatureEvent]
+      ]
+    }[keyof ActionsIntersect<Type>]
 
+    const useBoundStore = create(
+      redux<
+        { count: number },
+        PayloadOptionalIfUndefined<ReduxAction<FeatureEventActions>>
+      >(
+        (
+          state: { count: number },
+          [type, payload]: ReduxAction<FeatureEventActions>
+        ) => {
+          switch (type) {
+            case 'grumpiness/increase':
+              return { count: state.count + payload }
+            case 'grumpiness/decrease':
+              return { count: state.count - payload }
+            case 'grumpiness/reset':
+              return { count: 0 }
+            default:
+              return state
+          }
+        },
+        { count: 0 }
+      )
+    )
+
+    const TestComponent = () => {
+      useBoundStore.dispatch('grumpiness/increase', 2)
+      useBoundStore.dispatch('grumpiness/decrease', 1)
+      useBoundStore.dispatch('grumpiness/reset')
+      useBoundStore.dispatch('grumpiness/reset', undefined)
+      // @ts-expect-error misspelled feature segment of type value
+      useBoundStore.dispatch('grumpy/increase', 2)
+      // @ts-expect-error `redux` not configured for literal object
+      useBoundStore.dispatch({ type: 'grumpiness/reset' })
+    }
+    TestComponent
+  })
+
+  it('should enforce type constraint when literal object is used', () => {
     type PayloadOptionalIfUndefined<A> = A extends {
       type: infer T
       payload: undefined
     }
       ? { type: T; payload?: undefined }
       : A
-
-    type ActionsIndex<
-      Type extends FeatureEventMap,
-      FeatureKey extends keyof Type = ''
-    > = FeatureKey extends keyof Type
-      ? {
-          [EventKey in keyof Type[FeatureKey] as `${string &
-            FeatureKey}${Separator}${string &
-            EventKey}`]: Type[FeatureKey][EventKey]
-        }
-      : ActionsIndex<Type, keyof Type>
-
-    type ActionsIntersect<Type extends FeatureEventMap> = UnionToIntersection<
-      ActionsIndex<Type>
-    >
-
-    // To enforce typings for an `action` parameter of a `reducer` or `dispatch`.
-    // By doing so, conditional expressions evalutating the `type` property of `action` type, will have the `payload` type
-    // infered in the block scope of condition.
-    // For more information, see '[Flux like patterns / "dispatching" actions](https://github.com/pmndrs/zustand/blob/main/docs/guides/flux-inspired-practice.md)' section of docs.
     // Credit given [here](https://stackoverflow.com/questions/73792053/typescript-argument-type-from-a-previous-argument-value).
     type ReduxAction<Type extends FeatureEventMap> = {
       [FeatureEvent in keyof ActionsIntersect<Type>]: {
@@ -153,18 +236,22 @@ describe('counter state spec (single middleware)', () => {
 
     const useBoundStore = create(
       redux<
-        State,
+        { count: number },
         PayloadOptionalIfUndefined<ReduxAction<FeatureEventActions>>
       >(
-        // @ts-expect-error incorrect payload type for the 'grumpiness/reset' case.
-        (state: State, { type, payload }: ReduxAction<FeatureEventActions>) => {
+        (
+          state: { count: number },
+          { type, payload }: ReduxAction<FeatureEventActions>
+        ) => {
           switch (type) {
             case 'grumpiness/increase':
               return { count: state.count + payload }
             case 'grumpiness/decrease':
               return { count: state.count - payload }
             case 'grumpiness/reset':
-              return { count: payload }
+              return { count: 0 }
+            default:
+              return state
           }
         },
         { count: 0 }
@@ -172,22 +259,14 @@ describe('counter state spec (single middleware)', () => {
     )
 
     const TestComponent = () => {
-      useBoundStore.dispatch({ type: 'grumpiness/increase', payload: 10 })
-      // @ts-expect-error mispelled feature segment of type value
-      useBoundStore.dispatch({ type: 'grumpy/increase', payload: 10 })
-      // @ts-expect-error payload is required for given type value
-      useBoundStore.dispatch({ type: 'grumpiness/increase' })
-
-      useBoundStore.dispatch({
-        type: 'grumpiness/increase',
-        // @ts-expect-error incorrect type for payload
-        payload: { count: 10 },
-      })
-
+      useBoundStore.dispatch({ type: 'grumpiness/increase', payload: 2 })
+      useBoundStore.dispatch({ type: 'grumpiness/decrease', payload: 1 })
       useBoundStore.dispatch({ type: 'grumpiness/reset' })
-
-      // if desired, it still works the same as the line above
       useBoundStore.dispatch({ type: 'grumpiness/reset', payload: undefined })
+      // @ts-expect-error misspelled feature segment of type value
+      useBoundStore.dispatch({ type: 'grumpy/increase', payload: 2 })
+      // @ts-expect-error `redux` not configured for tuple object
+      useBoundStore.dispatch('grumpiness/reset')
     }
     TestComponent
   })
