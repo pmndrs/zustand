@@ -418,7 +418,7 @@ If your app does depends on the persisted state at page load, see [How can I che
 
 ### How can I check if my store has been hydrated?
 
-There's a fiew different ways to do this.
+There's a few different ways to do this.
 
 You can use the `onRehydrateStorage` option to update a field in the store:
 
