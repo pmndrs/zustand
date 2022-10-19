@@ -26,8 +26,8 @@ export type StateCreator<
   Mos extends [StoreMutatorIdentifier, unknown][] = [],
   U = T
 > = ((
-  setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', undefined>,
-  getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', undefined>,
+  setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', never>,
+  getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', never>,
   store: Mutate<StoreApi<T>, Mis>,
   $$storeMutations: Mis
 ) => U) & { $$storeMutators?: Mos }
