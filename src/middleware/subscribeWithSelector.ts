@@ -40,14 +40,8 @@ type StoreSubscribeWithSelector<T> = {
 }
 
 type SubscribeWithSelectorImpl = <T extends object>(
-  storeInitializer: PopArgument<StateCreator<T, [], []>>
-) => PopArgument<StateCreator<T, [], []>>
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
+  storeInitializer: StateCreator<T, [], []>
+) => StateCreator<T, [], []>
 
 const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =
   (fn) => (set, get, api) => {

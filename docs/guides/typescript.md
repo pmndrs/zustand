@@ -246,9 +246,9 @@ type Logger = <
 ) => StateCreator<T, Mps, Mcs>
 
 type LoggerImpl = <T extends State>(
-  f: PopArgument<StateCreator<T, [], []>>,
+  f: StateCreator<T, [], []>,
   name?: string
-) => PopArgument<StateCreator<T, [], []>>
+) => StateCreator<T, [], []>
 
 const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
   type T = ReturnType<typeof f>
@@ -262,12 +262,6 @@ const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
 }
 
 export const logger = loggerImpl as unknown as Logger
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
 
 // ---
 
@@ -310,9 +304,9 @@ declare module 'zustand' {
 }
 
 type FooImpl = <T extends State, A>(
-  f: PopArgument<StateCreator<T, [], []>>,
+  f: StateCreator<T, [], []>,
   bar: A
-) => PopArgument<StateCreator<T, [], []>>
+) => StateCreator<T, [], []>
 
 const fooImpl: FooImpl = (f, bar) => (set, get, _store) => {
   type T = ReturnType<typeof f>
@@ -324,12 +318,6 @@ const fooImpl: FooImpl = (f, bar) => (set, get, _store) => {
 }
 
 export const foo = fooImpl as unknown as Foo
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
 
 type Write<T extends object, U extends object> = Omit<T, keyof U> & U
 

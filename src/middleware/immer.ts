@@ -49,15 +49,9 @@ type StoreImmer<S> = S extends {
     : never
   : never
 
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
-
 type ImmerImpl = <T>(
-  storeInitializer: PopArgument<StateCreator<T, [], []>>
-) => PopArgument<StateCreator<T, [], []>>
+  storeInitializer: StateCreator<T, [], []>
+) => StateCreator<T, [], []>
 
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>

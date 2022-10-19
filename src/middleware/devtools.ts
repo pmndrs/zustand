@@ -141,15 +141,9 @@ declare module '../vanilla' {
 }
 
 type DevtoolsImpl = <T>(
-  storeInitializer: PopArgument<StateCreator<T, [], []>>,
+  storeInitializer: StateCreator<T, [], []>,
   devtoolsOptions?: DevtoolsOptions
-) => PopArgument<StateCreator<T, [], []>>
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
+) => StateCreator<T, [], []>
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
