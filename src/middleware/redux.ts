@@ -53,4 +53,4 @@ const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {
 
   return { dispatch: (...a) => (api as any).dispatch(...a), ...initial }
 }
-export const redux = reduxImpl as Redux
+export const redux = reduxImpl as unknown as Redux
