@@ -26,9 +26,15 @@ export type StateCreator<
   Mos extends [StoreMutatorIdentifier, unknown][] = [],
   U = T
 > = ((
-  setState: number extends Mis['length'] ? UnknownBecauseOfGenericMutators : Get<Mutate<StoreApi<T>, Mis>, 'setState', undefined>,
-  getState: number extends Mis['length'] ? UnknownBecauseOfGenericMutators : Get<Mutate<StoreApi<T>, Mis>, 'getState', undefined>,
-  store: number extends Mis['length'] ? UnknownBecauseOfGenericMutators : Mutate<StoreApi<T>, Mis>,
+  setState: number extends Mis['length']
+    ? UnknownBecauseOfGenericMutators
+    : Get<Mutate<StoreApi<T>, Mis>, 'setState', undefined>,
+  getState: number extends Mis['length']
+    ? UnknownBecauseOfGenericMutators
+    : Get<Mutate<StoreApi<T>, Mis>, 'getState', undefined>,
+  store: number extends Mis['length']
+    ? UnknownBecauseOfGenericMutators
+    : Mutate<StoreApi<T>, Mis>,
   $$storeMutations: Mis
 ) => U) & { $$storeMutators?: Mos }
 
