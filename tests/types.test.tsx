@@ -207,7 +207,7 @@ it('Shows UnknownBecauseOfGenericMutators type when dealing with generic mutator
   > = () => (set, get) => ({
     count: 0,
     increment: () => {
-      // @ts-expect-errors
+      // @ts-expect-error set and get are essentially unknown
       set({ count: get().count + 1 })
     },
   })

@@ -55,6 +55,7 @@ type CreateStore = {
 /**
  * TODO: write the jsdoc
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface UnknownBecauseOfGenericMutators {}
 
 type CreateStoreImpl = <
