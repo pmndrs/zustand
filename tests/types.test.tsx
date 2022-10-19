@@ -1,4 +1,9 @@
-import create, { StateCreator, StoreApi, StoreMutatorIdentifier, UseBoundStore } from 'zustand'
+import create, {
+  StateCreator,
+  StoreApi,
+  StoreMutatorIdentifier,
+  UseBoundStore,
+} from 'zustand'
 import { persist } from 'zustand/middleware'
 
 it('can use exposed types', () => {
@@ -190,20 +195,22 @@ it('state is covariant', () => {
   }> = store
 })
 
-it("Shows UnknownBecauseOfGenericMutators type when dealing with generic mutators", () => {
-  interface State
-    { count: number
-    , increment: () => void
-    }
+it('Shows UnknownBecauseOfGenericMutators type when dealing with generic mutators', () => {
+  interface State {
+    count: number
+    increment: () => void
+  }
 
-  const foo: <M extends [StoreMutatorIdentifier, unknown][]>() => StateCreator<State, M> =
-    () => (set, get) => ({
-      count: 0,
-      increment: () => {
-        // @ts-expect-errors
-        set({ count: get().count + 1 })
-      }
-    })
+  const foo: <M extends [StoreMutatorIdentifier, unknown][]>() => StateCreator<
+    State,
+    M
+  > = () => (set, get) => ({
+    count: 0,
+    increment: () => {
+      // @ts-expect-errors
+      set({ count: get().count + 1 })
+    },
+  })
 
   create<State>()(persist(foo()))
 })
