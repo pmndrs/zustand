@@ -12,7 +12,7 @@ export interface StoreApi<T> {
   destroy: () => void
 }
 
-type Get<T, K, F = never> = K extends keyof T ? T[K] : F
+type Get<T, K, F> = K extends keyof T ? T[K] : F
 
 export type Mutate<S, Ms> = Ms extends []
   ? S
