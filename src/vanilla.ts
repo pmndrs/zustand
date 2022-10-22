@@ -12,7 +12,7 @@ export interface StoreApi<T> {
   destroy: () => void
 }
 
-type Get<T, K, F = never> = K extends keyof T ? T[K] : F
+type Get<T, K, F> = K extends keyof T ? T[K] : F
 
 export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]
   ? S
@@ -28,8 +28,8 @@ export type StateCreator<
   Mos extends [StoreMutatorIdentifier, unknown][] = [],
   U = T
 > = ((
-  setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', undefined>,
-  getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', undefined>,
+  setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', never>,
+  getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', never>,
   store: Mutate<StoreApi<T>, Mis>,
   $$storeMutations: Mis
 ) => U) & { $$storeMutators?: Mos }
