@@ -1,4 +1,5 @@
-import create, {
+import create from 'zustand'
+import type {
   StateCreator,
   StoreApi,
   StoreMutatorIdentifier,
