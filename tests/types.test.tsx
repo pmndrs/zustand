@@ -1,4 +1,9 @@
-import create, { StateCreator, StoreApi, UseBoundStore } from 'zustand'
+import create, {
+  StateCreator,
+  StoreApi,
+  StoreMutatorIdentifier,
+  UseBoundStore,
+} from 'zustand'
 import { persist } from 'zustand/middleware'
 
 it('can use exposed types', () => {
@@ -188,6 +193,25 @@ it('state is covariant', () => {
     foo: string
     baz: string
   }> = store
+})
+
+it('StateCreator<T, [StoreMutatorIdentfier, unknown][]> is StateCreator<T, []>', () => {
+  interface State {
+    count: number
+    increment: () => void
+  }
+
+  const foo: <M extends [StoreMutatorIdentifier, unknown][]>() => StateCreator<
+    State,
+    M
+  > = () => (set, get) => ({
+    count: 0,
+    increment: () => {
+      set({ count: get().count + 1 })
+    },
+  })
+
+  create<State>()(persist(foo()))
 })
 
 it('StateCreator subtyping', () => {
