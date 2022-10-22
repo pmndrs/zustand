@@ -30,8 +30,7 @@ export type StateCreator<
 > = ((
   setState: Get<Mutate<StoreApi<T>, Mis>, 'setState', never>,
   getState: Get<Mutate<StoreApi<T>, Mis>, 'getState', never>,
-  store: Mutate<StoreApi<T>, Mis>,
-  $$storeMutations: Mis
+  store: Mutate<StoreApi<T>, Mis>
 ) => U) & { $$storeMutators?: Mos }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface
@@ -54,12 +53,6 @@ type CreateStoreImpl = <
 >(
   initializer: StateCreator<T, [], Mos>
 ) => Mutate<StoreApi<T>, Mos>
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
 
 const createStoreImpl: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
@@ -94,11 +87,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 
   const destroy: () => void = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
-  state = (createState as PopArgument<typeof createState>)(
-    setState,
-    getState,
-    api
-  )
+  state = createState(setState, getState, api)
   return api as any
 }
 

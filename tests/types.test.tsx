@@ -1,4 +1,5 @@
-import create, {
+import create from 'zustand'
+import type {
   StateCreator,
   StoreApi,
   StoreMutatorIdentifier,
@@ -212,4 +213,23 @@ it('StateCreator<T, [StoreMutatorIdentfier, unknown][]> is StateCreator<T, []>',
   })
 
   create<State>()(persist(foo()))
+})
+
+it('StateCreator subtyping', () => {
+  interface State {
+    count: number
+    increment: () => void
+  }
+
+  const foo: () => StateCreator<State, []> = () => (set, get) => ({
+    count: 0,
+    increment: () => {
+      set({ count: get().count + 1 })
+    },
+  })
+
+  create<State>()(persist(foo()))
+
+  const _testSubtyping: StateCreator<State, [['zustand/persist', unknown]]> =
+    {} as StateCreator<State, []>
 })

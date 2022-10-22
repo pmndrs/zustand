@@ -31,16 +31,10 @@ declare module '../vanilla' {
   }
 }
 
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
-
 type ReduxImpl = <T, A extends Action>(
   reducer: (state: T, action: A) => T,
   initialState: T
-) => PopArgument<StateCreator<T & ReduxState<A>, [], []>>
+) => StateCreator<T & ReduxState<A>, [], []>
 
 const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {
   type S = typeof initial
@@ -53,4 +47,4 @@ const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {
 
   return { dispatch: (...a) => (api as any).dispatch(...a), ...initial }
 }
-export const redux = reduxImpl as Redux
+export const redux = reduxImpl as unknown as Redux

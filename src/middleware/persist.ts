@@ -319,14 +319,8 @@ type WithPersist<S, A> = S extends { getState: () => infer T }
   : never
 
 type PersistImpl = <T>(
-  storeInitializer: PopArgument<StateCreator<T, [], []>>,
+  storeInitializer: StateCreator<T, [], []>,
   options: PersistOptions<T, T>
-) => PopArgument<StateCreator<T, [], []>>
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-) => infer R
-  ? (...a: A) => R
-  : never
+) => StateCreator<T, [], []>
 
 export const persist = persistImpl as unknown as Persist
