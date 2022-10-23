@@ -79,7 +79,12 @@ function createESMConfig(input, output) {
 function createCommonJSConfig(input, output) {
   return {
     input,
-    output: { file: `${output}.js`, format: 'cjs', exports: 'named' },
+    output: {
+      file: `${output}.js`,
+      format: 'cjs',
+      exports: 'named',
+      interop: 'auto',
+    },
     external,
     plugins: [
       alias({
