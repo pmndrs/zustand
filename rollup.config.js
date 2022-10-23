@@ -104,7 +104,6 @@ function createUMDConfig(input, output, env) {
     output: {
       file: `${output}.${env}.js`,
       format: 'umd',
-      exports: 'named',
       name:
         c === 'index'
           ? 'zustand'
