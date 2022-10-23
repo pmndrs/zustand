@@ -1,11 +1,11 @@
-import path from 'path'
-import alias from '@rollup/plugin-alias'
-import babelPlugin from '@rollup/plugin-babel'
-import resolve from '@rollup/plugin-node-resolve'
-import replace from '@rollup/plugin-replace'
-import typescript from '@rollup/plugin-typescript'
-import esbuild from 'rollup-plugin-esbuild'
-import { terser } from 'rollup-plugin-terser'
+const path = require('path')
+const alias = require('@rollup/plugin-alias')
+const babelPlugin = require('@rollup/plugin-babel')
+const resolve = require('@rollup/plugin-node-resolve')
+const replace = require('@rollup/plugin-replace')
+const typescript = require('@rollup/plugin-typescript')
+const { default: esbuild } = require('rollup-plugin-esbuild')
+const { terser } = require('rollup-plugin-terser')
 const createBabelConfig = require('./babel.config')
 
 const extensions = ['.js', '.ts', '.tsx']
@@ -79,7 +79,7 @@ function createESMConfig(input, output) {
 function createCommonJSConfig(input, output) {
   return {
     input,
-    output: { file: `${output}.js`, format: 'cjs', exports: 'named' },
+    output: { file: `${output}.js`, format: 'cjs' },
     external,
     plugins: [
       alias({
@@ -104,7 +104,6 @@ function createUMDConfig(input, output, env) {
     output: {
       file: `${output}.${env}.js`,
       format: 'umd',
-      exports: 'named',
       name:
         c === 'index'
           ? 'zustand'
@@ -160,7 +159,7 @@ function createSystemConfig(input, output, env) {
   }
 }
 
-export default function (args) {
+module.exports = function (args) {
   let c = Object.keys(args).find((key) => key.startsWith('config-'))
   if (c) {
     c = c.slice('config-'.length).replace(/_/g, '/')
