@@ -82,7 +82,6 @@ function createCommonJSConfig(input, output) {
     output: {
       file: `${output}.js`,
       format: 'cjs',
-      exports: 'named',
       interop: 'compat',
     },
     external,
