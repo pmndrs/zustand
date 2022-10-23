@@ -1,11 +1,11 @@
-import path from 'path'
-import alias from '@rollup/plugin-alias'
-import babelPlugin from '@rollup/plugin-babel'
-import resolve from '@rollup/plugin-node-resolve'
-import replace from '@rollup/plugin-replace'
-import typescript from '@rollup/plugin-typescript'
-import esbuild from 'rollup-plugin-esbuild'
-import { terser } from 'rollup-plugin-terser'
+const path = require('path')
+const alias = require('@rollup/plugin-alias')
+const babelPlugin = require('@rollup/plugin-babel')
+const resolve = require('@rollup/plugin-node-resolve')
+const replace = require('@rollup/plugin-replace')
+const typescript = require('@rollup/plugin-typescript')
+const { default: esbuild } = require('rollup-plugin-esbuild')
+const { terser } = require('rollup-plugin-terser')
 const createBabelConfig = require('./babel.config')
 
 const extensions = ['.js', '.ts', '.tsx']
@@ -160,7 +160,7 @@ function createSystemConfig(input, output, env) {
   }
 }
 
-export default function (args) {
+module.exports = function (args) {
   let c = Object.keys(args).find((key) => key.startsWith('config-'))
   if (c) {
     c = c.slice('config-'.length).replace(/_/g, '/')
