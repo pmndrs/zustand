@@ -131,7 +131,8 @@ subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubs
 ```
 
 ```jsx
-import { subscribeWithSelector } from 'zustand/middleware'
+import create from 'zustand';
+import { subscribeWithSelector, shallow } from 'zustand/middleware'
 const useStore = create(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
 
 // Getting non-reactive fresh state
@@ -139,13 +140,21 @@ const paw = useStore.getState().paw
 // Listening to all changes, fires on every change
 const unsub1 = useStore.subscribe(console.log)
 // Listening to selected changes, in this case when "paw" changes
-const unsub2 = useStore.subscribe(console.log, state => state.paw)
+const unsub2 = useStore.subscribe((state) => state.paw, console.log)
 // Subscribe also supports an optional equality function
-const unsub3 = useStore.subscribe(console.log, state => [state.paw, state.fur], shallow)
+const unsub3 = useStore.subscribe(
+  (state) => [state.paw, state.fur],
+  console.log,
+  { equalityFn: shallow }
+)
 // Subscribe also exposes the previous value
-const unsub4 = useStore.subscribe((paw, previousPaw) => console.log(paw, previousPaw), state => state.paw)
+const unsub4 = useStore.subscribe(
+  (state) => state.paw,
+  (paw, previousPaw) => console.log(paw, previousPaw)
+)
 // Updating state, will trigger listeners
 useStore.setState({ paw: false })
+useStore.setState({ snout: false })
 // Unsubscribe listeners
 unsub1()
 unsub2()
