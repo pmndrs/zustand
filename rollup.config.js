@@ -139,7 +139,6 @@ function createSystemConfig(input, output, env) {
     output: {
       file: `${output}.${env}.js`,
       format: 'system',
-      exports: 'named',
     },
     external,
     plugins: [
