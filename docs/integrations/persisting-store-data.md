@@ -28,8 +28,6 @@ export const useFishStore = create(
 )
 ```
 
-See [Options](#options) for more details.
-
 ## Options
 
 ### `name`
@@ -206,8 +204,7 @@ export const useBoundStore = create(
 
 If you want to introduce a breaking change in your storage (e.g. renaming a field), you can specify a new version number.
 By default, if the version in the storage does not match the version in the code, the stored value won't be used.
-
-See the `migrate` option below for more details about handling breaking changes.
+You can use the `migrate` option to handle breaking changes in order to persist previously stored data.
 
 ### `migrate`
 
