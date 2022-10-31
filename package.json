@@ -21,39 +21,57 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "import": {
+        "types": "./esm/index.d.mts",
+        "default": "./esm/index.mjs"
+      },
       "types": "./index.d.ts",
       "module": "./esm/index.js",
-      "import": "./esm/index.mjs",
       "default": "./index.js"
     },
     "./vanilla": {
+      "import": {
+        "types": "./esm/vanilla.d.mts",
+        "default": "./esm/vanilla.mjs"
+      },
       "types": "./vanilla.d.ts",
       "module": "./esm/vanilla.js",
-      "import": "./esm/vanilla.mjs",
       "default": "./vanilla.js"
     },
     "./middleware": {
+      "import": {
+        "types": "./esm/middleware.d.mts",
+        "default": "./esm/middleware.mjs"
+      },
       "types": "./middleware.d.ts",
       "module": "./esm/middleware.js",
-      "import": "./esm/middleware.mjs",
       "default": "./middleware.js"
     },
     "./middleware/immer": {
+      "import": {
+        "types": "./esm/middleware/immer.d.mts",
+        "default": "./esm/middleware/immer.mjs"
+      },
       "types": "./middleware/immer.d.ts",
       "module": "./esm/middleware/immer.js",
-      "import": "./esm/middleware/immer.mjs",
       "default": "./middleware/immer.js"
     },
     "./shallow": {
+      "import": {
+        "types": "./esm/shallow.d.mts",
+        "default": "./esm/shallow.mjs"
+      },
       "types": "./shallow.d.ts",
       "module": "./esm/shallow.js",
-      "import": "./esm/shallow.mjs",
       "default": "./shallow.js"
     },
     "./context": {
+      "import": {
+        "types": "./esm/context.d.mts",
+        "default": "./esm/context.mjs"
+      },
       "types": "./context.d.ts",
       "module": "./esm/context.js",
-      "import": "./esm/context.mjs",
       "default": "./context.js"
     }
   },
@@ -67,7 +85,7 @@
     "build:middleware:immer": "rollup -c --config-middleware_immer",
     "build:shallow": "rollup -c --config-shallow",
     "build:context": "rollup -c --config-context",
-    "postbuild": "yarn copy",
+    "postbuild": "yarn copy && yarn patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
     "prettier:ci": "prettier '*.{js,json,md}' '{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
     "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
@@ -77,7 +95,8 @@
     "test:ci": "jest",
     "test:dev": "jest --watch --no-coverage",
     "test:coverage:watch": "jest --watch",
-    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined;\""
+    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined;\"",
+    "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>require('fs').copyFileSync(f,f.replace(/\\.ts$/,'.mts')))\"; shx sed -i \"s/ from '(\\..*)';$/ from '\\$1.mjs';/\" 'dist/esm/**/*.d.mts'; shx sed -i \"s/^declare module '(\\..*)'/declare module '\\$1.mjs'/\" 'dist/esm/**/*.d.mts'"
   },
   "engines": {
     "node": ">=12.7.0"
