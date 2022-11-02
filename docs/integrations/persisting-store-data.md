@@ -409,7 +409,7 @@ Why does it matter?
 Asynchronous hydration can cause some unexpected behaviors.
 For instance, if you use Zustand in a React app, the store will _not_ be hydrated at the initial render. In cases where you app depends on the persisted value at page load, you might want to wait until the store has been hydrated before showing anything (e.g. your app might think the user is not logged in because it's the default, while in reality the store has not been hydrated yet).
 
-If your app does depends on the persisted state at page load, see [How can I check if my store has been hydrated?](#how-can-i-check-if-my-store-has-been-hydrated?) in the Q/A.
+If your app does depends on the persisted state at page load, see **_How can I check if my store has been hydrated?_** in the Q/A section.
 
 ## Q/A
 
