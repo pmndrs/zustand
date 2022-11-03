@@ -1,4 +1,4 @@
-import { useDebugValue } from 'react'
+import { useDebugValue, useState } from 'react'
 // import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 // This doesn't work in ESM, because use-sync-external-store only exposes CJS.
 // See: https://github.com/pmndrs/valtio/issues/452
@@ -76,7 +76,25 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   return useBoundStore
 }
 
+const createLocalImpl = <T>(createState: StateCreator<T, [], []>) => {
+  const useBoundStore: any = (selector?: any, equalityFn?: any) => {
+    const [api] = useState(
+      typeof createState === 'function'
+        ? () => createStore(createState)
+        : createState
+    )
+
+    return useStore(api, selector, equalityFn)
+  }
+
+  return useBoundStore
+}
+
 const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
   createState ? createImpl(createState) : createImpl) as Create
+
+export const createLocal = (<T>(
+  createState: StateCreator<T, [], []> | undefined
+) => (createState ? createLocalImpl(createState) : createLocalImpl)) as Create
 
 export default create
