@@ -62,9 +62,9 @@ function App() {
 export default App
 ```
 
-### Changing multiple stores together
+### Updating multiple stores
 
-You can affect multiple stores together in a single function itself.
+You can update multiple stores, at the same time, in a single function.
 
 ```js
 import { createBearSlice } from './bearSlice'
