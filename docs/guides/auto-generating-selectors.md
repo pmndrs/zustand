@@ -67,7 +67,7 @@ const increase = useBearStore.use.increment()
 
 ## Live Demo
 
-For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-9i0ob3?file=/src/store.ts:396-408).
+For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-forked-rl8v5e?file=/src/selectors.ts).
 
 ## 3rd-party Libraries
 
