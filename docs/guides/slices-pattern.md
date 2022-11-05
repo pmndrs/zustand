@@ -62,6 +62,37 @@ function App() {
 export default App
 ```
 
+### Updating multiple stores
+
+You can update multiple stores, at the same time, in a single function.
+
+```js
+import { createBearSlice } from './bearSlice'
+import { createFishSlice } from './fishSlice'
+
+export const createBearFishSlice = (set) => ({
+  addBearAndFish: () => {
+    createBearSlice(set).addBear()
+    createFishSlice(set).addFish()
+  },
+})
+```
+
+Combining all the stores together is the same as before.
+
+```js
+import create from 'zustand'
+import { createBearSlice } from './bearSlice'
+import { createFishSlice } from './fishSlice'
+import { createBearFishSlice } from './createBearFishSlice'
+
+export const useBoundStore = create((...a) => ({
+  ...createBearSlice(...a),
+  ...createFishSlice(...a),
+  ...createBearFishSlice(...a),
+}))
+```
+
 ## Adding middlewares
 
 Adding middlewares to a combined store is the same as with other normal stores.
