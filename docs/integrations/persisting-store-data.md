@@ -544,7 +544,7 @@ withStorageDOMEvents(useBoundStore)
 
 ### How do I use with TypeScript?
 
-Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`.
+Basic typescript usage require define middleware and state like below.
 
 ```tsx
 import create from 'zustand'
@@ -555,7 +555,10 @@ interface MyState {
   addAFish: () => void
 }
 
-export const useFishStore = create<MyState>()(
+export const useFishStore = create<
+  MyState,
+  [['zustand/persist', Pick<MyState, 'fishes'>]]
+>()(
   persist(
     (set, get) => ({
       fishes: 0,
