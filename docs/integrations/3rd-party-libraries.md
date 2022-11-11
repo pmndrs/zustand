@@ -20,6 +20,7 @@ Zustand provides bear necessities for state management which is great for most p
 - [zoov](https://github.com/InfiniteXyy/zoov) - Use 🐻 Zustand with Module-like api
 - [zundo](https://github.com/charkour/zundo) - 🍜 enable time-travel in your apps. undo/redo middleware for zustand
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) - Context based state management that use the power of both zustand and constate, and remove many cons of them
+- [zustand-computed](https://github.com/chrisvander/zustand-computed) - A Zustand middleware to create computed states.
 - [zustand-forms](https://github.com/Conduct/zustand-forms) - fast typesafe form states as zustand stores
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) - This is a dead simple middleware for adding computed state to state management library Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) - This middleware allows you to easily put your xstate state machines into a global zustand store.
