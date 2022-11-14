@@ -544,7 +544,7 @@ withStorageDOMEvents(useBoundStore)
 
 ### How do I use with TypeScript?
 
-Basic typescript usage require define middleware and state like below.
+To use the persist middleware with TypeScript, you should describe both the shape of your store as well as each middleware being introduced. `create` accepts two generics parameters. Refer to the example below.
 
 ```tsx
 import create from 'zustand'
