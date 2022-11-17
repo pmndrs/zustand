@@ -1,0 +1,1 @@
+ENVIRONMENT = 'local'

@@ -1,0 +1,1 @@
+ENVIRONMENT = 'development'
