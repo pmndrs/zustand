@@ -1,6 +1,3 @@
-export const storeKey = 'store'
-export const actionKey = 'lastAction'
-
 /**
  * NOTE: the variable below should be used across ALL zustand stores
  * that are using such zustand middlewares:

@@ -1,6 +1,6 @@
 import { devOnlyDevtools as devtools } from '@pavlobu/zustand/middleware'
 import { immer } from '@pavlobu/zustand/middleware/immer'
-import { reactDevtoolsConnectionName } from '../../utils/redux-devtools/constants'
+import { reactDevtoolsConnectionName } from '../../constants'
 import create from '@pavlobu/zustand'
 
 export interface BearsState {
