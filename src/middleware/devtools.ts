@@ -148,9 +148,10 @@ type DevtoolsImpl = <T>(
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
-let extensionGlobal: ReturnType<
+type ConnectResponse = ReturnType<
   NonNullable<Window['__REDUX_DEVTOOLS_EXTENSION__']>['connect']
 >
+const connections: Record<string, ConnectResponse> = {}
 
 const storeApis: (StoreApi<any> & { store: string })[] = []
 const initialStoreStates: (any & { store: string })[] = []
@@ -197,13 +198,15 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    let extension = extensionGlobal
-    if (extensionGlobal === undefined && store !== undefined) {
-      extensionGlobal = extensionConnector.connect(options)
-      extension = extensionGlobal
+    const name = options.name ?? ''
+    let connection = connections[name]
+    if (store !== undefined && connections[name] === undefined) {
+      const connectResponse = extensionConnector.connect(options)
+      connections[name] = connectResponse
+      connection = connectResponse
     }
     if (store === undefined) {
-      extension = extensionConnector.connect(options)
+      connection = extensionConnector.connect(options)
     }
 
     let isRecording = true
@@ -211,7 +214,7 @@ const devtoolsImpl: DevtoolsImpl =
       const r = set(state, replace)
       if (!isRecording) return r
       if (store === undefined) {
-        extension.send(
+        connection?.send(
           nameOrAction === undefined
             ? { type: anonymousActionType || 'anonymous' }
             : typeof nameOrAction === 'string'
@@ -239,7 +242,7 @@ const devtoolsImpl: DevtoolsImpl =
         }
         return { type: anonymousActionType || 'anonymous' }
       }
-      extension.send(getNameOrAction(nameOrAction), {
+      connection?.send(getNameOrAction(nameOrAction), {
         ...getCurrentStoresStates(),
         [store]: { ...api.getState(), store },
       })
@@ -255,7 +258,7 @@ const devtoolsImpl: DevtoolsImpl =
 
     const initialState = fn(api.setState, get, api)
     if (store === undefined) {
-      extension.init(initialState)
+      connection?.init(initialState)
     } else {
       storeApis.push({ ...api, store })
       initialStoreStates.push({ ...initialState, store })
@@ -263,7 +266,7 @@ const devtoolsImpl: DevtoolsImpl =
       initialStoreStates.forEach((storeState) => {
         inits[storeState.store] = storeState
       })
-      extension.init(inits)
+      connection?.init(inits)
       console.warn('zustand initialized with initial state', inits)
     }
 
@@ -290,7 +293,7 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     ;(
-      extension as unknown as {
+      connection as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
         subscribe: (
           listener: (message: Message) => void
@@ -335,26 +338,26 @@ const devtoolsImpl: DevtoolsImpl =
             case 'RESET':
               setStateFromDevtools(initialState as S)
               if (store === undefined) {
-                return extension.init(api.getState())
+                return connection?.init(api.getState())
               }
-              return extension.init(getCurrentStoresStates())
+              return connection?.init(getCurrentStoresStates())
 
             case 'COMMIT':
               if (store === undefined) {
-                extension.init(api.getState())
+                connection?.init(api.getState())
                 return
               }
-              return extension.init(getCurrentStoresStates())
+              return connection?.init(getCurrentStoresStates())
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
                 if (store === undefined) {
                   setStateFromDevtools(state)
-                  extension.init(api.getState())
+                  connection?.init(api.getState())
                   return
                 }
                 setStateFromDevtools(state[store] as S)
-                extension.init(getCurrentStoresStates())
+                connection?.init(getCurrentStoresStates())
               })
 
             case 'JUMP_TO_STATE':
@@ -382,7 +385,7 @@ const devtoolsImpl: DevtoolsImpl =
               } else {
                 setStateFromDevtools(lastComputedState[store])
               }
-              extension.send(
+              connection?.send(
                 null as any, // FIXME no-any
                 nextLiftedState
               )
@@ -395,23 +398,10 @@ const devtoolsImpl: DevtoolsImpl =
           return
       }
     })
+
     return initialState
   }
 export const devtools = devtoolsImpl as unknown as Devtools
-
-const isDevEnv = process.env.REACT_APP_CUSTOM_NODE_ENV
-  ? process.env.REACT_APP_CUSTOM_NODE_ENV !== 'production'
-  : process.env.NODE_ENV !== 'production'
-const devOnlyDevtoolsImpl: DevtoolsImpl =
-  (fn, devtoolsOptions = {}) =>
-  (set, get, api) => {
-    if (isDevEnv) {
-      return devtools(fn, devtoolsOptions)(set, get, api)
-    }
-    return fn(set, get, api)
-  }
-
-export const devOnlyDevtools = devOnlyDevtoolsImpl as unknown as Devtools
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
