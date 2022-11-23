@@ -151,24 +151,35 @@ export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 type ConnectResponse = ReturnType<
   NonNullable<Window['__REDUX_DEVTOOLS_EXTENSION__']>['connect']
 >
-const connections: Record<string, ConnectResponse> = {}
+const connections: Map<string | undefined, ConnectResponse> = new Map()
 
-const storeApis: (StoreApi<any> & { store: string })[] = []
-const initialStoreStates: (any & { store: string })[] = []
+type ConnectionStoreApis = (StoreApi<any> & { store: string })[]
+const connectionStoreApis: Map<string | undefined, ConnectionStoreApis> =
+  new Map()
+type ConnectionInitialStoreStates = (any & { store: string })[]
+const connectionInitialStoreStates: Map<
+  string | undefined,
+  ConnectionInitialStoreStates
+> = new Map()
 
-const getCurrentStoresStates = () => {
-  const storesStates = storeApis.map((storeApi) => ({
+const getCurrentConnectionStoresStates = (
+  name: string | undefined
+): Record<string, any> => {
+  let api = connectionStoreApis.get(name)
+  if (api === undefined) {
+    const arr: NonNullable<ConnectionStoreApis> = []
+    connectionStoreApis.set(name, arr)
+    api = arr
+  }
+  const states = api.map((storeApi) => ({
     ...storeApi.getState(),
     store: storeApi.store,
   }))
-  const currentStates: Record<
-    string,
-    ReturnType<StoreApi<any>['getState']>
-  > = {}
-  storesStates.forEach((storeState) => {
-    currentStates[storeState.store] = storeState
+  const res: Record<string, ReturnType<StoreApi<any>['getState']>> = {}
+  states.forEach((storeState) => {
+    res[storeState.store] = storeState
   })
-  return currentStates
+  return res
 }
 
 const devtoolsImpl: DevtoolsImpl =
@@ -176,7 +187,9 @@ const devtoolsImpl: DevtoolsImpl =
   (set, get, api) => {
     const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
-    type S = ReturnType<typeof fn> & { [store: string]: S }
+    type S = ReturnType<typeof fn> & {
+      [store: string]: S
+    }
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
     let extensionConnector:
@@ -198,11 +211,10 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const name = options.name ?? ''
-    let connection = connections[name]
-    if (store !== undefined && connections[name] === undefined) {
+    let connection = connections.get(options.name)
+    if (store !== undefined && connections.get(options.name) === undefined) {
       const connectResponse = extensionConnector.connect(options)
-      connections[name] = connectResponse
+      connections.set(options.name, connectResponse)
       connection = connectResponse
     }
     if (store === undefined) {
@@ -228,22 +240,22 @@ const devtoolsImpl: DevtoolsImpl =
         name?: string | { type: unknown }
       ): Action<unknown> {
         if (name !== undefined && typeof name === 'string') {
-          return { type: name }
+          return { type: `${store ? `${store}/` : ''}${name}` }
         }
         if (
           name !== undefined &&
           typeof name !== 'string' &&
           store !== undefined
         ) {
-          return { type: `${store}/${name.type}` }
+          return { ...name, type: `${store}/${name.type}` }
         }
         if (name !== undefined) {
           return name
         }
-        return { type: anonymousActionType || 'anonymous' }
+        return { type: `${store}/${anonymousActionType || 'anonymous'}` }
       }
       connection?.send(getNameOrAction(nameOrAction), {
-        ...getCurrentStoresStates(),
+        ...getCurrentConnectionStoresStates(options.name),
         [store]: { ...api.getState(), store },
       })
       return r
@@ -260,14 +272,25 @@ const devtoolsImpl: DevtoolsImpl =
     if (store === undefined) {
       connection?.init(initialState)
     } else {
-      storeApis.push({ ...api, store })
-      initialStoreStates.push({ ...initialState, store })
+      let storeApis = connectionStoreApis.get(options.name)
+      if (storeApis === undefined) {
+        const arr: NonNullable<ConnectionStoreApis> = []
+        connectionStoreApis.set(options.name, arr)
+        storeApis = arr
+      }
+      storeApis?.push({ ...api, store })
+      let initStates = connectionInitialStoreStates.get(options.name)
+      if (initStates === undefined) {
+        const arr: NonNullable<ConnectionInitialStoreStates> = []
+        connectionInitialStoreStates.set(options.name, arr)
+        initStates = arr
+      }
+      initStates?.push({ ...initialState, store })
       const inits: Record<string, S> = {}
-      initialStoreStates.forEach((storeState) => {
+      initStates?.forEach((storeState) => {
         inits[storeState.store] = storeState
       })
       connection?.init(inits)
-      console.warn('zustand initialized with initial state', inits)
     }
 
     if (
@@ -312,19 +335,35 @@ const devtoolsImpl: DevtoolsImpl =
             message.payload,
             (action) => {
               if (action.type === '__setState') {
-                if (action.type === '__setState') {
-                  if (store === undefined) {
-                    setStateFromDevtools(action.state as PartialState)
-                    return
-                  }
-                  if (
-                    JSON.stringify(api.getState()) !==
-                    JSON.stringify((action.state as S)[store])
-                  ) {
-                    setStateFromDevtools(action.state as S)
-                  }
+                if (store === undefined) {
+                  setStateFromDevtools(action.state as PartialState)
                   return
                 }
+                if (
+                  Object.keys(action.state as S).length > 1 ||
+                  Object.keys(action.state as S).length < 1
+                ) {
+                  console.error(
+                    `
+                    [zustand devtools middleware] Unsupported __setState action format. 
+                    When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
+                    and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
+                    `
+                  )
+                }
+                if ((action.state as S)[store] === undefined) {
+                  return
+                }
+                const stateFromDevtools = (action.state as S)[store]
+                if (stateFromDevtools) {
+                  if (
+                    JSON.stringify(api.getState()) !==
+                    JSON.stringify(stateFromDevtools)
+                  ) {
+                    setStateFromDevtools(stateFromDevtools)
+                  }
+                }
+                return
               }
 
               if (!(api as any).dispatchFromDevtools) return
@@ -340,14 +379,18 @@ const devtoolsImpl: DevtoolsImpl =
               if (store === undefined) {
                 return connection?.init(api.getState())
               }
-              return connection?.init(getCurrentStoresStates())
+              return connection?.init(
+                getCurrentConnectionStoresStates(options.name)
+              )
 
             case 'COMMIT':
               if (store === undefined) {
                 connection?.init(api.getState())
                 return
               }
-              return connection?.init(getCurrentStoresStates())
+              return connection?.init(
+                getCurrentConnectionStoresStates(options.name)
+              )
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
@@ -357,7 +400,7 @@ const devtoolsImpl: DevtoolsImpl =
                   return
                 }
                 setStateFromDevtools(state[store] as S)
-                connection?.init(getCurrentStoresStates())
+                connection?.init(getCurrentConnectionStoresStates(options.name))
               })
 
             case 'JUMP_TO_STATE':
