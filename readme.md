@@ -390,6 +390,7 @@ const useReduxStore = create(devtools(redux(reducer, initialState)))
 ```
 
 One redux devtools connection for multiple stores
+
 ```jsx
 import { devtools } from 'zustand/middleware'
 
@@ -400,6 +401,7 @@ const usePlainStore2 = create(devtools(store), { name, store: storeName2 })
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName3 })
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName4 })
 ```
+
 Assingning different connection names, will separate stores in redux devtools. This also helps grouping different stores into separate redux devtools connections.
 
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.
