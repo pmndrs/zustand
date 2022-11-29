@@ -111,7 +111,7 @@ If you are using `Immer`, make sure you are actually following the rules of
 
 For example, you have to add `[immerable] = true` for
 [class objects](https://immerjs.github.io/immer/complex-objects) to work. If
-you don't to this, `Immer` will still mutate the object, but not as a proxy, so
+you don't do this, `Immer` will still mutate the object, but not as a proxy, so
 it will also update the current state. `Zustand` checks if the state has
 actually changed, so since both the current state as well as the next state are
 equal (if you don't do it correctly), it will skip calling the subscriptions.
