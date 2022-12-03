@@ -60,7 +60,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   let state: TState
   const listeners: Set<Listener> = new Set()
 
-  const setState: SetStateInternal<TState> = (partial, replace) => {
+  const setState: StoreApi<TState>['setState'] = (partial, replace) => {
     // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
     // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
     const nextState =
@@ -77,15 +77,15 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     }
   }
 
-  const getState: () => TState = () => state
+  const getState: StoreApi<TState>['getState'] = () => state
 
-  const subscribe: (listener: Listener) => () => void = (listener) => {
+  const subscribe: StoreApi<TState>['subscribe'] = (listener) => {
     listeners.add(listener)
     // Unsubscribe
     return () => listeners.delete(listener)
   }
 
-  const destroy: () => void = () => listeners.clear()
+  const destroy: StoreApi<TState>['destroy'] = () => listeners.clear()
   const api = { setState, getState, subscribe, destroy }
   state = createState(setState, getState, api)
   return api as any
