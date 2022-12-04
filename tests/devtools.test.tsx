@@ -857,11 +857,11 @@ describe('when redux connection was called on multiple stores with `name` undefi
       }
       expect(connection.init).toHaveBeenCalledTimes(2)
       expect(connection.init).toHaveBeenNthCalledWith(1, {
-        [options1.store]: { ...initialState1, store: options1.store },
+        [options1.store]: initialState1,
       })
       expect(connection.init).toHaveBeenNthCalledWith(2, {
-        [options1.store]: { ...initialState1, store: options1.store },
-        [options2.store]: { ...initialState2, store: options2.store },
+        [options1.store]: initialState1,
+        [options2.store]: initialState2,
       })
     })
   })
@@ -979,19 +979,19 @@ describe('when redux connection was called on multiple stores with `name` provid
       }
       expect(connection1.init).toHaveBeenCalledTimes(2)
       expect(connection1.init).toHaveBeenNthCalledWith(1, {
-        [options1.store]: { ...initialState1, store: options1.store },
+        [options1.store]: initialState1,
       })
       expect(connection1.init).toHaveBeenNthCalledWith(2, {
-        [options1.store]: { ...initialState1, store: options1.store },
-        [options2.store]: { ...initialState2, store: options2.store },
+        [options1.store]: initialState1,
+        [options2.store]: initialState2,
       })
       expect(connection2.init).toHaveBeenCalledTimes(2)
       expect(connection2.init).toHaveBeenNthCalledWith(1, {
-        [options3.store]: { ...initialState3, store: options3.store },
+        [options3.store]: initialState3,
       })
       expect(connection2.init).toHaveBeenNthCalledWith(2, {
-        [options3.store]: { ...initialState3, store: options3.store },
-        [options4.store]: { ...initialState4, store: options4.store },
+        [options3.store]: initialState3,
+        [options4.store]: initialState4,
       })
     })
 
@@ -2623,7 +2623,7 @@ describe('when create devtools was called multiple times with `name` and `store`
         }
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/${testStateActionType}` },
-          { [options.store]: { count: 10, foo: 'bar', store: options.store } }
+          { [options.store]: { count: 10, foo: 'bar' } }
         )
 
         api.setState({ count: 15 }, false, {
@@ -2632,13 +2632,13 @@ describe('when create devtools was called multiple times with `name` and `store`
         })
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/${testStateActionType}`, payload: 15 },
-          { [options.store]: { count: 15, foo: 'bar', store: options.store } }
+          { [options.store]: { count: 15, foo: 'bar' } }
         )
 
         api.setState({ count: 5, foo: 'baz' }, true)
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/anonymous` },
-          { [options.store]: { count: 5, foo: 'baz', store: options.store } }
+          { [options.store]: { count: 5, foo: 'baz' } }
         )
       })
     })
@@ -2751,7 +2751,7 @@ describe('when create devtools was called multiple times with `name` and `store`
           )
           ;(connectionSubscriber as (message: any) => void)({
             type: 'ACTION',
-            payload: `{ "type": "__setState", "state": { "${options1.store}": { "foo": "bar", "store": "${options1.store}" } } }`,
+            payload: `{ "type": "__setState", "state": { "${options1.store}": { "foo": "bar" } } }`,
           })
 
           expect(console.error).toHaveBeenCalledTimes(1)
@@ -2759,7 +2759,6 @@ describe('when create devtools was called multiple times with `name` and `store`
           expect(api1.getState()).toStrictEqual({
             ...initialState1,
             foo: 'bar',
-            store: options1.store,
           })
           expect(api2.getState()).toStrictEqual({ ...initialState2 })
 
