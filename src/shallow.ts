@@ -15,7 +15,7 @@ function shallow<T>(objA: T, objB: T) {
     if (objA.size !== objB.size) return false
 
     for (const [key, value] of objA) {
-      if (value !== objB.get(key)) {
+      if (!Object.is(value, objB.get(key))) {
         return false
       }
     }
