@@ -39,6 +39,43 @@ describe('shallow', () => {
     expect(shallow([{ foo: 'bar' }], [{ foo: 'bar', asd: 123 }])).toBe(false)
   })
 
+  it('compares Maps', () => {
+    function createMap<T extends object>(obj: T) {
+      return new Map(Object.entries(obj))
+    }
+
+    expect(
+      shallow(
+        createMap({ foo: 'bar', asd: 123 }),
+        createMap({ foo: 'bar', asd: 123 })
+      )
+    ).toBe(true)
+
+    expect(
+      shallow(
+        createMap({ foo: 'bar', asd: 123 }),
+        createMap({ foo: 'bar', foobar: true })
+      )
+    ).toBe(false)
+
+    expect(
+      shallow(
+        createMap({ foo: 'bar', asd: 123 }),
+        createMap({ foo: 'bar', asd: 123, foobar: true })
+      )
+    ).toBe(false)
+  })
+
+  it('compares Sets', () => {
+    expect(shallow(new Set(['bar', 123]), new Set(['bar', 123]))).toBe(true)
+
+    expect(shallow(new Set(['bar', 123]), new Set(['bar', 2]))).toBe(false)
+
+    expect(shallow(new Set(['bar', 123]), new Set(['bar', 123, true]))).toBe(
+      false
+    )
+  })
+
   it('compares functions', () => {
     function firstFnCompare() {
       return { foo: 'bar' }
