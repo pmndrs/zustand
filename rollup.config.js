@@ -82,7 +82,7 @@ function createCommonJSConfig(input, output, options) {
       file: `${output}.js`,
       format: 'cjs',
       outro: options.addModuleExport
-        ? 'module.exports = exports.default; Object.assign(exports.default, exports)'
+        ? 'module.exports = exports.default; Object.assign(exports.default, exports);'
         : '',
     },
     external,
