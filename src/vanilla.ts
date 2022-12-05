@@ -63,7 +63,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   let state: TState
   const listeners: Set<Listener> = new Set()
 
-  const setState: SetStateInternal<TState> = (partial, replace) => {
+  const setState: StoreApi<TState>['setState'] = (partial, replace) => {
     // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
     // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
     const nextState =
@@ -80,15 +80,15 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     }
   }
 
-  const getState: () => TState = () => state
+  const getState: StoreApi<TState>['getState'] = () => state
 
-  const subscribe: (listener: Listener) => () => void = (listener) => {
+  const subscribe: StoreApi<TState>['subscribe'] = (listener) => {
     listeners.add(listener)
     // Unsubscribe
     return () => listeners.delete(listener)
   }
 
-  const destroy: () => void = () => {
+  const destroy: StoreApi<TState>['destroy'] = () => {
     if (__DEV__) {
       console.warn(
         '[DEPRECATED] The destroy method will be unsupported in the future version. You should use unsubscribe function returned by subscribe. Everything will be garbage collected if store is garbage collected.'

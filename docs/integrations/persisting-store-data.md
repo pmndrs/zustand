@@ -6,7 +6,7 @@ nav: 17
 The persist middleware enables you to store your Zustand state in a storage (e.g. `localStorage`, `AsyncStorage`, `IndexedDB`, etc...) thus persisting it's data.
 
 Note that this middleware does support both synchronous storages (e.g. `localStorage`) and asynchronous storages (e.g. `AsyncStorage`), but using an asynchronous storage does come with a cost.
-See [Hydration and asynchronous storages](#Hydration-and-asynchronous-storages) for more details.
+See [Hydration and asynchronous storages](#hydration-and-asynchronous-storages) for more details.
 
 Quick example:
 
@@ -27,8 +27,6 @@ export const useFishStore = create(
   )
 )
 ```
-
-See [Options](#Options) for more details.
 
 ## Options
 
@@ -206,8 +204,7 @@ export const useBoundStore = create(
 
 If you want to introduce a breaking change in your storage (e.g. renaming a field), you can specify a new version number.
 By default, if the version in the storage does not match the version in the code, the stored value won't be used.
-
-See the `migrate` option below for more details about handling breaking changes.
+You can use the `migrate` option to handle breaking changes in order to persist previously stored data.
 
 ### `migrate`
 
@@ -412,7 +409,7 @@ Why does it matter?
 Asynchronous hydration can cause some unexpected behaviors.
 For instance, if you use Zustand in a React app, the store will _not_ be hydrated at the initial render. In cases where you app depends on the persisted value at page load, you might want to wait until the store has been hydrated before showing anything (e.g. your app might think the user is not logged in because it's the default, while in reality the store has not been hydrated yet).
 
-If your app does depends on the persisted state at page load, see [How can I check if my store has been hydrated?](#how-can-I-check-if-my-store-has-been-hydrated) in the Q/A.
+If your app does depends on the persisted state at page load, see **_How can I check if my store has been hydrated?_** in the Q/A section.
 
 ## Q/A
 

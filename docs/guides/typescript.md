@@ -5,7 +5,7 @@ nav: 8
 
 ## Basic usage
 
-The difference when using TypeScript is that instead of writing `create(...)`, you have to write `create<T>()(...)` where `T` is the type of the state to annotate it. For example:
+The difference when using TypeScript is that instead of writing `create(...)`, you have to write `create<T>()(...)` (notice the extra parenthesis `()` too along with the type parameter) where `T` is the type of the state to annotate it. For example:
 
 ```ts
 import create from 'zustand'

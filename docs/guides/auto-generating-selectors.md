@@ -14,13 +14,13 @@ However, writing these could be tedious. If that is the case for you, you can au
 ## create the following function: `createSelectors`
 
 ```typescript
-import { State, StoreApi, UseBoundStore } from 'zustand'
+import { StoreApi, UseBoundStore } from 'zustand'
 
 type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
   : never
 
-const createSelectors = <S extends UseBoundStore<StoreApi<State>>>(
+const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(
   _store: S
 ) => {
   let store = _store as WithSelectors<typeof _store>
@@ -67,7 +67,7 @@ const increase = useBearStore.use.increment()
 
 ## Live Demo
 
-For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-9i0ob3?file=/src/store.ts:396-408).
+For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-forked-rl8v5e?file=/src/selectors.ts).
 
 ## 3rd-party Libraries
 

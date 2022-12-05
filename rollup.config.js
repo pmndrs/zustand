@@ -75,10 +75,16 @@ function createESMConfig(input, output) {
   }
 }
 
-function createCommonJSConfig(input, output) {
+function createCommonJSConfig(input, output, options) {
   return {
     input,
-    output: { file: `${output}.js`, format: 'cjs' },
+    output: {
+      file: `${output}.js`,
+      format: 'cjs',
+      outro: options.addModuleExport
+        ? 'module.exports = exports.default; Object.assign(exports.default, exports);'
+        : '',
+    },
     external,
     plugins: [
       alias({
@@ -166,7 +172,9 @@ module.exports = function (args) {
   }
   return [
     ...(c === 'index' ? [createDeclarationConfig(`src/${c}.ts`, 'dist')] : []),
-    createCommonJSConfig(`src/${c}.ts`, `dist/${c}`),
+    createCommonJSConfig(`src/${c}.ts`, `dist/${c}`, {
+      addModuleExport: c === 'index',
+    }),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
     createUMDConfig(`src/${c}.ts`, `dist/umd/${c}`, 'development'),
