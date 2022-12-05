@@ -5,10 +5,18 @@ type SetStateInternal<T> = {
   ): void
 }['_']
 
+type SubscribeInternal<T> = {
+  (listener: (state: T, prevState: T) => void): () => void
+  <R>(
+    selector: (state: T) => R,
+    listener: (state: R, prevState: R) => void
+  ): void
+}
+
 export interface StoreApi<T> {
   setState: SetStateInternal<T>
   getState: () => T
-  subscribe: (listener: (state: T, prevState: T) => void) => () => void
+  subscribe: SubscribeInternal<T>
   destroy: () => void
 }
 
