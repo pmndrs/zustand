@@ -160,7 +160,7 @@ const devtoolsImpl: DevtoolsImpl =
     try {
       extensionConnector =
         (enabled ?? __DEV__) && window.__REDUX_DEVTOOLS_EXTENSION__
-    } catch {
+    } catch (e) {
       // ignored
     }
 
