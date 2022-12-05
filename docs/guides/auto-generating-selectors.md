@@ -6,7 +6,7 @@ nav: 6
 We recommend using selectors when using either the properties or actions from the store. You can access values from the store like so:
 
 ```typescript
-const bears = useBearStore((state) => state.bears);
+const bears = useBearStore((state) => state.bears)
 ```
 
 However, writing these could be tedious. If that is the case for you, you can auto-generate your selectors.
@@ -14,56 +14,55 @@ However, writing these could be tedious. If that is the case for you, you can au
 ## create the following function: `createSelectors`
 
 ```typescript
-import { StoreApi, UseBoundStore } from "zustand";
-
+import { StoreApi, UseBoundStore } from 'zustand'
 
 type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
-  : never;
+  : never
 
 const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(
   _store: S
 ) => {
-  let store = _store as WithSelectors<typeof _store>;
-  store.use = {};
+  let store = _store as WithSelectors<typeof _store>
+  store.use = {}
   for (let k of Object.keys(store.getState())) {
-    (store.use as any)[k] = () => store((s) => s[k as keyof typeof s]);
+    ;(store.use as any)[k] = () => store((s) => s[k as keyof typeof s])
   }
 
-  return store;
-};
+  return store
+}
 ```
 
 If you have a store like this:
 
 ```typescript
 interface BearState {
-  bears: number;
-  increase: (by: number) => void;
-  increment: () => void;
+  bears: number
+  increase: (by: number) => void
+  increment: () => void
 }
 
 const useBearStoreBase = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
   increment: () => set((state) => ({ bears: state.bears + 1 })),
-}));
+}))
 ```
 
 Apply that function to your store:
 
 ```typescript
-const useBearStore = createSelectors(useBearStoreBase);
+const useBearStore = createSelectors(useBearStoreBase)
 ```
 
 Now the selectors are auto generated and you can access them directly:
 
 ```typescript
 // get the property
-const bears = useBearStore.use.bears();
+const bears = useBearStore.use.bears()
 
 // get the action
-const increase = useBearStore.use.increment();
+const increase = useBearStore.use.increment()
 ```
 
 ## Live Demo
