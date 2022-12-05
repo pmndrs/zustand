@@ -75,12 +75,15 @@ function createESMConfig(input, output) {
   }
 }
 
-function createCommonJSConfig(input, output, options = {}) {
-  const config = {
+function createCommonJSConfig(input, output, options) {
+  return {
     input,
     output: {
       file: `${output}.js`,
       format: 'cjs',
+      outro: options.addModuleExport
+        ? 'module.exports = exports.default; Object.assign(exports.default, exports)'
+        : '',
     },
     external,
     plugins: [
@@ -97,12 +100,6 @@ function createCommonJSConfig(input, output, options = {}) {
       babelPlugin(getBabelOptions({ ie: 11 })),
     ],
   }
-  if (options.addModuleExport) {
-    config.output.outro =
-      'module.exports = exports.default; Object.assign(exports.default,exports)'
-  }
-
-  return config
 }
 
 function createUMDConfig(input, output, env) {
