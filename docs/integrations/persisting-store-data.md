@@ -35,9 +35,9 @@ export const useFishStore = create(
 This is the only required option.
 The given name is going to be the key used to store your Zustand state in the storage, so it must be unique.
 
-### `getStorage`
+### `storage`
 
-> Default: `() => localStorage`
+> Default: `createJSONStorage(() => localStorage)`
 
 Enables you to use your own storage.
 Simply pass a function that returns the storage you want to use.
@@ -45,6 +45,8 @@ Simply pass a function that returns the storage you want to use.
 Example:
 
 ```ts
+import { persist, createJSONStorage } from 'zustand/middleware'
+
 export const useBoundStore = create(
   persist(
     (set, get) => ({
@@ -52,7 +54,7 @@ export const useBoundStore = create(
     }),
     {
       // ...
-      getStorage: () => AsyncStorage,
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 )
@@ -61,61 +63,13 @@ export const useBoundStore = create(
 The given storage must match the following interface:
 
 ```ts
-interface Storage {
-  getItem: (name: string) => string | null | Promise<string | null>
-  setItem: (name: string, value: string) => void | Promise<void>
+interface Storage<S> {
+  getItem: (
+    name: string
+  ) => { state: S version?: number } | null | Promise<{ state: S version?: number } | null>
+  setItem: (name: string, value: { state: S version?: number }) => void | Promise<void>
   removeItem: (name: string) => void | Promise<void>
 }
-```
-
-### `serialize`
-
-> Schema: `(state: Object) => string | Promise<string>`
-
-> Default: `(state) => JSON.stringify(state)`
-
-Since the only way to store an object in a storage is via a string, you can use this option to give a custom function to serialize your state to a string.
-
-For example, if you want to store your state in base64:
-
-```ts
-export const useBoundStore = create(
-  persist(
-    (set, get) => ({
-      // ...
-    }),
-    {
-      // ...
-      serialize: (state) => btoa(JSON.stringify(state)),
-    }
-  )
-)
-```
-
-Note that you would also need a custom `deserialize` function to make this work properly. See below.
-
-### `deserialize`
-
-> Schema: `(str: string) => Object | Promise<Object>`
-
-> Default: `(str) => JSON.parse(str)`
-
-If you pass a custom serialize function, you will most likely need to pass a custom deserialize function as well.
-
-To continue the example above, you could deserialize the base64 value using the following:
-
-```ts
-export const useBoundStore = create(
-  persist(
-    (set, get) => ({
-      // ...
-    }),
-    {
-      // ...
-      deserialize: (str) => JSON.parse(atob(str)),
-    }
-  )
-)
 ```
 
 ### `partialize`

@@ -310,7 +310,7 @@ You can persist your store's data using any kind of storage.
 
 ```jsx
 import create from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 const useFishStore = create(
   persist(
@@ -320,7 +320,7 @@ const useFishStore = create(
     }),
     {
       name: 'food-storage', // unique name
-      getStorage: () => sessionStorage, // (optional) by default, 'localStorage' is used
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
     }
   )
 )

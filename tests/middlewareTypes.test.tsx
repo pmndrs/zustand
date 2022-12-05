@@ -196,7 +196,7 @@ describe('counter state spec (single middleware)', () => {
     TestComponent
 
     const _testSubtyping: StoreApi<object> = createVanilla(
-      persist(() => ({ count: 0 }))
+      persist(() => ({ count: 0 }), { name: 'prefix' })
     )
   })
 
