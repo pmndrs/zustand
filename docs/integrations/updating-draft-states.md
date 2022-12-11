@@ -47,7 +47,7 @@ export const useCountStore = create(
 )
 ```
 
-Updating a complex states
+Updating complex states
 
 ```ts
 import create from 'zustand'
