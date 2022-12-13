@@ -1,34 +1,75 @@
 import { StoreApi } from 'zustand/vanilla'
 
-const connectionSubscribers = new Map<
-  string | undefined,
-  ((message: any) => void) | undefined
->()
-const nameUndefinedConnectionSubscribers = new Map<
-  string | undefined,
-  ((message: any) => void) | undefined
->()
-const connections = new Map<
-  string | undefined,
-  {
-    subscribe: jest.Mock<() => void, [f: any]>
-    unsubscribe: jest.Mock<any, any>
-    send: jest.Mock<any, any>
-    init: jest.Mock<any, any>
-    error: jest.Mock<any, any>
-  }
->()
+type TupleOfEqualLengthH<
+  Arr extends unknown[],
+  T,
+  Acc extends T[]
+> = Arr extends [unknown, ...infer Rest]
+  ? TupleOfEqualLengthH<Rest, T, [T, ...Acc]>
+  : Acc
+type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
+  ? T[]
+  : TupleOfEqualLengthH<Arr, T, []>
 
-const nameUndefinedConnections = new Map<
-  string,
-  {
+type Connection = {
+  subscribers: ((message: unknown) => void)[]
+  api: {
     subscribe: jest.Mock<() => void, [f: any]>
     unsubscribe: jest.Mock<any, any>
     send: jest.Mock<any, any>
     init: jest.Mock<any, any>
     error: jest.Mock<any, any>
+    dispatch?: jest.Mock<any, any>
   }
->()
+}
+const namedConnections = new Map<string | undefined, Connection>()
+const unnamedConnections = new Map<string, Connection>()
+
+function assertAllAreDefined<T>(arr: (T | undefined)[]): asserts arr is T[] {
+  if (arr.some((e) => e === undefined)) {
+    throw new Error()
+  }
+}
+function getNamedConnectionApis<Keys extends (string | undefined)[]>(
+  ...keys: Keys
+) {
+  const apis = keys.map((k) => namedConnections.get(k)?.api)
+  assertAllAreDefined(apis)
+  return apis as TupleOfEqualLength<Keys, Connection['api']>
+}
+function getNamedConnectionSubscribers<Keys extends (string | undefined)[]>(
+  ...keys: Keys
+) {
+  const subscribers = keys.map((k) => {
+    const subs = namedConnections.get(k)?.subscribers
+    if (subs?.length !== 1) throw new Error()
+    return subs[0]
+  })
+  assertAllAreDefined(subscribers)
+  return subscribers as TupleOfEqualLength<
+    Keys,
+    Connection['subscribers'][number]
+  >
+}
+function getUnnamedConnectionApis<Keys extends string[]>(...keys: Keys) {
+  const apis = keys.map((k) => unnamedConnections.get(k)?.api)
+  assertAllAreDefined(apis)
+  return apis as TupleOfEqualLength<Keys, Connection['api']>
+}
+function getUnnamedConnectionSubscribers<Keys extends string[]>(...keys: Keys) {
+  const subscribers = keys.map((k) => {
+    const subs = unnamedConnections.get(k)?.subscribers
+    if (!subs) {
+      throw new Error()
+    }
+    return subs[0]
+  })
+  assertAllAreDefined(subscribers)
+  return subscribers as TupleOfEqualLength<
+    Keys,
+    Connection['subscribers'][number]
+  >
+}
 
 function getKeyFromOptions(options: any): string | undefined {
   let key: string | undefined = options?.name
@@ -41,16 +82,16 @@ function getKeyFromOptions(options: any): string | undefined {
 const extensionConnector = {
   connect: jest.fn((options) => {
     const key = getKeyFromOptions(options)
-    console.log('options', options)
+    //console.log('options', options)
     const areNameUndefinedMapsNeeded =
       options.testConnectionId !== undefined && options?.name === undefined
-    const connection = {
+    const connectionMap = areNameUndefinedMapsNeeded
+      ? unnamedConnections
+      : namedConnections
+    const subscribers: Connection['subscribers'] = []
+    const api = {
       subscribe: jest.fn((f) => {
-        if (areNameUndefinedMapsNeeded) {
-          nameUndefinedConnectionSubscribers.set(options.testConnectionId, f)
-          return () => {}
-        }
-        connectionSubscribers.set(key, f)
+        subscribers.push(f)
         return () => {}
       }),
       unsubscribe: jest.fn(),
@@ -58,12 +99,14 @@ const extensionConnector = {
       init: jest.fn(),
       error: jest.fn(),
     }
-    if (areNameUndefinedMapsNeeded) {
-      nameUndefinedConnections.set(options.testConnectionId, connection)
-    } else {
-      connections.set(key, connection)
-    }
-    return connection
+    connectionMap.set(
+      areNameUndefinedMapsNeeded ? options.testConnectionId : key,
+      {
+        subscribers,
+        api,
+      }
+    )
+    return api
   }),
 }
 ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
@@ -71,9 +114,8 @@ const extensionConnector = {
 beforeEach(() => {
   jest.resetModules()
   extensionConnector.connect.mockClear()
-  connections.clear()
-  nameUndefinedConnections.clear()
-  connectionSubscribers.clear()
+  namedConnections.clear()
+  unnamedConnections.clear()
 })
 
 it('connects to the extension by passing the options and initializes', async () => {
@@ -84,10 +126,8 @@ it('connects to the extension by passing the options and initializes', async () 
   create(devtools(() => initialState, { enabled: true, ...options }))
 
   expect(extensionConnector.connect).toHaveBeenLastCalledWith(options)
-  const conn = connections.get(options.name)
-  if (undefined === conn) {
-    throw new Error()
-  }
+
+  const [conn] = getNamedConnectionApis(options.name)
   expect(conn.init).toHaveBeenLastCalledWith(initialState)
 })
 
@@ -157,10 +197,7 @@ describe('When state changes...', () => {
     const api = create(devtools(() => ({ count: 0, foo: 'bar' }), options))
 
     api.setState({ count: 10 }, false, 'testSetStateName')
-    const connection = connections.get(options.name)
-    if (undefined === connection) {
-      throw new Error()
-    }
+    const [connection] = getNamedConnectionApis(options.name)
     expect(connection.send).toHaveBeenLastCalledWith(
       { type: 'testSetStateName' },
       { count: 10, foo: 'bar' }
@@ -192,11 +229,8 @@ describe('when it receives a message of type...', () => {
       const api = create(devtools(() => initialState, { enabled: true }))
       const setState = jest.spyOn(api, 'setState')
 
-      const subscriber = connectionSubscribers.get(undefined)
-      if (undefined === subscriber) {
-        throw new Error()
-      }
-      ;(subscriber as (message: any) => void)({
+      const [subscriber] = getNamedConnectionSubscribers(undefined)
+      subscriber({
         type: 'ACTION',
         payload: '{ "type": "INCREMENT" }',
       })
@@ -211,11 +245,8 @@ describe('when it receives a message of type...', () => {
       const initialState = { count: 0 }
       const api = create(devtools(() => initialState, { enabled: true }))
 
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
-      ;(connectionSubscriber as (message: any) => void)({
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
         type: 'ACTION',
         payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
       })
@@ -231,11 +262,8 @@ describe('when it receives a message of type...', () => {
       ;(api as any).dispatch = jest.fn()
       const setState = jest.spyOn(api, 'setState')
 
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
-      ;(connectionSubscriber as (message: any) => void)({
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
         type: 'ACTION',
         payload: '{ "type": "INCREMENT" }',
       })
@@ -254,11 +282,8 @@ describe('when it receives a message of type...', () => {
       ;(api as any).dispatchFromDevtools = true
       const setState = jest.spyOn(api, 'setState')
 
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
-      ;(connectionSubscriber as (message: any) => void)({
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
         type: 'ACTION',
         payload: '{ "type": "INCREMENT" }',
       })
@@ -281,12 +306,9 @@ describe('when it receives a message of type...', () => {
       const originalConsoleError = console.error
       console.error = jest.fn()
 
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
       expect(() => {
-        ;(connectionSubscriber as (message: any) => void)({
+        connectionSubscriber({
           type: 'ACTION',
           payload: 'this.increment()',
         })
@@ -304,7 +326,7 @@ describe('when it receives a message of type...', () => {
       )
 
       expect(() => {
-        ;(connectionSubscriber as (message: any) => void)({
+        connectionSubscriber({
           type: 'ACTION',
           payload: { name: 'increment', args: [] },
         })
@@ -330,16 +352,10 @@ describe('when it receives a message of type...', () => {
       const api = create(devtools(() => initialState, { enabled: true }))
       api.setState({ count: 1 })
 
-      const connection = connections.get(undefined)
-      if (undefined === connection) {
-        throw new Error()
-      }
+      const [connection] = getNamedConnectionApis(undefined)
       connection.send.mockClear()
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
-      ;(connectionSubscriber as (message: any) => void)({
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
         type: 'DISPATCH',
         payload: { type: 'RESET' },
       })
@@ -357,16 +373,10 @@ describe('when it receives a message of type...', () => {
       api.setState({ count: 2 })
       const currentState = api.getState()
 
-      const connection = connections.get(undefined)
-      if (undefined === connection) {
-        throw new Error()
-      }
+      const [connection] = getNamedConnectionApis(undefined)
       connection.send.mockClear()
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
-      ;(connectionSubscriber as (message: any) => void)({
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
         type: 'DISPATCH',
         payload: { type: 'COMMIT' },
       })
@@ -383,16 +393,10 @@ describe('when it receives a message of type...', () => {
         const api = create(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
 
-        const connection = connections.get(undefined)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
-        const connectionSubscriber = connectionSubscribers.get(undefined)
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+        connectionSubscriber({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: JSON.stringify(newState),
@@ -415,17 +419,11 @@ describe('when it receives a message of type...', () => {
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connection = connections.get(undefined)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(undefined)
         connection.init.mockClear()
         connection.send.mockClear()
-        const connectionSubscriber = connectionSubscribers.get(undefined)
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+        connectionSubscriber({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: 'foobar',
@@ -458,16 +456,10 @@ describe('when it receives a message of type...', () => {
         const api = create(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
 
-        const connection = connections.get(undefined)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
-        const connectionSubscriber = connectionSubscribers.get(undefined)
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+        connectionSubscriber({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: JSON.stringify(newState),
@@ -484,16 +476,10 @@ describe('when it receives a message of type...', () => {
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connection = connections.get(undefined)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
-        const connectionSubscriber = connectionSubscribers.get(undefined)
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+        connectionSubscriber({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: 'foobar',
@@ -524,16 +510,10 @@ describe('when it receives a message of type...', () => {
         const api = create(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
 
-        const connection = connections.get(undefined)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
-        const connectionSubscriber = connectionSubscribers.get(undefined)
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+        connectionSubscriber({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: JSON.stringify(newState),
@@ -551,16 +531,10 @@ describe('when it receives a message of type...', () => {
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connection = connections.get(undefined)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
-        const connectionSubscriber = connectionSubscribers.get(undefined)
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+        connectionSubscriber({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: 'foobar',
@@ -592,16 +566,10 @@ describe('when it receives a message of type...', () => {
         computedStates: [{ state: { count: 4 } }, { state: { count: 5 } }],
       }
 
-      const connection = connections.get(undefined)
-      if (undefined === connection) {
-        throw new Error()
-      }
+      const [connection] = getNamedConnectionApis(undefined)
       connection.send.mockClear()
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
-      ;(connectionSubscriber as (message: any) => void)({
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
         type: 'DISPATCH',
         payload: {
           type: 'IMPORT_STATE',
@@ -621,19 +589,13 @@ describe('when it receives a message of type...', () => {
       const api = create(devtools(() => ({ count: 0 }), { enabled: true }))
 
       api.setState({ count: 1 }, false, 'increment')
-      const connection = connections.get(undefined)
-      if (undefined === connection) {
-        throw new Error()
-      }
-      const connectionSubscriber = connectionSubscribers.get(undefined)
-      if (undefined === connectionSubscriber) {
-        throw new Error()
-      }
+      const [connection] = getNamedConnectionApis(undefined)
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
       expect(connection.send).toHaveBeenLastCalledWith(
         { type: 'increment' },
         { count: 1 }
       )
-      ;(connectionSubscriber as (message: any) => void)({
+      connectionSubscriber({
         type: 'DISPATCH',
         payload: { type: 'PAUSE_RECORDING' },
       })
@@ -643,7 +605,7 @@ describe('when it receives a message of type...', () => {
         { type: 'increment' },
         { count: 1 }
       )
-      ;(connectionSubscriber as (message: any) => void)({
+      connectionSubscriber({
         type: 'DISPATCH',
         payload: { type: 'PAUSE_RECORDING' },
       })
@@ -684,15 +646,9 @@ describe('with redux middleware', () => {
     )
     ;(api as any).dispatch({ type: 'INCREMENT' })
     ;(api as any).dispatch({ type: 'INCREMENT' })
-    const connection = connections.get(undefined)
-    if (undefined === connection) {
-      throw new Error()
-    }
-    const connectionSubscriber = connectionSubscribers.get(undefined)
-    if (undefined === connectionSubscriber) {
-      throw new Error()
-    }
-    ;(connectionSubscriber as (message: any) => void)({
+    const [connection] = getNamedConnectionApis(undefined)
+    const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+    connectionSubscriber({
       type: 'ACTION',
       payload: JSON.stringify({ type: 'DECREMENT' }),
     })
@@ -749,19 +705,13 @@ it('preserves isRecording after setting from devtools', async () => {
   const { devtools } = await import('zustand/middleware')
   const create = await (await import('zustand/vanilla')).default
   const api = create(devtools(() => ({ count: 0 }), { enabled: true }))
-  const connection = connections.get(undefined)
-  if (undefined === connection) {
-    throw new Error()
-  }
-  const connectionSubscriber = connectionSubscribers.get(undefined)
-  if (undefined === connectionSubscriber) {
-    throw new Error()
-  }
-  ;(connectionSubscriber as (message: any) => void)({
+  const [connection] = getNamedConnectionApis(undefined)
+  const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+  connectionSubscriber({
     type: 'DISPATCH',
     payload: { type: 'PAUSE_RECORDING' },
   })
-  ;(connectionSubscriber as (message: any) => void)({
+  connectionSubscriber({
     type: 'ACTION',
     payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
   })
@@ -810,15 +760,12 @@ describe('when redux connection was called on multiple stores with `name` undefi
     create(devtools(() => initialState1, { enabled: true, ...options1 }))
     create(devtools(() => initialState2, { enabled: true, ...options2 }))
 
-    const conn1 = nameUndefinedConnections.get(options1.testConnectionId)
-    const conn2 = nameUndefinedConnections.get(options2.testConnectionId)
-    if (undefined === conn1 || undefined === conn2) {
-      console.log('conn2', conn2)
-      console.log('conn1', conn1)
-      throw new Error()
-    }
-    expect(conn1.init).toHaveBeenLastCalledWith(initialState1)
-    expect(conn2.init).toHaveBeenLastCalledWith(initialState2)
+    const [conn1, conn2] = getUnnamedConnectionApis(
+      options1.testConnectionId,
+      options2.testConnectionId
+    )
+    expect(conn1.init).toHaveBeenCalledWith(initialState1)
+    expect(conn2.init).toHaveBeenCalledWith(initialState2)
   })
 
   describe('when `store` property was provided in `devtools` call in options', () => {
@@ -851,17 +798,14 @@ describe('when redux connection was called on multiple stores with `name` undefi
       create(devtools(() => initialState2, { enabled: true, ...options2 }))
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
-      const connection = connections.get(undefined)
-      if (undefined === connection) {
-        throw new Error()
-      }
+      const [connection] = getNamedConnectionApis(undefined)
       expect(connection.init).toHaveBeenCalledTimes(2)
       expect(connection.init).toHaveBeenNthCalledWith(1, {
-        [options1.store]: { ...initialState1, store: options1.store },
+        [options1.store]: initialState1,
       })
       expect(connection.init).toHaveBeenNthCalledWith(2, {
-        [options1.store]: { ...initialState1, store: options1.store },
-        [options2.store]: { ...initialState2, store: options2.store },
+        [options1.store]: initialState1,
+        [options2.store]: initialState2,
       })
     })
   })
@@ -972,26 +916,25 @@ describe('when redux connection was called on multiple stores with `name` provid
       create(devtools(() => initialState4, { enabled: true, ...options4 }))
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(2)
-      const connection1 = connections.get(connectionNameGroup1)
-      const connection2 = connections.get(connectionNameGroup2)
-      if (undefined === connection1 || undefined === connection2) {
-        throw new Error()
-      }
+      const [connection1, connection2] = getNamedConnectionApis(
+        connectionNameGroup1,
+        connectionNameGroup2
+      )
       expect(connection1.init).toHaveBeenCalledTimes(2)
       expect(connection1.init).toHaveBeenNthCalledWith(1, {
-        [options1.store]: { ...initialState1, store: options1.store },
+        [options1.store]: initialState1,
       })
       expect(connection1.init).toHaveBeenNthCalledWith(2, {
-        [options1.store]: { ...initialState1, store: options1.store },
-        [options2.store]: { ...initialState2, store: options2.store },
+        [options1.store]: initialState1,
+        [options2.store]: initialState2,
       })
       expect(connection2.init).toHaveBeenCalledTimes(2)
       expect(connection2.init).toHaveBeenNthCalledWith(1, {
-        [options3.store]: { ...initialState3, store: options3.store },
+        [options3.store]: initialState3,
       })
       expect(connection2.init).toHaveBeenNthCalledWith(2, {
-        [options3.store]: { ...initialState3, store: options3.store },
-        [options4.store]: { ...initialState4, store: options4.store },
+        [options3.store]: initialState3,
+        [options4.store]: initialState4,
       })
     })
 
@@ -1004,27 +947,21 @@ describe('when redux connection was called on multiple stores with `name` provid
         devtools(() => ({ count: 0 }), { enabled: true, ...options1 })
       )
       create(devtools(() => ({ count: 0 }), { enabled: true, ...options2 }))
-      const connection1 = connections.get(options1.name)
-      const connection2 = connections.get(options2.name)
-      if (undefined === connection1 || undefined === connection2) {
-        throw new Error()
-      }
-      const connectionSubscriber1 = connectionSubscribers.get(options1.name)
-      if (undefined === connectionSubscriber1) {
-        throw new Error()
-      }
-      ;(connectionSubscriber1 as (message: any) => void)({
+      const connections = getNamedConnectionApis(options1.name, options2.name)
+      const [connectionSubscriber] = getNamedConnectionSubscribers(
+        options1.name
+      )
+      connectionSubscriber({
         type: 'DISPATCH',
         payload: { type: 'PAUSE_RECORDING' },
       })
-      ;(connectionSubscriber1 as (message: any) => void)({
+      connectionSubscriber({
         type: 'ACTION',
         payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
       })
 
       api1.setState({ count: 1 })
-      expect(connection1.send).not.toBeCalled()
-      expect(connection2.send).not.toBeCalled()
+      connections.forEach((conn) => expect(conn.send).not.toBeCalled())
     })
 
     describe('with redux middleware', () => {
@@ -1078,32 +1015,20 @@ describe('when redux connection was called on multiple stores with `name` provid
         ;(api1 as any).dispatch({ type: 'INCREMENT' })
         ;(api2 as any).dispatch({ type: 'INCREMENT' })
         ;(api2 as any).dispatch({ type: 'INCREMENT' })
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
+        const [connection1, connection2] = getUnnamedConnectionApis(
+          options1.testConnectionId,
           options2.testConnectionId
         )
-        if (undefined === connection1 || undefined === connection2) {
-          throw new Error()
-        }
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2
-        ) {
-          throw new Error()
-        }
-        ;(connectionSubscriber1 as (message: any) => void)({
+        const [connectionSubscriber1, connectionSubscriber2] =
+          getUnnamedConnectionSubscribers(
+            options1.testConnectionId,
+            options2.testConnectionId
+          )
+        connectionSubscriber1({
           type: 'ACTION',
           payload: JSON.stringify({ type: 'DECREMENT' }),
         })
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'ACTION',
           payload: JSON.stringify({ type: 'DECREMENT' }),
         })
@@ -1149,22 +1074,11 @@ describe('when create devtools was called multiple times with `name` option unde
       create(devtools(() => ({ count: 0, foo: 'bar2' }), options3))
 
       api1.setState({ count: 10 }, false, 'testSetStateName')
-      const connection1 = nameUndefinedConnections.get(
-        options1.testConnectionId
-      )
-      const connection2 = nameUndefinedConnections.get(
-        options2.testConnectionId
-      )
-      const connection3 = nameUndefinedConnections.get(
+      const [connection1, connection2, connection3] = getUnnamedConnectionApis(
+        options1.testConnectionId,
+        options2.testConnectionId,
         options3.testConnectionId
       )
-      if (
-        undefined === connection1 ||
-        undefined === connection2 ||
-        undefined === connection3
-      ) {
-        throw new Error()
-      }
       expect(connection1.send).toHaveBeenLastCalledWith(
         { type: 'testSetStateName' },
         { count: 10, foo: 'bar' }
@@ -1226,13 +1140,10 @@ describe('when create devtools was called multiple times with `name` option unde
         const setState2 = jest.spyOn(api2, 'setState')
         const setState3 = jest.spyOn(api3, 'setState')
 
-        const subscriber = nameUndefinedConnectionSubscribers.get(
+        const [subscriber] = getUnnamedConnectionSubscribers(
           options1.testConnectionId
         )
-        if (undefined === subscriber) {
-          throw new Error()
-        }
-        ;(subscriber as (message: any) => void)({
+        subscriber({
           type: 'ACTION',
           payload: '{ "type": "INCREMENT" }',
         })
@@ -1264,13 +1175,10 @@ describe('when create devtools was called multiple times with `name` option unde
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
 
-        const connectionSubscriber = nameUndefinedConnectionSubscribers.get(
+        const [connectionSubscriber] = getUnnamedConnectionSubscribers(
           options1.testConnectionId
         )
-        if (undefined === connectionSubscriber) {
-          throw new Error()
-        }
-        ;(connectionSubscriber as (message: any) => void)({
+        connectionSubscriber({
           type: 'ACTION',
           payload: '{ "type": "__setState", "state": { "foo": "bar" } }',
         })
@@ -1305,29 +1213,16 @@ describe('when create devtools was called multiple times with `name` option unde
         const setState2 = jest.spyOn(api2, 'setState')
         const setState3 = jest.spyOn(api3, 'setState')
 
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        const subscribers = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
         const testPayload = {
           type: 'ACTION',
           payload: '{ "type": "INCREMENT" }',
         }
-        ;(connectionSubscriber1 as (message: any) => void)(testPayload)
-        ;(connectionSubscriber2 as (message: any) => void)(testPayload)
-        ;(connectionSubscriber3 as (message: any) => void)(testPayload)
+        subscribers.forEach((sub) => sub(testPayload))
 
         expect(api1.getState()).toBe(initialState1)
         expect(api2.getState()).toBe(initialState2)
@@ -1368,29 +1263,16 @@ describe('when create devtools was called multiple times with `name` option unde
         const setState2 = jest.spyOn(api2, 'setState')
         const setState3 = jest.spyOn(api3, 'setState')
 
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        const subscribers = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
         const getTestPayload = (n: number) => ({
           type: 'ACTION',
           payload: `{ "type": "INCREMENT${n}" }`,
         })
-        ;(connectionSubscriber1 as (message: any) => void)(getTestPayload(1))
-        ;(connectionSubscriber2 as (message: any) => void)(getTestPayload(2))
-        ;(connectionSubscriber3 as (message: any) => void)(getTestPayload(3))
+        subscribers.forEach((sub, i) => sub(getTestPayload(i + 1)))
 
         expect(api1.getState()).toBe(initialState1)
         expect(api2.getState()).toBe(initialState2)
@@ -1439,24 +1321,17 @@ describe('when create devtools was called multiple times with `name` option unde
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
         expect(() => {
-          ;(connectionSubscriber1 as (message: any) => void)({
+          connectionSubscriber1({
             type: 'ACTION',
             payload: 'this.increment1()',
           })
@@ -1474,7 +1349,7 @@ describe('when create devtools was called multiple times with `name` option unde
         )
 
         expect(() => {
-          ;(connectionSubscriber1 as (message: any) => void)({
+          connectionSubscriber1({
             type: 'ACTION',
             payload: 'this.increment2()',
           })
@@ -1492,7 +1367,7 @@ describe('when create devtools was called multiple times with `name` option unde
         )
 
         expect(() => {
-          ;(connectionSubscriber1 as (message: any) => void)({
+          connectionSubscriber1({
             type: 'ACTION',
             payload: 'this.increment3()',
           })
@@ -1510,7 +1385,7 @@ describe('when create devtools was called multiple times with `name` option unde
         )
 
         expect(() => {
-          ;(connectionSubscriber1 as (message: any) => void)({
+          connectionSubscriber1({
             type: 'ACTION',
             payload: { name: 'increment', args: [] },
           })
@@ -1520,7 +1395,7 @@ describe('when create devtools was called multiple times with `name` option unde
           '[zustand devtools middleware] Unsupported action format'
         )
         expect(() => {
-          ;(connectionSubscriber2 as (message: any) => void)({
+          connectionSubscriber2({
             type: 'ACTION',
             payload: { name: 'increment', args: [] },
           })
@@ -1530,7 +1405,7 @@ describe('when create devtools was called multiple times with `name` option unde
           '[zustand devtools middleware] Unsupported action format'
         )
         expect(() => {
-          ;(connectionSubscriber3 as (message: any) => void)({
+          connectionSubscriber3({
             type: 'ACTION',
             payload: { name: 'increment', args: [] },
           })
@@ -1577,53 +1452,23 @@ describe('when create devtools was called multiple times with `name` option unde
         api2.setState({ count: 3 })
         api3.setState({ count: 10 })
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
+        const [connection1, connection2, connection3] = connections
+        connections.forEach((conn) => conn.send.mockClear())
+        const subscribers = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
+          options3.testConnectionId
+        )
+        const action = {
+          type: 'DISPATCH',
+          payload: { type: 'RESET' },
         }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
-        ;(connectionSubscriber1 as (message: any) => void)({
-          type: 'DISPATCH',
-          payload: { type: 'RESET' },
-        })
-        ;(connectionSubscriber2 as (message: any) => void)({
-          type: 'DISPATCH',
-          payload: { type: 'RESET' },
-        })
-        ;(connectionSubscriber3 as (message: any) => void)({
-          type: 'DISPATCH',
-          payload: { type: 'RESET' },
-        })
+        subscribers.forEach((sub) => sub(action))
 
         expect(api1.getState()).toStrictEqual(initialState1)
         expect(api1.getState()).toStrictEqual(initialState1)
@@ -1631,9 +1476,7 @@ describe('when create devtools was called multiple times with `name` option unde
         expect(connection1.init).toHaveBeenLastCalledWith(initialState1)
         expect(connection2.init).toHaveBeenLastCalledWith(initialState2)
         expect(connection3.init).toHaveBeenLastCalledWith(initialState3)
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
       })
 
       it('COMMIT, it inits with current state, connections are isolated from each other', async () => {
@@ -1661,60 +1504,28 @@ describe('when create devtools was called multiple times with `name` option unde
         const currentState2 = api2.getState()
         const currentState3 = api3.getState()
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const subscribers = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
+        const action = {
+          type: 'DISPATCH',
+          payload: { type: 'COMMIT' },
         }
-        ;(connectionSubscriber1 as (message: any) => void)({
-          type: 'DISPATCH',
-          payload: { type: 'COMMIT' },
-        })
-        ;(connectionSubscriber2 as (message: any) => void)({
-          type: 'DISPATCH',
-          payload: { type: 'COMMIT' },
-        })
-        ;(connectionSubscriber3 as (message: any) => void)({
-          type: 'DISPATCH',
-          payload: { type: 'COMMIT' },
-        })
+        subscribers.forEach((sub) => sub(action))
 
+        const [connection1, connection2, connection3] = connections
         expect(connection1.init).toHaveBeenLastCalledWith(currentState1)
         expect(connection2.init).toHaveBeenLastCalledWith(currentState2)
         expect(connection3.init).toHaveBeenLastCalledWith(currentState3)
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
       })
     })
 
@@ -1741,52 +1552,32 @@ describe('when create devtools was called multiple times with `name` option unde
         const newState2 = { foo: 'bar2' }
         const newState3 = { foo: 'bar3' }
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: JSON.stringify(newState1),
         })
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: JSON.stringify(newState2),
         })
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: JSON.stringify(newState3),
@@ -1804,6 +1595,7 @@ describe('when create devtools was called multiple times with `name` option unde
           ...initialState3,
           ...newState3,
         })
+        const [connection1, connection2, connection3] = connections
         expect(connection1.init).toHaveBeenLastCalledWith({
           ...initialState1,
           ...newState1,
@@ -1816,9 +1608,7 @@ describe('when create devtools was called multiple times with `name` option unde
           ...initialState3,
           ...newState3,
         })
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
       })
 
       it('does not throw for unparsable `message.state`, connections are isolated from each other', async () => {
@@ -1845,45 +1635,23 @@ describe('when create devtools was called multiple times with `name` option unde
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.init.mockClear()
-        connection2.init.mockClear()
-        connection3.init.mockClear()
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.init.mockClear())
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: 'foobar',
@@ -1898,7 +1666,7 @@ describe('when create devtools was called multiple times with `name` option unde
             }
           })()
         )
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: 'foobar1',
@@ -1913,7 +1681,7 @@ describe('when create devtools was called multiple times with `name` option unde
             }
           })()
         )
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'ROLLBACK' },
           state: 'foobar3',
@@ -1932,12 +1700,10 @@ describe('when create devtools was called multiple times with `name` option unde
         expect(api1.getState()).toBe(initialState1)
         expect(api2.getState()).toBe(initialState2)
         expect(api3.getState()).toBe(initialState3)
-        expect(connection1.init).not.toBeCalled()
-        expect(connection2.init).not.toBeCalled()
-        expect(connection3.init).not.toBeCalled()
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => {
+          expect(conn.init).not.toBeCalled()
+          expect(conn.send).not.toBeCalled()
+        })
 
         console.error = originalConsoleError
       })
@@ -1970,52 +1736,32 @@ describe('when create devtools was called multiple times with `name` option unde
         const newState2 = { foo: 'bar2' }
         const newState3 = { foo: 'bar3' }
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: JSON.stringify(newState1),
         })
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: JSON.stringify(newState2),
         })
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: JSON.stringify(newState3),
@@ -2033,9 +1779,7 @@ describe('when create devtools was called multiple times with `name` option unde
           ...initialState3,
           ...newState3,
         })
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
       })
 
       it('does not throw for unparsable `message.state`, connections are isolated from each other', async () => {
@@ -2059,43 +1803,23 @@ describe('when create devtools was called multiple times with `name` option unde
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
 
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: 'foobar',
@@ -2110,7 +1834,7 @@ describe('when create devtools was called multiple times with `name` option unde
             }
           })()
         )
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: 'foobar2',
@@ -2125,7 +1849,7 @@ describe('when create devtools was called multiple times with `name` option unde
             }
           })()
         )
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_STATE' },
           state: 'foobar3',
@@ -2144,9 +1868,7 @@ describe('when create devtools was called multiple times with `name` option unde
         expect(api1.getState()).toBe(initialState1)
         expect(api2.getState()).toBe(initialState2)
         expect(api3.getState()).toBe(initialState3)
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
 
         console.error = originalConsoleError
       })
@@ -2179,53 +1901,33 @@ describe('when create devtools was called multiple times with `name` option unde
         const newState2 = { foo: 'bar2' }
         const newState3 = { foo: 'bar3' }
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
 
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: JSON.stringify(newState1),
         })
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: JSON.stringify(newState2),
         })
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: JSON.stringify(newState3),
@@ -2243,9 +1945,7 @@ describe('when create devtools was called multiple times with `name` option unde
           ...initialState3,
           ...newState3,
         })
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
       })
 
       it('does not throw for unparsable `message.state`, connections are isolated from each other', async () => {
@@ -2269,42 +1969,22 @@ describe('when create devtools was called multiple times with `name` option unde
         const originalConsoleError = console.error
         console.error = jest.fn()
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: 'foobar',
@@ -2319,7 +1999,7 @@ describe('when create devtools was called multiple times with `name` option unde
             }
           })()
         )
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: 'foobar2',
@@ -2334,7 +2014,7 @@ describe('when create devtools was called multiple times with `name` option unde
             }
           })()
         )
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'JUMP_TO_ACTION' },
           state: 'foobar3',
@@ -2353,9 +2033,7 @@ describe('when create devtools was called multiple times with `name` option unde
         expect(api1.getState()).toBe(initialState1)
         expect(api2.getState()).toBe(initialState2)
         expect(api3.getState()).toBe(initialState3)
-        expect(connection1.send).not.toBeCalled()
-        expect(connection2.send).not.toBeCalled()
-        expect(connection3.send).not.toBeCalled()
+        connections.forEach((conn) => expect(conn.send).not.toBeCalled())
 
         console.error = originalConsoleError
       })
@@ -2388,57 +2066,37 @@ describe('when create devtools was called multiple times with `name` option unde
           computedStates: [{ state: { count: 12 } }, { state: { count: 100 } }],
         }
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const connections = getUnnamedConnectionApis(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        connection1.send.mockClear()
-        connection2.send.mockClear()
-        connection3.send.mockClear()
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
+        connections.forEach((conn) => conn.send.mockClear())
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
 
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: {
             type: 'IMPORT_STATE',
             nextLiftedState: nextLiftedState1,
           },
         })
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: {
             type: 'IMPORT_STATE',
             nextLiftedState: nextLiftedState2,
           },
         })
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: {
             type: 'IMPORT_STATE',
@@ -2458,6 +2116,7 @@ describe('when create devtools was called multiple times with `name` option unde
           ...initialState3,
           ...nextLiftedState3.computedStates.slice(-1)[0]?.state,
         })
+        const [connection1, connection2, connection3] = connections
         expect(connection1.send).toHaveBeenLastCalledWith(
           null,
           nextLiftedState1
@@ -2495,44 +2154,27 @@ describe('when create devtools was called multiple times with `name` option unde
         api2.setState(newState2, false, 'increment')
         api3.setState(newState3, false, 'increment')
 
-        const connection1 = nameUndefinedConnections.get(
-          options1.testConnectionId
-        )
-        const connection2 = nameUndefinedConnections.get(
-          options2.testConnectionId
-        )
-        const connection3 = nameUndefinedConnections.get(
+        const [connection1, connection2, connection3] =
+          getUnnamedConnectionApis(
+            options1.testConnectionId,
+            options2.testConnectionId,
+            options3.testConnectionId
+          )
+        const [
+          connectionSubscriber1,
+          connectionSubscriber2,
+          connectionSubscriber3,
+        ] = getUnnamedConnectionSubscribers(
+          options1.testConnectionId,
+          options2.testConnectionId,
           options3.testConnectionId
         )
-        if (
-          undefined === connection1 ||
-          undefined === connection2 ||
-          undefined === connection3
-        ) {
-          throw new Error()
-        }
-        const connectionSubscriber1 = nameUndefinedConnectionSubscribers.get(
-          options1.testConnectionId
-        )
-        const connectionSubscriber2 = nameUndefinedConnectionSubscribers.get(
-          options2.testConnectionId
-        )
-        const connectionSubscriber3 = nameUndefinedConnectionSubscribers.get(
-          options3.testConnectionId
-        )
-        if (
-          undefined === connectionSubscriber1 ||
-          undefined === connectionSubscriber2 ||
-          undefined === connectionSubscriber3
-        ) {
-          throw new Error()
-        }
 
         expect(connection1.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
           newState1
         )
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'PAUSE_RECORDING' },
         })
@@ -2541,7 +2183,7 @@ describe('when create devtools was called multiple times with `name` option unde
           { type: 'increment' },
           newState1
         )
-        ;(connectionSubscriber1 as (message: any) => void)({
+        connectionSubscriber1({
           type: 'DISPATCH',
           payload: { type: 'PAUSE_RECORDING' },
         })
@@ -2555,7 +2197,7 @@ describe('when create devtools was called multiple times with `name` option unde
           { type: 'increment' },
           newState2
         )
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'PAUSE_RECORDING' },
         })
@@ -2564,7 +2206,7 @@ describe('when create devtools was called multiple times with `name` option unde
           { type: 'increment' },
           newState2
         )
-        ;(connectionSubscriber2 as (message: any) => void)({
+        connectionSubscriber2({
           type: 'DISPATCH',
           payload: { type: 'PAUSE_RECORDING' },
         })
@@ -2578,7 +2220,7 @@ describe('when create devtools was called multiple times with `name` option unde
           { type: 'increment' },
           newState3
         )
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'PAUSE_RECORDING' },
         })
@@ -2587,7 +2229,7 @@ describe('when create devtools was called multiple times with `name` option unde
           { type: 'increment' },
           newState3
         )
-        ;(connectionSubscriber3 as (message: any) => void)({
+        connectionSubscriber3({
           type: 'DISPATCH',
           payload: { type: 'PAUSE_RECORDING' },
         })
@@ -2617,13 +2259,10 @@ describe('when create devtools was called multiple times with `name` and `store`
         const testStateActionType = 'testSetStateName'
 
         api.setState({ count: 10 }, false, testStateActionType)
-        const connection = connections.get(options.name)
-        if (undefined === connection) {
-          throw new Error()
-        }
+        const [connection] = getNamedConnectionApis(options.name)
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/${testStateActionType}` },
-          { [options.store]: { count: 10, foo: 'bar', store: options.store } }
+          { [options.store]: { count: 10, foo: 'bar' } }
         )
 
         api.setState({ count: 15 }, false, {
@@ -2632,13 +2271,13 @@ describe('when create devtools was called multiple times with `name` and `store`
         })
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/${testStateActionType}`, payload: 15 },
-          { [options.store]: { count: 15, foo: 'bar', store: options.store } }
+          { [options.store]: { count: 15, foo: 'bar' } }
         )
 
         api.setState({ count: 5, foo: 'baz' }, true)
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/anonymous` },
-          { [options.store]: { count: 5, foo: 'baz', store: options.store } }
+          { [options.store]: { count: 5, foo: 'baz' } }
         )
       })
     })
@@ -2683,13 +2322,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const setState3 = jest.spyOn(api3, 'setState')
           const setState4 = jest.spyOn(api4, 'setState')
 
-          const subscriber = nameUndefinedConnectionSubscribers.get(
+          const [subscriber] = getUnnamedConnectionSubscribers(
             options1.testConnectionId
           )
-          if (undefined === subscriber) {
-            throw new Error()
-          }
-          ;(subscriber as (message: any) => void)({
+          subscriber({
             type: 'ACTION',
             payload: '{ "type": "INCREMENT" }',
           })
@@ -2732,13 +2368,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const originalConsoleError = console.error
           console.error = jest.fn()
 
-          const connectionSubscriber = connectionSubscribers.get(
+          const [connectionSubscriber] = getNamedConnectionSubscribers(
             getKeyFromOptions(options1)
           )
-          if (undefined === connectionSubscriber) {
-            throw new Error()
-          }
-          ;(connectionSubscriber as (message: any) => void)({
+          connectionSubscriber({
             type: 'ACTION',
             payload:
               '{ "type": "__setState", "state": { "foo": "bar", "foo2": "bar2" } }',
@@ -2749,9 +2382,9 @@ describe('when create devtools was called multiple times with `name` and `store`
               '[zustand devtools middleware] Unsupported __setState'
             )
           )
-          ;(connectionSubscriber as (message: any) => void)({
+          connectionSubscriber({
             type: 'ACTION',
-            payload: `{ "type": "__setState", "state": { "${options1.store}": { "foo": "bar", "store": "${options1.store}" } } }`,
+            payload: `{ "type": "__setState", "state": { "${options1.store}": { "foo": "bar" } } }`,
           })
 
           expect(console.error).toHaveBeenCalledTimes(1)
@@ -2759,7 +2392,6 @@ describe('when create devtools was called multiple times with `name` and `store`
           expect(api1.getState()).toStrictEqual({
             ...initialState1,
             foo: 'bar',
-            store: options1.store,
           })
           expect(api2.getState()).toStrictEqual({ ...initialState2 })
 
@@ -2796,24 +2428,15 @@ describe('when create devtools was called multiple times with `name` and `store`
           const setState1 = jest.spyOn(api1, 'setState')
           const setState2 = jest.spyOn(api2, 'setState')
 
-          const connectionSubscriber1 = connectionSubscribers.get(
-            getKeyFromOptions(options1)
-          )
-          const connectionSubscriber2 = connectionSubscribers.get(
+          const subscribers = getNamedConnectionSubscribers(
+            getKeyFromOptions(options1),
             getKeyFromOptions(options2)
           )
-          if (
-            undefined === connectionSubscriber1 ||
-            undefined === connectionSubscriber2
-          ) {
-            throw new Error()
-          }
           const testPayload = {
             type: 'ACTION',
             payload: '{ "type": "INCREMENT" }',
           }
-          ;(connectionSubscriber1 as (message: any) => void)(testPayload)
-          ;(connectionSubscriber2 as (message: any) => void)(testPayload)
+          subscribers.forEach((sub) => sub(testPayload))
 
           expect(api1.getState()).toBe(initialState1)
           expect(api2.getState()).toBe(initialState2)
@@ -2855,24 +2478,15 @@ describe('when create devtools was called multiple times with `name` and `store`
           const setState1 = jest.spyOn(api1, 'setState')
           const setState2 = jest.spyOn(api2, 'setState')
 
-          const connectionSubscriber1 = connectionSubscribers.get(
-            getKeyFromOptions(options1)
-          )
-          const connectionSubscriber2 = connectionSubscribers.get(
+          const subscribers = getNamedConnectionSubscribers(
+            getKeyFromOptions(options1),
             getKeyFromOptions(options2)
           )
-          if (
-            undefined === connectionSubscriber1 ||
-            undefined === connectionSubscriber2
-          ) {
-            throw new Error()
-          }
           const getTestPayload = (n: number) => ({
             type: 'ACTION',
             payload: `{ "type": "INCREMENT${n}" }`,
           })
-          ;(connectionSubscriber1 as (message: any) => void)(getTestPayload(1))
-          ;(connectionSubscriber2 as (message: any) => void)(getTestPayload(2))
+          subscribers.forEach((sub, i) => sub(getTestPayload(i + 1)))
 
           expect(api1.getState()).toBe(initialState1)
           expect(api2.getState()).toBe(initialState2)

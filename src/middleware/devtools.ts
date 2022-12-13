@@ -148,38 +148,29 @@ type DevtoolsImpl = <T>(
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
-type ConnectResponse = ReturnType<
+type Connection = ReturnType<
   NonNullable<Window['__REDUX_DEVTOOLS_EXTENSION__']>['connect']
 >
-const connections: Map<string | undefined, ConnectResponse> = new Map()
+type ConnectionName = string | undefined
+type StoreName = string
+type StoreInformation = {
+  api: StoreApi<unknown>
+  initialState: unknown
+}
+type ConnectionInformation = {
+  connection: Connection
+  stores: Record<StoreName, StoreInformation>
+}
+const trackedConnections: Map<ConnectionName, ConnectionInformation> = new Map()
 
-type ConnectionStoreApis = (StoreApi<any> & { store: string })[]
-const connectionStoreApis: Map<string | undefined, ConnectionStoreApis> =
-  new Map()
-type ConnectionInitialStoreStates = (any & { store: string })[]
-const connectionInitialStoreStates: Map<
-  string | undefined,
-  ConnectionInitialStoreStates
-> = new Map()
-
-const getCurrentConnectionStoresStates = (
+const getTrackedConnectionState = (
   name: string | undefined
 ): Record<string, any> => {
-  let api = connectionStoreApis.get(name)
-  if (api === undefined) {
-    const arr: NonNullable<ConnectionStoreApis> = []
-    connectionStoreApis.set(name, arr)
-    api = arr
-  }
-  const states = api.map((storeApi) => ({
-    ...storeApi.getState(),
-    store: storeApi.store,
-  }))
-  const res: Record<string, ReturnType<StoreApi<any>['getState']>> = {}
-  states.forEach((storeState) => {
-    res[storeState.store] = storeState
-  })
-  return res
+  const api = trackedConnections.get(name)
+  if (!api) return {}
+  return Object.fromEntries(
+    Object.entries(api.stores).map(([key, { api }]) => [key, api.getState()])
+  )
 }
 
 const devtoolsImpl: DevtoolsImpl =
@@ -211,53 +202,51 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    let connection = connections.get(options.name)
-    if (store !== undefined && connections.get(options.name) === undefined) {
-      const connectResponse = extensionConnector.connect(options)
-      connections.set(options.name, connectResponse)
-      connection = connectResponse
-    }
-    if (store === undefined) {
-      connection = extensionConnector.connect(options)
-    }
+    const { connection, ...connectionInformation } = (() => {
+      // For backwards-compatibility's sake, we don't track
+      // a store unless it's given us a `store` string
+      if (store === undefined) {
+        return {
+          type: 'untracked' as const,
+          connection: extensionConnector.connect(options),
+        }
+      }
+      const existingConnection = trackedConnections.get(options.name)
+      if (existingConnection) {
+        return { type: 'tracked' as const, store, ...existingConnection }
+      }
+      const newConnection: ConnectionInformation = {
+        connection: extensionConnector.connect(options),
+        stores: {},
+      }
+      trackedConnections.set(options.name, newConnection)
+      return { type: 'tracked' as const, store, ...newConnection }
+    })()
 
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       const r = set(state, replace)
       if (!isRecording) return r
+      const action: Action<unknown> =
+        nameOrAction === undefined
+          ? { type: anonymousActionType || 'anonymous' }
+          : typeof nameOrAction === 'string'
+          ? { type: nameOrAction }
+          : nameOrAction
       if (store === undefined) {
-        connection?.send(
-          nameOrAction === undefined
-            ? { type: anonymousActionType || 'anonymous' }
-            : typeof nameOrAction === 'string'
-            ? { type: nameOrAction }
-            : nameOrAction,
-          get()
-        )
+        connection?.send(action, get())
         return r
       }
-      function getNameOrAction(
-        name?: string | { type: unknown }
-      ): Action<unknown> {
-        if (name !== undefined && typeof name === 'string') {
-          return { type: `${store ? `${store}/` : ''}${name}` }
+      connection?.send(
+        {
+          ...action,
+          type: `${store}/${action.type}`,
+        },
+        {
+          ...getTrackedConnectionState(options.name),
+          [store]: api.getState(),
         }
-        if (
-          name !== undefined &&
-          typeof name !== 'string' &&
-          store !== undefined
-        ) {
-          return { ...name, type: `${store}/${name.type}` }
-        }
-        if (name !== undefined) {
-          return name
-        }
-        return { type: `${store}/${anonymousActionType || 'anonymous'}` }
-      }
-      connection?.send(getNameOrAction(nameOrAction), {
-        ...getCurrentConnectionStoresStates(options.name),
-        [store]: { ...api.getState(), store },
-      })
+      )
       return r
     }
 
@@ -269,28 +258,22 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
-    if (store === undefined) {
+    if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
     } else {
-      let storeApis = connectionStoreApis.get(options.name)
-      if (storeApis === undefined) {
-        const arr: NonNullable<ConnectionStoreApis> = []
-        connectionStoreApis.set(options.name, arr)
-        storeApis = arr
+      const storeInfo: StoreInformation = {
+        api,
+        initialState,
       }
-      storeApis?.push({ ...api, store })
-      let initStates = connectionInitialStoreStates.get(options.name)
-      if (initStates === undefined) {
-        const arr: NonNullable<ConnectionInitialStoreStates> = []
-        connectionInitialStoreStates.set(options.name, arr)
-        initStates = arr
-      }
-      initStates?.push({ ...initialState, store })
-      const inits: Record<string, S> = {}
-      initStates?.forEach((storeState) => {
-        inits[storeState.store] = storeState
-      })
-      connection?.init(inits)
+      connectionInformation.stores[connectionInformation.store] = storeInfo
+      connection?.init(
+        Object.fromEntries(
+          Object.entries(connectionInformation.stores).map(([key, store]) => [
+            key,
+            store.initialState,
+          ])
+        )
+      )
     }
 
     if (
@@ -379,18 +362,14 @@ const devtoolsImpl: DevtoolsImpl =
               if (store === undefined) {
                 return connection?.init(api.getState())
               }
-              return connection?.init(
-                getCurrentConnectionStoresStates(options.name)
-              )
+              return connection?.init(getTrackedConnectionState(options.name))
 
             case 'COMMIT':
               if (store === undefined) {
                 connection?.init(api.getState())
                 return
               }
-              return connection?.init(
-                getCurrentConnectionStoresStates(options.name)
-              )
+              return connection?.init(getTrackedConnectionState(options.name))
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
@@ -400,7 +379,7 @@ const devtoolsImpl: DevtoolsImpl =
                   return
                 }
                 setStateFromDevtools(state[store] as S)
-                connection?.init(getCurrentConnectionStoresStates(options.name))
+                connection?.init(getTrackedConnectionState(options.name))
               })
 
             case 'JUMP_TO_STATE':
