@@ -501,9 +501,9 @@ A more complete TypeScript guide is [here](docs/guides/typescript.md).
 - [Calling actions outside a React event handler in pre React 18](./docs/guides/event-handler-in-pre-react-18.md).
 - [Testing](./docs/guides/testing.mdx)
 
-## 3rd-Party Libraries
+## Third-Party Libraries
 
-Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit [the doc](./docs/integrations/3rd-party-libraries.md).
+Some users may want to extends Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
 
 ## Comparison with other libraries
 

@@ -3,9 +3,16 @@ title: Third-party Libraries
 nav: 16
 ---
 
-Zustand provides bear necessities for state management. Although it is great for most projects, some users wish to extend the library's feature set. This can be done using third-party libraries created by the community.
+Zustand provides bear necessities for state management.
+Although it is great for most projects,
+some users wish to extend the library's feature set.
+This can be done using third-party libraries created by the community.
 
-> Disclaimer: These libraries may have bugs, limited maintenance, or other limitations, and are not officially recommended by pmndrs or the Zustand maintainers. This list aims to provide a good starting point for someone looking to extend Zustand's feature set.
+> Disclaimer: These libraries may have bugs, limited maintenance,
+> or other limitations, and are not officially recommended
+> by pmndrs or the Zustand maintainers.
+> This list aims to provide a good starting point
+> for someone looking to extend Zustand's feature set.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
