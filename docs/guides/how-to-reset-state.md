@@ -74,6 +74,72 @@ export const resetAllSlices = () => {
 }
 ```
 
+Resetting bound store using Slices pettern
+
+```ts
+import create, { StateCreator } from "zustand";
+
+const resetters: (() => void)[] = [];
+
+// Bear slice
+const initialStateBear = { bears: 0 };
+
+interface BearSlice {
+  bears: number;
+  addBear: () => void;
+  eatFish: () => void;
+}
+
+const createBearSlice: StateCreator<
+  BearSlice & FishSlice,
+  [],
+  [],
+  BearSlice
+> = (set) => {
+  resetters.push(() => set(initialStateBear));
+  return {
+    ...initialStateBear,
+    addBear: () => set((state) => ({ bears: state.bears + 1 })),
+    eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
+  };
+};
+
+//Fish slice
+const initialStateFish = { fishes: 0 };
+
+interface FishSlice {
+  fishes: number;
+  addFish: () => void;
+}
+
+const createFishSlice: StateCreator<
+  BearSlice & FishSlice,
+  [],
+  [],
+  FishSlice
+> = (set) => {
+  resetters.push(() => set(initialStateFish));
+  return {
+    ...initialStateFish,
+    addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+  };
+};
+
+//Bound store
+const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
+  ...createBearSlice(...a),
+  ...createFishSlice(...a),
+}));
+
+export const resetAllSlices = () => {
+  for (const resetter of resetters) {
+    resetter();
+  }
+};
+
+export default useBoundStore;
+```
+
 ## CodeSandbox Demo
 
 - Basic: https://codesandbox.io/s/zustand-how-to-reset-state-basic-demo-rrqyon
