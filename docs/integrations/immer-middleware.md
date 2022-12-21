@@ -3,13 +3,15 @@ title: Immer middleware
 nav: 16
 ---
 
-The [Immer](https://github.com/immerjs/immer) middleware enables you to use an immutable state in a more convenient
-way. Also, with `Immer` you can simplify handling immutable data structures on
-`Zustand`.
+The [Immer](https://github.com/immerjs/immer) middleware enables you
+to use immutable state in a more convenient way.
+Also, with Immer, you can simplify handling
+immutable data structures in Zustand.
 
 ## Installation
 
-In order to use the Immer middleware in `Zustand`, you will need to install `Immer` as a direct dependency.
+In order to use the Immer middleware in Zustand,
+you will need to install Immer as a direct dependency.
 
 ```bash
 npm install immer
@@ -101,22 +103,25 @@ export const useTodoStore = create(
 
 ## Gotchas
 
-On this page we can find some things that we need to keep in mind when we are
-using `Zustand` with `Immer`.
+In this section you will find some things
+that you need to keep in mind when using Zustand with Immer.
 
 ### My subscriptions aren't being called
 
-If you are using `Immer`, make sure you are actually following the rules of
-[Immer](https://immerjs.github.io/immer/pitfalls).
+If you are using Immer,
+make sure you are actually following
+[the rules of Immer](https://immerjs.github.io/immer/pitfalls).
 
 For example, you have to add `[immerable] = true` for
-[class objects](https://immerjs.github.io/immer/complex-objects) to work. If
-you don't do this, `Immer` will still mutate the object, but not as a proxy, so
-it will also update the current state. `Zustand` checks if the state has
-actually changed, so since both the current state as well as the next state are
-equal (if you don't do it correctly), it will skip calling the subscriptions.
+[class objects](https://immerjs.github.io/immer/complex-objects) to work.
+If you don't do this, Immer will still mutate the object,
+but not as a proxy, so it will also update the current state.
+Zustand checks if the state has actually changed,
+so since both the current state and the next state are
+equal (if you don't do it correctly),
+Zustand will skip calling the subscriptions.
 
 ## CodeSandbox Demo
 
-- Basic: https://codesandbox.io/s/zustand-updating-draft-states-basic-demo-zkp22g
-- Advanced: https://codesandbox.io/s/zustand-updating-draft-states-advanced-demo-3znqzk
+- [Basic](https://codesandbox.io/s/zustand-updating-draft-states-basic-demo-zkp22g),
+- [Advanced](https://codesandbox.io/s/zustand-updating-draft-states-advanced-demo-3znqzk).
