@@ -44,20 +44,20 @@ const useSlice = create<State & Actions>((set, get) => ({
 }))
 ```
 
-Resetting multiple stores at once instead of individual stores
+Resetting multiple stores at once
 
 ```ts
-import _create, { StateCreator, StoreApi, UseBoundStore } from 'zustand'
+import _create, { StoreMutatorIdentifier, StateCreator } from 'zustand'
 
 const resetters: (() => void)[] = []
 
-export const create = <TState extends unknown>(
-  createState: StateCreator<TState> | StoreApi<TState>
+export const create = <
+  TState,
+  Mos extends [StoreMutatorIdentifier, unknown][] = []
+>(
+  createState: StateCreator<TState>
 ): UseBoundStore<StoreApi<TState>> => {
-  // We need to use createState as never to support StateCreator<TState> and
-  // StoreApi<TState> at the same time.
-  // We also need to re-type slice to UseBoundStore<StoreApi<TState>>
-  const slice: UseBoundStore<StoreApi<TState>> = _create(createState as never)
+  const slice = _create(createState)
   const initialState = slice.getState()
 
   resetters.push(() => {
@@ -78,3 +78,4 @@ export const resetAllSlices = () => {
 
 - Basic: https://codesandbox.io/s/zustand-how-to-reset-state-basic-demo-rrqyon
 - Advanced: https://codesandbox.io/s/zustand-how-to-reset-state-advanced-demo-gtu0qe
+- Immer: https://codesandbox.io/s/how-to-reset-state-advance-immer-demo-nyet3f
