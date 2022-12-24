@@ -51,13 +51,10 @@ import _create, { StoreMutatorIdentifier, StateCreator } from 'zustand'
 
 const resetters: (() => void)[] = []
 
-export const create = <
-  TState,
-  Mos extends [StoreMutatorIdentifier, unknown][] = []
->(
-  createState: StateCreator<TState>
-): UseBoundStore<StoreApi<TState>> => {
-  const slice = _create(createState)
+const create = <TState, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
+  createState: StateCreator<TState, [], Mos>
+) => {
+  const slice = _create<TState, Mos>(createState)
   const initialState = slice.getState()
 
   resetters.push(() => {
