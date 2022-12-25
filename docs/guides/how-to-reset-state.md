@@ -47,22 +47,19 @@ const useSlice = create<State & Actions>((set, get) => ({
 Resetting multiple stores at once
 
 ```ts
-import _create, { StoreMutatorIdentifier, StateCreator } from 'zustand'
+import _create, { StateCreator } from 'zustand'
 
 const resetters: (() => void)[] = []
 
-const create = <TState, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
-  createState: StateCreator<TState, [], Mos>
-) => {
-  const slice = _create<TState, Mos>(createState)
-  const initialState = slice.getState()
-
+export const create = (<T extends unknown>(f: StateCreator<T> | undefined) => {
+  if (f === undefined) return create
+  const store = _create(f)
+  const initialState = store.getState()
   resetters.push(() => {
-    slice.setState(initialState, true)
+    store.setState(initialState, true)
   })
-
-  return slice
-}
+  return store
+}) as typeof _create
 
 export const resetAllSlices = () => {
   for (const resetter of resetters) {
