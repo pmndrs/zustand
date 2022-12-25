@@ -61,7 +61,7 @@ export const create = (<T extends unknown>(f: StateCreator<T> | undefined) => {
   return store
 }) as typeof _create
 
-export const resetAllSlices = () => {
+export const resetAllStores = () => {
   for (const resetter of resetters) {
     resetter()
   }
