@@ -173,6 +173,31 @@ const getTrackedConnectionState = (
   )
 }
 
+const extractConnectionInformation = (
+  store: string | undefined,
+  extensionConnector: NonNullable<
+    typeof window['__REDUX_DEVTOOLS_EXTENSION__']
+  >,
+  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>
+) => {
+  if (store === undefined) {
+    return {
+      type: 'untracked' as const,
+      connection: extensionConnector.connect(options),
+    }
+  }
+  const existingConnection = trackedConnections.get(options.name)
+  if (existingConnection) {
+    return { type: 'tracked' as const, store, ...existingConnection }
+  }
+  const newConnection: ConnectionInformation = {
+    connection: extensionConnector.connect(options),
+    stores: {},
+  }
+  trackedConnections.set(options.name, newConnection)
+  return { type: 'tracked' as const, store, ...newConnection }
+}
+
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
@@ -202,26 +227,8 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const { connection, ...connectionInformation } = (() => {
-      // For backwards-compatibility's sake, we don't track
-      // a store unless it's given us a `store` string
-      if (store === undefined) {
-        return {
-          type: 'untracked' as const,
-          connection: extensionConnector.connect(options),
-        }
-      }
-      const existingConnection = trackedConnections.get(options.name)
-      if (existingConnection) {
-        return { type: 'tracked' as const, store, ...existingConnection }
-      }
-      const newConnection: ConnectionInformation = {
-        connection: extensionConnector.connect(options),
-        stores: {},
-      }
-      trackedConnections.set(options.name, newConnection)
-      return { type: 'tracked' as const, store, ...newConnection }
-    })()
+    const { connection, ...connectionInformation } =
+      extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
