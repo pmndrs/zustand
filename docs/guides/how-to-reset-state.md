@@ -27,7 +27,7 @@ const initialState: State = {
 }
 
 // create store
-const useSlice = create<State & Actions>((set, get) => ({
+const useSlice = create<State & Actions>()((set, get) => ({
   ...initialState,
 
   addSalmon: (qty: number) => {
