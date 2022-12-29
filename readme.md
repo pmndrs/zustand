@@ -162,7 +162,9 @@ const useSoundStore = create((set, get) => ({
 Sometimes you need to access state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
 
 ```jsx
-const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
+import {createStore} from 'zustand
+
+const useDogStore = createStore(() => ({ paw: true, snout: true, fur: true }))
 
 // Getting non-reactive fresh state
 const paw = useDogStore.getState().paw
