@@ -382,7 +382,7 @@ await useBoundStore.persist.rehydrate()
 
 This is a non-reactive getter to check
 if the storage has been hydrated
-(note that it updates when calling [rehydrate](#rehydrate)).
+(note that it updates when calling [`rehydrate`](#rehydrate)).
 
 ```ts
 useBoundStore.persist.hasHydrated()
