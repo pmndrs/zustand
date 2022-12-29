@@ -8,7 +8,7 @@ your Zustand state in a storage
 (e.g., `localStorage`, `AsyncStorage`, `IndexedDB`, etc.),
 thus persisting it's data.
 
-Note that this middleware does support both
+Note that this middleware supports both
 synchronous storages, like `localStorage`,
 and asynchronous storages, like `AsyncStorage`,
 but using an asynchronous storage does come with a cost.
