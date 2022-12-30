@@ -1,28 +1,35 @@
 ---
-title: Persist middleware
+title: Persisting store data
 nav: 17
 ---
 
-The persist middleware enables you to store your Zustand state in a storage (e.g. `localStorage`, `AsyncStorage`, `IndexedDB`, etc...) thus persisting it's data.
+The Persist middleware enables you to store
+your Zustand state in a storage
+(e.g., `localStorage`, `AsyncStorage`, `IndexedDB`, etc.),
+thus persisting it's data.
 
-Note that this middleware does support both synchronous storages (e.g. `localStorage`) and asynchronous storages (e.g. `AsyncStorage`), but using an asynchronous storage does come with a cost.
-See [Hydration and asynchronous storages](#hydration-and-asynchronous-storages) for more details.
+Note that this middleware supports both
+synchronous storages, like `localStorage`,
+and asynchronous storages, like `AsyncStorage`,
+but using an asynchronous storage does come with a cost.
+See [Hydration and asynchronous storages](#hydration-and-asynchronous-storages)
+for more details.
 
-Quick example:
+## Simple example
 
 ```ts
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export const useFishStore = create(
+export const useBearStore = create(
   persist(
     (set, get) => ({
-      fishes: 0,
-      addAFish: () => set({ fishes: get().fishes + 1 }),
+      bears: 0,
+      addABear: () => set({ bears: get().bears + 1 }),
     }),
     {
-      name: 'food-storage', // name of item in the storage (must be unique)
-      getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
+      name: 'food-storage', // name of the item in the storage (must be unique)
+      getStorage: () => sessionStorage, // (optional) by default, 'localStorage' is used
     }
   )
 )
@@ -33,9 +40,19 @@ export const useFishStore = create(
 ### `name`
 
 This is the only required option.
-The given name is going to be the key used to store your Zustand state in the storage, so it must be unique.
+The given name is going to be the key
+used to store your Zustand state in the storage,
+so it must be unique.
 
 ### `getStorage`
+
+> Type: `() => StateStorage`
+
+The `StateStorage` can be imported with:
+
+```ts
+import { StateStorage } from 'zustand/middleware'
+```
 
 > Default: `() => localStorage`
 
@@ -58,23 +75,16 @@ export const useBoundStore = create(
 )
 ```
 
-The given storage must match the following interface:
-
-```ts
-interface Storage {
-  getItem: (name: string) => string | null | Promise<string | null>
-  setItem: (name: string, value: string) => void | Promise<void>
-  removeItem: (name: string) => void | Promise<void>
-}
-```
-
 ### `serialize`
 
-> Schema: `(state: Object) => string | Promise<string>`
+> Type: `(state: Object) => string | Promise<string>`
 
 > Default: `(state) => JSON.stringify(state)`
 
-Since the only way to store an object in a storage is via a string, you can use this option to give a custom function to serialize your state to a string.
+The only way to store an object in a storage is as a string.
+If the default method of serialization doesn't suit your needs,
+pass custom functions for serialization
+and [deserialization](#deserialize) (see below).
 
 For example, if you want to store your state in base64:
 
@@ -92,17 +102,17 @@ export const useBoundStore = create(
 )
 ```
 
-Note that you would also need a custom `deserialize` function to make this work properly. See below.
-
 ### `deserialize`
 
-> Schema: `(str: string) => Object | Promise<Object>`
+> Type: `(str: string) => Object | Promise<Object>`
 
 > Default: `(str) => JSON.parse(str)`
 
-If you pass a custom serialize function, you will most likely need to pass a custom deserialize function as well.
+If you pass a custom [`serialize`](#serialize) function,
+you will most likely need to pass a custom deserialize function as well.
 
-To continue the example above, you could deserialize the base64 value using the following:
+To continue the example above,
+you could deserialize the base64 value using the following:
 
 ```ts
 export const useBoundStore = create(
@@ -120,11 +130,11 @@ export const useBoundStore = create(
 
 ### `partialize`
 
-> Schema: `(state: Object) => Object`
+> Type: `(state: Object) => Object`
 
 > Default: `(state) => state`
 
-Enables you to omit some of the state's fields to be stored in the storage.
+Enables you to pick some of the state's fields to be stored in the storage.
 
 You could omit multiple fields using the following:
 
@@ -165,9 +175,10 @@ export const useBoundStore = create(
 
 ### `onRehydrateStorage`
 
-> Schema: `(state: Object) => ((state?: Object, error?: Error) => void) | void`
+> Type: `(state: Object) => ((state?: Object, error?: Error) => void) | void`
 
-This option enables you to pass a listener function that will be called when the storage is hydrated.
+This option enables you to pass a listener function
+that will be called when the storage is hydrated.
 
 Example:
 
@@ -198,22 +209,29 @@ export const useBoundStore = create(
 
 ### `version`
 
-> Schema: `number`
+> Type: `number`
 
 > Default: `0`
 
-If you want to introduce a breaking change in your storage (e.g. renaming a field), you can specify a new version number.
-By default, if the version in the storage does not match the version in the code, the stored value won't be used.
-You can use the `migrate` option to handle breaking changes in order to persist previously stored data.
+If you want to introduce a breaking change in your storage
+(e.g. renaming a field), you can specify a new version number.
+By default, if the version in the storage
+does not match the version in the code,
+the stored value won't be used.
+You can use the [migrate](#migrate) function (see below)
+to handle breaking changes in order to persist previously stored data.
 
 ### `migrate`
 
-> Schema: `(persistedState: Object, version: number) => Object | Promise<Object>`
+> Type: `(persistedState: Object, version: number) => Object | Promise<Object>`
 
 > Default: `(persistedState) => persistedState`
 
 You can use this option to handle versions migration.
-The migrate function takes the persisted state and the version number as arguments. It must return a state that is compliant to the latest version (the version in the code).
+The migrate function takes the persisted state
+and the version number as arguments.
+It must return a state that is compliant
+to the latest version (the version in the code).
 
 For instance, if you want to rename a field, you can use the following:
 
@@ -242,14 +260,16 @@ export const useBoundStore = create(
 
 ### `merge`
 
-> Schema: `(persistedState: Object, currentState: Object) => Object`
+> Type: `(persistedState: Object, currentState: Object) => Object`
 
 > Default: `(persistedState, currentState) => ({ ...currentState, ...persistedState })`
 
-In some cases, you might want to use a custom merge function to merge the persisted value with the current state.
+In some cases, you might want to use a custom merge function
+to merge the persisted value with the current state.
 
 By default, the middleware does a shallow merge.
-The shallow merge might not be enough if you have partially persisted nested objects.
+The shallow merge might not be enough
+if you have partially persisted nested objects.
 For instance, if the storage contains the following:
 
 ```ts
@@ -296,13 +316,15 @@ export const useBoundStore = create(
 
 > Version: >=3.6.3
 
-The persist api enables you to do numbers of interactions with the persist middleware from inside or outside a React component.
+The Persist API enables you to do a number of interactions
+with the Persist middleware
+from inside or outside of a React component.
 
 ### `getOptions`
 
-> Schema: `() => Partial<PersistOptions>`
+> Type: `() => Partial<PersistOptions>`
 
-This method can you get the options of the middleware.
+> Returns: Options of the Persist middleware
 
 For example, it can be used to obtain the storage name:
 
@@ -312,9 +334,10 @@ useBoundStore.persist.getOptions().name
 
 ### `setOptions`
 
-> Schema: `(newOptions: PersistOptions) => void`
+> Type: `(newOptions: Partial<PersistOptions>) => void`
 
-This method enables you to change the middleware options. Note that the new options will be merged with the current ones.
+Changes the middleware options.
+Note that the new options will be merged with the current ones.
 
 For instance, this can be used to change the storage name:
 
@@ -334,9 +357,9 @@ useBoundStore.persist.setOptions({
 
 ### `clearStorage`
 
-> Schema: `() => void`
+> Type: `() => void`
 
-This can be used to fully clear the persisted value in the storage.
+Clears everything stored under the [name](#name) key.
 
 ```ts
 useBoundStore.persist.clearStorage()
@@ -344,9 +367,9 @@ useBoundStore.persist.clearStorage()
 
 ### `rehydrate`
 
-> Schema: `() => Promise<void>`
+> Type: `() => Promise<void>`
 
-In some cases, you might want to trigger a rehydration manually.
+In some cases, you might want to trigger the rehydration manually.
 This can be done by calling the `rehydrate` method.
 
 ```ts
@@ -355,9 +378,11 @@ await useBoundStore.persist.rehydrate()
 
 ### `hasHydrated`
 
-> Schema: `() => boolean`
+> Type: `() => boolean`
 
-This is a non-reactive getter to know if the storage has been hydrated (note that this does update when calling `useBoundStore.persist.rehydrate()`).
+This is a non-reactive getter to check
+if the storage has been hydrated
+(note that it updates when calling [`rehydrate`](#rehydrate)).
 
 ```ts
 useBoundStore.persist.hasHydrated()
@@ -365,9 +390,11 @@ useBoundStore.persist.hasHydrated()
 
 ### `onHydrate`
 
-> Schema: `(listener: (state) => void) => () => void`
+> Type: `(listener: (state) => void) => () => void`
 
-The given listener will be called when the hydration process starts.
+> Returns: Unsubscribe function
+
+This listener will be called when the hydration process starts.
 
 ```ts
 const unsub = useBoundStore.persist.onHydrate((state) => {
@@ -380,9 +407,11 @@ unsub()
 
 ### `onFinishHydration`
 
-> Schema: `(listener: (state) => void) => () => void`
+> Type: `(listener: (state) => void) => () => void`
 
-The given listener will be called when the hydration process ends.
+> Returns: Unsubscribe function
+
+This listener will be called when the hydration process ends.
 
 ```ts
 const unsub = useBoundStore.persist.onFinishHydration((state) => {
@@ -395,29 +424,49 @@ unsub()
 
 ## Hydration and asynchronous storages
 
-To explain what's the "cost" of asynchronous storages, you need to understand what's hydration.
-In a nutshell, hydration is the process of retrieving the persisted state from the storage and merging it with the current state.
+To explain what is the "cost" of asynchronous storages,
+you need to understand what is hydration.
 
-The persist middleware does two kinds of hydration: synchronous and asynchronous.
-If the given storage is synchronous (e.g. `localStorage`), hydration will be done synchronously. On the other hand, if the given storage is asynchronous (e.g. `AsyncStorage`), hydration will be done ... 🥁 asynchronously.
+In a nutshell, hydration is a process
+of retrieving persisted state from the storage
+and merging it with the current state.
+
+The Persist middleware does two kinds of hydration:
+synchronous and asynchronous.
+If the given storage is synchronous (e.g., `localStorage`),
+hydration will be done synchronously.
+On the other hand, if the given storage is asynchronous (e.g., `AsyncStorage`),
+hydration will be done asynchronously (shocking, I know!).
 
 But what's the catch?
-With synchronous hydration, the Zustand store will have been hydrated at its creation.
-While with asynchronous hydration, the Zustand store will be hydrated later on, in a microtask.
+With synchronous hydration,
+the Zustand store will already have been hydrated at its creation.
+In contrast, with asynchronous hydration,
+the Zustand store will be hydrated later on, in a microtask.
 
 Why does it matter?
 Asynchronous hydration can cause some unexpected behaviors.
-For instance, if you use Zustand in a React app, the store will _not_ be hydrated at the initial render. In cases where you app depends on the persisted value at page load, you might want to wait until the store has been hydrated before showing anything (e.g. your app might think the user is not logged in because it's the default, while in reality the store has not been hydrated yet).
+For instance, if you use Zustand in a React app,
+the store will **not** be hydrated at the initial render.
+In cases where your app depends on the persisted value at page load,
+you might want to wait until
+the store has been hydrated before showing anything.
+For example, your app might think the user
+is not logged in because it's the default,
+but in reality the store has not been hydrated yet.
 
-If your app does depends on the persisted state at page load, see **_How can I check if my store has been hydrated?_** in the Q/A section.
+If your app does depends on the persisted state at page load,
+see [_How can I check if my store has been hydrated?_](#how-can-i-check-if-my-store-has-been-hydrated)
+in the [FAQ](#faq) section below.
 
-## Q/A
+## FAQ
 
 ### How can I check if my store has been hydrated?
 
-There's a few different ways to do this.
+There are a few different ways to do this.
 
-You can use the `onRehydrateStorage` option to update a field in the store:
+You can use the [`onRehydrateStorage`](#onrehydratestorage)
+listener function to update a field in the store:
 
 ```ts
 const useBoundStore = create(
@@ -462,7 +511,10 @@ const useHydration = () => {
   const [hydrated, setHydrated] = useState(useBoundStore.persist.hasHydrated)
 
   useEffect(() => {
-    const unsubHydrate = useBoundStore.persist.onHydrate(() => setHydrated(false)) // Note: this is just in case you want to take into account manual rehydrations. You can remove this if you don't need it/don't want it.
+    // Note: This is just in case you want to take into account manual rehydration.
+    // You can remove the following line if you don't need it.
+    const unsubHydrate = useBoundStore.persist.onHydrate(() => setHydrated(false))
+
     const unsubFinishHydration = useBoundStore.persist.onFinishHydration(() => setHydrated(true))
 
     setHydrated(useBoundStore.persist.hasHydrated())
@@ -505,8 +557,8 @@ const storage: StateStorage = {
 export const useBoundStore = create(
   persist(
     (set, get) => ({
-      fishes: 0,
-      addAFish: () => set({ fishes: get().fishes + 1 }),
+      bears: 0,
+      addABear: () => set({ bears: get().bears + 1 }),
     }),
     {
       name: 'food-storage', // unique name
@@ -518,10 +570,10 @@ export const useBoundStore = create(
 
 ### How can I rehydrate on storage event?
 
-You can use the `persist` api to create your own implementation, similar to what we see below
+You can use the Persist API to create your own implementation,
+similar to the example below:
 
 ```ts
-
 type StoreWithPersist = Mutate<StoreApi<State>, [["zustand/persist", unknown]]>
 
 export const withStorageDOMEvents = (store: StoreWithPersist) => {
@@ -542,29 +594,30 @@ const useBoundStore = create(persist(...))
 withStorageDOMEvents(useBoundStore)
 ```
 
-### How do I use with TypeScript?
+### How do I use it with TypeScript?
 
-Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`.
+Basic typescript usage doesn't require anything special
+except for writing `create<State>()(...)` instead of `create(...)`.
 
 ```tsx
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface MyState {
-  fishes: number
-  addAFish: () => void
+  bears: number
+  addABear: () => void
 }
 
-export const useFishStore = create<MyState>()(
+export const useBearStore = create<MyState>()(
   persist(
     (set, get) => ({
-      fishes: 0,
-      addAFish: () => set({ fishes: get().fishes + 1 }),
+      bears: 0,
+      addABear: () => set({ bears: get().bears + 1 }),
     }),
     {
       name: 'food-storage', // name of item in the storage (must be unique)
       getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
-      partialize: (state) => ({ fishes: state.fishes }),
+      partialize: (state) => ({ bears: state.bears }),
     }
   )
 )
