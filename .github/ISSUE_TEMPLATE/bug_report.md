@@ -19,7 +19,7 @@ assignees: ''
 
 Please do not ask questions in issues.
 
-- [ ] I understand this is not a question.
+- [ ] I've already opened a [discussion](https://github.com/pmndrs/zustand/discussions) before opening this issue.
 
 Please fill this template if you're filling an issue regarding TypeScript.
 
