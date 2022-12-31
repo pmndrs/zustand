@@ -204,7 +204,7 @@ const devtoolsImpl: DevtoolsImpl =
     const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
-      [store: string]: S
+      [store: string]: ReturnType<typeof fn>
     }
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
@@ -339,7 +339,10 @@ const devtoolsImpl: DevtoolsImpl =
                   )
                 }
                 const stateFromDevtools = (action.state as S)[store]
-                if (stateFromDevtools === undefined) {
+                if (
+                  stateFromDevtools === undefined ||
+                  stateFromDevtools === null
+                ) {
                   return
                 }
                 if (
