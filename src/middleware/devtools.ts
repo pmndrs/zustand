@@ -329,10 +329,7 @@ const devtoolsImpl: DevtoolsImpl =
                   setStateFromDevtools(action.state as PartialState)
                   return
                 }
-                if (
-                  Object.keys(action.state as S).length > 1 ||
-                  Object.keys(action.state as S).length < 1
-                ) {
+                if (Object.keys(action.state as S).length !== 1) {
                   console.error(
                     `
                     [zustand devtools middleware] Unsupported __setState action format. 
@@ -341,17 +338,15 @@ const devtoolsImpl: DevtoolsImpl =
                     `
                   )
                 }
-                if ((action.state as S)[store] === undefined) {
+                const stateFromDevtools = (action.state as S)[store]
+                if (stateFromDevtools === undefined) {
                   return
                 }
-                const stateFromDevtools = (action.state as S)[store]
-                if (stateFromDevtools) {
-                  if (
-                    JSON.stringify(api.getState()) !==
-                    JSON.stringify(stateFromDevtools)
-                  ) {
-                    setStateFromDevtools(stateFromDevtools)
-                  }
+                if (
+                  JSON.stringify(api.getState()) !==
+                  JSON.stringify(stateFromDevtools)
+                ) {
+                  setStateFromDevtools(stateFromDevtools)
                 }
                 return
               }
