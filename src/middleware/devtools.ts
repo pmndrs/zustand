@@ -153,10 +153,7 @@ type Connection = ReturnType<
 >
 type ConnectionName = string | undefined
 type StoreName = string
-type StoreInformation = {
-  api: StoreApi<unknown>
-  initialState: unknown
-}
+type StoreInformation = StoreApi<unknown>
 type ConnectionInformation = {
   connection: Connection
   stores: Record<StoreName, StoreInformation>
@@ -169,8 +166,33 @@ const getTrackedConnectionState = (
   const api = trackedConnections.get(name)
   if (!api) return {}
   return Object.fromEntries(
-    Object.entries(api.stores).map(([key, { api }]) => [key, api.getState()])
+    Object.entries(api.stores).map(([key, api]) => [key, api.getState()])
   )
+}
+
+const extractConnectionInformation = (
+  store: string | undefined,
+  extensionConnector: NonNullable<
+    typeof window['__REDUX_DEVTOOLS_EXTENSION__']
+  >,
+  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>
+) => {
+  if (store === undefined) {
+    return {
+      type: 'untracked' as const,
+      connection: extensionConnector.connect(options),
+    }
+  }
+  const existingConnection = trackedConnections.get(options.name)
+  if (existingConnection) {
+    return { type: 'tracked' as const, store, ...existingConnection }
+  }
+  const newConnection: ConnectionInformation = {
+    connection: extensionConnector.connect(options),
+    stores: {},
+  }
+  trackedConnections.set(options.name, newConnection)
+  return { type: 'tracked' as const, store, ...newConnection }
 }
 
 const devtoolsImpl: DevtoolsImpl =
@@ -179,7 +201,7 @@ const devtoolsImpl: DevtoolsImpl =
     const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
-      [store: string]: S
+      [store: string]: ReturnType<typeof fn>
     }
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
@@ -202,26 +224,8 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const { connection, ...connectionInformation } = (() => {
-      // For backwards-compatibility's sake, we don't track
-      // a store unless it's given us a `store` string
-      if (store === undefined) {
-        return {
-          type: 'untracked' as const,
-          connection: extensionConnector.connect(options),
-        }
-      }
-      const existingConnection = trackedConnections.get(options.name)
-      if (existingConnection) {
-        return { type: 'tracked' as const, store, ...existingConnection }
-      }
-      const newConnection: ConnectionInformation = {
-        connection: extensionConnector.connect(options),
-        stores: {},
-      }
-      trackedConnections.set(options.name, newConnection)
-      return { type: 'tracked' as const, store, ...newConnection }
-    })()
+    const { connection, ...connectionInformation } =
+      extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
@@ -261,16 +265,14 @@ const devtoolsImpl: DevtoolsImpl =
     if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
     } else {
-      const storeInfo: StoreInformation = {
-        api,
-        initialState,
-      }
-      connectionInformation.stores[connectionInformation.store] = storeInfo
+      connectionInformation.stores[connectionInformation.store] = api
       connection?.init(
         Object.fromEntries(
           Object.entries(connectionInformation.stores).map(([key, store]) => [
             key,
-            store.initialState,
+            key === connectionInformation.store
+              ? initialState
+              : store.getState(),
           ])
         )
       )
@@ -322,10 +324,7 @@ const devtoolsImpl: DevtoolsImpl =
                   setStateFromDevtools(action.state as PartialState)
                   return
                 }
-                if (
-                  Object.keys(action.state as S).length > 1 ||
-                  Object.keys(action.state as S).length < 1
-                ) {
+                if (Object.keys(action.state as S).length !== 1) {
                   console.error(
                     `
                     [zustand devtools middleware] Unsupported __setState action format. 
@@ -334,17 +333,18 @@ const devtoolsImpl: DevtoolsImpl =
                     `
                   )
                 }
-                if ((action.state as S)[store] === undefined) {
+                const stateFromDevtools = (action.state as S)[store]
+                if (
+                  stateFromDevtools === undefined ||
+                  stateFromDevtools === null
+                ) {
                   return
                 }
-                const stateFromDevtools = (action.state as S)[store]
-                if (stateFromDevtools) {
-                  if (
-                    JSON.stringify(api.getState()) !==
-                    JSON.stringify(stateFromDevtools)
-                  ) {
-                    setStateFromDevtools(stateFromDevtools)
-                  }
+                if (
+                  JSON.stringify(api.getState()) !==
+                  JSON.stringify(stateFromDevtools)
+                ) {
+                  setStateFromDevtools(stateFromDevtools)
                 }
                 return
               }
