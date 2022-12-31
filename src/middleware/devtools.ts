@@ -153,10 +153,7 @@ type Connection = ReturnType<
 >
 type ConnectionName = string | undefined
 type StoreName = string
-type StoreInformation = {
-  api: StoreApi<unknown>
-  initialState: unknown
-}
+type StoreInformation = StoreApi<unknown>
 type ConnectionInformation = {
   connection: Connection
   stores: Record<StoreName, StoreInformation>
@@ -169,7 +166,7 @@ const getTrackedConnectionState = (
   const api = trackedConnections.get(name)
   if (!api) return {}
   return Object.fromEntries(
-    Object.entries(api.stores).map(([key, { api }]) => [key, api.getState()])
+    Object.entries(api.stores).map(([key, api]) => [key, api.getState()])
   )
 }
 
@@ -268,16 +265,14 @@ const devtoolsImpl: DevtoolsImpl =
     if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
     } else {
-      const storeInfo: StoreInformation = {
-        api,
-        initialState,
-      }
-      connectionInformation.stores[connectionInformation.store] = storeInfo
+      connectionInformation.stores[connectionInformation.store] = api
       connection?.init(
         Object.fromEntries(
           Object.entries(connectionInformation.stores).map(([key, store]) => [
             key,
-            store.initialState,
+            key === connectionInformation.store
+              ? initialState
+              : store.getState(),
           ])
         )
       )
