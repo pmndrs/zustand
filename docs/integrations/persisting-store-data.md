@@ -19,7 +19,7 @@ for more details.
 
 ```ts
 import create from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export const useBearStore = create(
   persist(
@@ -29,7 +29,7 @@ export const useBearStore = create(
     }),
     {
       name: 'food-storage', // name of the item in the storage (must be unique)
-      getStorage: () => sessionStorage, // (optional) by default, 'localStorage' is used
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
     }
   )
 )
@@ -44,7 +44,7 @@ The given name is going to be the key
 used to store your Zustand state in the storage,
 so it must be unique.
 
-### `getStorage`
+### `storage`
 
 > Type: `() => StateStorage`
 
@@ -54,7 +54,7 @@ The `StateStorage` can be imported with:
 import { StateStorage } from 'zustand/middleware'
 ```
 
-> Default: `() => localStorage`
+> Default: `createJSONStorage(() => localStorage)`
 
 Enables you to use your own storage.
 Simply pass a function that returns the storage you want to use.
@@ -62,6 +62,8 @@ Simply pass a function that returns the storage you want to use.
 Example:
 
 ```ts
+import { persist, createJSONStorage } from 'zustand/middleware'
+
 export const useBoundStore = create(
   persist(
     (set, get) => ({
@@ -69,60 +71,7 @@ export const useBoundStore = create(
     }),
     {
       // ...
-      getStorage: () => AsyncStorage,
-    }
-  )
-)
-```
-
-### `serialize`
-
-> Type: `(state: Object) => string | Promise<string>`
-
-> Default: `(state) => JSON.stringify(state)`
-
-The only way to store an object in a storage is as a string.
-If the default method of serialization doesn't suit your needs,
-pass custom functions for serialization
-and [deserialization](#deserialize) (see below).
-
-For example, if you want to store your state in base64:
-
-```ts
-export const useBoundStore = create(
-  persist(
-    (set, get) => ({
-      // ...
-    }),
-    {
-      // ...
-      serialize: (state) => btoa(JSON.stringify(state)),
-    }
-  )
-)
-```
-
-### `deserialize`
-
-> Type: `(str: string) => Object | Promise<Object>`
-
-> Default: `(str) => JSON.parse(str)`
-
-If you pass a custom [`serialize`](#serialize) function,
-you will most likely need to pass a custom deserialize function as well.
-
-To continue the example above,
-you could deserialize the base64 value using the following:
-
-```ts
-export const useBoundStore = create(
-  persist(
-    (set, get) => ({
-      // ...
-    }),
-    {
-      // ...
-      deserialize: (str) => JSON.parse(atob(str)),
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 )
