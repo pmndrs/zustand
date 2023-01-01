@@ -389,6 +389,21 @@ const usePlainStore = create(devtools(store))
 const useReduxStore = create(devtools(redux(reducer, initialState)))
 ```
 
+One redux devtools connection for multiple stores
+
+```jsx
+import { devtools } from 'zustand/middleware'
+
+// Usage with a plain action store, it will log actions as "setState"
+const usePlainStore1 = create(devtools(store), { name, store: storeName1 })
+const usePlainStore2 = create(devtools(store), { name, store: storeName2 })
+// Usage with a redux store, it will log full action types
+const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName3 })
+const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName4 })
+```
+
+Assingning different connection names, will separate stores in redux devtools. This also helps grouping different stores into separate redux devtools connections.
+
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.
 
 Name store: `devtools(store, {name: "MyStore"})`, which will create a separate instance named "MyStore" in the devtools.
@@ -501,9 +516,9 @@ A more complete TypeScript guide is [here](docs/guides/typescript.md).
 - [Calling actions outside a React event handler in pre React 18](./docs/guides/event-handler-in-pre-react-18.md).
 - [Testing](./docs/guides/testing.mdx)
 
-## 3rd-Party Libraries
+## Third-Party Libraries
 
-Some users may want to extends Zustand's feature set which can be done using 3rd-party libraries made by the community. For information regarding 3rd-party libraries with Zustand, visit [the doc](./docs/integrations/3rd-party-libraries.md).
+Some users may want to extends Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
 
 ## Comparison with other libraries
 

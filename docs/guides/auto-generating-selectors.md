@@ -69,7 +69,7 @@ const increase = useBearStore.use.increment()
 
 For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-forked-rl8v5e?file=/src/selectors.ts).
 
-## 3rd-party Libraries
+## Third-party Libraries
 
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook)
 - [react-hooks-global-state](https://github.com/dai-shi/react-hooks-global-state)
