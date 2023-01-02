@@ -8,9 +8,9 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
-A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy api based on hooks, isn't boilerplatey or opinionated.
+A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy API based on hooks, isn't boilerplatey or opinionated.
 
-Don't disregard it because it's cute. It has quite the claws, lots of time was spent to deal with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
+Don't disregard it because it's cute. It has quite the claws, lots of time was spent dealing with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
 
 You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/examples/demo).
 
@@ -36,7 +36,7 @@ const useBearStore = create((set) => ({
 
 ## Then bind your components, and that's it!
 
-Use the hook anywhere, no providers needed. Select your state and the component will re-render on changes.
+Use the hook anywhere, no providers are needed. Select your state and the component will re-render on changes.
 
 ```jsx
 function BearCounter() {
@@ -219,7 +219,7 @@ const unsub5 = useDogStore.subscribe((state) => state.paw, console.log, {
 
 ## Using zustand without React
 
-Zustand core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
+Zustand core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the API utilities.
 
 ```jsx
 import create from 'zustand/vanilla'
@@ -370,7 +370,7 @@ const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api.
+Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla API.
 
 ```jsx
 import { redux } from 'zustand/middleware'
@@ -402,7 +402,7 @@ const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, s
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName4 })
 ```
 
-Assingning different connection names, will separate stores in redux devtools. This also helps grouping different stores into separate redux devtools connections.
+Assigning different connection names will separate stores in redux devtools. This also helps group different stores into separate redux devtools connections.
 
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.
 
@@ -427,7 +427,7 @@ const createBearSlice = (set, get) => ({
 })
 ```
 
-You can also log action's type along with its payload:
+You can also log the action's type along with its payload:
 
 ```jsx
 const createBearSlice = (set, get) => ({
@@ -453,9 +453,9 @@ devtools(..., { enabled: false, ... })
 
 ## React context
 
-The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the normal store is a hook, passing it as a normal context value may violate rules of hooks.
+The store created with `create` doesn't require context providers. In some cases, you may want to use contexts for dependency injection or if you want to initialize your store with props from a component. Because the normal store is a hook, passing it as a normal context value may violate the rules of hooks.
 
-The recommended method available since v4 is to use vanilla store.
+The recommended method available since v4 is to use the vanilla store.
 
 ```jsx
 import { createContext, useContext } from 'react'
