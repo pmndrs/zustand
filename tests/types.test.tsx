@@ -212,7 +212,7 @@ it('StateCreator<T, [StoreMutatorIdentfier, unknown][]> is StateCreator<T, []>',
     },
   })
 
-  create<State>()(persist(foo()))
+  create<State>()(persist(foo(), { name: 'prefix' }))
 })
 
 it('StateCreator subtyping', () => {
@@ -228,7 +228,7 @@ it('StateCreator subtyping', () => {
     },
   })
 
-  create<State>()(persist(foo()))
+  create<State>()(persist(foo(), { name: 'prefix' }))
 
   const _testSubtyping: StateCreator<State, [['zustand/persist', unknown]]> =
     {} as StateCreator<State, []>

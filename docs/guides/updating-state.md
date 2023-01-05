@@ -98,13 +98,13 @@ merging that in with the new state values. Like so:
 This is very long! Let's explore some alternatives that will make your life
 easier.
 
-### With immer
+### With Immer
 
-Many people use [immer](https://github.com/immerjs/immer) to update nested
+Many people use [Immer](https://github.com/immerjs/immer) to update nested
 values. Immer can be used anytime you need to update nested state such as in
 React, Redux and of course, Zustand!
 
-You can use immer to shorten your state updates for deeply nested object. Let's
+You can use Immer to shorten your state updates for deeply nested object. Let's
 take a look at an example:
 
 ```ts
@@ -112,7 +112,7 @@ take a look at an example:
     set(produce((state: State) => { ++state.deep.nested.obj.count })),
 ```
 
-What a reduction!. [Please take note of the gotchas listed here](../integrations/updating-draft-states.md).
+What a reduction! Please take note of the [gotchas listed here](../integrations/immer-middleware.md).
 
 ### With optics-ts
 
@@ -123,7 +123,7 @@ There is another option with [optics-ts](https://github.com/akheron/optics-ts/):
     set(O.modify(O.optic<State>().path("deep.nested.obj.count"))((c) => c + 1)),
 ```
 
-Unlike immer, optics-ts doesn't use proxies or mutation syntax.
+Unlike Immer, optics-ts doesn't use proxies or mutation syntax.
 
 ### With Ramda
 
