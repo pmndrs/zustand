@@ -135,9 +135,16 @@ We're no longer using the trick to disallow `{ foo: undefined }`
 to be assigned to `Partial<{ foo: string }>`.
 Instead, we're relying on the users to turn on `exactOptionalPropertyTypes`.
 
-## `useStore` (from `zustand` and `zustand/react`)
+## `useStore`
 
-### Change
+**Applicable imports**
+
+```ts
+import { useStore } from 'zustand'
+import { useStore } from 'zustand/react'
+```
+
+**Change**
 
 ```diff
 - useStore:
@@ -157,9 +164,14 @@ Instead, we're relying on the users to turn on `exactOptionalPropertyTypes`.
 +       => StateSlice
 ```
 
-### Migration
+**Migration**
 
-If you're not passing any type parameters to `useStore` then there is no migration needed. If you are then it's recommended to remove them, or pass the store type instead of the state type as the first parameter.
+If you are not passing any type parameters to `useStore`,
+no migration is required.
+
+If you are,
+it's recommended to remove all the type parameters,
+or pass the **store** type instead of the **state** type as the first parameter.
 
 ## `UseBoundStore` (from `zustand` and `zustand/react`)
 
