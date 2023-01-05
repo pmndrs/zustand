@@ -27,8 +27,6 @@ import create from 'zustand'
 import create from 'zustand/vanilla'
 ```
 
-**Pattern:** `/import create from ?['"]zustand(/vanilla)?['"];?/`
-
 **Change**
 
 ```diff
@@ -55,9 +53,16 @@ remove all type parameters from `create`.
 
 Else, replace `create<T, ...>(...)` with `create<T>()(...)`.
 
-## `StateCreator` (from `zustand` and `zustand/vanilla`)
+## `StateCreator`
 
-### Change
+**Applicable imports**
+
+```ts
+import type { StateCreator } from 'zustand'
+import type { StateCreator } from 'zustand/vanilla'
+```
+
+**Change**
 
 ```diff
 - type StateCreator
@@ -76,9 +81,15 @@ Else, replace `create<T, ...>(...)` with `create<T>()(...)`.
 +     ...
 ```
 
-### Migration
+**Migration**
 
-If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](../guides/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](../guides/typescript.md#common-recipes) sections.
+If you are using `StateCreator`,
+you are likely authoring a middleware
+or using the "slices" pattern.
+For that check the
+[Authoring middlewares and advanced usage](../guides/typescript.md#authoring-middlewares-and-advanced-usage)
+and [Common recipes](../guides/typescript.md#common-recipes)
+sections of the TypeScript Guide.
 
 ## `PartialState` (from `zustand` and `zustand/vanilla`)
 
