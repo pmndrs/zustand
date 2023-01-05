@@ -124,9 +124,9 @@ export interface PersistOptions<S, PersistedState = S> {
    * An optional boolean that will prevent the persist middleware from triggering hydration on initialization,
    * This allows you to call `rehydrate()` at a specific point in your apps rendering life-cycle.
    *
-   * This is useful in SSR applications, or if you need to check for user permission first for example.
+   * This is useful in SSR application.
    *
-   * @default undefined hydration will run automatically.
+   * @default undefined
    */
   skipHydration?: boolean
 }
