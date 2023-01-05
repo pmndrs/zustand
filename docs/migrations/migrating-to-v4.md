@@ -249,7 +249,15 @@ import createContext from 'zustand/context'
 Replace `createContext<T>()` with `createContext<StoreApi<T>>()`,
 and `createContext<T, S>()` with `createContext<S>()`.
 
-## `combine`, `devtools`, `subscribeWithSelector` (from `zustand/middleware`)
+## `combine`, `devtools`, `subscribeWithSelector`
+
+**Applicable imports**
+
+```ts
+import { combine } from 'zustand/middleware'
+import { devtools } from 'zustand/middleware'
+import { subscribeWithSelector } from 'zustand/middleware'
+```
 
 **Change**
 
@@ -272,9 +280,20 @@ and `createContext<T, S>()` with `createContext<S>()`.
 
 **Migration**
 
-If you're not passing any type parameters then there is no migration needed. If you're passing any type parameters, remove them as are inferred.
+If you are not passing any type parameters
+to `combine`, `devtools`, or `subscribeWithSelector`,
+no migration is required.
 
-## `persist` (from `zustand/middleware`)
+If you are passing any type parameters,
+remove them as they are inferred automatically.
+
+## `persist`
+
+**Applicable imports**
+
+```ts
+import { persist } from 'zustand/middleware'
+```
 
 **Change**
 
@@ -287,11 +306,31 @@ If you're not passing any type parameters then there is no migration needed. If 
 
 **Migration**
 
-If you're passing any type parameters, then remove them because they will be inferred. Next, if you're passing the `partialize` option then there's no further steps required for migration.
+If you are passing any type parameters,
+remove them as they are inferred automatically.
 
-But if you're not passing the `partialize` option then you might be seeing some compilation errors. If you're not seeing any compilation errors then there's no further steps required for migration.
+Next, if you are passing the `partialize` option,
+there is no further steps required for migration.
 
-But if you're seeing some compilation errors—because now the type of partialized state is `T` instead of `Partial<T>` which is in alignment with the runtime behavior of default `partialize` being `s => s`—then in that case you should fix the errors because they might be indicative of unsound code. To be clear the runtime behavior has not changed, the types have gotten more correct, but if your partialised state is truly `Partial<T>` then you can pass the `partialize` option as `s => s as Partial<typeof s>`. You can do this for a quickfix too.
+If you are **not** passing the `partialize` option,
+you might be seeing some compilation errors.
+If you do not see any,
+there is no further migration required.
+
+The type of partialized state is now `T` instead of `Partial<T>`,
+which aligns with the runtime behavior of the default `partialize`,
+which is an identity (`s => s`).
+
+If you see some compilation errors,
+you have to find and fix the errors yourself,
+because they might be indicative of unsound code.
+Alternatively, the workaround will be passing
+`s => s as Partial<typeof s>` to `partialize`.
+If your partialized state is truly `Partial<T>`,
+you should not encounter any bugs.
+
+The runtime behavior has not changed,
+only the types are now correct.
 
 ## `redux` (from `zustand/middleware`)
 
