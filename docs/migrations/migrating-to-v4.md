@@ -91,9 +91,16 @@ For that check the
 and [Common recipes](../guides/typescript.md#common-recipes)
 sections of the TypeScript Guide.
 
-## `PartialState` (from `zustand` and `zustand/vanilla`)
+## `PartialState`
 
-### Change
+**Applicable imports**
+
+```ts
+import type { PartialState } from 'zustand'
+import type { PartialState } from 'zustand/vanilla'
+```
+
+**Change**
 
 ```diff
 - type PartialState
@@ -110,11 +117,23 @@ sections of the TypeScript Guide.
 +   | ((state: T) => Partial<T>)
 ```
 
-### Migration
+**Migration**
 
-Replace `PartialState<T, ...>` with `PartialState<T>` and preferably turn on [`--exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes).
+Replace `PartialState<T, ...>` with `PartialState<T>`
+and preferably turn on [`exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes)
+in your `tsconfig.json`:
 
-We're no longer using the trick to disallow `{ foo: undefined }` to be assigned to `Partial<{ foo: string }>` instead now we're relying on the users to turn on `--exactOptionalPropertyTypes`.
+```json
+{
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true
+  }
+}
+```
+
+We're no longer using the trick to disallow `{ foo: undefined }`
+to be assigned to `Partial<{ foo: string }>`.
+Instead, we're relying on the users to turn on `exactOptionalPropertyTypes`.
 
 ## `useStore` (from `zustand` and `zustand/react`)
 
