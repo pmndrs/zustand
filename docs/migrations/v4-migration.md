@@ -3,11 +3,20 @@ title: v4 Migrations
 nav: 19
 ---
 
-If you're not using the typed version (either via TypeScript or via JSDoc) then there are no breaking changes for you and hence no migration is needed either.
+The only breaking changes are in types.
+If you are using Zustand with TypeScript
+or JSDoc type annotations,
+this guide applies.
+Otherwise, no migration is required.
 
-Also it's recommended to first read the new [TypeScript Guide](../guides/typescript.md), it'll be easier to understand the migration.
+Also, it's recommended to first read
+the new [TypeScript Guide](../guides/typescript.md),
+so that the migration is easier to understand.
 
-In addition to this migration guide you can also check the diff of the test files in the repo from v3 to v4.
+In addition to this migration guide,
+you can also check the
+[diff](https://github.com/pmndrs/zustand/compare/v3.7.2...v4.0.0?short_path=37e5b4c#diff-c21e24854115b390eccde717da83f91feb2d5927a76c1485e5f0fdd0135c2afa)
+of the test files in the repo from v3 to v4.
 
 ## `create` (from `zustand` and `zustand/vanilla`)
 
