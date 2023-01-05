@@ -284,8 +284,9 @@ If you are not passing any type parameters
 to `combine`, `devtools`, or `subscribeWithSelector`,
 no migration is required.
 
-If you are passing any type parameters,
-remove them as they are inferred automatically.
+If you are,
+remove all the type parameters,
+as they are inferred automatically.
 
 ## `persist`
 
@@ -332,7 +333,13 @@ you should not encounter any bugs.
 The runtime behavior has not changed,
 only the types are now correct.
 
-## `redux` (from `zustand/middleware`)
+## `redux`
+
+**Applicable imports**
+
+```ts
+import { redux } from 'zustand/middleware'
+```
 
 **Change**
 
@@ -345,4 +352,11 @@ only the types are now correct.
 
 **Migration**
 
-If you're not passing any type parameters then there is no migration needed. If you're passing type parameters them remove them and annotate the second (action) parameter. That is replace `redux<T, A>((state, action) => ..., ...)` with `redux((state, action: A) => ..., ...)`.
+If you are not passing any type parameters to `redux`,
+no migration is required.
+
+If you are,
+remove all the type parameters,
+and annotate only the second (action) parameter.
+That is, replace `redux<T, A>((state, action) => ..., ...)`
+with `redux((state, action: A) => ..., ...)`.
