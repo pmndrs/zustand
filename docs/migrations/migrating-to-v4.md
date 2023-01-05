@@ -233,7 +233,7 @@ Use `typeof MyContext.useStore` instead
 **Applicable imports**
 
 ```ts
-import { createContext } from 'zustand/context'
+import createContext from 'zustand/context'
 ```
 
 **Change**
