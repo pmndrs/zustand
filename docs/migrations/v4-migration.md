@@ -38,7 +38,11 @@ of the test files in the repo from v3 to v4.
 
 ### Migration
 
-If you're not passing any type parameters to `create` then there is no migration needed. If you're using a "leaf" middleware like `combine` or `redux` then remove all type parameters from `create`. Else replace `create<T, ...>(...)` with `create<T>()(...)`.
+If you're not passing any type parameters to `create`,
+no migration is required.
+If you're using a "leaf" middleware like `combine` or `redux`,
+remove all type parameters from `create`.
+Else, replace `create<T, ...>(...)` with `create<T>()(...)`.
 
 ## `StateCreator` (from `zustand` and `zustand/vanilla`)
 
@@ -211,7 +215,7 @@ If you're not passing any type parameters then there is no migration needed. If 
 
 If you're passing any type parameters, then remove them because they will be inferred. Next, if you're passing the `partialize` option then there's no further steps required for migration.
 
-But if you're not passing the `partialize` option then you might be seeing some compilation errors. If you're not seeing any compilation errors then there's no further steps requierd for migration.
+But if you're not passing the `partialize` option then you might be seeing some compilation errors. If you're not seeing any compilation errors then there's no further steps required for migration.
 
 But if you're seeing some compilation errors—because now the type of partialized state is `T` instead of `Partial<T>` which is in alignment with the runtime behavior of default `partialize` being `s => s`—then in that case you should fix the errors because they might be indicative of unsound code. To be clear the runtime behavior has not changed, the types have gotten more correct, but if your partialised state is truly `Partial<T>` then you can pass the `partialize` option as `s => s as Partial<typeof s>`. You can do this for a quickfix too.
 
