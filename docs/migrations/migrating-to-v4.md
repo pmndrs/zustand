@@ -16,7 +16,7 @@ so that the migration is easier to understand.
 In addition to this migration guide,
 you can also check the
 [diff](https://github.com/pmndrs/zustand/compare/v3.7.2...v4.0.0?short_path=37e5b4c#diff-c21e24854115b390eccde717da83f91feb2d5927a76c1485e5f0fdd0135c2afa)
-of the test files in the repo from v3 to v4.
+of the test files in the Zustand repository from v3 to v4.
 
 ## `create`
 
@@ -173,9 +173,16 @@ If you are,
 it's recommended to remove all the type parameters,
 or pass the **store** type instead of the **state** type as the first parameter.
 
-## `UseBoundStore` (from `zustand` and `zustand/react`)
+## `UseBoundStore`
 
-### Change
+**Applicable imports**
+
+```ts
+import type { UseBoundStore } from 'zustand'
+import type { UseBoundStore } from 'zustand/react'
+```
+
+**Change**
 
 ```diff
 - type UseBoundStore<
@@ -198,25 +205,38 @@ or pass the **store** type instead of the **state** type as the first parameter.
 +   & S
 ```
 
-### Migration
+**Migration**
 
-Replace `UseBoundStore<T>` with `UseBoundStore<StoreApi<T>>` and `UseBoundStore<T, S>` with `UseBoundStore<S>`
+Replace `UseBoundStore<T>` with `UseBoundStore<StoreApi<T>>`,
+and `UseBoundStore<T, S>` with `UseBoundStore<S>`
 
-## `UseContextStore` (from `zustand/context`)
+## `UseContextStore`
 
-### Change
+**Applicable imports**
+
+```ts
+import type { UseContextStore } from 'zustand/context'
+```
+
+**Change**
 
 ```diff
 - type UseContextStore
 ```
 
-### Migration
+**Migration**
 
 Use `typeof MyContext.useStore` instead
 
-## `createContext` (from `zustand/context`)
+## `createContext`
 
-### Change
+**Applicable imports**
+
+```ts
+import { createContext } from 'zustand/context'
+```
+
+**Change**
 
 ```diff
   createContext:
@@ -224,13 +244,14 @@ Use `typeof MyContext.useStore` instead
 +   <Store>() => ...
 ```
 
-### Migration
+**Migration**
 
-Replace `createContext<T>()` with `createContext<StoreApi<T>>()` and `createContext<T, S>()` with `createContext<S>()`.
+Replace `createContext<T>()` with `createContext<StoreApi<T>>()`,
+and `createContext<T, S>()` with `createContext<S>()`.
 
 ## `combine`, `devtools`, `subscribeWithSelector` (from `zustand/middleware`)
 
-### Change
+**Change**
 
 ```diff
 - combine:
@@ -249,13 +270,13 @@ Replace `createContext<T>()` with `createContext<StoreApi<T>>()` and `createCont
 +   <T, Mps, Mcs>(...) => ...
 ```
 
-### Migration
+**Migration**
 
 If you're not passing any type parameters then there is no migration needed. If you're passing any type parameters, remove them as are inferred.
 
 ## `persist` (from `zustand/middleware`)
 
-### Change
+**Change**
 
 ```diff
 - persist:
@@ -264,7 +285,7 @@ If you're not passing any type parameters then there is no migration needed. If 
 +   <T, Mps, Mcs, U = T>(...) => ...
 ```
 
-### Migration
+**Migration**
 
 If you're passing any type parameters, then remove them because they will be inferred. Next, if you're passing the `partialize` option then there's no further steps required for migration.
 
@@ -274,7 +295,7 @@ But if you're seeing some compilation errors—because now the type of partializ
 
 ## `redux` (from `zustand/middleware`)
 
-### Change
+**Change**
 
 ```diff
 - redux:
@@ -283,6 +304,6 @@ But if you're seeing some compilation errors—because now the type of partializ
 +   <T, A, Mps, Mcs>(...) => ...
 ```
 
-### Migration
+**Migration**
 
 If you're not passing any type parameters then there is no migration needed. If you're passing type parameters them remove them and annotate the second (action) parameter. That is replace `redux<T, A>((state, action) => ..., ...)` with `redux((state, action: A) => ..., ...)`.
