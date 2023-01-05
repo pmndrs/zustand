@@ -314,7 +314,7 @@ Next, if you are passing the `partialize` option,
 there is no further steps required for migration.
 
 If you are **not** passing the `partialize` option,
-you might be seeing some compilation errors.
+you might see some compilation errors.
 If you do not see any,
 there is no further migration required.
 
