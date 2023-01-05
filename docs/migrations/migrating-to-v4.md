@@ -18,9 +18,18 @@ you can also check the
 [diff](https://github.com/pmndrs/zustand/compare/v3.7.2...v4.0.0?short_path=37e5b4c#diff-c21e24854115b390eccde717da83f91feb2d5927a76c1485e5f0fdd0135c2afa)
 of the test files in the repo from v3 to v4.
 
-## `create` (from `zustand` and `zustand/vanilla`)
+## `create`
 
-### Change
+**Applicable imports**
+
+```ts
+import create from 'zustand'
+import create from 'zustand/vanilla'
+```
+
+**Pattern:** `/import create from ?['"]zustand(/vanilla)?['"];?/`
+
+**Change**
 
 ```diff
 - create:
@@ -36,7 +45,7 @@ of the test files in the repo from v3 to v4.
 +   }
 ```
 
-### Migration
+**Migration**
 
 If you are not passing any type parameters to `create`,
 no migration is required.
