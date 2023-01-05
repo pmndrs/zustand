@@ -40,8 +40,10 @@ of the test files in the repo from v3 to v4.
 
 If you're not passing any type parameters to `create`,
 no migration is required.
+
 If you're using a "leaf" middleware like `combine` or `redux`,
 remove all type parameters from `create`.
+
 Else, replace `create<T, ...>(...)` with `create<T>()(...)`.
 
 ## `StateCreator` (from `zustand` and `zustand/vanilla`)
