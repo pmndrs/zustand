@@ -121,11 +121,14 @@ export interface PersistOptions<S, PersistedState = S> {
   merge?: (persistedState: unknown, currentState: S) => S
 
   /**
-   * A boolean that will prevent the persist middleware automatically triggering hydration on initialization,
-   * This allows you to call the rehydrate function at a specific point in your apps rendering life-cycle.
-   * This is useful in SSR applications and mobile applications for example.
+   * An optional boolean that will prevent the persist middleware from triggering hydration on initialization,
+   * This allows you to call `rehydrate()` at a specific point in your apps rendering life-cycle.
+   *
+   * This is useful in SSR applications, or if you need to check for user permission first for example.
+   *
+   * @default undefined hydration will run automatically.
    */
-  manualHydration?: boolean
+  skipHydration?: boolean
 }
 
 type PersistListener<S> = (state: S) => void
@@ -349,9 +352,7 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     },
   }
 
-  if (!options.manualHydration) {
-    hydrate()
-  }
+  hydrate()
 
   return stateFromStorage || configResult
 }
@@ -500,7 +501,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     },
   }
 
-  if (!options.manualHydration) {
+  if (!options.skipHydration) {
     hydrate()
   }
 
