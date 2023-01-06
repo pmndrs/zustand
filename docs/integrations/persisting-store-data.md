@@ -601,4 +601,4 @@ Now, you will need to use the `storage` prop, let's say your state use a `Map` t
     },
     removeItem: (name) => localStorage.removeItem(name),
   },
-  ```
+```
