@@ -35,7 +35,7 @@ const treats = useStore(
 For instance, if you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
 
 ```jsx
-import shallow from 'zustand/shallow'
+import { shallow } from 'zustand/shallow'
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
 const { nuts, honey } = useStore(
@@ -131,7 +131,7 @@ subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubs
 ```
 
 ```jsx
-import create from 'zustand';
+import { create } from 'zustand';
 import { subscribeWithSelector, shallow } from 'zustand/middleware'
 const useStore = create(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
 
@@ -173,17 +173,17 @@ function Component() {
 Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
 
 ```jsx
-import create from 'zustand/vanilla'
+import { createStore } from 'zustand/vanilla'
 
-const store = create(() => ({ ... }))
+const store = createStore(() => ({ ... }))
 const { getState, setState, subscribe, destroy } = store
 ```
 
 You can even consume an existing vanilla store with React:
 
 ```jsx
-import create from 'zustand'
-import vanillaStore from './vanillaStore'
+import { create } from 'zustand'
+import { vanillaStore } from './vanillaStore'
 
 const useStore = create(vanillaStore)
 ```
@@ -258,7 +258,7 @@ const useStore = create(
 <summary>How to pipe middlewares</summary>
 
 ```js
-import create from 'zustand'
+import { create } from 'zustand'
 import produce from 'immer'
 import pipe from 'ramda/es/pipe'
 
@@ -309,7 +309,7 @@ const immer =
 You can persist your store's data using any kind of storage.
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export const useStore = create(

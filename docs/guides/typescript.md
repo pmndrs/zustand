@@ -8,7 +8,7 @@ nav: 8
 The difference when using TypeScript is that instead of writing `create(...)`, you have to write `create<T>()(...)` (notice the extra parenthesis `()` too along with the type parameter) where `T` is the type of the state to annotate it. For example:
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 interface BearState {
   bears: number
@@ -71,7 +71,7 @@ So what we're saying is, the inference failure in case of `createFoo` is not rea
 Zustand lies that it implemented `create`'s type, it implemented only the most part of it. Here's a simple proof by showing unsoundness. Consider the following code:
 
 ```ts
-import create from 'zustand/vanilla'
+import { create } from 'zustand'
 
 const useBoundStore = create<{ foo: number }>()((_, get) => ({
   foo: get().foo,
@@ -136,7 +136,7 @@ This way, `T` gets inferred and you get to annotate `E`. Zustand has the same us
 Alternatively, you can also use `combine`, which infers the state so that you do not need to type it.
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
 
 const useBearStore = create(
@@ -166,7 +166,7 @@ Note that we don't use the curried version when using `combine` because `combine
 You do not have to do anything special to use middlewares in TypeScript.
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 
 interface BearState {
@@ -187,7 +187,7 @@ const useBearStore = create<BearState>()(
 Just make sure you are using them immediately inside `create` so as to make the contextual inference work. Doing something even remotely fancy like the following `myMiddlewares` would require more advanced types.
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 
 const myMiddlewares = (f) => devtools(persist(f))
@@ -212,7 +212,7 @@ Also, we recommend using `devtools` middleware as last as possible. For example,
 Imagine you had to write this hypothetical middleware.
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 const foo = (f, bar) => (set, get, store) => {
   store.foo = bar
@@ -234,7 +234,7 @@ If you are eager to know what the answer is to this particular problem then you 
 ### Middleware that doesn't change the store type
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier } from 'zustand'
+import { create, State, StateCreator, StoreMutatorIdentifier } from 'zustand'
 
 type Logger = <
   T extends State,
@@ -279,7 +279,8 @@ const useBearStore = create<BearState>()(
 ### Middleware that changes the store type
 
 ```ts
-import create, {
+import {
+  create,
   State,
   StateCreator,
   StoreMutatorIdentifier,
@@ -334,7 +335,7 @@ console.log(useBearStore.foo.toUpperCase())
 The recommended way to use `create` is using the curried workaround like so: `create<T>()(...)`. This is because it enables you to infer the store type. But if for some reason you do not want to use the workaround, you can pass the type parameters like the following. Note that in some cases, this acts as an assertion instead of annotation, so we don't recommend it.
 
 ```ts
-import create from "zustand"
+import { create } from "zustand"
 
 interface BearState {
   bears: number
@@ -356,7 +357,7 @@ const useBearStore = create<
 ### Slices pattern
 
 ```ts
-import create, { StateCreator } from 'zustand'
+import { create, StateCreator } from 'zustand'
 
 interface BearSlice {
   bears: number

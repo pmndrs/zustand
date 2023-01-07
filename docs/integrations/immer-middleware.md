@@ -22,7 +22,7 @@ npm install immer
 Updating simple states
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
 type State = {
@@ -52,7 +52,7 @@ export const useCountStore = create(
 Updating complex states
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
 interface Todo {

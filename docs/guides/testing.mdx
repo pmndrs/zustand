@@ -11,7 +11,7 @@ When running tests, the stores are not automatically reset before each test run.
 Thus, there can be cases where the state of one test can affect another. To make sure all tests run with a pristine store state, you can mock `zustand` during testing and use the following code to create your store:
 
 ```jsx
-import actualCreate from 'zustand'
+import { create: actualCreate } from 'zustand'
 // const actualCreate = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
 
@@ -43,7 +43,7 @@ In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place
 If you are using zustand, as documented in [TypeScript Guide](./typescript.md), use the following code:
 
 ```tsx
-import actualCreate, { StateCreator } from 'zustand'
+import { create: actualCreate, StateCreator } from 'zustand'
 // const actualCreate = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
 

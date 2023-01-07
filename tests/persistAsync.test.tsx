@@ -1,6 +1,6 @@
 import { StrictMode, useEffect } from 'react'
 import { act, render, waitFor } from '@testing-library/react'
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 const createPersistantStore = (initialValue: string | null) => {
