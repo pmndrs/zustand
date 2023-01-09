@@ -574,7 +574,10 @@ export const useBearStore = create<MyState>()(
 
 ### How do I use it with Map and Set?
 
-With the previous persist API, you would use `serialize`/`deserialize` to deal with Map and Set and convert them into an Array so they could be parsed into proper JSON.
+With the previous persist API, you would use `serialize`/`deserialize`
+to deal with `Map` and `Set` and convert them into
+an Array so they could be parsed into proper JSON.
+
 The new persist API has deprecated `serialize`/`deserialize`.
 
 Now, you will need to use the `storage` prop.
