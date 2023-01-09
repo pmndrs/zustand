@@ -577,9 +577,11 @@ export const useBearStore = create<MyState>()(
 With the previous persist API, you would use `serialize`/`deserialize` to deal with Map and Set and convert them into an Array so they could be parsed into proper JSON.
 The new persist API has deprecated `serialize`/`deserialize`.
 
-Now, you will need to use the `storage` prop. Let's say your state uses `Map` to handle a list of `transactions`, then you can convert the Map into an Array in the storage prop:
+Now, you will need to use the `storage` prop.
+Let's say your state uses `Map` to handle a list of `transactions`,
+then you can convert the Map into an Array in the storage prop:
 
-```typecript
+```ts
   storage: {
     getItem: (name) => {
       const str = localStorage.getItem(name)
