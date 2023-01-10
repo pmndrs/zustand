@@ -481,6 +481,8 @@ const Component = () => {
 
 Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`...
 
+**Note the extra set of brackets! This is required for correct typing**
+
 ```ts
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
@@ -490,7 +492,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useBearStore = create<BearState>(
+const useBearStore = create<BearState>()(
   devtools(
     persist(
       (set) => ({
