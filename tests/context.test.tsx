@@ -7,7 +7,8 @@ import {
   useState,
 } from 'react'
 import { render } from '@testing-library/react'
-import create, { StoreApi } from 'zustand'
+import { create } from 'zustand'
+import type { StoreApi } from 'zustand'
 import createContext from 'zustand/context'
 import { subscribeWithSelector } from 'zustand/middleware'
 

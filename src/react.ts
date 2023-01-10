@@ -4,7 +4,7 @@ import { useDebugValue } from 'react'
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
-import createStore from './vanilla'
+import { createStore } from './vanilla'
 import type {
   Mutate,
   StateCreator,
@@ -84,7 +84,15 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   return useBoundStore
 }
 
-const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
+export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
   createState ? createImpl(createState) : createImpl) as Create
 
-export default create
+/**
+ * @deprecated Use `import { create } from 'zustand'`
+ */
+export default ((createState: any) => {
+  console.warn(
+    "[DEPRECATED] default export is deprecated, instead import { create } from'zustand'"
+  )
+  return create(createState)
+}) as Create

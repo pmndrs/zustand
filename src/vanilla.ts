@@ -102,10 +102,18 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   return api as any
 }
 
-const createStore = ((createState) =>
+export const createStore = ((createState) =>
   createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
 
-export default createStore
+/**
+ * @deprecated Use `import { createStore } from ...`
+ */
+export default ((createState) => {
+  console.warn(
+    '[DEPRECATED] default export is deprecated, instead import { createStore } ...'
+  )
+  return createStore(createState)
+}) as CreateStore
 
 // ---------------------------------------------------------
 

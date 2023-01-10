@@ -1,4 +1,5 @@
-import create, { StoreApi } from 'zustand'
+import { create } from 'zustand'
+import type { StoreApi } from 'zustand'
 import {
   combine,
   devtools,
@@ -7,7 +8,7 @@ import {
   subscribeWithSelector,
 } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import createVanilla from 'zustand/vanilla'
+import { createStore } from 'zustand/vanilla'
 
 type CounterState = {
   count: number
@@ -63,7 +64,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createVanilla(
+    const _testSubtyping: StoreApi<object> = createStore(
       immer(() => ({ count: 0 }))
     )
   })
@@ -91,7 +92,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createVanilla(
+    const _testSubtyping: StoreApi<object> = createStore(
       redux((x) => x, { count: 0 })
     )
   })
@@ -119,7 +120,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createVanilla(
+    const _testSubtyping: StoreApi<object> = createStore(
       devtools(() => ({ count: 0 }))
     )
   })
@@ -146,7 +147,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createVanilla(
+    const _testSubtyping: StoreApi<object> = createStore(
       subscribeWithSelector(() => ({ count: 0 }))
     )
   })
@@ -168,7 +169,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createVanilla(
+    const _testSubtyping: StoreApi<object> = createStore(
       combine({ count: 0 }, () => ({}))
     )
   })
@@ -195,7 +196,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createVanilla(
+    const _testSubtyping: StoreApi<object> = createStore(
       persist(() => ({ count: 0 }), { name: 'prefix' })
     )
   })

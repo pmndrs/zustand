@@ -18,7 +18,7 @@ for more details.
 ## Simple example
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 export const useBearStore = create(
@@ -483,7 +483,7 @@ const useHydration = () => {
 If the storage you want to use does not match the expected API, you can create your own storage:
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist, StateStorage } from 'zustand/middleware'
 import { get, set, del } from 'idb-keyval' // can use anything: IndexedDB, Ionic Storage, etc.
 
@@ -549,7 +549,7 @@ Basic typescript usage doesn't require anything special
 except for writing `create<State>()(...)` instead of `create(...)`.
 
 ```tsx
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface MyState {

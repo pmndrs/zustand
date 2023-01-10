@@ -25,7 +25,7 @@ npm install zustand # or yarn add zustand
 Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/guides/immutable-state-and-merging.md) to help it.
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 
 const useBearStore = create((set) => ({
   bears: 0,
@@ -87,7 +87,7 @@ const honey = useBearStore((state) => state.honey)
 If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
 
 ```jsx
-import shallow from 'zustand/shallow'
+import { shallow } from 'zustand/shallow'
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
 const { nuts, honey } = useBearStore(
@@ -220,7 +220,7 @@ const unsub5 = useDogStore.subscribe((state) => state.paw, console.log, {
 Zustand core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the API utilities.
 
 ```jsx
-import createStore from 'zustand/vanilla'
+import { createStore } from 'zustand/vanilla'
 
 const store = createStore(() => ({ ... }))
 const { getState, setState, subscribe } = store
@@ -232,7 +232,7 @@ You can use a vanilla store with `useStore` hook available since v4.
 
 ```jsx
 import { useStore } from 'zustand'
-import vanillaStore from './vanillaStore'
+import { vanillaStore } from './vanillaStore'
 
 const useBoundStore = (selector) => useStore(vanillaStore, selector)
 ```
@@ -309,7 +309,7 @@ const useBeeStore = create(
 You can persist your store's data using any kind of storage.
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 const useFishStore = create(
@@ -333,7 +333,7 @@ const useFishStore = create(
 Immer is available as middleware too.
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
 const useBeeStore = create(
@@ -482,7 +482,7 @@ const Component = () => {
 Basic typescript usage doesn't require anything special except for writing `create<State>()(...)` instead of `create(...)`...
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 
 interface BearState {

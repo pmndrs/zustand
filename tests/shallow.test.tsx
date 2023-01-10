@@ -1,5 +1,5 @@
-import create from 'zustand'
-import shallow from 'zustand/shallow'
+import { create } from 'zustand'
+import { shallow } from 'zustand/shallow'
 
 describe('shallow', () => {
   it('compares primitive values', () => {

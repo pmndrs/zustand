@@ -20,7 +20,7 @@ immutable state model. However, Redux, requires your app to be wrapped in
 context providers; Zustand does not.
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -39,7 +39,7 @@ const useCountStore = create<State & Actions>((set) => ({
 ```
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -129,7 +129,7 @@ recommended that you manually apply render optimizations by using selectors.
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -234,7 +234,7 @@ Zustand is based on the **immutable** state model, while Valtio is based on the
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   obj: { count: number }
@@ -264,7 +264,7 @@ that you manually apply render optimizations by using selectors.
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -307,7 +307,7 @@ suitable when access outside of React is required.
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -343,7 +343,7 @@ selectors.
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -392,7 +392,7 @@ identities, additionally, Recoil needs to wrap your app in a context provider.
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number
@@ -429,7 +429,7 @@ manually apply render optimizations by using selectors.
 **Zustand**
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 
 type State = {
   count: number

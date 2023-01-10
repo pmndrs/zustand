@@ -31,7 +31,7 @@ export const createBearSlice = (set) => ({
 You can now combine both the stores into **one bounded store**:
 
 ```js
-import create from 'zustand'
+import { create } from 'zustand'
 import { createBearSlice } from './bearSlice'
 import { createFishSlice } from './fishSlice'
 
@@ -81,7 +81,7 @@ export const createBearFishSlice = (set) => ({
 Combining all the stores together is the same as before.
 
 ```js
-import create from 'zustand'
+import { create } from 'zustand'
 import { createBearSlice } from './bearSlice'
 import { createFishSlice } from './fishSlice'
 import { createBearFishSlice } from './createBearFishSlice'
@@ -100,7 +100,7 @@ Adding middlewares to a combined store is the same as with other normal stores.
 Adding `persist` middleware to our `useBoundStore`:
 
 ```js
-import create from 'zustand'
+import { create } from 'zustand'
 import { createBearSlice } from './bearSlice'
 import { createFishSlice } from './fishSlice'
 import { persist } from 'zustand/middleware'

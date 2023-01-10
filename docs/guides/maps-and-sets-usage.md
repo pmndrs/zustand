@@ -9,7 +9,7 @@ you do it by calling `setState` on it:
 **You can view a codesandbox here: https://codesandbox.io/s/late-https-bxz9qy**
 
 ```js
-import create from 'zustand'
+import { create } from 'zustand'
 
 const useFooBar = create(() => ({ foo: new Map(), bar: new Set() }))
 

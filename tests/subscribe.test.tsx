@@ -1,4 +1,4 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
 describe('subscribe()', () => {

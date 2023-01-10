@@ -8,7 +8,7 @@ Like with React's `useState`, we need to update state immutably.
 Here's a typical example:
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 
 const useCountStore = create((set) => ({
   count: 0,
@@ -36,7 +36,7 @@ The `set` function merges state at only one level.
 If you have a nested object, you need to merge them explicitly. You will use the spread operator pattern like so:
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 
 const useCountStore = create((set) => ({
   nested: { count: 0 },
