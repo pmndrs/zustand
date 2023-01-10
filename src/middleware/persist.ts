@@ -418,7 +418,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       options.onRehydrateStorage?.(get()) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
-    return Promise.resolve(storage.getItem.bind(storage)(options.name))
+    return toThenable(storage.getItem.bind(storage))(options.name)
       .then((deserializedStorageValue) => {
         if (deserializedStorageValue) {
           if (
@@ -473,7 +473,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       storage?.removeItem(options.name)
     },
     getOptions: () => options,
-    rehydrate: () => hydrate(),
+    rehydrate: () => hydrate() as Promise<void>,
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
       hydrationListeners.add(cb)

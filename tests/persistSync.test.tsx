@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 const createPersistentStore = (initialValue: string | null) => {
   let state = initialValue
@@ -54,7 +54,7 @@ describe('persist middleware with sync configuration', () => {
         }),
         {
           name: 'test-storage',
-          getStorage: () => storage,
+          storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         }
       )
@@ -83,7 +83,7 @@ describe('persist middleware with sync configuration', () => {
     create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => spy,
       })
     )
@@ -99,7 +99,7 @@ describe('persist middleware with sync configuration', () => {
       const useBoundStore = create(
         persist(() => ({ count: 0 }), {
           name: 'test-storage',
-          getStorage: () => storage,
+          storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         })
       )
@@ -148,7 +148,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
         migrate: migrateSpy,
       })
@@ -183,7 +183,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
       })
     )
@@ -210,7 +210,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         version: 13,
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         migrate: () => {
           throw new Error('migrate error')
         },
@@ -243,7 +243,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0, unstorableMethod }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
       })
     )
@@ -273,7 +273,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0, actions: { unstorableMethod } }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         merge: (_persistedState, currentState) => {
           const persistedState = _persistedState as any
           delete persistedState.actions
@@ -309,8 +309,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
-        deserialize: (str) => JSON.parse(str),
+        storage: createJSONStorage(() => storage),
       })
     )
 
@@ -349,7 +348,7 @@ describe('persist middleware with sync configuration', () => {
         }),
         {
           name: 'test-storage',
-          getStorage: () => storage,
+          storage: createJSONStorage(() => storage),
           partialize: (state) => {
             return {
               object: {
@@ -394,7 +393,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
       })
     )
     expect(useBoundStore.persist.getOptions().name).toBeDefined()
@@ -413,7 +412,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
         partialize: (s) => s as Partial<typeof s>,
       })
     )
@@ -450,7 +449,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
       })
     )
 
@@ -470,7 +469,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
       })
     )
 
@@ -491,7 +490,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
       })
     )
 
@@ -519,7 +518,7 @@ describe('persist middleware with sync configuration', () => {
     const useBoundStore = create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
-        getStorage: () => storage,
+        storage: createJSONStorage(() => storage),
       })
     )
 
