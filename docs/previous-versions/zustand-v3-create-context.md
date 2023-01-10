@@ -6,7 +6,7 @@ nav: 18
 A special `createContext` is provided since v3.5,
 which avoids misusing the store hook.
 
-> **Note**: This function will be deprecated in v4 and removed in v5.
+> **Note**: This function is deprecated in v4 and will be removed in v5. See [Migration](#migration).
 
 ```jsx
 import create from 'zustand'
@@ -101,4 +101,31 @@ export default function App({ initialBears }) {
     </Provider>
   )
 }
+```
+
+## Migration
+
+Discussion: https://github.com/pmndrs/zustand/discussions/1276
+
+Here's the diff showing how to migrate from v3 createContext to v4 API.
+
+```diff
+// store.ts
++ import { createContext, useContext } from "react";
+- import create from "zustand";
+- import createContext from "zustand/context";
++ import { createStore, useStore } from "zustand";
+
+- const useStore = create((set) => ({
++ const store =  createStore((set) => ({
+    bears: 0,
+    increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+    removeAllBears: () => set({ bears: 0 })
+  }));
+
++ const MyContext = createContext()
+
++ export const Provider = ({ children }) = <MyContext.Provider value={store}>{children}</MyContext.Provider>;
+
++ export const useMyStore = (selector) => useStore(useContext(MyContext), selector);
 ```
