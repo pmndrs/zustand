@@ -61,10 +61,18 @@ type Create = {
   <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
+  /**
+   * @deprecated Use `useStore` hook to bind store
+   */
   <S extends StoreApi<unknown>>(store: S): UseBoundStore<S>
 }
 
 const createImpl = <T>(createState: StateCreator<T, [], []>) => {
+  if (__DEV__ && typeof createState !== 'function') {
+    console.warn(
+      '[DEPRECATED] Passing a vanilla store will be unsupported in the future version. Please use `import { useStore } from "zustand"` to use the vanilla store in React.'
+    )
+  }
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
 

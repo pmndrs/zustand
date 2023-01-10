@@ -172,8 +172,6 @@ const unsub1 = useDogStore.subscribe(console.log)
 useDogStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
-// Destroying the store (removing all listeners)
-useDogStore.destroy()
 
 // You can of course use the hook as you always would
 const Component = () => {
@@ -222,19 +220,21 @@ const unsub5 = useDogStore.subscribe((state) => state.paw, console.log, {
 Zustand core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the API utilities.
 
 ```jsx
-import create from 'zustand/vanilla'
+import createStore from 'zustand/vanilla'
 
-const store = create(() => ({ ... }))
-const { getState, setState, subscribe, destroy } = store
+const store = createStore(() => ({ ... }))
+const { getState, setState, subscribe } = store
+
+export default store
 ```
 
-You can even consume an existing vanilla store with React:
+You can use a vanilla store with `useStore` hook available since v4.
 
 ```jsx
-import create from 'zustand'
+import { useStore } from 'zustand'
 import vanillaStore from './vanillaStore'
 
-const useBoundStore = create(vanillaStore)
+const useBoundStore = (selector) => useStore(vanillaStore, selector)
 ```
 
 :warning: Note that middlewares that modify `set` or `get` are not applied to `getState` and `setState`.
@@ -476,8 +476,6 @@ const Component = () => {
   const slice = useStore(store, selector)
   ...
 ```
-
-[Alternatively, a special createContext is provided.](./docs/previous-versions/zustand-v3-create-context.md)
 
 ## TypeScript Usage
 
