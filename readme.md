@@ -490,7 +490,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const useBearStore = create<BearState>()(
+const useBearStore = create<BearState>(
   devtools(
     persist(
       (set) => ({
