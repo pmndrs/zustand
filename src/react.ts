@@ -91,8 +91,10 @@ export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
  * @deprecated Use `import { create } from 'zustand'`
  */
 export default ((createState: any) => {
-  console.warn(
-    "[DEPRECATED] default export is deprecated, instead import { create } from'zustand'"
-  )
+  if (__DEV__) {
+    console.warn(
+      "[DEPRECATED] default export is deprecated, instead import { create } from'zustand'"
+    )
+  }
   return create(createState)
 }) as Create

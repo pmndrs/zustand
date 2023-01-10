@@ -109,9 +109,11 @@ export const createStore = ((createState) =>
  * @deprecated Use `import { createStore } from ...`
  */
 export default ((createState) => {
-  console.warn(
-    '[DEPRECATED] default export is deprecated, instead import { createStore } ...'
-  )
+  if (__DEV__) {
+    console.warn(
+      '[DEPRECATED] default export is deprecated, instead import { createStore } ...'
+    )
+  }
   return createStore(createState)
 }) as CreateStore
 
