@@ -6,7 +6,7 @@ nav: 18
 A special `createContext` is provided since v3.5,
 which avoids misusing the store hook.
 
-> **Note**: This function is deprecated in v4 and will be removed in v5. See [#migration](Migration).
+> **Note**: This function is deprecated in v4 and will be removed in v5. See [Migration](#migration).
 
 ```jsx
 import create from 'zustand'
