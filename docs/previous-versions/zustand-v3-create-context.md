@@ -105,7 +105,7 @@ export default function App({ initialBears }) {
 
 ## Migration
 
-https://github.com/pmndrs/zustand/discussions/1276
+Discussion: https://github.com/pmndrs/zustand/discussions/1276
 
 Here's the diff showing how to migrate from v3 createContext to v4 API.
 
