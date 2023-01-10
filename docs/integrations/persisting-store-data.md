@@ -18,7 +18,7 @@ for more details.
 ## Simple example
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 export const useBearStore = create(
@@ -300,7 +300,7 @@ Or even to change the storage engine:
 
 ```ts
 useBoundStore.persist.setOptions({
-  getStorage: () => sessionStorage,
+  storage: createJSONStorage(() => sessionStorage),
 })
 ```
 
@@ -483,7 +483,7 @@ const useHydration = () => {
 If the storage you want to use does not match the expected API, you can create your own storage:
 
 ```ts
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist, StateStorage } from 'zustand/middleware'
 import { get, set, del } from 'idb-keyval' // can use anything: IndexedDB, Ionic Storage, etc.
 
@@ -511,7 +511,7 @@ export const useBoundStore = create(
     }),
     {
       name: 'food-storage', // unique name
-      getStorage: () => storage,
+      storage: createJSONStorage(() => storage),
     }
   )
 )
@@ -549,7 +549,7 @@ Basic typescript usage doesn't require anything special
 except for writing `create<State>()(...)` instead of `create(...)`.
 
 ```tsx
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface MyState {
@@ -565,7 +565,7 @@ export const useBearStore = create<MyState>()(
     }),
     {
       name: 'food-storage', // name of item in the storage (must be unique)
-      getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default the 'localStorage' is used
       partialize: (state) => ({ bears: state.bears }),
     }
   )

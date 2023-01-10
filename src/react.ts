@@ -4,7 +4,7 @@ import { useDebugValue } from 'react'
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
-import createStore from './vanilla'
+import { createStore } from './vanilla'
 import type {
   Mutate,
   StateCreator,
@@ -61,10 +61,18 @@ type Create = {
   <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
+  /**
+   * @deprecated Use `useStore` hook to bind store
+   */
   <S extends StoreApi<unknown>>(store: S): UseBoundStore<S>
 }
 
 const createImpl = <T>(createState: StateCreator<T, [], []>) => {
+  if (__DEV__ && typeof createState !== 'function') {
+    console.warn(
+      '[DEPRECATED] Passing a vanilla store will be unsupported in the future version. Please use `import { useStore } from "zustand"` to use the vanilla store in React.'
+    )
+  }
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
 
@@ -76,7 +84,15 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   return useBoundStore
 }
 
-const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
+export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
   createState ? createImpl(createState) : createImpl) as Create
 
-export default create
+/**
+ * @deprecated Use `import { create } from 'zustand'`
+ */
+export default ((createState: any) => {
+  console.warn(
+    "[DEPRECATED] default export is deprecated, instead import { create } from'zustand'"
+  )
+  return create(createState)
+}) as Create

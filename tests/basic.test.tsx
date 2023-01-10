@@ -8,7 +8,8 @@ import {
 } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import ReactDOM from 'react-dom'
-import create, { StoreApi } from 'zustand'
+import { create } from 'zustand'
+import type { StoreApi } from 'zustand'
 
 const consoleError = console.error
 afterEach(() => {

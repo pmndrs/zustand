@@ -1,4 +1,4 @@
-function shallow<T>(objA: T, objB: T) {
+export function shallow<T>(objA: T, objB: T) {
   if (Object.is(objA, objB)) {
     return true
   }
@@ -48,4 +48,12 @@ function shallow<T>(objA: T, objB: T) {
   return true
 }
 
-export default shallow
+/**
+ * @deprecated Use `import { shallow } from 'zustand/shallow'`
+ */
+export default ((objA, objB) => {
+  console.warn(
+    "[DEPRECATED] default export is deprecated, instead import { shallow } from'zustand/shallow'"
+  )
+  return shallow(objA, objB)
+}) as typeof shallow
