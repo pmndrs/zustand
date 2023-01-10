@@ -300,7 +300,7 @@ Or even to change the storage engine:
 
 ```ts
 useBoundStore.persist.setOptions({
-  getStorage: () => sessionStorage,
+  storage: createJSONStorage(() => sessionStorage),
 })
 ```
 
@@ -511,7 +511,7 @@ export const useBoundStore = create(
     }),
     {
       name: 'food-storage', // unique name
-      getStorage: () => storage,
+      storage: createJSONStorage(() => storage),
     }
   )
 )
@@ -565,7 +565,7 @@ export const useBearStore = create<MyState>()(
     }),
     {
       name: 'food-storage', // name of item in the storage (must be unique)
-      getStorage: () => sessionStorage, // (optional) by default the 'localStorage' is used
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default the 'localStorage' is used
       partialize: (state) => ({ bears: state.bears }),
     }
   )
