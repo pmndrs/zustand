@@ -6,7 +6,7 @@ export interface StateStorage {
   removeItem: (name: string) => void | Promise<void>
 }
 
-type StorageValue<S> = {
+export type StorageValue<S> = {
   state: S
   version?: number
 }
