@@ -242,7 +242,7 @@ type State = {
 
 const store = create<State>(() => ({ obj: { count: 0 } }))
 
-store.setState((prev) => ({ obj: { count: prev.obj.count + 1 } })
+store.setState((prev) => ({ obj: { count: prev.obj.count + 1 } }))
 ```
 
 **Valtio**
