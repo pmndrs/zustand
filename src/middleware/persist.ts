@@ -89,7 +89,7 @@ export interface PersistOptions<S, PersistedState = S> {
    *
    * @default createJSONStorage(() => localStorage)
    */
-  storage?: PersistStorage<S> | undefined
+  storage?: PersistStorage<PersistedState> | undefined
   /**
    * Filter the persisted value.
    *
