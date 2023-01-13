@@ -174,7 +174,7 @@ module.exports = function (args) {
   return [
     ...(c === 'index' ? [createDeclarationConfig(`src/${c}.ts`, 'dist')] : []),
     createCommonJSConfig(`src/${c}.ts`, `dist/${c}`, {
-      addModuleExport: ['index', 'shallow'].includes(c),
+      addModuleExport: ['index', 'vanilla', 'shallow'].includes(c),
     }),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
