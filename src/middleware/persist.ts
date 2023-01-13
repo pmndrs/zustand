@@ -6,7 +6,7 @@ export interface StateStorage {
   removeItem: (name: string) => void | Promise<void>
 }
 
-type StorageValue<S> = {
+export type StorageValue<S> = {
   state: S
   version?: number
 }
@@ -89,7 +89,7 @@ export interface PersistOptions<S, PersistedState = S> {
    *
    * @default createJSONStorage(() => localStorage)
    */
-  storage?: PersistStorage<S> | undefined
+  storage?: PersistStorage<PersistedState> | undefined
   /**
    * Filter the persisted value.
    *
