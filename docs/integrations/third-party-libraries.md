@@ -42,3 +42,4 @@ This can be done using third-party libraries created by the community.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
 - [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
+- [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
