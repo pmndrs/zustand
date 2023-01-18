@@ -11,7 +11,7 @@ When running tests, the stores are not automatically reset before each test run.
 Thus, there can be cases where the state of one test can affect another. To make sure all tests run with a pristine store state, you can mock `zustand` during testing and use the following code to create your store:
 
 ```jsx
-import { create: actualCreate } from 'zustand'
+import { create as actualCreate } from 'zustand'
 // const actualCreate = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
 
@@ -19,7 +19,7 @@ import { act } from 'react-dom/test-utils'
 const storeResetFns = new Set()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-const create = (createState) => {
+export const create = (createState) => {
   const store = actualCreate(createState)
   const initialState = store.getState()
   storeResetFns.add(() => store.setState(initialState, true))
@@ -30,8 +30,6 @@ const create = (createState) => {
 beforeEach(() => {
   act(() => storeResetFns.forEach((resetFn) => resetFn()))
 })
-
-export default create
 ```
 
 The way you mock a dependency depends on your test runner/library.
@@ -43,7 +41,7 @@ In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place
 If you are using zustand, as documented in [TypeScript Guide](./typescript.md), use the following code:
 
 ```tsx
-import { create: actualCreate, StateCreator } from 'zustand'
+import { create as actualCreate, StateCreator } from 'zustand'
 // const actualCreate = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
 
@@ -51,7 +49,7 @@ import { act } from 'react-dom/test-utils'
 const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-const create =
+export const create =
   () =>
   <S,>(createState: StateCreator<S>) => {
     const store = actualCreate<S>(createState)
@@ -64,8 +62,6 @@ const create =
 beforeEach(() => {
   act(() => storeResetFns.forEach((resetFn) => resetFn()))
 })
-
-export default create
 ```
 
 ## Resetting state between tests in **react-native** and **jest**
