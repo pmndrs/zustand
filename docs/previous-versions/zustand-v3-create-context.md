@@ -9,7 +9,7 @@ which avoids misusing the store hook.
 > **Note**: This function is deprecated in v4 and will be removed in v5. See [Migration](#migration).
 
 ```jsx
-import create from 'zustand'
+import { create } from 'zustand'
 import createContext from 'zustand/context'
 
 const { Provider, useStore } = createContext()
@@ -83,7 +83,7 @@ export default function App() {
 ## createContext usage with initialization from props
 
 ```tsx
-import create from 'zustand'
+import { create } from 'zustand'
 import createContext from 'zustand/context'
 
 const { Provider, useStore } = createContext()
