@@ -15,8 +15,8 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-It detects changes with strict-equality (old === new) by default,
-this is efficient for atomic state picks.
+It detects changes with strict-equality (`old === new`) by default.
+This is efficient for atomic state picks.
 
 ```jsx
 const nuts = useStore((state) => state.nuts)
@@ -194,7 +194,9 @@ function Component() {
 
 ## Using zustand without React
 
-Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
+Zustand's core can be imported and used without the React dependency.
+The only difference is that the create function does not return a hook,
+but the API utilities.
 
 ```jsx
 import { createStore } from 'zustand/vanilla'
@@ -212,9 +214,14 @@ import { vanillaStore } from './vanillaStore'
 const useStore = create(vanillaStore)
 ```
 
-## Transient updates (for often occurring state-changes)
+## Transient updates (for frequent state changes)
 
-The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
+The `subscribe` function allows components to bind
+to a state portion without forcing a re-render on changes.
+It is best to combine it with `useEffect`
+for automatic unsubscribe on unmount.
+This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws)
+performance impact, when you are allowed to mutate the view directly.
 
 ```jsx
 const useStore = create(set => ({ scratches: 0, ... }))
@@ -233,7 +240,8 @@ function Component() {
 
 ## Sick of reducers and changing nested state? Use Immer!
 
-Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
+Reducing nested structures is tiresome.
+Have you tried [Immer](https://github.com/immerjs/immer)?
 
 ```jsx
 import produce from 'immer'
@@ -352,7 +360,7 @@ export const useStore = create(
 )
 ```
 
-## Can't live without redux-like reducers and action types?
+## Can't live without Redux-like reducers and action types?
 
 ```jsx
 const types = { increase: 'INCREASE', decrease: 'DECREASE' }
@@ -375,7 +383,9 @@ const dispatch = useStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api.
+Or, just use our `redux` middleware.
+It wires up your main reducer, sets initial state,
+and adds a dispatch function to the state itself and the vanilla API.
 
 ```jsx
 import { redux } from 'zustand/middleware'
@@ -385,8 +395,13 @@ const useStore = create(redux(reducer, initialState))
 
 ## Calling actions outside a React event handler
 
-Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
-In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
+Because React handles `setState` synchronously
+if it's called outside an event handler.
+Updating the state outside an event handler
+will force react to update the components synchronously,
+therefore adding the risk of encountering the zombie-child effect.
+In order to fix this,
+the action needs to be wrapped in `unstable_batchedUpdates`.
 
 ```jsx
 import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
@@ -403,7 +418,7 @@ const nonReactCallback = () => {
 }
 ```
 
-More details: https://github.com/pmndrs/zustand/issues/302
+More details in [this issue](https://github.com/pmndrs/zustand/issues/302).
 
 ## Redux devtools
 
@@ -418,8 +433,13 @@ const useStore = create(devtools(redux(reducer, initialState)))
 const useStore = create(devtools(store, { enabled: false }))
 ```
 
-devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
-devtools will only log actions from each separated store unlike in a typical _combined reducers_ redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
+The `devtools` middleware takes the store function as its first argument.
+Optionally, you can name the store with a second argument:
+`devtools(store, "MyStore")`, which will be prefixed to your actions.
+
+`devtools` will only log actions from each separated store,
+unlike in a typical _combined reducers_ Redux store.
+See an approach to combining stores [here](https://github.com/pmndrs/zustand/issues/163).
 
 ## TypeScript
 
@@ -435,7 +455,7 @@ const useStore = create<State>((set) => ({
 }))
 ```
 
-You can also use an `interface`:
+You can also use an interface:
 
 ```tsx
 import { State } from 'zustand'
@@ -446,7 +466,7 @@ interface BearState extends State {
 }
 ```
 
-Or, use `combine` and let tsc infer types.
+Or use `combine` and let `tsc` infer types.
 
 ```tsx
 import { combine } from 'zustand/middleware'
