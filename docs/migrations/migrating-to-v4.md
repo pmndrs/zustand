@@ -23,7 +23,7 @@ of the test files in the Zustand repository from v3 to v4.
 **Applicable imports**
 
 ```ts
-import { create } from 'zustand'
+import create from 'zustand'
 import create from 'zustand/vanilla'
 ```
 
