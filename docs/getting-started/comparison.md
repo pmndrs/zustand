@@ -18,7 +18,7 @@ and we will compare key differences and similarities between each.
 
 Conceptually, Zustand and Redux are quite similar,
 both are based on an immutable state model.
-However, Redux, requires your app to be wrapped
+However, Redux requires your app to be wrapped
 in context providers; Zustand does not.
 
 ```ts
