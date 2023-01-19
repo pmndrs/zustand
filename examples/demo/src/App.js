@@ -1,4 +1,4 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import CodePreview from './components/CodePreview'
 import Details from './components/Details'
 import code from './resources/code'
