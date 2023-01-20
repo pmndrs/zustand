@@ -1,23 +1,25 @@
 ---
 title: Comparison
-description:
-nav: 2
+description: How Zustand stacks up against similar libraries
+nav: 1
 ---
 
-Zustand is one of many state management libraries for React. On this page we
-will discuss Zustand in comparison to some of these libraries, including Redux,
-Valtio, Jotai, and Recoil.
+Zustand is one of many state management libraries for React.
+On this page we will discuss Zustand
+in comparison to some of these libraries,
+including Redux, Valtio, Jotai, and Recoil.
 
-Each library has its own strengths and weaknesses, and we will compare key
-differences and similarities between each.
+Each library has its own strengths and weaknesses,
+and we will compare key differences and similarities between each.
 
 ## Redux
 
 ### State Model
 
-Conceptually, Zustand and Redux are quite similar, both are based on an
-immutable state model. However, Redux, requires your app to be wrapped in
-context providers; Zustand does not.
+Conceptually, Zustand and Redux are quite similar,
+both are based on an immutable state model.
+However, Redux requires your app to be wrapped
+in context providers; Zustand does not.
 
 ```ts
 import { create } from 'zustand'
@@ -122,9 +124,10 @@ const countStore = configureStore({ reducer: countSlice.reducer })
 
 ### Render Optimization
 
-When it comes to render optimizations within your app, there are no major
-differences in approach between Zustand and Redux. In both libraries it is
-recommended that you manually apply render optimizations by using selectors.
+When it comes to render optimizations within your app,
+there are no major differences in approach between Zustand and Redux.
+In both libraries it is recommended
+that you manually apply render optimizations by using selectors.
 
 **Zustand**
 
@@ -227,9 +230,10 @@ const Component = () => {
 
 ### State Model
 
-Zustand and Valtio approach state management in a fundamentally different way.
-Zustand is based on the **immutable** state model, while Valtio is based on the
-**mutable** state model.
+Zustand and Valtio approach state management
+in a fundamentally different way.
+Zustand is based on the **immutable** state model,
+while Valtio is based on the **mutable** state model.
 
 **Zustand**
 
@@ -257,9 +261,10 @@ state.obj.count += 1
 
 ### Render Optimization
 
-The other difference between Zustand and Valtio is Valtio makes render
-optimizations through property access. However, with Zustand, it is recommended
-that you manually apply render optimizations by using selectors.
+The other difference between Zustand and Valtio
+is Valtio makes render optimizations through property access.
+However, with Zustand, it is recommended that
+you manually apply render optimizations by using selectors.
 
 **Zustand**
 
@@ -299,10 +304,12 @@ const Component = () => {
 
 ### State Model
 
-There are two major differences between Zustand and Jotai. Firstly, Zustand is a
-single store, while Jotai consists of primitive atoms that can be composed
-together. Secondly, a Zustand store is an external store, making it more
-suitable when access outside of React is required.
+There are two major differences between Zustand and Jotai.
+Firstly, Zustand is a single store,
+while Jotai consists of primitive atoms
+that can be composed together.
+Secondly, a Zustand store is an external store,
+making it more suitable when access outside of React is required.
 
 **Zustand**
 
@@ -336,9 +343,9 @@ const countAtom = atom<number>(0)
 
 ### Render Optimization
 
-Jotai achieves render optimizations through atom dependency. However, with
-Zustand it is recommended that you manually apply render optimizations by using
-selectors.
+Jotai achieves render optimizations through atom dependency.
+However, with Zustand it is recommended that
+you manually apply render optimizations by using selectors.
 
 **Zustand**
 
@@ -385,9 +392,11 @@ const Component = () => {
 
 ### State Model
 
-The difference between Zustand and Recoil is similar to that between Zustand and
-Jotai. Recoil depends on atom string keys instead of atom object referential
-identities, additionally, Recoil needs to wrap your app in a context provider.
+The difference between Zustand and Recoil
+is similar to that between Zustand and Jotai.
+Recoil depends on atom string keys
+instead of atom object referential identities.
+Additionally, Recoil needs to wrap your app in a context provider.
 
 **Zustand**
 
@@ -422,9 +431,10 @@ const count = atom({
 
 ### Render Optimization
 
-Similar to previous optimization comparisons, Recoil makes render optimizations
-through atom dependency. Whereas, with Zustand, it is recommended that you
-manually apply render optimizations by using selectors.
+Similar to previous optimization comparisons,
+Recoil makes render optimizations through atom dependency.
+Whereas with Zustand, it is recommended that
+you manually apply render optimizations by using selectors.
 
 **Zustand**
 

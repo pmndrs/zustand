@@ -4,11 +4,10 @@ description: How to do all you need with Zustand
 nav: 15
 ---
 
-⚠️ This doc is still under construction. https://github.com/pmndrs/zustand/discussions/1033
-
 ## Fetching everything
 
-You can, but bear in mind that it will cause the component to update on every state change!
+You can, but bear in mind that it will cause
+the component to update on every state change!
 
 ```jsx
 const state = useStore()
@@ -16,14 +15,16 @@ const state = useStore()
 
 ## Selecting multiple state slices
 
-It detects changes with strict-equality (old === new) by default, this is efficient for atomic state picks.
+It detects changes with strict-equality (`old === new`) by default.
+This is efficient for atomic state picks.
 
 ```jsx
 const nuts = useStore((state) => state.nuts)
 const honey = useStore((state) => state.honey)
 ```
 
-For more control over re-rendering, you may provide an alternative equality function on the second argument.
+For more control over re-rendering,
+you may provide an alternative equality function on the second argument.
 
 ```jsx
 const treats = useStore(
@@ -32,7 +33,11 @@ const treats = useStore(
 )
 ```
 
-For instance, if you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
+For instance, if you want to construct
+a single object with multiple state-picks inside,
+similar to Redux's `mapStateToProps`,
+you can tell Zustand that you want the object
+to be diffed shallowly by passing the `shallow` equality function.
 
 ```jsx
 import { shallow } from 'zustand/shallow'
@@ -52,7 +57,8 @@ const treats = useStore((state) => Object.keys(state.treats), shallow)
 
 ## Fetching from multiple stores
 
-Since you can create as many stores as you like, forwarding results to succeeding selectors is as natural as it gets.
+Since you can create as many stores as you like,
+forwarding results to succeeding selectors is as natural as it gets.
 
 ```jsx
 const currentBear = useCredentialsStore((state) => state.currentBear)
@@ -61,24 +67,32 @@ const bear = useBearStore((state) => state.bears[currentBear])
 
 ## Memoizing selectors
 
-It is generally recommended to memoize selectors with useCallback. This will prevent unnecessary computations each render. It also allows React to optimize performance in concurrent mode.
+It is generally recommended to memoize selectors with `useCallback`.
+This will prevent unnecessary computations each render.
+It also allows React to optimize performance in concurrent mode.
 
 ```jsx
 const fruit = useStore(useCallback((state) => state.fruits[id], [id]))
 ```
 
-If a selector doesn't depend on scope, you can define it outside the render function to obtain a fixed reference without useCallback.
+If a selector doesn't depend on scope,
+you can define it outside the render function
+to obtain a fixed reference without `useCallback`.
 
 ```jsx
-const selector = state => state.berries
+const selector = (state) => state.berries
 
 function Component() {
   const berries = useStore(selector)
+  // ...
+}
 ```
 
 ## Overwriting state
 
-The `set` function has a second argument, `false` by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
+The `set` function has a second argument, `false` by default.
+Instead of merging, it will replace the state model.
+Be careful not to wipe out parts you rely on, like actions.
 
 ```jsx
 import omit from 'lodash-es/omit'
@@ -93,7 +107,8 @@ const useStore = create((set) => ({
 
 ## Async actions
 
-Just call `set` when you're ready, zustand doesn't care if your actions are async or not.
+Just call `set` when you're ready,
+zustand doesn't care if your actions are async or not.
 
 ```jsx
 const useStore = create((set) => ({
@@ -107,33 +122,40 @@ const useStore = create((set) => ({
 
 ## Read from state in actions
 
-`set` allows fn-updates `set(state => result)`, but you still have access to state outside of it through `get`.
+`set` allows fn-updates `set(state => result)`,
+but you still have access to state outside of it through `get`.
 
 ```jsx
 const useStore = create((set, get) => ({
-  sound: "grunt",
+  sound: 'grunt',
   action: () => {
     const sound = get().sound
     // ...
-  }
-})
+  },
+}))
 ```
 
 ## Reading/writing state and reacting to changes outside of components
 
-Sometimes you need to access state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
+Sometimes you need to access state in a non-reactive way,
+or act upon the store.
+For these cases the resulting hook
+has utility functions attached to its prototype.
 
-If you need to subscribe with selector, subscribeWithSelector middleware will help.
-With this middleware subscribe accepts an additional signature:
+If you need to subscribe with selector,
+`subscribeWithSelector` middleware will help.
+With this middleware, subscribe accepts an additional signature:
 
 ```jsx
 subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubscribe
 ```
 
 ```jsx
-import { create } from 'zustand';
+import { create } from 'zustand'
 import { subscribeWithSelector, shallow } from 'zustand/middleware'
-const useStore = create(subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })))
+const useStore = create(
+  subscribeWithSelector(() => ({ paw: true, snout: true, fur: true }))
+)
 
 // Getting non-reactive fresh state
 const paw = useStore.getState().paw
@@ -165,12 +187,16 @@ useStore.destroy()
 
 // You can of course use the hook as you always would
 function Component() {
-  const paw = useStore(state => state.paw)
+  const paw = useStore((state) => state.paw)
+  // ...
+}
 ```
 
 ## Using zustand without React
 
-Zustands core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the api utilities.
+Zustand's core can be imported and used without the React dependency.
+The only difference is that the create function does not return a hook,
+but the API utilities.
 
 ```jsx
 import { createStore } from 'zustand/vanilla'
@@ -188,9 +214,14 @@ import { vanillaStore } from './vanillaStore'
 const useStore = create(vanillaStore)
 ```
 
-## Transient updates (for often occurring state-changes)
+## Transient updates (for frequent state changes)
 
-The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
+The `subscribe` function allows components to bind
+to a state portion without forcing a re-render on changes.
+It is best to combine it with `useEffect`
+for automatic unsubscribe on unmount.
+This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws)
+performance impact, when you are allowed to mutate the view directly.
 
 ```jsx
 const useStore = create(set => ({ scratches: 0, ... }))
@@ -203,11 +234,14 @@ function Component() {
     scratches => (scratchRef.current = scratches),
     state => state.scratches
   ), [])
+  // ...
+}
 ```
 
 ## Sick of reducers and changing nested state? Use Immer!
 
-Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
+Reducing nested structures is tiresome.
+Have you tried [Immer](https://github.com/immerjs/immer)?
 
 ```jsx
 import produce from 'immer'
@@ -326,7 +360,7 @@ export const useStore = create(
 )
 ```
 
-## Can't live without redux-like reducers and action types?
+## Can't live without Redux-like reducers and action types?
 
 ```jsx
 const types = { increase: 'INCREASE', decrease: 'DECREASE' }
@@ -349,7 +383,9 @@ const dispatch = useStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla api.
+Or, just use our `redux` middleware.
+It wires up your main reducer, sets initial state,
+and adds a dispatch function to the state itself and the vanilla API.
 
 ```jsx
 import { redux } from 'zustand/middleware'
@@ -359,8 +395,13 @@ const useStore = create(redux(reducer, initialState))
 
 ## Calling actions outside a React event handler
 
-Because React handles `setState` synchronously if it's called outside an event handler. Updating the state outside an event handler will force react to update the components synchronously, therefore adding the risk of encountering the zombie-child effect.
-In order to fix this, the action needs to be wrapped in `unstable_batchedUpdates`
+Because React handles `setState` synchronously
+if it's called outside an event handler.
+Updating the state outside an event handler
+will force react to update the components synchronously,
+therefore adding the risk of encountering the zombie-child effect.
+In order to fix this,
+the action needs to be wrapped in `unstable_batchedUpdates`.
 
 ```jsx
 import { unstable_batchedUpdates } from 'react-dom' // or 'react-native'
@@ -377,7 +418,7 @@ const nonReactCallback = () => {
 }
 ```
 
-More details: https://github.com/pmndrs/zustand/issues/302
+More details in [this issue](https://github.com/pmndrs/zustand/issues/302).
 
 ## Redux devtools
 
@@ -392,8 +433,13 @@ const useStore = create(devtools(redux(reducer, initialState)))
 const useStore = create(devtools(store, { enabled: false }))
 ```
 
-devtools takes the store function as its first argument, optionally you can name the store with a second argument: `devtools(store, "MyStore")`, which will be prefixed to your actions.
-devtools will only log actions from each separated store unlike in a typical _combined reducers_ redux store. See an approach to combining stores https://github.com/pmndrs/zustand/issues/163
+The `devtools` middleware takes the store function as its first argument.
+Optionally, you can name the store with a second argument:
+`devtools(store, "MyStore")`, which will be prefixed to your actions.
+
+`devtools` will only log actions from each separated store,
+unlike in a typical _combined reducers_ Redux store.
+See an approach to combining stores [here](https://github.com/pmndrs/zustand/issues/163).
 
 ## TypeScript
 
@@ -409,7 +455,7 @@ const useStore = create<State>((set) => ({
 }))
 ```
 
-You can also use an `interface`:
+You can also use an interface:
 
 ```tsx
 import { State } from 'zustand'
@@ -420,7 +466,7 @@ interface BearState extends State {
 }
 ```
 
-Or, use `combine` and let tsc infer types.
+Or use `combine` and let `tsc` infer types.
 
 ```tsx
 import { combine } from 'zustand/middleware'
