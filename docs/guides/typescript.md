@@ -399,6 +399,59 @@ A detailed explanation on the slices pattern can be found [here](./slices-patter
 
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. For example, if you are using `devtools` then it will be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
+### Using a vanilla store as a bound store
+Create your vanilla store:
+```ts
+import { createStore } from "zustand/vanilla";
+
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+const initialBearState = { bears: 0 };
+export const vanillaBearStore = createStore<BearState>((set, getState) => ({
+  ...initialBearState,
+  increase: (by) => set((state) => ({ bears: state.bears + by }))
+}));
+```
+Create a hook to provide a bound store to be used in your component:
+```ts
+import { useStore } from "zustand";
+
+export const useBoundBearStore = <T>(
+  selector: (state: BearState) => T = (state) => state as T,
+  equals?: (a: T, b: T) => boolean
+) => useStore(vanillaBearStore, selector, equals);
+```
+Now you can access your vanilla store (e.g. in your tests) like:
+```ts
+import { bearStore, initialBearStore } from "./BearStore";
+
+describe("MyComponent should", () => {
+  // remember to reset the store 
+  beforeEach(() => {
+    bearStore.setState(initialState);
+  });
+
+  it("set the value", () => {
+    const store = fooStore;
+    // do the test
+    expect(store.getState().bears).toEqual(0);
+  });
+});
+```
+And access the store in your component
+```tsx
+import { useBoundBearStore } from "./BearStore";
+
+export const BearComponent = () => {
+  const bears = useBoundBearStore((state) => state.bears);
+
+  return <div>{ bears }</div>;
+};
+```
+
 ## Middlewares and their mutators reference
 
 - `devtools` — `["zustand/devtools", never]`
