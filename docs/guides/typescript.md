@@ -411,7 +411,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-const initialBearState = { bears: 0 }
+export const initialBearState = { bears: 0 }
 export const vanillaBearStore = createStore<BearState>((set, getState) => ({
   ...initialBearState,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
@@ -423,25 +423,32 @@ Create a hook to provide a bound store to be used in your component:
 ```ts
 import { useStore } from 'zustand'
 
-export const useBoundBearStore = <T>(
-  selector: (state: BearState) => T = (state) => state as T,
+export function useBoundBearStore(): BearState
+export function useBoundBearStore<T>(
+  selector: (state: BearState) => T,
   equals?: (a: T, b: T) => boolean
-) => useStore(vanillaBearStore, selector, equals)
+): T
+export function useBoundBearStore(selector?: any, equals?: any) {
+  return useStore(vanillaBearStore, selector, equals)
+}
 ```
+
+> **_NOTE:_** We prefer function overloading here, as this closely follows the definition of `useStore` itself.  
+> If you are not familiar with this pattern, just have a look here: [Typescript Docs](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-overloads)
 
 Now you can access your vanilla store (e.g. in your tests) like:
 
 ```ts
-import { bearStore, initialBearStore } from './BearStore'
+import { vanillaBearStore, initialBearState } from './BearStore'
 
 describe('MyComponent should', () => {
   // remember to reset the store
   beforeEach(() => {
-    bearStore.setState(initialState)
+    vanillaBearStore.setState(initialState)
   })
 
   it('set the value', () => {
-    const store = fooStore
+    const store = vanillaBearStore
     // do the test
     expect(store.getState().bears).toEqual(0)
   })
