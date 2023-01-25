@@ -399,6 +399,74 @@ A detailed explanation on the slices pattern can be found [here](./slices-patter
 
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. For example, if you are using `devtools` then it will be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
+### Using a vanilla store as a bound store
+
+Create your vanilla store:
+
+```ts
+import { createStore } from 'zustand/vanilla'
+
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+export const initialBearState = { bears: 0 }
+export const vanillaBearStore = createStore<BearState>((set, getState) => ({
+  ...initialBearState,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))
+```
+
+Create a hook to provide a bound store to be used in your component:
+
+```ts
+import { useStore } from 'zustand'
+
+export function useBoundBearStore(): BearState
+export function useBoundBearStore<T>(
+  selector: (state: BearState) => T,
+  equals?: (a: T, b: T) => boolean
+): T
+export function useBoundBearStore(selector?: any, equals?: any) {
+  return useStore(vanillaBearStore, selector, equals)
+}
+```
+
+> **_NOTE:_** We prefer function overloading here, as this closely follows the definition of `useStore` itself.  
+> If you are not familiar with this pattern, just have a look here: [Typescript Docs](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-overloads)
+
+Now you can access your vanilla store (e.g. in your tests) like:
+
+```ts
+import { vanillaBearStore, initialBearState } from './BearStore'
+
+describe('MyComponent should', () => {
+  // remember to reset the store
+  beforeEach(() => {
+    vanillaBearStore.setState(initialState)
+  })
+
+  it('set the value', () => {
+    const store = vanillaBearStore
+    // do the test
+    expect(store.getState().bears).toEqual(0)
+  })
+})
+```
+
+And access the store in your component
+
+```tsx
+import { useBoundBearStore } from './BearStore'
+
+export const BearComponent = () => {
+  const bears = useBoundBearStore((state) => state.bears)
+
+  return <div>{bears}</div>
+}
+```
+
 ## Middlewares and their mutators reference
 
 - `devtools` — `["zustand/devtools", never]`
