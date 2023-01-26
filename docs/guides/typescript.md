@@ -481,7 +481,8 @@ export const vanillaBearStore = createStore<BearState>()(
 )
 ```
 
-For the extra parantheses please see [this](https://github.com/pmndrs/zustand/blob/main/docs/guides/typescript.md#basic-usage)
+For more information about why there are extra parentheses,
+please see the [Basic usage section](#basic-usage).
 
 ## Middlewares and their mutators reference
 
