@@ -444,7 +444,7 @@ import { vanillaBearStore, initialBearState } from './BearStore'
 describe('MyComponent should', () => {
   // remember to reset the store
   beforeEach(() => {
-    vanillaBearStore.setState(initialState)
+    vanillaBearStore.setState(initialBearState)
   })
 
   it('set the value', () => {
@@ -466,6 +466,22 @@ export const BearComponent = () => {
   return <div>{bears}</div>
 }
 ```
+
+If you want to use middlewares with your store:
+
+```ts
+import { createStore } from 'zustand/vanilla'
+import { devtools } from 'zustand/middleware'
+
+export const vanillaBearStore = createStore<BearState>()(
+  devtools((set, getState) => ({
+    ...initialBearState,
+    increase: (by) => set((state) => ({ bears: state.bears + by })),
+  }))
+)
+```
+
+For the extra parantheses please see [this](https://github.com/pmndrs/zustand/blob/main/docs/guides/typescript.md#basic-usage)
 
 ## Middlewares and their mutators reference
 
