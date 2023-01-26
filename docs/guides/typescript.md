@@ -444,7 +444,7 @@ import { vanillaBearStore, initialBearState } from './BearStore'
 describe('MyComponent should', () => {
   // remember to reset the store
   beforeEach(() => {
-    vanillaBearStore.setState(initialState)
+    vanillaBearStore.setState(initialBearState)
   })
 
   it('set the value', () => {
