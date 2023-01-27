@@ -399,17 +399,18 @@ A detailed explanation on the slices pattern can be found [here](./slices-patter
 
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. For example, if you are using `devtools` then it will be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
-### A bounded `useStore` hook
+### Bounded `useStore` hook for vanilla stores
 
 ```ts
-import { create, useStore } from 'zustand'
+import { useStore } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 interface BearState {
   bears: number
   increase: (by: number) => void
 }
 
-const bearStore = create<BearState>()((set) => ({
+const bearStore = createStore<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
@@ -430,14 +431,15 @@ function useBearStore<T>(
 You can also make an abstract `createBoundedUseStore` if you create bounded `useStore`s often and want to DRY things up...
 
 ```ts
-import { create, useStore, StoreApi } from 'zustand'
+import { useStore, StoreApi } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 interface BearState {
   bears: number
   increase: (by: number) => void
 }
 
-const bearStore = create<BearState>()((set) => ({
+const bearStore = createStore<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
