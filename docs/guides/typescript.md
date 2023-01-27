@@ -467,6 +467,23 @@ export const BearComponent = () => {
 }
 ```
 
+If you want to use middlewares with your store:
+
+```ts
+import { createStore } from 'zustand/vanilla'
+import { devtools } from 'zustand/middleware'
+
+export const vanillaBearStore = createStore<BearState>()(
+  devtools((set, getState) => ({
+    ...initialBearState,
+    increase: (by) => set((state) => ({ bears: state.bears + by })),
+  }))
+)
+```
+
+For more information about why there are extra parentheses,
+please see the [Basic usage section](#basic-usage).
+
 ## Middlewares and their mutators reference
 
 - `devtools` — `["zustand/devtools", never]`
