@@ -409,7 +409,7 @@ interface BearState {
   increase: (by: number) => void
 }
 
-export const bearStore = create<BearState>()((set) => ({
+const bearStore = create<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
@@ -419,6 +419,34 @@ function useBearStore<T>(selector: (state: BearState) => T, equals?: (a: T, b: T
 function useBearStore<T>(selector?: (state: BearState) => T, equals?: (a: T, b: T) => boolean) {
   return useStore(bearStore, selector!, equals)
 }
+```
+
+You can also make an abstract `createBoundedUseStore` if you create bounded `useStore`s often and want to DRY things up...
+    
+```ts
+import { create, useStore, StoreApi } from 'zustand'
+
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+const bearStore = create<BearState>()((set) => ({
+  bears: 0,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))
+
+const createBoundedUseStore =
+  ((store) => (selector, equals) => useStore(store, selector as any, equals)) as
+    <S extends StoreApi<unknown>>(store: S) => {
+      (): ExtractState<S>
+      <T>(selector?: (state: ExtractState<S>) => T, equals?: (a: T, b: T) => boolean): T
+    }
+
+type ExtractState<S> =
+  S extends { get: () => infer X } ? X : never
+
+const useBearStore = createBoundedUseStore(bearStore)
 ```
  
 ## Middlewares and their mutators reference
