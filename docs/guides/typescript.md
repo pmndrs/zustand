@@ -415,14 +415,20 @@ const bearStore = create<BearState>()((set) => ({
 }))
 
 function useBearStore(): BearState
-function useBearStore<T>(selector: (state: BearState) => T, equals?: (a: T, b: T) => boolean): T
-function useBearStore<T>(selector?: (state: BearState) => T, equals?: (a: T, b: T) => boolean) {
+function useBearStore<T>(
+  selector: (state: BearState) => T,
+  equals?: (a: T, b: T) => boolean
+): T
+function useBearStore<T>(
+  selector?: (state: BearState) => T,
+  equals?: (a: T, b: T) => boolean
+) {
   return useStore(bearStore, selector!, equals)
 }
 ```
 
 You can also make an abstract `createBoundedUseStore` if you create bounded `useStore`s often and want to DRY things up...
-    
+
 ```ts
 import { create, useStore, StoreApi } from 'zustand'
 
@@ -436,19 +442,22 @@ const bearStore = create<BearState>()((set) => ({
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
 
-const createBoundedUseStore =
-  ((store) => (selector, equals) => useStore(store, selector as any, equals)) as
-    <S extends StoreApi<unknown>>(store: S) => {
-      (): ExtractState<S>
-      <T>(selector?: (state: ExtractState<S>) => T, equals?: (a: T, b: T) => boolean): T
-    }
+const createBoundedUseStore = ((store) => (selector, equals) =>
+  useStore(store, selector as any, equals)) as <S extends StoreApi<unknown>>(
+  store: S
+) => {
+  (): ExtractState<S>
+  <T>(
+    selector?: (state: ExtractState<S>) => T,
+    equals?: (a: T, b: T) => boolean
+  ): T
+}
 
-type ExtractState<S> =
-  S extends { get: () => infer X } ? X : never
+type ExtractState<S> = S extends { get: () => infer X } ? X : never
 
 const useBearStore = createBoundedUseStore(bearStore)
 ```
- 
+
 ## Middlewares and their mutators reference
 
 - `devtools` — `["zustand/devtools", never]`
