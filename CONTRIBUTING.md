@@ -20,7 +20,7 @@ If you are here to suggest a feature, first create an issue if it does not alrea
 - Now, you should have two repositories locally
 - Inside the website folder, run `npm install` and then `npm run dev`
   - This will launch the website locally. You should be able to open and see the various documentation sites
-- One little catch here is that the docs site currently reads only from Github, not locally. So you can do the following (without committing it any where):
+- One little catch here is that the website reads directly from Github, not locally. As a temporary measure, you can do the following (without actually committing these changes):
   - Inside website, open `src/data/libraries.ts`
   - Within the `Zustand` key, change `docs: 'pmndrs/zustand/main/docs`, to `docs: '[username]/zustand/[test-branch]/docs'`,
     - For example,`docs: 'chrisk-7777/zustand/docs-test/docs'`,
