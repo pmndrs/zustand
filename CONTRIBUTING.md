@@ -15,7 +15,7 @@ If you are here to suggest a feature, first create an issue if it does not alrea
 - Fork the [Zustand repo](https://github.com/pmndrs/zustand/) into your own Github account
 - Locally, clone down your fork
 - Separately, clone the [Pmdrs-Website](https://github.com/pmndrs/website}
-  - this runs most of the doc websites under the pmndrs banner, including react three fiber and (eventually) zustand
+  - this runs most of the doc websites under the pmndrs banner, including React Three Fiber and Zustand
   - Switch to the `docs`-branch.
 - Now, you should have two repositories locally
 - Inside the website folder, run `npm install` and then `npm run dev`
