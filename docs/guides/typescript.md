@@ -399,11 +399,10 @@ A detailed explanation on the slices pattern can be found [here](./slices-patter
 
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. For example, if you are using `devtools` then it will be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
-### Using a vanilla store as a bound store
-
-Create your vanilla store:
+### Bounded `useStore` hook for vanilla stores
 
 ```ts
+import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
 
 interface BearState {
@@ -411,78 +410,55 @@ interface BearState {
   increase: (by: number) => void
 }
 
-export const initialBearState = { bears: 0 }
-export const vanillaBearStore = createStore<BearState>((set, getState) => ({
-  ...initialBearState,
+const bearStore = createStore<BearState>()((set) => ({
+  bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
-```
 
-Create a hook to provide a bound store to be used in your component:
-
-```ts
-import { useStore } from 'zustand'
-
-export function useBoundBearStore(): BearState
-export function useBoundBearStore<T>(
+function useBearStore(): BearState
+function useBearStore<T>(
   selector: (state: BearState) => T,
   equals?: (a: T, b: T) => boolean
 ): T
-export function useBoundBearStore(selector?: any, equals?: any) {
-  return useStore(vanillaBearStore, selector, equals)
+function useBearStore<T>(
+  selector?: (state: BearState) => T,
+  equals?: (a: T, b: T) => boolean
+) {
+  return useStore(bearStore, selector!, equals)
 }
 ```
 
-> **_NOTE:_** We prefer function overloading here, as this closely follows the definition of `useStore` itself.  
-> If you are not familiar with this pattern, just have a look here: [Typescript Docs](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-overloads)
-
-Now you can access your vanilla store (e.g. in your tests) like:
+You can also make an abstract `createBoundedUseStore` if you create bounded `useStore`s often and want to DRY things up...
 
 ```ts
-import { vanillaBearStore, initialBearState } from './BearStore'
-
-describe('MyComponent should', () => {
-  // remember to reset the store
-  beforeEach(() => {
-    vanillaBearStore.setState(initialBearState)
-  })
-
-  it('set the value', () => {
-    const store = vanillaBearStore
-    // do the test
-    expect(store.getState().bears).toEqual(0)
-  })
-})
-```
-
-And access the store in your component
-
-```tsx
-import { useBoundBearStore } from './BearStore'
-
-export const BearComponent = () => {
-  const bears = useBoundBearStore((state) => state.bears)
-
-  return <div>{bears}</div>
-}
-```
-
-If you want to use middlewares with your store:
-
-```ts
+import { useStore, StoreApi } from 'zustand'
 import { createStore } from 'zustand/vanilla'
-import { devtools } from 'zustand/middleware'
 
-export const vanillaBearStore = createStore<BearState>()(
-  devtools((set, getState) => ({
-    ...initialBearState,
-    increase: (by) => set((state) => ({ bears: state.bears + by })),
-  }))
-)
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+}
+
+const bearStore = createStore<BearState>()((set) => ({
+  bears: 0,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))
+
+const createBoundedUseStore = ((store) => (selector, equals) =>
+  useStore(store, selector as any, equals)) as <S extends StoreApi<unknown>>(
+  store: S
+) => {
+  (): ExtractState<S>
+  <T>(
+    selector?: (state: ExtractState<S>) => T,
+    equals?: (a: T, b: T) => boolean
+  ): T
+}
+
+type ExtractState<S> = S extends { get: () => infer X } ? X : never
+
+const useBearStore = createBoundedUseStore(bearStore)
 ```
-
-For more information about why there are extra parentheses,
-please see the [Basic usage section](#basic-usage).
 
 ## Middlewares and their mutators reference
 
