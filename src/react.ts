@@ -70,7 +70,7 @@ type Create = {
 const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   if (__DEV__ && typeof createState !== 'function') {
     console.warn(
-      '[DEPRECATED] Passing a vanilla store will be unsupported in the future version. Please use `import { useStore } from "zustand"` to use the vanilla store in React.'
+      "[DEPRECATED] Passing a vanilla store will be unsupported in a future version. Instead use `import { useStore } from 'zustand'`."
     )
   }
   const api =
@@ -93,7 +93,7 @@ export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
 export default ((createState: any) => {
   if (__DEV__) {
     console.warn(
-      "[DEPRECATED] default export is deprecated, instead import { create } from'zustand'"
+      "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand'`."
     )
   }
   return create(createState)

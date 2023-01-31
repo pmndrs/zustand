@@ -54,7 +54,7 @@ export function shallow<T>(objA: T, objB: T) {
 export default ((objA, objB) => {
   if (__DEV__) {
     console.warn(
-      "[DEPRECATED] default export is deprecated, instead import { shallow } from'zustand/shallow'"
+      "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand/shallow'`."
     )
   }
   return shallow(objA, objB)
