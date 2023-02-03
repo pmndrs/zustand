@@ -216,9 +216,6 @@
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.4"
   },
-  "resolutions": {
-    "date-fns": "2.27.0"
-  },
   "peerDependencies": {
     "immer": ">=9.0",
     "react": ">=16.8"
