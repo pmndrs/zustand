@@ -91,10 +91,10 @@
     "eslint": "eslint --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "eslint:ci": "eslint '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "pretest": "tsc --noEmit",
-    "test": "jest",
-    "test:ci": "jest",
-    "test:dev": "jest --watch --no-coverage",
-    "test:coverage:watch": "jest --watch",
+    "test": "yarn node --experimental-vm-modules $(yarn bin jest)",
+    "test:ci": "yarn node --experimental-vm-modules $(yarn bin jest)",
+    "test:dev": "yarn node --experimental-vm-modules $(yarn bin jest) --watch --no-coverage",
+    "test:coverage:watch": "yarn node --experimental-vm-modules $(yarn bin jest) --watch",
     "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined;\"",
     "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').copyFileSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
   },
@@ -143,6 +143,10 @@
         }
       ]
     },
+    "extensionsToTreatAsEsm": [
+      ".ts",
+      ".tsx"
+    ],
     "globals": {
       "__DEV__": true
     },

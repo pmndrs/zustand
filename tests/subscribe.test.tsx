@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 

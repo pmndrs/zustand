@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { StoreApi } from 'zustand/vanilla'
 
 const getImports = async () => {
@@ -20,12 +21,12 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: jest.Mock<() => void, [f: any]>
-    unsubscribe: jest.Mock<any, any>
-    send: jest.Mock<any, any>
-    init: jest.Mock<any, any>
-    error: jest.Mock<any, any>
-    dispatch?: jest.Mock<any, any>
+    subscribe: jest.Mock<(f: (message: unknown) => void) => void>
+    unsubscribe: jest.Mock<any>
+    send: jest.Mock<any>
+    init: jest.Mock<any>
+    error: jest.Mock<any>
+    dispatch?: jest.Mock<any>
   }
 }
 const namedConnections = new Map<string | undefined, Connection>()
@@ -86,7 +87,7 @@ function getKeyFromOptions(options: any): string | undefined {
 }
 
 const extensionConnector = {
-  connect: jest.fn((options) => {
+  connect: jest.fn((options: any) => {
     const key = getKeyFromOptions(options)
     //console.log('options', options)
     const areNameUndefinedMapsNeeded =
@@ -96,7 +97,7 @@ const extensionConnector = {
       : namedConnections
     const subscribers: Connection['subscribers'] = []
     const api = {
-      subscribe: jest.fn((f) => {
+      subscribe: jest.fn((f: (m: unknown) => void) => {
         subscribers.push(f)
         return () => {}
       }),
