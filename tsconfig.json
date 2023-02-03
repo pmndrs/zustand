@@ -12,8 +12,7 @@
     "paths": {
       "zustand": ["./src/index.ts"],
       "zustand/*": ["./src/*.ts"]
-    },
-    "skipLibCheck": true
+    }
   },
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -41,7 +41,7 @@ jobs:
         if: ${{ matrix.typescript == '4.2.3' || matrix.typescript == '4.1.5' }}
         run: |
           sed -i~ 's/import\.meta\.env/(import.meta.env as any)/' tests/*.tsx
-          sed -i~ 's/jest\.Mock<[^>]*>/jest\.Mock/g' tests/*.tsx
+          sed -i~ 's/jest\.Mock<[^>]*>/jest.Mock/g' tests/*.tsx
           yarn json -I -f package.json -e "this.resolutions['@jest/globals']='25.5.2';"
           yarn add -D @jest/globals@25.5.2
       - name: Test ${{ matrix.typescript }}
