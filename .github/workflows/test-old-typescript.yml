@@ -43,7 +43,7 @@ jobs:
         run: |
           sed -i~ 's/import\.meta\.env/(import.meta.env as any)/' tests/*.tsx
           sed -i~ 's/jest\.Mock<.*>$/any/' tests/*.tsx
-          sed -i~ 's/jest\.fn<.*>(/jest.fn(/' tests/*.tsx
+          sed -i~ 's/jest\.fn<.*>(/jest.fn<any,any>(/' tests/*.tsx
           yarn json -I -f package.json -e "this.resolutions={}; this.resolutions['@jest/globals']='25.5.2';"
           yarn add -D @jest/globals@25.5.2
       - name: Test ${{ matrix.typescript }}
