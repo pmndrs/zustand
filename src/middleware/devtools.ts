@@ -210,13 +210,14 @@ const devtoolsImpl: DevtoolsImpl =
       | false
     try {
       extensionConnector =
-        (enabled ?? __DEV__) && window.__REDUX_DEVTOOLS_EXTENSION__
+        (enabled ?? import.meta.env?.MODE !== 'production') &&
+        window.__REDUX_DEVTOOLS_EXTENSION__
     } catch (e) {
       // ignored
     }
 
     if (!extensionConnector) {
-      if (__DEV__ && enabled) {
+      if (import.meta.env?.MODE !== 'production' && enabled) {
         console.warn(
           '[zustand devtools middleware] Please install/enable Redux devtools extension'
         )
@@ -286,7 +287,7 @@ const devtoolsImpl: DevtoolsImpl =
       const originalDispatch = (api as any).dispatch
       ;(api as any).dispatch = (...a: any[]) => {
         if (
-          __DEV__ &&
+          import.meta.env?.MODE !== 'production' &&
           a[0].type === '__setState' &&
           !didWarnAboutReservedActionType
         ) {

@@ -25,7 +25,7 @@ type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
  * @deprecated Use `createStore` and `useStore` for context usage
  */
 function createContext<S extends StoreApi<unknown>>() {
-  if (__DEV__) {
+  if (import.meta.env?.MODE !== 'production') {
     console.warn(
       '[DEPRECATED] zustand/context will be removed in the future version. Please use `import { createStore, useStore } from "zustand"` for context usage. See: https://github.com/pmndrs/zustand/discussions/1180'
     )

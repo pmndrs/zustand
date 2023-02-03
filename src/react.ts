@@ -68,7 +68,10 @@ type Create = {
 }
 
 const createImpl = <T>(createState: StateCreator<T, [], []>) => {
-  if (__DEV__ && typeof createState !== 'function') {
+  if (
+    import.meta.env?.MODE !== 'production' &&
+    typeof createState !== 'function'
+  ) {
     console.warn(
       '[DEPRECATED] Passing a vanilla store will be unsupported in the future version. Please use `import { useStore } from "zustand"` to use the vanilla store in React.'
     )
@@ -91,7 +94,7 @@ export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
  * @deprecated Use `import { create } from 'zustand'`
  */
 export default ((createState: any) => {
-  if (__DEV__) {
+  if (import.meta.env?.MODE !== 'production') {
     console.warn(
       "[DEPRECATED] default export is deprecated, instead import { create } from'zustand'"
     )

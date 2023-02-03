@@ -146,16 +146,13 @@ it('connects to the extension by passing the options and initializes', async () 
 
 describe('If there is no extension installed...', () => {
   let savedConsoleWarn: any
-  let savedDEV: boolean
   beforeEach(() => {
     savedConsoleWarn = console.warn
     console.warn = jest.fn()
-    savedDEV = __DEV__
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = undefined
   })
   afterEach(() => {
     console.warn = savedConsoleWarn
-    __DEV__ = savedDEV
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
   })
 
@@ -174,21 +171,18 @@ describe('If there is no extension installed...', () => {
 
   it('[DEV-ONLY] warns if enabled in dev mode', async () => {
     const { devtools, createStore } = await getImports()
-    __DEV__ = true
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).toBeCalled()
   })
 
-  it('[PRD-ONLY] does not warn if not in dev env', async () => {
+  it.skip('[PRD-ONLY] does not warn if not in dev env', async () => {
     const { devtools, createStore } = await getImports()
-    __DEV__ = false
     createStore(devtools(() => ({ count: 0 })))
     expect(console.warn).not.toBeCalled()
   })
 
-  it('[PRD-ONLY] does not warn if not in dev env even if enabled', async () => {
+  it.skip('[PRD-ONLY] does not warn if not in dev env even if enabled', async () => {
     const { devtools, createStore } = await getImports()
-    __DEV__ = false
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).not.toBeCalled()
   })

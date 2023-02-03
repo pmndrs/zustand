@@ -1,2 +1,5 @@
-// eslint-disable-next-line no-var
-declare var __DEV__: boolean
+declare interface ImportMeta {
+  env?: {
+    MODE: string
+  }
+}

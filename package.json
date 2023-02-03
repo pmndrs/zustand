@@ -147,9 +147,6 @@
       ".ts",
       ".tsx"
     ],
-    "globals": {
-      "__DEV__": true
-    },
     "moduleNameMapper": {
       "^zustand$": "<rootDir>/src/index.ts",
       "^zustand/(.*)$": "<rootDir>/src/$1.ts"

@@ -52,7 +52,7 @@ export function shallow<T>(objA: T, objB: T) {
  * @deprecated Use `import { shallow } from 'zustand/shallow'`
  */
 export default ((objA, objB) => {
-  if (__DEV__) {
+  if (import.meta.env?.MODE !== 'production') {
     console.warn(
       "[DEPRECATED] default export is deprecated, instead import { shallow } from'zustand/shallow'"
     )
