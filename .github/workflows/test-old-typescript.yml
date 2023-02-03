@@ -32,16 +32,17 @@ jobs:
       - run: yarn build
       - name: Patch for Old TS
         run: |
-          sed -i~ "s/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//" tests/*.tsx
-          sed -i~ "s/\"exactOptionalPropertyTypes\": true,//" tsconfig.json
-          sed -i~ "s/\"zustand\": \[\"\.\/src\/index\.ts\"\],/\"zustand\": [\".\/dist\/index.d.ts\"],/" tsconfig.json
-          sed -i~ "s/\"zustand\/\*\": \[\"\.\/src\/\*\.ts\"\]/\"zustand\/*\": [\".\/dist\/*.d.ts\"]/" tsconfig.json
-          sed -i~ "s/\"include\": .*/\"include\": [\"src\/types.d.ts\", \"dist\/**\/*\", \"tests\/**\/*\"],/" tsconfig.json
+          sed -i~ 's/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//' tests/*.tsx
+          sed -i~ 's/"exactOptionalPropertyTypes": true,//' tsconfig.json
+          sed -i~ 's/"zustand": \["\.\/src\/index\.ts"\],/"zustand": [".\/dist\/index.d.ts"],/' tsconfig.json
+          sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/*.d.ts"]/' tsconfig.json
+          sed -i~ 's/"include": .*/"include": ["src\/types.d.ts", "dist\/**\/*", "tests\/**\/*"],/' tsconfig.json
       - name: Patch for Older TS
         if: ${{ matrix.typescript == '4.2.3' || matrix.typescript == '4.1.5' }}
         run: |
-          yarn json -I -f package.json -e "this.resolutions['@types/jest']='29.2.0';"
-          yarn add -D @types/jest@29.2.0
+          sed -i~ 's/import\.meta\.env/(import.meta.env as any)/' tests/*.tsx
+          yarn json -I -f package.json -e "this.resolutions['@jest/globals']='25.5.2';"
+          yarn add -D @jest/globals@25.5.2
       - name: Test ${{ matrix.typescript }}
         run: |
           yarn add -D typescript@${{ matrix.typescript }}
