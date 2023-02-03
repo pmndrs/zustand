@@ -134,9 +134,13 @@
   "jest": {
     "rootDir": ".",
     "testEnvironment": "jsdom",
+    "preset": "ts-jest/presets/js-with-ts-esm",
     "transform": {
       "^.+\\.(t|j)sx?$": [
-        "@swc/jest"
+        "ts-jest",
+        {
+          "useESM": true
+        }
       ]
     },
     "globals": {
@@ -180,8 +184,6 @@
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.3.0",
     "@rollup/plugin-typescript": "^11.0.0",
-    "@swc/core": "^1.3.26",
-    "@swc/jest": "^0.2.24",
     "@testing-library/react": "^13.4.0",
     "@types/jest": "^29.2.5",
     "@types/react": "^18.0.26",
@@ -211,6 +213,7 @@
     "rollup": "^3.10.0",
     "rollup-plugin-esbuild": "^5.0.0",
     "shx": "^0.3.4",
+    "ts-jest": "^29.0.5",
     "typescript": "^4.9.4"
   },
   "resolutions": {
