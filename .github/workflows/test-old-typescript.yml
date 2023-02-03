@@ -41,4 +41,5 @@ jobs:
       - name: Test ${{ matrix.typescript }}
         run: |
           yarn add -D typescript@${{ matrix.typescript }}
+          rm -r node_modules/parse5
           yarn tsc --noEmit
