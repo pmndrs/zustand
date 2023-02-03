@@ -39,7 +39,7 @@ jobs:
           sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/*.d.ts"]/' tsconfig.json
           sed -i~ 's/"include": .*/"include": ["src\/types.d.ts", "dist\/**\/*", "tests\/**\/*"],/' tsconfig.json
       - name: Patch for Older TS
-        if: ${{ matrix.typescript == 'disable4.2.3' || matrix.typescript == '4.1.5' }}
+        if: ${{ matrix.typescript == 'disable4.2.3' || matrix.typescript == 'disable4.1.5' }}
         run: |
           sed -i~ 's/import\.meta\.env/(import.meta.env as any)/' tests/*.tsx
           sed -i~ 's/jest\.Mock<.*>$/any/' tests/*.tsx
