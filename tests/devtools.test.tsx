@@ -1,4 +1,11 @@
-import { jest } from '@jest/globals'
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals'
 import { StoreApi } from 'zustand/vanilla'
 
 const getImports = async () => {
@@ -638,11 +645,22 @@ describe('with redux middleware', () => {
       payload: JSON.stringify({ type: 'DECREMENT' }),
     })
 
-    expect(connection.init.mock.calls).toMatchObject([[{ count: 0 }]])
+    expect(connection.init.mock.calls).toMatchObject([
+      [{ count: 0 }] as unknown as Record<string, unknown>,
+    ])
     expect(connection.send.mock.calls).toMatchObject([
-      [{ type: 'INCREMENT' }, { count: 1 }],
-      [{ type: 'INCREMENT' }, { count: 2 }],
-      [{ type: 'DECREMENT' }, { count: 1 }],
+      [{ type: 'INCREMENT' }, { count: 1 }] as unknown as Record<
+        string,
+        unknown
+      >,
+      [{ type: 'INCREMENT' }, { count: 2 }] as unknown as Record<
+        string,
+        unknown
+      >,
+      [{ type: 'DECREMENT' }, { count: 1 }] as unknown as Record<
+        string,
+        unknown
+      >,
     ])
     expect(api.getState()).toMatchObject({ count: 1 })
   })
@@ -1009,17 +1027,39 @@ describe('when redux connection was called on multiple stores with `name` provid
           payload: JSON.stringify({ type: 'DECREMENT' }),
         })
 
-        expect(connection1.init.mock.calls).toMatchObject([[{ count: 0 }]])
-        expect(connection2.init.mock.calls).toMatchObject([[{ count: 10 }]])
+        expect(connection1.init.mock.calls).toMatchObject([
+          [{ count: 0 }] as unknown as Record<string, unknown>,
+        ])
+        expect(connection2.init.mock.calls).toMatchObject([
+          [{ count: 10 }] as unknown as Record<string, unknown>,
+        ])
         expect(connection1.send.mock.calls).toMatchObject([
-          [{ type: 'INCREMENT' }, { count: 1 }],
-          [{ type: 'INCREMENT' }, { count: 2 }],
-          [{ type: 'DECREMENT' }, { count: 1 }],
+          [{ type: 'INCREMENT' }, { count: 1 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'INCREMENT' }, { count: 2 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'DECREMENT' }, { count: 1 }] as unknown as Record<
+            string,
+            unknown
+          >,
         ])
         expect(connection2.send.mock.calls).toMatchObject([
-          [{ type: 'INCREMENT' }, { count: 11 }],
-          [{ type: 'INCREMENT' }, { count: 12 }],
-          [{ type: 'DECREMENT' }, { count: 11 }],
+          [{ type: 'INCREMENT' }, { count: 11 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'INCREMENT' }, { count: 12 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'DECREMENT' }, { count: 11 }] as unknown as Record<
+            string,
+            unknown
+          > as unknown as Record<string, unknown>,
         ])
         expect(api1.getState()).toMatchObject({ count: 1 })
         expect(api2.getState()).toMatchObject({ count: 11 })
