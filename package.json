@@ -134,7 +134,7 @@
   "jest": {
     "rootDir": ".",
     "testEnvironment": "jsdom",
-    "preset": "ts-jest/presets/js-with-ts-esm",
+    "preset": "ts-jest/presets/default-esm",
     "transform": {
       "^.+\\.(t|j)sx?$": [
         "ts-jest",
