@@ -21,6 +21,7 @@ This can be done using third-party libraries created by the community.
 - [derive-zustand](https://github.com/dai-shi/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
 - [geschichte](https://github.com/BowlingX/geschichte) — Zustand and Immer-based hook to manage query parameters.
 - [mobz](https://github.com/2A5F/Mobz) — Zustand-style MobX API.
+- [ngx-zustand](https://github.com/JoaoPauloLousada/ngx-zustand) - A Zustand adapter for Angular.
 - [shared-zustand](https://github.com/Tom-Julux/shared-zustand) — Cross-tab state sharing for Zustand.
 - [simple-zustand-devtools](https://github.com/beerose/simple-zustand-devtools) — 🐻⚛️ Inspect your Zustand store in React DevTools.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
