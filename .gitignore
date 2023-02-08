@@ -1,5 +1,4 @@
 node_modules/
-coverage/
 dist/
 Thumbs.db
 ehthumbs.db
@@ -10,6 +9,5 @@ $RECYCLE.BIN/
 .docz/
 package-lock.json
 coverage/
-.idea
 .rpt2_cache/
 .idea
