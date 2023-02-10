@@ -1,4 +1,5 @@
 import { StrictMode, useEffect } from 'react'
+import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { act, render, waitFor } from '@testing-library/react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -190,7 +191,7 @@ describe('persist middleware with async configuration', () => {
   })
 
   it('can migrate persisted state', async () => {
-    const setItemSpy = jest.fn()
+    const setItemSpy = jest.fn<() => void>()
     const onRehydrateStorageSpy = jest.fn()
     const migrateSpy = jest.fn(() => ({ count: 99 }))
 

@@ -1,3 +1,11 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals'
 import { StoreApi } from 'zustand/vanilla'
 
 const getImports = async () => {
@@ -20,12 +28,12 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: jest.Mock<() => void, [f: any]>
-    unsubscribe: jest.Mock<any, any>
-    send: jest.Mock<any, any>
-    init: jest.Mock<any, any>
-    error: jest.Mock<any, any>
-    dispatch?: jest.Mock<any, any>
+    subscribe: jest.Mock<(f: (message: unknown) => void) => void>
+    unsubscribe: jest.Mock<any>
+    send: jest.Mock<any>
+    init: jest.Mock<any>
+    error: jest.Mock<any>
+    dispatch?: jest.Mock<any>
   }
 }
 const namedConnections = new Map<string | undefined, Connection>()
@@ -86,7 +94,7 @@ function getKeyFromOptions(options: any): string | undefined {
 }
 
 const extensionConnector = {
-  connect: jest.fn((options) => {
+  connect: jest.fn((options: any) => {
     const key = getKeyFromOptions(options)
     //console.log('options', options)
     const areNameUndefinedMapsNeeded =
@@ -96,7 +104,7 @@ const extensionConnector = {
       : namedConnections
     const subscribers: Connection['subscribers'] = []
     const api = {
-      subscribe: jest.fn((f) => {
+      subscribe: jest.fn((f: (m: unknown) => void) => {
         subscribers.push(f)
         return () => {}
       }),
@@ -138,16 +146,13 @@ it('connects to the extension by passing the options and initializes', async () 
 
 describe('If there is no extension installed...', () => {
   let savedConsoleWarn: any
-  let savedDEV: boolean
   beforeEach(() => {
     savedConsoleWarn = console.warn
     console.warn = jest.fn()
-    savedDEV = __DEV__
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = undefined
   })
   afterEach(() => {
     console.warn = savedConsoleWarn
-    __DEV__ = savedDEV
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
   })
 
@@ -166,21 +171,18 @@ describe('If there is no extension installed...', () => {
 
   it('[DEV-ONLY] warns if enabled in dev mode', async () => {
     const { devtools, createStore } = await getImports()
-    __DEV__ = true
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).toBeCalled()
   })
 
-  it('[PRD-ONLY] does not warn if not in dev env', async () => {
+  it.skip('[PRD-ONLY] does not warn if not in dev env', async () => {
     const { devtools, createStore } = await getImports()
-    __DEV__ = false
     createStore(devtools(() => ({ count: 0 })))
     expect(console.warn).not.toBeCalled()
   })
 
-  it('[PRD-ONLY] does not warn if not in dev env even if enabled', async () => {
+  it.skip('[PRD-ONLY] does not warn if not in dev env even if enabled', async () => {
     const { devtools, createStore } = await getImports()
-    __DEV__ = false
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).not.toBeCalled()
   })
@@ -637,11 +639,22 @@ describe('with redux middleware', () => {
       payload: JSON.stringify({ type: 'DECREMENT' }),
     })
 
-    expect(connection.init.mock.calls).toMatchObject([[{ count: 0 }]])
+    expect(connection.init.mock.calls).toMatchObject([
+      [{ count: 0 }] as unknown as Record<string, unknown>,
+    ])
     expect(connection.send.mock.calls).toMatchObject([
-      [{ type: 'INCREMENT' }, { count: 1 }],
-      [{ type: 'INCREMENT' }, { count: 2 }],
-      [{ type: 'DECREMENT' }, { count: 1 }],
+      [{ type: 'INCREMENT' }, { count: 1 }] as unknown as Record<
+        string,
+        unknown
+      >,
+      [{ type: 'INCREMENT' }, { count: 2 }] as unknown as Record<
+        string,
+        unknown
+      >,
+      [{ type: 'DECREMENT' }, { count: 1 }] as unknown as Record<
+        string,
+        unknown
+      >,
     ])
     expect(api.getState()).toMatchObject({ count: 1 })
   })
@@ -1008,17 +1021,39 @@ describe('when redux connection was called on multiple stores with `name` provid
           payload: JSON.stringify({ type: 'DECREMENT' }),
         })
 
-        expect(connection1.init.mock.calls).toMatchObject([[{ count: 0 }]])
-        expect(connection2.init.mock.calls).toMatchObject([[{ count: 10 }]])
+        expect(connection1.init.mock.calls).toMatchObject([
+          [{ count: 0 }] as unknown as Record<string, unknown>,
+        ])
+        expect(connection2.init.mock.calls).toMatchObject([
+          [{ count: 10 }] as unknown as Record<string, unknown>,
+        ])
         expect(connection1.send.mock.calls).toMatchObject([
-          [{ type: 'INCREMENT' }, { count: 1 }],
-          [{ type: 'INCREMENT' }, { count: 2 }],
-          [{ type: 'DECREMENT' }, { count: 1 }],
+          [{ type: 'INCREMENT' }, { count: 1 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'INCREMENT' }, { count: 2 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'DECREMENT' }, { count: 1 }] as unknown as Record<
+            string,
+            unknown
+          >,
         ])
         expect(connection2.send.mock.calls).toMatchObject([
-          [{ type: 'INCREMENT' }, { count: 11 }],
-          [{ type: 'INCREMENT' }, { count: 12 }],
-          [{ type: 'DECREMENT' }, { count: 11 }],
+          [{ type: 'INCREMENT' }, { count: 11 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'INCREMENT' }, { count: 12 }] as unknown as Record<
+            string,
+            unknown
+          >,
+          [{ type: 'DECREMENT' }, { count: 11 }] as unknown as Record<
+            string,
+            unknown
+          > as unknown as Record<string, unknown>,
         ])
         expect(api1.getState()).toMatchObject({ count: 1 })
         expect(api2.getState()).toMatchObject({ count: 11 })

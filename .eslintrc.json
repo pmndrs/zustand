@@ -114,12 +114,6 @@
       }
     },
     {
-      "files": ["tests/**/*.tsx"],
-      "env": {
-        "jest/globals": true
-      }
-    },
-    {
       "files": ["./*.js"],
       "rules": {
         "@typescript-eslint/no-var-requires": "off"

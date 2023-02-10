@@ -62,12 +62,15 @@ function createESMConfig(input, output) {
       }),
       resolve({ extensions }),
       replace({
-        __DEV__: output.endsWith('.mjs')
-          ? '((import.meta.env&&import.meta.env.MODE)!=="production")'
-          : '(process.env.NODE_ENV!=="production")',
+        ...(output.endsWith('.js')
+          ? {
+              'import.meta.env?.MODE': 'process.env.NODE_ENV',
+            }
+          : {}),
         // a workround for #829
         'use-sync-external-store/shim/with-selector':
           'use-sync-external-store/shim/with-selector.js',
+        delimiters: ['\\b', '\\b(?!(\\.|/))'],
         preventAssignment: true,
       }),
       getEsbuild('node12'),
@@ -95,7 +98,8 @@ function createCommonJSConfig(input, output, options) {
       }),
       resolve({ extensions }),
       replace({
-        __DEV__: '(process.env.NODE_ENV!=="production")',
+        'import.meta.env?.MODE': 'process.env.NODE_ENV',
+        delimiters: ['\\b', '\\b(?!(\\.|/))'],
         preventAssignment: true,
       }),
       babelPlugin(getBabelOptions({ ie: 11 })),
@@ -131,7 +135,8 @@ function createUMDConfig(input, output, env) {
       }),
       resolve({ extensions }),
       replace({
-        __DEV__: env !== 'production' ? 'true' : 'false',
+        'import.meta.env?.MODE': JSON.stringify(env),
+        delimiters: ['\\b', '\\b(?!(\\.|/))'],
         preventAssignment: true,
       }),
       babelPlugin(getBabelOptions({ ie: 11 })),
@@ -156,7 +161,8 @@ function createSystemConfig(input, output, env) {
       }),
       resolve({ extensions }),
       replace({
-        __DEV__: env !== 'production' ? 'true' : 'false',
+        'import.meta.env?.MODE': JSON.stringify(env),
+        delimiters: ['\\b', '\\b(?!(\\.|/))'],
         preventAssignment: true,
       }),
       getEsbuild('node12', env),

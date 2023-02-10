@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -130,7 +131,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can migrate persisted state', () => {
-    const setItemSpy = jest.fn()
+    const setItemSpy = jest.fn<() => void>()
     const onRehydrateStorageSpy = jest.fn()
     const migrateSpy = jest.fn(() => ({ count: 99 }))
 
@@ -319,7 +320,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can filter the persisted value', () => {
-    const setItemSpy = jest.fn()
+    const setItemSpy = jest.fn<() => void>()
 
     const storage = {
       getItem: () => '',
@@ -386,7 +387,7 @@ describe('persist middleware with sync configuration', () => {
   it('can access the options through the api', () => {
     const storage = {
       getItem: () => null,
-      setItem: jest.fn(),
+      setItem: jest.fn<() => void>(),
       removeItem: () => {},
     }
 
@@ -401,7 +402,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can change the options through the api', () => {
-    const setItemSpy = jest.fn()
+    const setItemSpy = jest.fn<() => void>()
 
     const storage = {
       getItem: () => null,
@@ -438,7 +439,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can clear the storage through the api', () => {
-    const removeItemSpy = jest.fn()
+    const removeItemSpy = jest.fn<() => void>()
 
     const storage = {
       getItem: () => null,

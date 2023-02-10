@@ -1,3 +1,4 @@
+import { expect, it } from '@jest/globals'
 import { create } from 'zustand'
 import type {
   StateCreator,
