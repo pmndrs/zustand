@@ -1,4 +1,3 @@
-import type {} from '@redux-devtools/extension'
 import type { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
 
 // Copy types to avoid import type { Config } from '@redux-devtools/extension'
