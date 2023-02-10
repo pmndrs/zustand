@@ -504,7 +504,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => {
   ) {
     if (__DEV__) {
       console.warn(
-        '[DEPRECATED] `getStorage`, `serialize` and `deserialize` options are deprecated. Please use `storage` option instead.'
+        '[DEPRECATED] `getStorage`, `serialize` and `deserialize` options are deprecated. Use `storage` option instead.'
       )
     }
     return oldImpl(config, baseOptions)

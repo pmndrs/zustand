@@ -91,7 +91,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   const destroy: StoreApi<TState>['destroy'] = () => {
     if (__DEV__) {
       console.warn(
-        '[DEPRECATED] The destroy method will be unsupported in the future version. You should use unsubscribe function returned by subscribe. Everything will be garbage collected if store is garbage collected.'
+        '[DEPRECATED] The `destroy` method will be unsupported in a future version. Instead use unsubscribe function returned by subscribe. Everything will be garbage-collected if store is garbage-collected.'
       )
     }
     listeners.clear()
@@ -106,12 +106,12 @@ export const createStore = ((createState) =>
   createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
 
 /**
- * @deprecated Use `import { createStore } from ...`
+ * @deprecated Use `import { createStore } from 'zustand/vanilla'`
  */
 export default ((createState) => {
   if (__DEV__) {
     console.warn(
-      '[DEPRECATED] default export is deprecated, instead import { createStore } ...'
+      "[DEPRECATED] Default export is deprecated. Instead use import { createStore } from 'zustand/vanilla'."
     )
   }
   return createStore(createState)

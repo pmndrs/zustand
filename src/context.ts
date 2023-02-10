@@ -27,7 +27,7 @@ type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
 function createContext<S extends StoreApi<unknown>>() {
   if (__DEV__) {
     console.warn(
-      '[DEPRECATED] zustand/context will be removed in the future version. Please use `import { createStore, useStore } from "zustand"` for context usage. See: https://github.com/pmndrs/zustand/discussions/1180'
+      "[DEPRECATED] `context` will be removed in a future version. Instead use `import { createStore, useStore } from 'zustand'`. See: https://github.com/pmndrs/zustand/discussions/1180."
     )
   }
   const ZustandContext = reactCreateContext<S | undefined>(undefined)
