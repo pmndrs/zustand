@@ -21,56 +21,56 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "types": "./index.d.ts",
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "types": "./index.d.ts",
       "module": "./esm/index.js",
       "default": "./index.js"
     },
     "./vanilla": {
+      "types": "./vanilla.d.ts",
       "import": {
         "types": "./esm/vanilla.d.mts",
         "default": "./esm/vanilla.mjs"
       },
-      "types": "./vanilla.d.ts",
       "module": "./esm/vanilla.js",
       "default": "./vanilla.js"
     },
     "./middleware": {
+      "types": "./middleware.d.ts",
       "import": {
         "types": "./esm/middleware.d.mts",
         "default": "./esm/middleware.mjs"
       },
-      "types": "./middleware.d.ts",
       "module": "./esm/middleware.js",
       "default": "./middleware.js"
     },
     "./middleware/immer": {
+      "types": "./middleware/immer.d.ts",
       "import": {
         "types": "./esm/middleware/immer.d.mts",
         "default": "./esm/middleware/immer.mjs"
       },
-      "types": "./middleware/immer.d.ts",
       "module": "./esm/middleware/immer.js",
       "default": "./middleware/immer.js"
     },
     "./shallow": {
+      "types": "./shallow.d.ts",
       "import": {
         "types": "./esm/shallow.d.mts",
         "default": "./esm/shallow.mjs"
       },
-      "types": "./shallow.d.ts",
       "module": "./esm/shallow.js",
       "default": "./shallow.js"
     },
     "./context": {
+      "types": "./context.d.ts",
       "import": {
         "types": "./esm/context.d.mts",
         "default": "./esm/context.mjs"
       },
-      "types": "./context.d.ts",
       "module": "./esm/context.js",
       "default": "./context.js"
     }
