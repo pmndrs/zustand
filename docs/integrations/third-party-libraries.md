@@ -44,3 +44,5 @@ This can be done using third-party libraries created by the community.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
 - [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
 - [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
+- [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) - State management for vue (Vue3 / Vue2) based on zustand.   
+- [zustand-pub](https://github.com/AwesomeDevin/zustand-pub) - Cross-Application/Cross-Framework State Management And Sharing based on zustand and zustand-vue for React/Vue.   
