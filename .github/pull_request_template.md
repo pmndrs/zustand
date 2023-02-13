@@ -1,6 +1,6 @@
-## Related Issues
+## Related Issues or Discussions
 
-Fixes #.
+Fixes #
 
 ## Summary
 
