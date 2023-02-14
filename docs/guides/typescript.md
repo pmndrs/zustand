@@ -463,7 +463,7 @@ const useBearStore = createBoundedUseStore(bearStore)
 ### Store creator with createStore
 
 As shown in the
-[initialize state with props guide](../guides/initialize-state-with-props.md##store-creator-with-createstore),
+[initialize state with props guide](./initialize-state-with-props.md##store-creator-with-createstore),
 a store creator can be created with
 the following pattern:
 
