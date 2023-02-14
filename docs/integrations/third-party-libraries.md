@@ -37,10 +37,12 @@ This can be done using third-party libraries created by the community.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
 - [zustand-middleware-yjs](https://github.com/joebobmiles/zustand-middleware-yjs) — A middleware for synchronizing Zustand stores with Yjs.
 - [zustand-persist](https://github.com/roadmanfong/zustand-persist) — A middleware for persisting and rehydrating state.
+- [zustand-pub](https://github.com/AwesomeDevin/zustand-pub) - Cross-Application/Cross-Framework State Management And Sharing based on zustand and zustand-vue for React/Vue.
+- [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
+- [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
 - [zustand-saga](https://github.com/Nowsta/zustand-saga) — A Zustand middleware for redux-saga (minus redux).
 - [zustand-store-addons](https://github.com/Diablow/zustand-store-addons) — React state management addons for Zustand.
+- [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) - State management for vue (Vue3 / Vue2) based on zustand.
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
-- [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
-- [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
