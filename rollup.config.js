@@ -123,11 +123,11 @@ function createUMDConfig(input, output, env) {
       name,
       globals: {
         react: 'React',
+        immer: 'immer',
         // FIXME not yet supported
         'use-sync-external-store/shim/with-selector':
           'useSyncExternalStoreShimWithSelector',
         'zustand/vanilla': 'zustandVanilla',
-        immer: 'immer',
       },
     },
     external,
