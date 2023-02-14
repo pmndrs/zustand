@@ -460,6 +460,67 @@ type ExtractState<S> = S extends { get: () => infer X } ? X : never
 const useBearStore = createBoundedUseStore(bearStore)
 ```
 
+### Store creator with createStore
+
+As shown in the
+[initialize state with props guide](../guides/initialize-state-with-props.md##store-creator-with-createstore),
+a store creator can be created with 
+the following pattern:
+
+```ts
+import { createStore } from 'zustand'
+
+interface BearProps {
+  bears: number
+}
+
+interface BearState extends BearProps {
+  addBear: () => void
+}
+
+type BearStore = ReturnType<typeof createBearStore>
+
+const createBearStore = (initialProps?: Partial<BearProps>) => {
+  const DEFAULT_PROPS: BearProps = {
+    bears: 0,
+  }
+  return createStore<BearState>()((set) => ({
+    ...DEFAULT_PROPS,
+    ...initialProps,
+    addBear: () => set((state) => ({ bears: ++state.bears })),
+  }))
+}
+```
+
+This pattern allows passing in a subset of props 
+by applying the `partial` utility helper.
+Any omitted props will be merged with `DEFAULT_PROPS`.
+
+However by default TypeScript will allow the following:
+
+```ts
+createBearStore({ bears: undefined })
+```
+
+A keen eye will notice 
+that `bears` should be a number!
+
+To ensure TypeScript generates an error, 
+set `exactOptionalPropertyTypes` to `true` in your `tsconfig.json`. 
+
+```json
+{
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true
+  }
+}
+```
+
+See the [official TypeScript guide](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes) 
+for more.
+
+
+
 ## Middlewares and their mutators reference
 
 - `devtools` — `["zustand/devtools", never]`

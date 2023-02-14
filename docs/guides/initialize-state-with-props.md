@@ -32,6 +32,9 @@ const createBearStore = (initProps?: Partial<BearProps>) => {
 }
 ```
 
+Please see the [TypeScript Guide](../guides/typescript.md#store-creator-with-createstore) 
+for more on using this pattern with TypeScript.
+
 ## Creating a context with `React.createContext`
 
 ```ts
