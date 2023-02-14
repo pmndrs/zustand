@@ -108,16 +108,19 @@ function createCommonJSConfig(input, output, options) {
 }
 
 function createUMDConfig(input, output, env) {
-  const c = output.split('/').pop()
+  const c = output.replace(/^dist\/umd\//, '').split(/\W/)
+  const name = c.reduce((acc, itm, idx) => {
+    if (idx === c.length - 1 && itm === 'index') {
+      return acc
+    }
+    return acc + `${itm.slice(0, 1).toUpperCase()}${itm.slice(1)}`
+  }, 'zustand')
   return {
     input,
     output: {
       file: `${output}.${env}.js`,
       format: 'umd',
-      name:
-        c === 'index'
-          ? 'zustand'
-          : `zustand${c.slice(0, 1).toUpperCase()}${c.slice(1)}`,
+      name,
       globals: {
         react: 'React',
         // FIXME not yet supported
