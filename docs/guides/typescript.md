@@ -464,7 +464,7 @@ const useBearStore = createBoundedUseStore(bearStore)
 
 As shown in the
 [initialize state with props guide](../guides/initialize-state-with-props.md##store-creator-with-createstore),
-a store creator can be created with 
+a store creator can be created with
 the following pattern:
 
 ```ts
@@ -492,7 +492,7 @@ const createBearStore = (initialProps?: Partial<BearProps>) => {
 }
 ```
 
-This pattern allows passing in a subset of props 
+This pattern allows passing in a subset of props
 by applying the `partial` utility helper.
 Any omitted props will be merged with `DEFAULT_PROPS`.
 
@@ -502,11 +502,11 @@ However by default TypeScript will allow the following:
 createBearStore({ bears: undefined })
 ```
 
-A keen eye will notice 
+A keen eye will notice
 that `bears` should be a number!
 
-To ensure TypeScript generates an error, 
-set `exactOptionalPropertyTypes` to `true` in your `tsconfig.json`. 
+To ensure TypeScript generates an error,
+set `exactOptionalPropertyTypes` to `true` in your `tsconfig.json`.
 
 ```json
 {
@@ -516,10 +516,8 @@ set `exactOptionalPropertyTypes` to `true` in your `tsconfig.json`.
 }
 ```
 
-See the [official TypeScript guide](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes) 
+See the [official TypeScript guide](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes)
 for more.
-
-
 
 ## Middlewares and their mutators reference
 
