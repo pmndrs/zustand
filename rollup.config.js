@@ -127,6 +127,7 @@ function createUMDConfig(input, output, env) {
         'use-sync-external-store/shim/with-selector':
           'useSyncExternalStoreShimWithSelector',
         'zustand/vanilla': 'zustandVanilla',
+        immer: 'immer',
       },
     },
     external,
