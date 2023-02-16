@@ -108,13 +108,12 @@ function createCommonJSConfig(input, output, options) {
 }
 
 function createUMDConfig(input, output, env) {
-  const c = output.replace(/^dist\/umd\//, '').split(/\W/)
-  const name = c.reduce((acc, itm, idx) => {
-    if (idx === c.length - 1 && itm === 'index') {
-      return acc
-    }
-    return acc + `${itm.slice(0, 1).toUpperCase()}${itm.slice(1)}`
-  }, 'zustand')
+  let name = 'zustand'
+  const fileName = output.slice('dist/umd/'.length)
+  const capitalize = (s) => s.slice(0, 1).toUpperCase() + s.slice(1)
+  if (fileName !== 'index') {
+    name += fileName.replaceAll(/(\w+)\W*/g, (_, p) => capitalize(p))
+  }
   return {
     input,
     output: {
