@@ -112,7 +112,7 @@ function createUMDConfig(input, output, env) {
   const fileName = output.slice('dist/umd/'.length)
   const capitalize = (s) => s.slice(0, 1).toUpperCase() + s.slice(1)
   if (fileName !== 'index') {
-    name += fileName.replaceAll(/(\w+)\W*/g, (_, p) => capitalize(p))
+    name += fileName.replace(/(\w+)\W*/g, (_, p) => capitalize(p))
   }
   return {
     input,
