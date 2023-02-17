@@ -405,12 +405,12 @@ is not logged in because it's the default,
 but in reality the store has not been hydrated yet.
 
 If your app does depends on the persisted state at page load,
-see [_How can I check if my store has been hydrated?_](#how-can-i-check-if-my-store-has-been-hydrated)
+see [_How can I check if my store has been hydrated_](#how-can-i-check-if-my-store-has-been-hydrated)
 in the [FAQ](#faq) section below.
 
 ## FAQ
 
-### How can I check if my store has been hydrated?
+### How can I check if my store has been hydrated
 
 There are a few different ways to do this.
 
@@ -478,7 +478,7 @@ const useHydration = () => {
 }
 ```
 
-### How can I use a custom storage engine?
+### How can I use a custom storage engine
 
 If the storage you want to use does not match the expected API, you can create your own storage:
 
@@ -517,7 +517,7 @@ export const useBoundStore = create(
 )
 ```
 
-### How can I rehydrate on storage event?
+### How can I rehydrate on storage event
 
 You can use the Persist API to create your own implementation,
 similar to the example below:
@@ -543,7 +543,7 @@ const useBoundStore = create(persist(...))
 withStorageDOMEvents(useBoundStore)
 ```
 
-### How do I use it with TypeScript?
+### How do I use it with TypeScript
 
 Basic typescript usage doesn't require anything special
 except for writing `create<State>()(...)` instead of `create(...)`.
@@ -572,7 +572,7 @@ export const useBearStore = create<MyState>()(
 )
 ```
 
-### How do I use it with Map and Set?
+### How do I use it with Map and Set
 
 With the previous persist API, you would use `serialize`/`deserialize`
 to deal with `Map` and `Set` and convert them into
