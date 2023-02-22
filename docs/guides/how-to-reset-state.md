@@ -74,14 +74,13 @@ export const resetAllSlices = () => {
 }
 ```
 
-Resetting bound store using Slices pettern
+Resetting bound store using Slices pattern
 
 ```ts
 import create, { StateCreator } from "zustand";
 
 const resetters: (() => void)[] = [];
 
-// Bear slice
 const initialStateBear = { bears: 0 };
 
 interface BearSlice {
@@ -104,7 +103,7 @@ const createBearSlice: StateCreator<
   };
 };
 
-//Fish slice
+
 const initialStateFish = { fishes: 0 };
 
 interface FishSlice {
@@ -125,7 +124,6 @@ const createFishSlice: StateCreator<
   };
 };
 
-//Bound store
 const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
   ...createBearSlice(...a),
   ...createFishSlice(...a),
