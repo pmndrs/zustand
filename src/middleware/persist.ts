@@ -123,7 +123,7 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-type StorePersist<S, Ps> = {
+export type StorePersist<S, Ps> = {
   persist: {
     setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
@@ -528,7 +528,7 @@ declare module '../vanilla' {
   }
 }
 
-type Write<T, U> = Omit<T, keyof U> & U
+export type Write<T, U> = Omit<T, keyof U> & U
 
 type WithPersist<S, A> = S extends { getState: () => infer T }
   ? Write<S, StorePersist<T, A>>

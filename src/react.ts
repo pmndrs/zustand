@@ -1,9 +1,10 @@
-import { useDebugValue } from 'react'
+import { useDebugValue, useEffect, useState } from 'react'
 // import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 // This doesn't work in ESM, because use-sync-external-store only exposes CJS.
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
+import { StorePersist, Write } from './middleware'
 import { createStore } from './vanilla'
 import type {
   Mutate,
@@ -67,6 +68,10 @@ type Create = {
   <S extends StoreApi<unknown>>(store: S): UseBoundStore<S>
 }
 
+type PersistedStore = UseBoundStore<
+  Write<StoreApi<any>, StorePersist<any, unknown>>
+>
+
 const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   if (
     import.meta.env?.MODE !== 'production' &&
@@ -89,6 +94,29 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
 
 export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
   createState ? createImpl(createState) : createImpl) as Create
+
+export const useHydration = (persistedStore: PersistedStore) => {
+  const [hydrated, setHydrated] = useState(persistedStore.persist.hasHydrated)
+
+  useEffect(() => {
+    const unsubHydrate = persistedStore.persist.onHydrate(() =>
+      setHydrated(false)
+    )
+
+    const unsubFinishHydration = persistedStore.persist.onFinishHydration(() =>
+      setHydrated(true)
+    )
+
+    setHydrated(persistedStore.persist.hasHydrated())
+
+    return () => {
+      unsubHydrate()
+      unsubFinishHydration()
+    }
+  }, [persistedStore.persist])
+
+  return hydrated
+}
 
 /**
  * @deprecated Use `import { create } from 'zustand'`
