@@ -414,7 +414,34 @@ in the [FAQ](#faq) section below.
 
 There are a few different ways to do this.
 
-You can use the [`onRehydrateStorage`](#onrehydratestorage)
+You can use the `useHydration` hook:
+
+```ts
+const useBoundStore = create(
+  persist(
+    (set, get) => ({
+      // ...
+    }),
+    {
+      // ...
+    }
+  )
+);
+
+export default function App() {
+  const hasHydrated = useHydration(useBoundStore);
+
+  if (!hasHydrated) {
+    return <p>Loading...</p>
+  }
+
+  return (
+    // ...
+  );
+}
+```
+
+You can also use the [`onRehydrateStorage`](#onrehydratestorage)
 listener function to update a field in the store:
 
 ```ts
@@ -448,33 +475,6 @@ export default function App() {
   return (
     // ...
   );
-}
-```
-
-You can also create a custom `useHydration` hook:
-
-```ts
-const useBoundStore = create(persist(...))
-
-const useHydration = () => {
-  const [hydrated, setHydrated] = useState(useBoundStore.persist.hasHydrated)
-
-  useEffect(() => {
-    // Note: This is just in case you want to take into account manual rehydration.
-    // You can remove the following line if you don't need it.
-    const unsubHydrate = useBoundStore.persist.onHydrate(() => setHydrated(false))
-
-    const unsubFinishHydration = useBoundStore.persist.onFinishHydration(() => setHydrated(true))
-
-    setHydrated(useBoundStore.persist.hasHydrated())
-
-    return () => {
-      unsubHydrate()
-      unsubFinishHydration()
-    }
-  }, [])
-
-  return hydrated
 }
 ```
 
