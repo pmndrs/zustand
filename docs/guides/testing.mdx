@@ -12,7 +12,7 @@ Thus, there can be cases where the state of one test can affect another. To make
 
 ```jsx
 import { create as actualCreate } from 'zustand'
-// import { create as actualCreate } from 'zustand' // if using jest
+// const { create: actualCreate } = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
 
 // a variable to hold reset functions for all stores declared in the app
@@ -42,7 +42,9 @@ If you are using zustand, as documented in [TypeScript Guide](./typescript.md), 
 
 ```typescript
 import { create as actualCreate, StateCreator } from 'zustand'
-// import { create as actualCreate } from 'zustand' // if using jest
+// if using Jest:
+// import { StateCreator } from 'zustand';
+// const { create: actualCreate } = jest.requireActual<typeof import('zustand')>('zustand');
 import { act } from 'react-dom/test-utils'
 
 // a variable to hold reset functions for all stores declared in the app
@@ -68,7 +70,7 @@ You should use the following code in the `__mocks__/zustand.js` file (the `__moc
 
 ```js
 import { act } from '@testing-library/react-native'
-import { create as actualCreate } from 'zustand'
+const { create: actualCreate } = jest.requireActual('zustand')
 
 // a variable to hold reset functions for all stores declared in the app
 const storeResetFns = new Set()
