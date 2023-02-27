@@ -66,7 +66,10 @@ function createESMConfig(input, output) {
           ? {
               'import.meta.env?.MODE': 'process.env.NODE_ENV',
             }
-          : {}),
+          : {
+              'import.meta.env?.MODE':
+                '(import.meta.env && import.meta.env.MODE)',
+            }),
         // a workround for #829
         'use-sync-external-store/shim/with-selector':
           'use-sync-external-store/shim/with-selector.js',
