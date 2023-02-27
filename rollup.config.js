@@ -197,7 +197,7 @@ module.exports = function (args) {
           default: 'react',
           create: 'create',
           useStore: 'useStore',
-          createStore: 'exports.createStore',
+          createStore: 'vanilla.createStore',
         },
         vanilla: { default: 'vanilla', createStore: 'createStore' },
         shallow: { default: 'shallow$1', shallow: 'shallow' },
