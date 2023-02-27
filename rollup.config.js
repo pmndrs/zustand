@@ -89,7 +89,13 @@ function createCommonJSConfig(input, output, options) {
       format: 'cjs',
       esModule: false,
       outro: options.addModuleExport
-        ? ';(module.exports = (exports && exports.default) || {}),\n  Object.assign(module.exports, exports)'
+        ? [
+            `module.exports = ${options.addModuleExport.default};`,
+            ...Object.entries(options.addModuleExport)
+              .filter(([key]) => key !== 'default')
+              .map(([key, value]) => `module.exports.${key} = ${value};`),
+            `exports.default = module.exports;`,
+          ].join('\n')
         : '',
     },
     external,
@@ -186,7 +192,11 @@ module.exports = function (args) {
   return [
     ...(c === 'index' ? [createDeclarationConfig(`src/${c}.ts`, 'dist')] : []),
     createCommonJSConfig(`src/${c}.ts`, `dist/${c}`, {
-      addModuleExport: ['index', 'vanilla', 'shallow'].includes(c),
+      addModuleExport: {
+        index: { default: 'react', create: 'create', useStore: 'useStore' },
+        vanilla: { default: 'vanilla', createStore: 'createStore' },
+        shallow: { default: 'shallow', shallow: 'shallow' },
+      }[c],
     }),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
