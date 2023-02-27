@@ -108,18 +108,21 @@ function createCommonJSConfig(input, output, options) {
 }
 
 function createUMDConfig(input, output, env) {
-  const c = output.split('/').pop()
+  let name = 'zustand'
+  const fileName = output.slice('dist/umd/'.length)
+  const capitalize = (s) => s.slice(0, 1).toUpperCase() + s.slice(1)
+  if (fileName !== 'index') {
+    name += fileName.replace(/(\w+)\W*/g, (_, p) => capitalize(p))
+  }
   return {
     input,
     output: {
       file: `${output}.${env}.js`,
       format: 'umd',
-      name:
-        c === 'index'
-          ? 'zustand'
-          : `zustand${c.slice(0, 1).toUpperCase()}${c.slice(1)}`,
+      name,
       globals: {
         react: 'React',
+        immer: 'immer',
         // FIXME not yet supported
         'use-sync-external-store/shim/with-selector':
           'useSyncExternalStoreShimWithSelector',
