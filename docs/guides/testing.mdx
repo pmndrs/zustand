@@ -12,7 +12,7 @@ Thus, there can be cases where the state of one test can affect another. To make
 
 ```jsx
 import { create as actualCreate } from 'zustand'
-// const actualCreate = jest.requireActual('zustand') // if using jest
+// const { create: actualCreate } = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
 
 // a variable to hold reset functions for all stores declared in the app
@@ -40,23 +40,23 @@ In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place
 
 If you are using zustand, as documented in [TypeScript Guide](./typescript.md), use the following code:
 
-```tsx
+```typescript
 import { create as actualCreate, StateCreator } from 'zustand'
-// const actualCreate = jest.requireActual('zustand') // if using jest
+// if using Jest:
+// import { StateCreator } from 'zustand';
+// const { create: actualCreate } = jest.requireActual<typeof import('zustand')>('zustand');
 import { act } from 'react-dom/test-utils'
 
 // a variable to hold reset functions for all stores declared in the app
 const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create =
-  () =>
-  <S,>(createState: StateCreator<S>) => {
-    const store = actualCreate<S>(createState)
-    const initialState = store.getState()
-    storeResetFns.add(() => store.setState(initialState, true))
-    return store
-  }
+export const create = <S>(createState: StateCreator<S>) => {
+  const store = actualCreate(createState)
+  const initialState = store.getState()
+  storeResetFns.add(() => store.setState(initialState, true))
+  return store
+}
 
 // Reset all stores after each test run
 beforeEach(() => {
@@ -70,14 +70,14 @@ You should use the following code in the `__mocks__/zustand.js` file (the `__moc
 
 ```js
 import { act } from '@testing-library/react-native'
-const actualCreate = jest.requireActual('zustand')
+const { create: actualCreate } = jest.requireActual('zustand')
 
 // a variable to hold reset functions for all stores declared in the app
 const storeResetFns = new Set()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-const create = (createState) => {
-  const store = actualCreate.default(createState)
+export const create = (createState) => {
+  const store = actualCreate(createState)
   const initialState = store.getState()
   storeResetFns.add(() => {
     store.setState(initialState, true)
@@ -93,8 +93,6 @@ beforeEach(async () => {
     })
   )
 })
-
-export default create
 ```
 
 If the `jest.config.js` has `automock: false`, then you need to do the following in `jest.setup.js`:
