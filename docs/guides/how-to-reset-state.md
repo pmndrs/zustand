@@ -77,16 +77,16 @@ export const resetAllSlices = () => {
 Resetting bound store using Slices pattern
 
 ```ts
-import create, { StateCreator } from "zustand";
+import create, { StateCreator } from 'zustand'
 
-const resetters: (() => void)[] = [];
+const resetters: (() => void)[] = []
 
-const initialStateBear = { bears: 0 };
+const initialBearState = { bears: 0 }
 
 interface BearSlice {
-  bears: number;
-  addBear: () => void;
-  eatFish: () => void;
+  bears: number
+  addBear: () => void
+  eatFish: () => void
 }
 
 const createBearSlice: StateCreator<
@@ -95,20 +95,19 @@ const createBearSlice: StateCreator<
   [],
   BearSlice
 > = (set) => {
-  resetters.push(() => set(initialStateBear));
+  resetters.push(() => set(initialBearState))
   return {
-    ...initialStateBear,
+    ...initialBearState,
     addBear: () => set((state) => ({ bears: state.bears + 1 })),
     eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
-  };
-};
+  }
+}
 
-
-const initialStateFish = { fishes: 0 };
+const initialStateFish = { fishes: 0 }
 
 interface FishSlice {
-  fishes: number;
-  addFish: () => void;
+  fishes: number
+  addFish: () => void
 }
 
 const createFishSlice: StateCreator<
@@ -117,25 +116,21 @@ const createFishSlice: StateCreator<
   [],
   FishSlice
 > = (set) => {
-  resetters.push(() => set(initialStateFish));
+  resetters.push(() => set(initialStateFish))
   return {
     ...initialStateFish,
     addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
-  };
-};
+  }
+}
 
 const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
   ...createBearSlice(...a),
   ...createFishSlice(...a),
-}));
+}))
 
-export const resetAllSlices = () => {
-  for (const resetter of resetters) {
-    resetter();
-  }
-};
+export const resetAllSlices = () => resetters.forEach((resetter) => resetter())
 
-export default useBoundStore;
+export default useBoundStore
 ```
 
 ## CodeSandbox Demo
