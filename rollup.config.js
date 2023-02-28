@@ -193,7 +193,12 @@ module.exports = function (args) {
     ...(c === 'index' ? [createDeclarationConfig(`src/${c}.ts`, 'dist')] : []),
     createCommonJSConfig(`src/${c}.ts`, `dist/${c}`, {
       addModuleExport: {
-        index: { default: 'react', create: 'create', useStore: 'useStore' },
+        index: {
+          default: 'react',
+          create: 'create',
+          useStore: 'useStore',
+          createStore: 'vanilla.createStore',
+        },
         vanilla: { default: 'vanilla', createStore: 'createStore' },
         shallow: { default: 'shallow$1', shallow: 'shallow' },
       }[c],
