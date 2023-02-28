@@ -68,6 +68,65 @@ export const resetAllStores = () => {
 }
 ```
 
+Resetting bound store using Slices pattern
+
+```ts
+import create, { StateCreator } from 'zustand'
+
+const resetters: (() => void)[] = []
+
+const initialBearState = { bears: 0 }
+
+interface BearSlice {
+  bears: number
+  addBear: () => void
+  eatFish: () => void
+}
+
+const createBearSlice: StateCreator<
+  BearSlice & FishSlice,
+  [],
+  [],
+  BearSlice
+> = (set) => {
+  resetters.push(() => set(initialBearState))
+  return {
+    ...initialBearState,
+    addBear: () => set((state) => ({ bears: state.bears + 1 })),
+    eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
+  }
+}
+
+const initialStateFish = { fishes: 0 }
+
+interface FishSlice {
+  fishes: number
+  addFish: () => void
+}
+
+const createFishSlice: StateCreator<
+  BearSlice & FishSlice,
+  [],
+  [],
+  FishSlice
+> = (set) => {
+  resetters.push(() => set(initialStateFish))
+  return {
+    ...initialStateFish,
+    addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+  }
+}
+
+const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
+  ...createBearSlice(...a),
+  ...createFishSlice(...a),
+}))
+
+export const resetAllSlices = () => resetters.forEach((resetter) => resetter())
+
+export default useBoundStore
+```
+
 ## CodeSandbox Demo
 
 - Basic: https://codesandbox.io/s/zustand-how-to-reset-state-basic-demo-rrqyon
