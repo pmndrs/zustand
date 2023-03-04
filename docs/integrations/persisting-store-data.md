@@ -484,7 +484,7 @@ If the storage you want to use does not match the expected API, you can create y
 
 ```ts
 import { create } from 'zustand'
-import { persist, StateStorage } from 'zustand/middleware'
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware'
 import { get, set, del } from 'idb-keyval' // can use anything: IndexedDB, Ionic Storage, etc.
 
 // Custom storage object
