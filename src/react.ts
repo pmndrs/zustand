@@ -7,6 +7,7 @@ import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selec
 import { createStore } from './vanilla'
 import type {
   Mutate,
+  ReadOnlyStoreApi,
   StateCreator,
   StoreApi,
   StoreMutatorIdentifier,
@@ -16,15 +17,15 @@ const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type WithReact<S extends StoreApi<unknown>> = S & {
+type WithReact<S extends ReadOnlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
-export function useStore<S extends WithReact<StoreApi<unknown>>>(
+export function useStore<S extends WithReact<ReadOnlyStoreApi<unknown>>>(
   api: S
 ): ExtractState<S>
 
-export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
+export function useStore<S extends WithReact<ReadOnlyStoreApi<unknown>>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
   equalityFn?: (a: U, b: U) => boolean

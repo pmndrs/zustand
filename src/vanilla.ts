@@ -5,10 +5,13 @@ type SetStateInternal<T> = {
   ): void
 }['_']
 
-export interface StoreApi<T> {
-  setState: SetStateInternal<T>
+export interface ReadOnlyStoreApi<T> {
   getState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
+}
+
+export interface StoreApi<T> extends ReadOnlyStoreApi<T> {
+  setState: SetStateInternal<T>
   /**
    * @deprecated Use `unsubscribe` returned by `subscribe`
    */

@@ -1,6 +1,7 @@
 import { expect, it } from '@jest/globals'
 import { create } from 'zustand'
 import type {
+  ReadOnlyStoreApi,
   StateCreator,
   StoreApi,
   StoreMutatorIdentifier,
@@ -82,7 +83,8 @@ it('can use exposed types', () => {
     _destroy: StoreApi<ExampleState>['destroy'],
     _equalityFn: (a: ExampleState, b: ExampleState) => boolean,
     _stateCreator: StateCreator<ExampleState>,
-    _useBoundStore: UseBoundStore<StoreApi<ExampleState>>
+    _useBoundStore: UseBoundStore<StoreApi<ExampleState>>,
+    _readonlyStoreApi: ReadOnlyStoreApi<ExampleState>
   ) {
     expect(true).toBeTruthy()
   }
@@ -99,7 +101,8 @@ it('can use exposed types', () => {
     storeApi.destroy,
     equalityFn,
     stateCreator,
-    useBoundStore
+    useBoundStore,
+    { getState: storeApi.getState, subscribe: storeApi.subscribe }
   )
 })
 
