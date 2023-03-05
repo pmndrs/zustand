@@ -76,6 +76,15 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
         replace ?? typeof nextState !== 'object'
           ? (nextState as TState)
           : Object.assign({}, state, nextState)
+      // copy getters
+      if (typeof state === 'object' && state !== null) {
+        for (const key in previousState) {
+          const descriptor = Object.getOwnPropertyDescriptor(previousState, key)
+          if (descriptor?.get) {
+            Reflect.defineProperty(state, key, descriptor)
+          }
+        }
+      }
       listeners.forEach((listener) => listener(state, previousState))
     }
   }

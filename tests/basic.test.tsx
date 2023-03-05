@@ -684,3 +684,19 @@ it('works with non-object state', async () => {
   fireEvent.click(getByText('button'))
   await findByText('count: 2')
 })
+
+it('can use the store with getters', () => {
+  const { setState, getState } = create<{
+    value: number
+    readonly double: number
+  }>((_set, get) => ({
+    value: 1,
+    get double() {
+      return get().value * 2
+    },
+  }))
+
+  expect(getState()).toEqual({ value: 1, double: 2 })
+  setState({ value: 2 })
+  expect(getState()).toEqual({ value: 2, double: 4 })
+})
