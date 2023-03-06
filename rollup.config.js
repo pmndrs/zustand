@@ -10,10 +10,7 @@ const createBabelConfig = require('./babel.config.js')
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
-const entries = [
-  { find: /.*\/index\.ts$/, replacement: 'zustand' },
-  { find: /.*\/vanilla\.ts$/, replacement: 'zustand/vanilla' },
-]
+const entries = [{ find: /.*\/vanilla\.ts$/, replacement: 'zustand/vanilla' }]
 
 function external(id) {
   return !id.startsWith('.') && !id.startsWith(root)
