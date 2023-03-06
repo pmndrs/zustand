@@ -16,7 +16,9 @@ const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type WithReact<S extends StoreApi<unknown>> = S & {
+type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
+
+type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
@@ -46,7 +48,7 @@ export function useStore<TState, StateSlice>(
   return slice
 }
 
-export type UseBoundStore<S extends WithReact<StoreApi<unknown>>> = {
+export type UseBoundStore<S extends WithReact<ReadonlyStoreApi<unknown>>> = {
   (): ExtractState<S>
   <U>(
     selector: (state: ExtractState<S>) => U,

@@ -234,3 +234,17 @@ it('StateCreator subtyping', () => {
   const _testSubtyping: StateCreator<State, [['zustand/persist', unknown]]> =
     {} as StateCreator<State, []>
 })
+
+it('set state exists on store with readonly store', () => {
+  interface State {
+    count: number
+    increment: () => void
+  }
+
+  const useStore = create<State>()((set, get) => ({
+    count: 0,
+    increment: () => set({ count: get().count + 1 }),
+  }))
+
+  useStore.setState((state) => ({ ...state, count: state.count + 1 }))
+})
