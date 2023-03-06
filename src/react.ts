@@ -3,14 +3,15 @@ import { useDebugValue } from 'react'
 // This doesn't work in ESM, because use-sync-external-store only exposes CJS.
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
+// eslint-disable-next-line import/extensions
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
-import { createStore } from './vanilla'
+import { createStore } from './vanilla.ts'
 import type {
   Mutate,
   StateCreator,
   StoreApi,
   StoreMutatorIdentifier,
-} from './vanilla'
+} from './vanilla.ts'
 
 const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 

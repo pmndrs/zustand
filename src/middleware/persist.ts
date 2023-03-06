@@ -1,4 +1,8 @@
-import type { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
+import type {
+  StateCreator,
+  StoreApi,
+  StoreMutatorIdentifier,
+} from '../vanilla.ts'
 
 export interface StateStorage {
   getItem: (name: string) => string | null | Promise<string | null>

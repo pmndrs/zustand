@@ -36,6 +36,7 @@
     "prefer-const": "error",
     "curly": ["warn", "multi-line", "consistent"],
     "no-console": "off",
+    "import/extensions": ["error", "always"],
     "import/no-unresolved": ["error", { "commonjs": true, "amd": true }],
     "import/export": "error",
     "@typescript-eslint/no-duplicate-imports": ["error"],
@@ -93,12 +94,8 @@
       "@typescript-eslint/parser": [".js", ".jsx", ".ts", ".tsx"]
     },
     "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"],
-        "paths": ["src"]
-      },
       "alias": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
         "map": [
           ["^zustand$", "./src/index.ts"],
           ["zustand", "./src"]
@@ -108,9 +105,9 @@
   },
   "overrides": [
     {
-      "files": ["src"],
-      "parserOptions": {
-        "project": "./tsconfig.json"
+      "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+      "rules": {
+        "import/extensions": ["error", "never"]
       }
     },
     {

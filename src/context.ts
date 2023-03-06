@@ -6,8 +6,8 @@ import {
   useRef,
 } from 'react'
 import type { ReactNode } from 'react'
-import { useStore } from 'zustand'
-import type { StoreApi } from 'zustand'
+import { useStore } from './index.ts'
+import type { StoreApi } from './index.ts'
 
 type UseContextStore<S extends StoreApi<unknown>> = {
   (): ExtractState<S>

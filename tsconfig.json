@@ -6,6 +6,7 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "baseUrl": ".",

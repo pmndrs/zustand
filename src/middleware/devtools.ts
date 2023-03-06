@@ -1,5 +1,9 @@
 import type {} from '@redux-devtools/extension'
-import type { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
+import type {
+  StateCreator,
+  StoreApi,
+  StoreMutatorIdentifier,
+} from '../vanilla.ts'
 
 // Copy types to avoid import type { Config } from '@redux-devtools/extension'
 // https://github.com/pmndrs/zustand/issues/1205
