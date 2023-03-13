@@ -14,8 +14,8 @@ import { persist, StateStorage, createJSONStorage } from 'zustand/middleware'
 const hashStorage: StateStorage = {
   getItem: (key): string => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
-    const storedValue = searchParams.get(key)
-    return storedValue ? JSON.parse(storedValue) : ''
+    const storedValue = searchParams.get(key) ?? ''
+    return storedValue
   },
   setItem: (key, newValue): void => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
@@ -45,4 +45,4 @@ export const useBoundStore = create(
 
 ## CodeSandbox Demo
 
-[https://codesandbox.io/s/silly-fire-gsjbc7?file=/src/App.tsx](https://codesandbox.io/s/zustand-state-with-url-hash-demo-pn20n5?file=/src/store/index.ts:1182-1227)
+https://codesandbox.io/s/zustand-state-with-url-hash-demo-pn20n5?file=/src/store/index.ts
