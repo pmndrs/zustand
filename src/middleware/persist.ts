@@ -455,6 +455,13 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         // state is used. However, this could be a breaking change, so this isn't being
         // done now.
         postRehydrationCallback?.(stateFromStorage, undefined)
+
+        // It's possible that 'postRehydrationCallback' updated the state. To ensure
+        // that isn't overwritten when returning 'stateFromStorage' below
+        // (synchronous-case only), update 'stateFromStorage' to point to the latest
+        // state. In the asynchronous case, 'stateFromStorage' isn't used after this
+        // callback, so there's no harm in updating it to match the latest state.
+        stateFromStorage = get()
         hasHydrated = true
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
