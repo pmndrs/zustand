@@ -226,6 +226,30 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
+  it('passes the latest state to onRehydrateStorage', () => {
+    const onRehydrateStorageSpy =
+      jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
+
+    const storage = {
+      getItem: () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: onRehydrateStorageSpy,
+      })
+    )
+
+    // The 'onRehydrateStorage' spy is invoked prior to rehydration, so it should
+    // be passed the default state.
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
+    expect(useBoundStore.getState()).toEqual({ count: 1 })
+  })
+
   it('gives the merged state to onRehydrateStorage', () => {
     const onRehydrateStorageSpy = jest.fn()
 

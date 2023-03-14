@@ -385,6 +385,44 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
+  it('passes the latest state to onRehydrateStorage', async () => {
+    const onRehydrateStorageSpy =
+      jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
+
+    const storage = {
+      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: onRehydrateStorageSpy,
+      })
+    )
+
+    function Counter() {
+      const { count } = useBoundStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
+
+    await findByText('count: 1')
+
+    // The 'onRehydrateStorage' spy is invoked prior to rehydration, so it should
+    // be passed the default state.
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
+    })
+  })
+
   it('gives the merged state to onRehydrateStorage', async () => {
     const onRehydrateStorageSpy = jest.fn()
 
