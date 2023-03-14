@@ -548,4 +548,28 @@ describe('persist middleware with sync configuration', () => {
     expect(onFinishHydrationSpy1).not.toBeCalledTimes(2)
     expect(onFinishHydrationSpy2).toBeCalledWith({ count: 2 })
   })
+
+  it('handles state updates during onRehydrateStorage', () => {
+    const storage = {
+      getItem: () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create<{ count: number; inc: () => void }>()(
+      persist(
+        (set) => ({
+          count: 0,
+          inc: () => set((s) => ({ count: s.count + 1 })),
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage),
+          onRehydrateStorage: () => (s) => s?.inc(),
+        }
+      )
+    )
+
+    expect(useBoundStore.getState().count).toEqual(2)
+  })
 })
