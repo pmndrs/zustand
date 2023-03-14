@@ -226,7 +226,7 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
-  it('passes the latest state to onRehydrateStorage', () => {
+  it('passes the latest state to onRehydrateStorage and onHydrate on first hydrate', () => {
     const onRehydrateStorageSpy =
       jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
 
@@ -244,8 +244,19 @@ describe('persist middleware with sync configuration', () => {
       })
     )
 
-    // The 'onRehydrateStorage' spy is invoked prior to rehydration, so it should
-    // be passed the default state.
+    /**
+     * NOTE: It's currently not possible to add an 'onHydrate' listener which will be
+     * invoked prior to the first hydration. This is because, during first hydration,
+     * the 'onHydrate' listener set (which will be empty) is evaluated before the
+     * 'persist' API is exposed to the caller of 'create'/'createStore'.
+     *
+     * const onHydrateSpy = jest.fn()
+     * useBoundStore.persist.onHydrate(onHydrateSpy)
+     * expect(onHydrateSpy).toBeCalledWith({ count: 0 })
+     */
+
+    // The 'onRehydrateStorage' and 'onHydrate' spies are invoked prior to rehydration,
+    // so they should both be passed the default state.
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
     expect(useBoundStore.getState()).toEqual({ count: 1 })
   })
