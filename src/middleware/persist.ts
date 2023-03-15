@@ -257,16 +257,11 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   const hydrate = () => {
     if (!storage) return
 
-    // On the first invocation of 'hydrate', state will not yet be defined (this is
-    // true for both the 'asynchronous' and 'synchronous' case). Pass 'configResult'
-    // as a backup  to 'get()' so listeners and 'onRehydrateStorage' are called with
-    // the latest available state.
-
     hasHydrated = false
-    hydrationListeners.forEach((cb) => cb(get() ?? configResult))
+    hydrationListeners.forEach((cb) => cb(get()))
 
     const postRehydrationCallback =
-      options.onRehydrateStorage?.(get() ?? configResult) || undefined
+      options.onRehydrateStorage?.(get()) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
     return toThenable(storage.getItem.bind(storage))(options.name)
