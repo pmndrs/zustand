@@ -215,7 +215,7 @@
     "rollup-plugin-esbuild": "^5.0.0",
     "shx": "^0.3.4",
     "ts-jest": "^29.0.5",
-    "typescript": "^5.0.1-rc"
+    "typescript": "^5.0.2"
   },
   "peerDependencies": {
     "immer": ">=9.0",
