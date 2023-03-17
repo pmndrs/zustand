@@ -7,7 +7,6 @@
     "module": "esnext",
     "moduleResolution": "nodenext",
     "skipLibCheck": true /* FIXME remove this once redux fixes it */,
-    "allowJs": true,
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
