@@ -56,6 +56,8 @@ jobs:
           yarn add -D typescript@4.9.5
           sed -i~ 's/"moduleResolution": "nodenext",/"moduleResolution": "node",/' tsconfig.json
           sed -i~ 's/"allowImportingTsExtensions": true,//' tsconfig.json
+          sed -i~ 's/"zustand": \["\.\/src\/index\.ts"\],/"zustand": [".\/dist\/ts3.4\/index.d.ts"],/' tsconfig.json
+          sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/ts3.4\/*.d.ts"]/' tsconfig.json
       - name: Test ${{ matrix.react }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
