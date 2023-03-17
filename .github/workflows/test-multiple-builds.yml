@@ -53,8 +53,6 @@ jobs:
         run: |
           sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/${BUILD}\1.${NODE_ENV}.js/" package.json
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest --no-coverage",/' package.json
-          sed -i~ 's/"preset"/"DISABLED_preset"/' package.json
-          sed -i~ 's/"transform"/"DISABLED_transform"/' package.json
         env:
           BUILD: ${{ matrix.build }}
           NODE_ENV: ${{ matrix.env }}
