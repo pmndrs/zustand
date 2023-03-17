@@ -53,9 +53,6 @@ jobs:
           sed -i~ 's/"jsx": "react-jsx"/"jsx": "react"/' tsconfig.json
           sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest --no-coverage",/' package.json
-          yarn add -D typescript@4.9.5
-          sed -i~ 's/"moduleResolution": "nodenext",/"moduleResolution": "node",/' tsconfig.json
-          sed -i~ 's/"allowImportingTsExtensions": true,//' tsconfig.json
       - name: Test ${{ matrix.react }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
