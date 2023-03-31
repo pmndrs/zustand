@@ -269,7 +269,8 @@ export const useBoundStore = create(
 
 By default the store with be hydrated on initialization.
 
-In some applications you may need to control when the first hydration occurs. For example in server rendered apps.
+In some applications you may need to control when the first hydration occurs.
+For example, in server-rendered apps.
 
 If you set `skipHydration` the initial call for hydration isn't called,
 and it is left up to you to manually call `reHydrate()`.
