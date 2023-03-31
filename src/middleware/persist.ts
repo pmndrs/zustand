@@ -123,6 +123,16 @@ export interface PersistOptions<S, PersistedState = S> {
    * By default, this function does a shallow merge.
    */
   merge?: (persistedState: unknown, currentState: S) => S
+
+  /**
+   * An optional boolean that will prevent the persist middleware from triggering hydration on initialization,
+   * This allows you to call `rehydrate()` at a specific point in your apps rendering life-cycle.
+   *
+   * This is useful in SSR application.
+   *
+   * @default false
+   */
+  skipHydration?: boolean
 }
 
 type PersistListener<S> = (state: S) => void
@@ -415,11 +425,16 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   const hydrate = () => {
     if (!storage) return
 
+    // On the first invocation of 'hydrate', state will not yet be defined (this is
+    // true for both the 'asynchronous' and 'synchronous' case). Pass 'configResult'
+    // as a backup  to 'get()' so listeners and 'onRehydrateStorage' are called with
+    // the latest available state.
+
     hasHydrated = false
-    hydrationListeners.forEach((cb) => cb(get()))
+    hydrationListeners.forEach((cb) => cb(get() ?? configResult))
 
     const postRehydrationCallback =
-      options.onRehydrateStorage?.(get()) || undefined
+      options.onRehydrateStorage?.(get() ?? configResult) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
     return toThenable(storage.getItem.bind(storage))(options.name)
@@ -453,7 +468,19 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         return setItem()
       })
       .then(() => {
+        // TODO: In the asynchronous case, it's possible that the state has changed
+        // since it was set in the prior callback. As such, it would be better to
+        // pass 'get()' to the 'postRehydrationCallback' to ensure the most up-to-date
+        // state is used. However, this could be a breaking change, so this isn't being
+        // done now.
         postRehydrationCallback?.(stateFromStorage, undefined)
+
+        // It's possible that 'postRehydrationCallback' updated the state. To ensure
+        // that isn't overwritten when returning 'stateFromStorage' below
+        // (synchronous-case only), update 'stateFromStorage' to point to the latest
+        // state. In the asynchronous case, 'stateFromStorage' isn't used after this
+        // callback, so there's no harm in updating it to match the latest state.
+        stateFromStorage = get()
         hasHydrated = true
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
@@ -495,7 +522,9 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     },
   }
 
-  hydrate()
+  if (!options.skipHydration) {
+    hydrate()
+  }
 
   return stateFromStorage || configResult
 }

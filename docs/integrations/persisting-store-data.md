@@ -261,6 +261,50 @@ export const useBoundStore = create(
 )
 ```
 
+### `skipHydration`
+
+> Type: `boolean | undefined`
+
+> Default: `undefined`
+
+By default the store with be hydrated on initialization.
+
+In some applications you may need to control when the first hydration occurs.
+For example, in server-rendered apps.
+
+If you set `skipHydration`, the initial call for hydration isn't called,
+and it is left up to you to manually call `reHydrate()`.
+
+```ts
+export const useBoundStore = create(
+  persist(
+    () => ({
+      count: 0,
+      // ...
+    }),
+    {
+      // ...
+      skipHydration: true,
+    }
+  )
+)
+```
+
+```tsx
+export function StoreConsumer(){
+  const store = useBoundStore();
+
+  // hydrate persisted store after on mount
+  useEffect(() => {
+    store.persist.reHydrate();
+  }, [])
+
+  return (
+    //...
+  )
+}
+```
+
 ## API
 
 > Version: >=3.6.3

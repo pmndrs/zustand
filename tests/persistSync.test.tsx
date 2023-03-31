@@ -226,6 +226,41 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
+  it('passes the latest state to onRehydrateStorage and onHydrate on first hydrate', () => {
+    const onRehydrateStorageSpy =
+      jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
+
+    const storage = {
+      getItem: () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: onRehydrateStorageSpy,
+      })
+    )
+
+    /**
+     * NOTE: It's currently not possible to add an 'onHydrate' listener which will be
+     * invoked prior to the first hydration. This is because, during first hydration,
+     * the 'onHydrate' listener set (which will be empty) is evaluated before the
+     * 'persist' API is exposed to the caller of 'create'/'createStore'.
+     *
+     * const onHydrateSpy = jest.fn()
+     * useBoundStore.persist.onHydrate(onHydrateSpy)
+     * expect(onHydrateSpy).toBeCalledWith({ count: 0 })
+     */
+
+    // The 'onRehydrateStorage' and 'onHydrate' spies are invoked prior to rehydration,
+    // so they should both be passed the default state.
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
+    expect(useBoundStore.getState()).toEqual({ count: 1 })
+  })
+
   it('gives the merged state to onRehydrateStorage', () => {
     const onRehydrateStorageSpy = jest.fn()
 
@@ -547,5 +582,80 @@ describe('persist middleware with sync configuration', () => {
     expect(onHydrateSpy2).toBeCalledWith({ count: 1 })
     expect(onFinishHydrationSpy1).not.toBeCalledTimes(2)
     expect(onFinishHydrationSpy2).toBeCalledWith({ count: 2 })
+  })
+
+  it('can skip initial hydration', async () => {
+    const storage = {
+      getItem: (name: string) => ({
+        state: { count: 42, name },
+        version: 0,
+      }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const onRehydrateStorageSpy = jest.fn()
+    const useBoundStore = create(
+      persist(
+        () => ({
+          count: 0,
+          name: 'empty',
+        }),
+        {
+          name: 'test-storage',
+          storage: storage,
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+          skipHydration: true,
+        }
+      )
+    )
+
+    expect(useBoundStore.getState()).toEqual({
+      count: 0,
+      name: 'empty',
+    })
+
+    // Because `skipHydration` is only in newImpl and the hydration function for newImpl is now a promise
+    // In the default case we would need to await `onFinishHydration` to assert the auto hydration has completed
+    // As we are testing the skip hydration case we await nextTick, to make sure the store is initialised
+    await new Promise((resolve) => process.nextTick(resolve))
+
+    // Asserting store hasn't hydrated from nextTick
+    expect(useBoundStore.persist.hasHydrated()).toBe(false)
+
+    await useBoundStore.persist.rehydrate()
+
+    expect(useBoundStore.getState()).toEqual({
+      count: 42,
+      name: 'test-storage',
+    })
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { count: 42, name: 'test-storage' },
+      undefined
+    )
+  })
+
+  it('handles state updates during onRehydrateStorage', () => {
+    const storage = {
+      getItem: () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create<{ count: number; inc: () => void }>()(
+      persist(
+        (set) => ({
+          count: 0,
+          inc: () => set((s) => ({ count: s.count + 1 })),
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage),
+          onRehydrateStorage: () => (s) => s?.inc(),
+        }
+      )
+    )
+
+    expect(useBoundStore.getState().count).toEqual(2)
   })
 })

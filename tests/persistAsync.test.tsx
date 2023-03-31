@@ -385,6 +385,56 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
+  it('passes the latest state to onRehydrateStorage and onHydrate on first hydrate', async () => {
+    const onRehydrateStorageSpy =
+      jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
+
+    const storage = {
+      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: onRehydrateStorageSpy,
+      })
+    )
+
+    /**
+     * NOTE: It's currently not possible to add an 'onHydrate' listener which will be
+     * invoked prior to the first hydration. This is because, during first hydration,
+     * the 'onHydrate' listener set (which will be empty) is evaluated before the
+     * 'persist' API is exposed to the caller of 'create'/'createStore'.
+     *
+     * const onHydrateSpy = jest.fn()
+     * useBoundStore.persist.onHydrate(onHydrateSpy)
+     * ...
+     * await waitFor(() => expect(onHydrateSpy).toBeCalledWith({ count: 0 }))
+     */
+
+    function Counter() {
+      const { count } = useBoundStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
+
+    await findByText('count: 1')
+
+    // The 'onRehydrateStorage' spy is invoked prior to rehydration, so it should
+    // be passed the default state.
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
+    })
+  })
+
   it('gives the merged state to onRehydrateStorage', async () => {
     const onRehydrateStorageSpy = jest.fn()
 
@@ -560,5 +610,92 @@ describe('persist middleware with async configuration', () => {
 
     await useBoundStore.persist.rehydrate()
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
+  })
+
+  it('can skip initial hydration', async () => {
+    const storage = {
+      getItem: async (name: string) => ({
+        state: { count: 42, name },
+        version: 0,
+      }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const onRehydrateStorageSpy = jest.fn()
+    const useBoundStore = create(
+      persist(
+        () => ({
+          count: 0,
+          name: 'empty',
+        }),
+        {
+          name: 'test-storage',
+          storage: storage,
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+          skipHydration: true,
+        }
+      )
+    )
+
+    expect(useBoundStore.getState()).toEqual({
+      count: 0,
+      name: 'empty',
+    })
+
+    // Because `skipHydration` is only in newImpl and the hydration function for newImpl is now a promise
+    // In the default case we would need to await `onFinishHydration` to assert the auto hydration has completed
+    // As we are testing the skip hydration case we await nextTick, to make sure the store is initialised
+    await new Promise((resolve) => process.nextTick(resolve))
+
+    // Asserting store hasn't hydrated from nextTick
+    expect(useBoundStore.persist.hasHydrated()).toBe(false)
+
+    await useBoundStore.persist.rehydrate()
+
+    expect(useBoundStore.getState()).toEqual({
+      count: 42,
+      name: 'test-storage',
+    })
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { count: 42, name: 'test-storage' },
+      undefined
+    )
+  })
+
+  it('handles state updates during onRehydrateStorage', async () => {
+    const storage = {
+      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create<{ count: number; inc: () => void }>()(
+      persist(
+        (set) => ({
+          count: 0,
+          inc: () => set((s) => ({ count: s.count + 1 })),
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage),
+          onRehydrateStorage: () => (s) => s?.inc(),
+        }
+      )
+    )
+
+    function Counter() {
+      const { count } = useBoundStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
+
+    await findByText('count: 2')
+    expect(useBoundStore.getState().count).toEqual(2)
   })
 })
