@@ -119,6 +119,16 @@ export interface PersistOptions<S, PersistedState = S> {
    * By default, this function does a shallow merge.
    */
   merge?: (persistedState: unknown, currentState: S) => S
+
+  /**
+   * An optional boolean that will prevent the persist middleware from triggering hydration on initialization,
+   * This allows you to call `rehydrate()` at a specific point in your apps rendering life-cycle.
+   *
+   * This is useful in SSR application.
+   *
+   * @default false
+   */
+  skipHydration?: boolean
 }
 
 type PersistListener<S> = (state: S) => void
@@ -491,7 +501,9 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     },
   }
 
-  hydrate()
+  if (!options.skipHydration) {
+    hydrate()
+  }
 
   return stateFromStorage || configResult
 }

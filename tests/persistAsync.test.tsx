@@ -561,4 +561,55 @@ describe('persist middleware with async configuration', () => {
     await useBoundStore.persist.rehydrate()
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
   })
+
+  it('can skip initial hydration', async () => {
+    const storage = {
+      getItem: async (name: string) => ({
+        state: { count: 42, name },
+        version: 0,
+      }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const onRehydrateStorageSpy = jest.fn()
+    const useBoundStore = create(
+      persist(
+        () => ({
+          count: 0,
+          name: 'empty',
+        }),
+        {
+          name: 'test-storage',
+          storage: storage,
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+          skipHydration: true,
+        }
+      )
+    )
+
+    expect(useBoundStore.getState()).toEqual({
+      count: 0,
+      name: 'empty',
+    })
+
+    // Because `skipHydration` is only in newImpl and the hydration function for newImpl is now a promise
+    // In the default case we would need to await `onFinishHydration` to assert the auto hydration has completed
+    // As we are testing the skip hydration case we await nextTick, to make sure the store is initialised
+    await new Promise((resolve) => process.nextTick(resolve))
+
+    // Asserting store hasn't hydrated from nextTick
+    expect(useBoundStore.persist.hasHydrated()).toBe(false)
+
+    await useBoundStore.persist.rehydrate()
+
+    expect(useBoundStore.getState()).toEqual({
+      count: 42,
+      name: 'test-storage',
+    })
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { count: 42, name: 'test-storage' },
+      undefined
+    )
+  })
 })
