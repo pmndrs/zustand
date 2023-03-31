@@ -612,4 +612,40 @@ describe('persist middleware with async configuration', () => {
       undefined
     )
   })
+
+  it('handles state updates during onRehydrateStorage', async () => {
+    const storage = {
+      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create<{ count: number; inc: () => void }>()(
+      persist(
+        (set) => ({
+          count: 0,
+          inc: () => set((s) => ({ count: s.count + 1 })),
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage),
+          onRehydrateStorage: () => (s) => s?.inc(),
+        }
+      )
+    )
+
+    function Counter() {
+      const { count } = useBoundStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
+
+    await findByText('count: 2')
+    expect(useBoundStore.getState().count).toEqual(2)
+  })
 })
