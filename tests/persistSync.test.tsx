@@ -549,7 +549,6 @@ describe('persist middleware with sync configuration', () => {
     expect(onFinishHydrationSpy2).toBeCalledWith({ count: 2 })
   })
 
-
   it('can skip initial hydration', async () => {
     const storage = {
       getItem: (name: string) => ({
