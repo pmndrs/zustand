@@ -385,6 +385,56 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
+  it('passes the latest state to onRehydrateStorage and onHydrate on first hydrate', async () => {
+    const onRehydrateStorageSpy =
+      jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
+
+    const storage = {
+      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: onRehydrateStorageSpy,
+      })
+    )
+
+    /**
+     * NOTE: It's currently not possible to add an 'onHydrate' listener which will be
+     * invoked prior to the first hydration. This is because, during first hydration,
+     * the 'onHydrate' listener set (which will be empty) is evaluated before the
+     * 'persist' API is exposed to the caller of 'create'/'createStore'.
+     *
+     * const onHydrateSpy = jest.fn()
+     * useBoundStore.persist.onHydrate(onHydrateSpy)
+     * ...
+     * await waitFor(() => expect(onHydrateSpy).toBeCalledWith({ count: 0 }))
+     */
+
+    function Counter() {
+      const { count } = useBoundStore()
+      return <div>count: {count}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>
+    )
+
+    await findByText('count: 1')
+
+    // The 'onRehydrateStorage' spy is invoked prior to rehydration, so it should
+    // be passed the default state.
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
+    })
+  })
+
   it('gives the merged state to onRehydrateStorage', async () => {
     const onRehydrateStorageSpy = jest.fn()
 
