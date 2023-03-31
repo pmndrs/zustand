@@ -126,7 +126,7 @@ export interface PersistOptions<S, PersistedState = S> {
    *
    * This is useful in SSR application.
    *
-   * @default undefined
+   * @default false
    */
   skipHydration?: boolean
 }
