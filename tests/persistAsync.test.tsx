@@ -611,6 +611,7 @@ describe('persist middleware with async configuration', () => {
       { count: 42, name: 'test-storage' },
       undefined
     )
+  })
 
   it('handles state updates during onRehydrateStorage', async () => {
     const storage = {

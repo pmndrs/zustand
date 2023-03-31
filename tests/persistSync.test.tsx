@@ -598,6 +598,7 @@ describe('persist middleware with sync configuration', () => {
       { count: 42, name: 'test-storage' },
       undefined
     )
+  })
 
   it('handles state updates during onRehydrateStorage', () => {
     const storage = {
