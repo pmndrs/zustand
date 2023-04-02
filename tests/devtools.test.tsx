@@ -931,8 +931,6 @@ describe('when redux connection was called on multiple stores with `name` provid
       }>
 
       it('works as expected', async () => {
-        const { devtools, redux } = await import('zustand/middleware')
-        const { createStore } = await import('zustand/vanilla')
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         api1 = createStore(
