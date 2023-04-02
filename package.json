@@ -167,9 +167,6 @@
     "collectCoverageFrom": [
       "src/**/*.{js,ts,tsx}",
       "tests/**/*.{js,ts,tsx}"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/tests/devtools.test.tsx"
     ]
   },
   "dependencies": {
