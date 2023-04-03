@@ -35,12 +35,6 @@ jobs:
           - 18.2.0
           - 18.3.0-next-1308e49a6-20230330
           - 0.0.0-experimental-1308e49a6-20230330
-        devtools-skip:
-          - CI-MATRIX-[2345]
-          - CI-MATRIX-[1345]
-          - CI-MATRIX-[1245]
-          - CI-MATRIX-[1235]
-          - CI-MATRIX-[1234]
         include:
           - react: 16.8.0
             devtools-skip: CI-MATRIX-[2345]
