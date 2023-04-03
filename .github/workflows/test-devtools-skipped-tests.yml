@@ -1,0 +1,49 @@
+name: Test Devtools Skipped Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - name: Test Default
+        run: yarn test:ci
+
+  test_matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - CI-ONLY-1
+          - CI-ONLY-2
+          - CI-ONLY-3
+          - CI-ONLY-4
+          - CI-ONLY-5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: yarn
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - run: yarn install --frozen-lockfile --check-files
+      - name: Patch for skipped tests
+        run: |
+          sed -i~ "s/it\.skip('\[${TAG}\]/it('/" tests/devtools.test.tsx
+        env:
+          TAG: ${{ matrix.tag }}
+      - name: Test ${{ matrix.tag }}
+        run: |
+          yarn test:ci tests/devtools.test.tsx
