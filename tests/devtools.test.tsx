@@ -730,13 +730,19 @@ describe('when redux connection was called on multiple stores with `name` undefi
     // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
     // Relevant issues https://github.com/nodejs/node/issues/35889
     it.skip('[CI-ONLY-1] should create single connection for all indernal calls of .connect and `store` is not passed to .connect', async () => {
+      const { devtools: newDevtools } = await import('zustand/middleware')
+
       const options1 = { store: 'store1123', foo: 'bar1' }
       const options2 = { store: 'store2313132', foo: 'bar2' }
       const initialState1 = { count: 0 }
       const initialState2 = { count1: 1 }
 
-      createStore(devtools(() => initialState1, { enabled: true, ...options1 }))
-      createStore(devtools(() => initialState2, { enabled: true, ...options2 }))
+      createStore(
+        newDevtools(() => initialState1, { enabled: true, ...options1 })
+      )
+      createStore(
+        newDevtools(() => initialState2, { enabled: true, ...options2 })
+      )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
       expect(extensionConnector.connect).toHaveBeenCalledWith({
@@ -747,13 +753,19 @@ describe('when redux connection was called on multiple stores with `name` undefi
     // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
     // Relevant issues https://github.com/nodejs/node/issues/35889
     it.skip('[CI-ONLY-2] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+      const { devtools: newDevtools } = await import('zustand/middleware')
+
       const options1 = { store: 'store12' }
       const options2 = { store: 'store21' }
       const initialState1 = { count1: 0 }
       const initialState2 = { count2: 1 }
 
-      createStore(devtools(() => initialState1, { enabled: true, ...options1 }))
-      createStore(devtools(() => initialState2, { enabled: true, ...options2 }))
+      createStore(
+        newDevtools(() => initialState1, { enabled: true, ...options1 })
+      )
+      createStore(
+        newDevtools(() => initialState2, { enabled: true, ...options2 })
+      )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
       const [connection] = getNamedConnectionApis(undefined)
@@ -837,6 +849,7 @@ describe('when redux connection was called on multiple stores with `name` provid
     // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
     // Relevant issues https://github.com/nodejs/node/issues/35889
     it.skip('[CI-ONLY-3] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+      const { devtools: newDevtools } = await import('zustand/middleware')
       const connectionNameGroup1 = 'test1'
       const connectionNameGroup2 = 'test2'
       const options1 = {
@@ -864,10 +877,18 @@ describe('when redux connection was called on multiple stores with `name` provid
       const initialState3 = { count: 5 }
       const initialState4 = { count: 7 }
 
-      createStore(devtools(() => initialState1, { enabled: true, ...options1 }))
-      createStore(devtools(() => initialState2, { enabled: true, ...options2 }))
-      createStore(devtools(() => initialState3, { enabled: true, ...options3 }))
-      createStore(devtools(() => initialState4, { enabled: true, ...options4 }))
+      createStore(
+        newDevtools(() => initialState1, { enabled: true, ...options1 })
+      )
+      createStore(
+        newDevtools(() => initialState2, { enabled: true, ...options2 })
+      )
+      createStore(
+        newDevtools(() => initialState3, { enabled: true, ...options3 })
+      )
+      createStore(
+        newDevtools(() => initialState4, { enabled: true, ...options4 })
+      )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(2)
       const [connection1, connection2] = getNamedConnectionApis(
@@ -2341,6 +2362,8 @@ describe('when create devtools was called multiple times with `name` and `store`
         // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
         // Relevant issues https://github.com/nodejs/node/issues/35889
         it.skip('[CI-ONLY-4] does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
+          const { devtools: newDevtools } = await import('zustand/middleware')
+
           const name1 = 'name1'
           const name2 = 'name2'
           const store1 = 'someStore1'
@@ -2358,10 +2381,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            devtools(() => initialState1, { enabled: true, ...options1 })
+            newDevtools(() => initialState1, { enabled: true, ...options1 })
           )
           const api2 = createStore(
-            devtools(() => initialState2, { enabled: true, ...options2 })
+            newDevtools(() => initialState2, { enabled: true, ...options2 })
           )
           ;(api1 as any).dispatch = jest.fn()
           ;(api2 as any).dispatch = jest.fn()
@@ -2389,6 +2412,7 @@ describe('when create devtools was called multiple times with `name` and `store`
         // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
         // Relevant issues https://github.com/nodejs/node/issues/35889
         it.skip('[CI-ONLY-5] dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
+          const { devtools: newDevtools } = await import('zustand/middleware')
           const name1 = 'name1'
           const name2 = 'name2'
           const store1 = 'someStore1'
@@ -2406,10 +2430,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            devtools(() => initialState1, { enabled: true, ...options1 })
+            newDevtools(() => initialState1, { enabled: true, ...options1 })
           )
           const api2 = createStore(
-            devtools(() => initialState2, { enabled: true, ...options2 })
+            newDevtools(() => initialState2, { enabled: true, ...options2 })
           )
           ;(api1 as any).dispatch = jest.fn()
           ;(api1 as any).dispatchFromDevtools = true
