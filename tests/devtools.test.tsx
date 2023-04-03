@@ -727,9 +727,9 @@ describe('when redux connection was called on multiple stores with `name` undefi
   })
 
   describe('when `store` property was provided in `devtools` call in options', () => {
-    // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
     // Relevant issues https://github.com/nodejs/node/issues/35889
-    it.skip('[CI-ONLY-1] should create single connection for all indernal calls of .connect and `store` is not passed to .connect', async () => {
+    it('[CI-MATRIX-1] should create single connection for all indernal calls of .connect and `store` is not passed to .connect', async () => {
       const { devtools: newDevtools } = await import('zustand/middleware')
 
       const options1 = { store: 'store1123', foo: 'bar1' }
@@ -750,9 +750,9 @@ describe('when redux connection was called on multiple stores with `name` undefi
       })
     })
 
-    // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
     // Relevant issues https://github.com/nodejs/node/issues/35889
-    it.skip('[CI-ONLY-2] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+    it('[CI-MATRIX-2] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
       const { devtools: newDevtools } = await import('zustand/middleware')
 
       const options1 = { store: 'store12' }
@@ -846,9 +846,9 @@ describe('when redux connection was called on multiple stores with `name` provid
       })
     })
 
-    // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
     // Relevant issues https://github.com/nodejs/node/issues/35889
-    it.skip('[CI-ONLY-3] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+    it('[CI-MATRIX-3] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
       const { devtools: newDevtools } = await import('zustand/middleware')
       const connectionNameGroup1 = 'test1'
       const connectionNameGroup2 = 'test2'
@@ -2359,9 +2359,9 @@ describe('when create devtools was called multiple times with `name` and `store`
           console.error = originalConsoleError
         })
 
-        // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+        // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
         // Relevant issues https://github.com/nodejs/node/issues/35889
-        it.skip('[CI-ONLY-4] does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
+        it('[CI-MATRIX-4] does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
           const { devtools: newDevtools } = await import('zustand/middleware')
 
           const name1 = 'name1'
@@ -2409,9 +2409,9 @@ describe('when create devtools was called multiple times with `name` and `store`
           expect((api2 as any).dispatch).not.toBeCalled()
         })
 
-        // FIXME: Skip this test until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+        // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
         // Relevant issues https://github.com/nodejs/node/issues/35889
-        it.skip('[CI-ONLY-5] dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
+        it('[CI-MATRIX-5] dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
           const { devtools: newDevtools } = await import('zustand/middleware')
           const name1 = 'name1'
           const name2 = 'name2'
