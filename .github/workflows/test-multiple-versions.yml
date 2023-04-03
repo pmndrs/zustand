@@ -37,7 +37,6 @@ jobs:
           - 0.0.0-experimental-1308e49a6-20230330
         include:
           - devtools-skip: CI-MATRIX-NOSKIP
-            react: 16.8.0
           - devtools-skip: CI-MATRIX-[2345]
             react: 16.8.0
           - devtools-skip: CI-MATRIX-[1345]
@@ -70,7 +69,7 @@ jobs:
           cat tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
-      - name: Test ${{ matrix.react }}
+      - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
           yarn test:ci
