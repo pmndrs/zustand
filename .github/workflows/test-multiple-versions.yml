@@ -48,6 +48,9 @@ jobs:
             react: 16.8.0
           - devtools-skip: CI-MATRIX-[1234]
             react: 16.8.0
+        exclude:
+          - devtools-skip: CI-MATRIX-NOSKIP
+            react: 16.8.0
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -67,7 +70,6 @@ jobs:
           sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
           sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
-          cat tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
