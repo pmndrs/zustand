@@ -37,15 +37,15 @@ jobs:
           - 0.0.0-experimental-1308e49a6-20230330
         include:
           - react: 16.8.0
-            devtools-skip: CI-MATRIX-[2345]
+            devtools-matrix-1: true
           - react: 16.8.0
-            devtools-skip: CI-MATRIX-[1345]
+            devtools-matrix-2: true
           - react: 16.8.0
-            devtools-skip: CI-MATRIX-[1245]
+            devtools-matrix-3: true
           - react: 16.8.0
-            devtools-skip: CI-MATRIX-[1235]
+            devtools-matrix-4: true
           - react: 16.8.0
-            devtools-skip: CI-MATRIX-[1234]
+            devtools-matrix-5: true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -64,11 +64,22 @@ jobs:
           sed -i~ 's/"jsx": "react-jsx"/"jsx": "react"/' tsconfig.json
           sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
-          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
-          cat tests/devtools.test.tsx
-        env:
-          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
-      - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
+      - name: Patch for Devools Matrix 1
+        if: ${{ matrix.devtools-matrix-1 == 'true' }}
+          sed -i~ "s/it('\[CI-MATRIX-[2345]\]/it.skip('/" tests/devtools.test.tsx
+      - name: Patch for Devools Matrix 2
+        if: ${{ matrix.devtools-matrix-2 == 'true' }}
+          sed -i~ "s/it('\[CI-MATRIX-[1345]\]/it.skip('/" tests/devtools.test.tsx
+      - name: Patch for Devools Matrix 3
+        if: ${{ matrix.devtools-matrix-3 == 'true' }}
+          sed -i~ "s/it('\[CI-MATRIX-[1245]\]/it.skip('/" tests/devtools.test.tsx
+      - name: Patch for Devools Matrix 4
+        if: ${{ matrix.devtools-matrix-4 == 'true' }}
+          sed -i~ "s/it('\[CI-MATRIX-[1235]\]/it.skip('/" tests/devtools.test.tsx
+      - name: Patch for Devools Matrix 5
+        if: ${{ matrix.devtools-matrix-5 == 'true' }}
+          sed -i~ "s/it('\[CI-MATRIX-[1234]\]/it.skip('/" tests/devtools.test.tsx
+      - name: Test ${{ matrix.react }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
           yarn test:ci
