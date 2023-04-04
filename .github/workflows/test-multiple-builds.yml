@@ -27,9 +27,6 @@ jobs:
             build: umd
           - devtools-skip: CI-MATRIX-[1234]
             build: umd
-        exclude:
-          - devtools-skip: CI-MATRIX-NOSKIP
-            build: umd
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -79,7 +76,6 @@ jobs:
           sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
-          NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}
         run: |
           yarn test:ci
