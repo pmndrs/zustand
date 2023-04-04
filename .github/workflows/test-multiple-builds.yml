@@ -78,6 +78,7 @@ jobs:
           sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
+          NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}
         run: |
           yarn test:ci
