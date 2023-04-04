@@ -61,21 +61,18 @@ jobs:
         if: ${{ matrix.build == 'esm' }}
         run: |
           sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js" package.json
-          sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
+          sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${ENV}';/" tests/*.tsx
         env:
-          NODE_ENV: ${{ matrix.env }}
+          ENV: ${{ matrix.env }}
       - name: Patch for UMD/SystemJS
         if: ${{ matrix.build == 'umd' || matrix.build == 'system' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/${BUILD}\1.${NODE_ENV}.js/" package.json
-          echo ${BUILD}
-          echo ${NODE_ENV}
-          cat package.json
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/${BUILD}\1.${ENV}.js/" package.json
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
           sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
         env:
           BUILD: ${{ matrix.build }}
-          NODE_ENV: ${{ matrix.env }}
+          ENV: ${{ matrix.env }}
       - name: Patch for UMD
         if: ${{ matrix.build == 'umd' }}
         run: |
