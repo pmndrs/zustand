@@ -66,18 +66,23 @@ jobs:
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
       - name: Patch for Devools Matrix 1
         if: ${{ matrix.devtools-matrix-1 == 'true' }}
+        run: |
           sed -i~ "s/it('\[CI-MATRIX-[2345]\]/it.skip('/" tests/devtools.test.tsx
       - name: Patch for Devools Matrix 2
         if: ${{ matrix.devtools-matrix-2 == 'true' }}
+        run: |
           sed -i~ "s/it('\[CI-MATRIX-[1345]\]/it.skip('/" tests/devtools.test.tsx
       - name: Patch for Devools Matrix 3
         if: ${{ matrix.devtools-matrix-3 == 'true' }}
+        run: |
           sed -i~ "s/it('\[CI-MATRIX-[1245]\]/it.skip('/" tests/devtools.test.tsx
       - name: Patch for Devools Matrix 4
         if: ${{ matrix.devtools-matrix-4 == 'true' }}
+        run: |
           sed -i~ "s/it('\[CI-MATRIX-[1235]\]/it.skip('/" tests/devtools.test.tsx
       - name: Patch for Devools Matrix 5
         if: ${{ matrix.devtools-matrix-5 == 'true' }}
+        run: |
           sed -i~ "s/it('\[CI-MATRIX-[1234]\]/it.skip('/" tests/devtools.test.tsx
       - name: Test ${{ matrix.react }}
         run: |
