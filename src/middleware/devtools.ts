@@ -173,7 +173,7 @@ const getTrackedConnectionState = (
 const extractConnectionInformation = (
   store: string | undefined,
   extensionConnector: NonNullable<
-    typeof window['__REDUX_DEVTOOLS_EXTENSION__']
+    (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
   >,
   options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>
 ) => {
@@ -206,7 +206,7 @@ const devtoolsImpl: DevtoolsImpl =
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
     let extensionConnector:
-      | typeof window['__REDUX_DEVTOOLS_EXTENSION__']
+      | (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
       | false
     try {
       extensionConnector =
