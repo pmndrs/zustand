@@ -455,7 +455,7 @@ const createBoundedUseStore = ((store) => (selector, equals) =>
   ): T
 }
 
-type ExtractState<S> = S extends { get: () => infer X } ? X : never
+type ExtractState<S> = S extends { getState: () => infer X } ? X : never
 
 const useBearStore = createBoundedUseStore(bearStore)
 ```
