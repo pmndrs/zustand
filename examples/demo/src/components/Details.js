@@ -1,7 +1,10 @@
 export default function Details() {
   return (
     <>
-      <a href="https://github.com/pmndrs/zustand" className="top-right" children="Github" />
+      <nav className="nav">
+        <a href="https://docs.pmnd.rs/zustand" children="Documentation" />
+        <a href="https://github.com/pmndrs/zustand" children="Github" />
+      </nav>
       <div className="bottom">
         <a
           href="https://github.com/pmndrs/zustand/tree/main/examples/demo"
