@@ -357,42 +357,25 @@ const useBearStore = create<
 ### Slices pattern
 
 ```ts
-import { create, StateCreator } from 'zustand'
-
-interface BearSlice {
-  bears: number
-  addBear: () => void
-  eatFish: () => void
-}
-const createBearSlice: StateCreator<
-  BearSlice & FishSlice,
-  [],
-  [],
-  BearSlice
-> = (set) => ({
+const createBearSlice = set => ({
   bears: 0,
   addBear: () => set((state) => ({ bears: state.bears + 1 })),
   eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
-})
+});
 
-interface FishSlice {
-  fishes: number
-  addFish: () => void
-}
-const createFishSlice: StateCreator<
-  BearSlice & FishSlice,
-  [],
-  [],
-  FishSlice
-> = (set) => ({
+const createFishSlice = set => ({
   fishes: 0,
   addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
 })
 
-const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
-  ...createBearSlice(...a),
-  ...createFishSlice(...a),
-}))
+const createSlices = (...a) => ({
+	...createBearSlice(...a),
+	...createFishSlice(...a),
+});
+
+type StoreState = ReturnType<typeof createSlices>;
+
+const useBoundStore = create<StoreState>()(createSlices);
 ```
 
 A detailed explanation on the slices pattern can be found [here](./slices-pattern.md).
