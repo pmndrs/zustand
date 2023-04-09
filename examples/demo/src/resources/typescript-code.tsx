@@ -11,8 +11,7 @@ const useStore = create<Store>()((set) => ({
 }))
 
 function Counter() {
-  const count = useStore((state) => state.count)
-  const inc = useStore((state) => state.inc)
+  const { count, inc } = useStore((state) => state.count)
 
   return (
     <div>
