@@ -471,6 +471,7 @@ a.bottom-right {
 
 .copy-container {
   display: flex;
+  align-items: center;
   gap: 4px;
   position: absolute;
   bottom: 0;
