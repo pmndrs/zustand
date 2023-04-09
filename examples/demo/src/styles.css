@@ -372,10 +372,22 @@ a.top-left {
   left: 40px;
 }
 
-a.top-right {
-  top: 40px;
+.nav {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  left: 40px;
+  min-height: 38px;
+  position: fixed;
   right: 40px;
+  top: 40px;
   z-index: 1000;
+}
+
+.nav a {
+  position: relative;
+  flex: 0 0 auto;
 }
 
 a.bottom-left {
@@ -415,11 +427,13 @@ a.bottom-right {
     left: 40px;
   }
 
-  a.top-right {
-    position: fixed;
-    top: 40px;
+  .nav {
+    justify-content: flex-start;
+    left: 40px;
     right: 40px;
+    top: 90px;
   }
+
   span.header-left {
     position: fixed;
     top: 30px;
@@ -440,9 +454,10 @@ a.bottom-right {
     left: 20px;
   }
 
-  a.top-right {
-    top: 20px;
+  .nav {
+    left: 20px;
     right: 20px;
+    top: 60px;
   }
 
   a.bottom-left {

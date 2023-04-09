@@ -8,9 +8,11 @@ nav: 9
 
 When running tests, the stores are not automatically reset before each test run.
 
-Thus, there can be cases where the state of one test can affect another. To make sure all tests run with a pristine store state, you can mock `zustand` during testing and use the following code to create your store:
+Thus, there can be cases where the state of one test can affect another. To make sure all tests run
+with a pristine store state, you can mock `zustand` during testing and use the following code to
+create your store:
 
-```jsx
+```js
 import { create as actualCreate } from 'zustand'
 // const { create: actualCreate } = jest.requireActual('zustand') // if using jest
 import { act } from 'react-dom/test-utils'
@@ -34,13 +36,16 @@ beforeEach(() => {
 
 The way you mock a dependency depends on your test runner/library.
 
-In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place the code in that file. If your app is using `zustand/vanilla` instead of `zustand`, then you'll have to place the above code in `__mocks__/zustand/vanilla.js`.
+In [jest](https://jestjs.io/), you can create a `__mocks__/zustand.js` and place the code in that
+file. If your app is using `zustand/vanilla` instead of `zustand`, then you'll have to place the
+above code in `__mocks__/zustand/vanilla.js`.
 
 ### TypeScript usage
 
-If you are using zustand, as documented in [TypeScript Guide](./typescript.md), use the following code:
+If you are using zustand, as documented in [TypeScript Guide](./typescript.md), use the following
+code:
 
-```typescript
+```ts
 import { create as actualCreate, StateCreator } from 'zustand'
 // if using Jest:
 // import { StateCreator } from 'zustand';
@@ -51,12 +56,14 @@ import { act } from 'react-dom/test-utils'
 const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = <S>(createState: StateCreator<S>) => {
-  const store = actualCreate(createState)
-  const initialState = store.getState()
-  storeResetFns.add(() => store.setState(initialState, true))
-  return store
-}
+const create =
+  () =>
+  <S>(createState: StateCreator<S>) => {
+    const store = actualCreate(createState)
+    const initialState = store.getState()
+    storeResetFns.add(() => store.setState(initialState, true))
+    return store
+  }
 
 // Reset all stores after each test run
 beforeEach(() => {
@@ -66,7 +73,9 @@ beforeEach(() => {
 
 ## Resetting state between tests in **react-native** and **jest**
 
-You should use the following code in the `__mocks__/zustand.js` file (the `__mocks__` directory should be adjacent to node_modules, placed in the same folder as node_modules, unless you configured roots to point to a folder other than the project root [jest docs: mocking node modules](https://jestjs.io/docs/manual-mocks#mocking-node-modules)):
+You should use the following code in the `__mocks__/zustand.js` file (the `__mocks__` directory
+should be adjacent to node_modules, placed in the same folder as node_modules, unless you
+configured roots to point to a folder other than the project root [jest docs: mocking node modules](https://jestjs.io/docs/manual-mocks#mocking-node-modules)):
 
 ```js
 import { act } from '@testing-library/react-native'
@@ -79,19 +88,13 @@ const storeResetFns = new Set()
 export const create = (createState) => {
   const store = actualCreate(createState)
   const initialState = store.getState()
-  storeResetFns.add(() => {
-    store.setState(initialState, true)
-  })
+  storeResetFns.add(() => store.setState(initialState, true))
   return store
 }
 
 // Reset all stores after each test run
-beforeEach(async () => {
-  await act(() =>
-    storeResetFns.forEach((resetFn) => {
-      resetFn()
-    })
-  )
+beforeEach(() => {
+  act(() => storeResetFns.forEach((resetFn) => resetFn()))
 })
 ```
 
