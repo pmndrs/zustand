@@ -469,7 +469,7 @@ a.bottom-right {
   }
 }
 
-.copy-container {
+.snippet-container {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -479,7 +479,7 @@ a.bottom-right {
   padding: 5px;
 }
 
-.copy-lang {
+.snippet-lang {
   background-color: #272822;
   color: #fff;
   outline: 0;

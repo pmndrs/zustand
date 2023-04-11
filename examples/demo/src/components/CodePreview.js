@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import Highlight, { defaultProps } from 'prism-react-renderer'
 import CopyButton from './CopyButton'
-import CopyLang from './CopyLang'
+import SnippetLang from './SnippetLang'
 import 'prismjs/themes/prism-okaidia.css'
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import javascriptCode from '!!raw-loader!../resources/javascript-code.jsx'
@@ -31,8 +31,8 @@ export default function CodePreview() {
               ))}
             </div>
           ))}
-          <div className="copy-container">
-            <CopyLang lang={lang} setLang={setLang} />
+          <div className="snippet-container">
+            <SnippetLang lang={lang} setLang={setLang} />
             <CopyButton code={code} />
           </div>
         </pre>
