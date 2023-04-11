@@ -1,8 +1,8 @@
 import type { StateCreator, StoreApi, StoreMutatorIdentifier } from '../vanilla'
 
-export interface StateStorage {
-  getItem: (name: string) => string | null | Promise<string | null>
-  setItem: (name: string, value: string) => void | Promise<void>
+export interface StateStorage<T = string> {
+  getItem: (name: string) => T | null | Promise<T | null>
+  setItem: (name: string, value: T) => void | Promise<void>
   removeItem: (name: string) => void | Promise<void>
 }
 
@@ -19,10 +19,20 @@ export interface PersistStorage<S> {
   removeItem: (name: string) => void | Promise<void>
 }
 
-export function createJSONStorage<S>(
-  getStorage: () => StateStorage
+
+export interface PersistStorageOptions <S, T = string> {
+  serialize?: (value:StorageValue<S> ) => T 
+  deserialize?: (value: T | null) => StorageValue<S>
+}
+
+export function createJSONStorage<S, T = string>(
+  getStorage: () => StateStorage<T>,
+  options: PersistStorageOptions<S, T> = {
+    serialize: (value: StorageValue<S>) => JSON.stringify(value) as T,
+    deserialize: (value: T | null | string) => {if (value === null) return null; return JSON.parse(value as string)}
+  }
 ): PersistStorage<S> | undefined {
-  let storage: StateStorage | undefined
+  let storage: StateStorage<T> | undefined
   try {
     storage = getStorage()
   } catch (e) {
@@ -31,21 +41,16 @@ export function createJSONStorage<S>(
   }
   const persistStorage: PersistStorage<S> = {
     getItem: (name) => {
-      const parse = (str: string | null) => {
-        if (str === null) {
-          return null
-        }
-        return JSON.parse(str) as StorageValue<S>
-      }
-      const str = (storage as StateStorage).getItem(name) ?? null
+     
+      const str = (storage as StateStorage<T>).getItem(name) ?? null
       if (str instanceof Promise) {
-        return str.then(parse)
+        return str.then((res: any) => options.deserialize?.(res) )
       }
-      return parse(str)
+      return options.deserialize?.(str) || JSON.parse(str as string)
     },
     setItem: (name, newValue) =>
-      (storage as StateStorage).setItem(name, JSON.stringify(newValue)),
-    removeItem: (name) => (storage as StateStorage).removeItem(name),
+      (storage as StateStorage<T>).setItem(name, options?.serialize?.(newValue) || JSON.stringify(newValue) as T),
+    removeItem: (name) => (storage as StateStorage<T>).removeItem(name),
   }
   return persistStorage
 }
