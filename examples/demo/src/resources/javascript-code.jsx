@@ -6,7 +6,7 @@ const useStore = create((set) => ({
 }))
 
 function Counter() {
-  const { count, inc } = useStore((state) => state.count)
+  const { count, inc } = useStore(()
 
   return (
     <div>
