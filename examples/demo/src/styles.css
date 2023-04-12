@@ -469,18 +469,31 @@ a.bottom-right {
   }
 }
 
-.copy-button {
+.snippet-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   position: absolute;
   bottom: 0;
   right: 0;
+  padding: 5px;
+}
+
+.snippet-lang {
+  background-color: #272822;
+  color: #fff;
+  outline: 0;
+  border: 0;
+}
+
+.copy-button {
   box-shadow: none;
   text-decoration: none;
   font-size: 14px;
   font-family: sans-serif;
   line-height: 1;
   pointer-events: all;
-  margin: 10px;
-  padding: 5px 10px;
+  padding: 12px;
   width: auto;
   border-radius: 5px;
   border: 0;
@@ -488,4 +501,8 @@ a.bottom-right {
   background: transparent;
   color: #f8f9fa;
   cursor: pointer;
+}
+
+.copy-button:hover {
+  background-color: #5f5e5d;
 }
