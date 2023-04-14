@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
 import {

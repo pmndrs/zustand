@@ -52,7 +52,6 @@ jobs:
         if: ${{ matrix.build == 'umd' || matrix.build == 'system' }}
         run: |
           sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/${BUILD}\1.${NODE_ENV}.js/" package.json
-          sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
         env:
           BUILD: ${{ matrix.build }}
           NODE_ENV: ${{ matrix.env }}

@@ -1,11 +1,4 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals'
+import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StoreApi } from 'zustand/vanilla'
 
 const getImports = async () => {
@@ -28,12 +21,12 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: jest.Mock<(f: (message: unknown) => void) => void>
-    unsubscribe: jest.Mock<any>
-    send: jest.Mock<any>
-    init: jest.Mock<any>
-    error: jest.Mock<any>
-    dispatch?: jest.Mock<any>
+    subscribe: Mock<[f: (m: unknown) => void], () => void>
+    unsubscribe: Mock<any>
+    send: Mock<any>
+    init: Mock<any>
+    error: Mock<any>
+    dispatch?: Mock<any>
   }
 }
 const namedConnections = new Map<string | undefined, Connection>()
@@ -94,7 +87,7 @@ function getKeyFromOptions(options: any): string | undefined {
 }
 
 const extensionConnector = {
-  connect: jest.fn((options: any) => {
+  connect: vi.fn((options: any) => {
     const key = getKeyFromOptions(options)
     //console.log('options', options)
     const areNameUndefinedMapsNeeded =
@@ -104,14 +97,14 @@ const extensionConnector = {
       : namedConnections
     const subscribers: Connection['subscribers'] = []
     const api = {
-      subscribe: jest.fn((f: (m: unknown) => void) => {
+      subscribe: vi.fn((f: (m: unknown) => void) => {
         subscribers.push(f)
         return () => {}
       }),
-      unsubscribe: jest.fn(),
-      send: jest.fn(),
-      init: jest.fn(),
-      error: jest.fn(),
+      unsubscribe: vi.fn(),
+      send: vi.fn(),
+      init: vi.fn(),
+      error: vi.fn(),
     }
     connectionMap.set(
       areNameUndefinedMapsNeeded ? options.testConnectionId : key,
@@ -126,7 +119,7 @@ const extensionConnector = {
 ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = extensionConnector
 
 beforeEach(() => {
-  jest.resetModules()
+  vi.resetModules()
   extensionConnector.connect.mockClear()
   namedConnections.clear()
   unnamedConnections.clear()
@@ -148,7 +141,7 @@ describe('If there is no extension installed...', () => {
   let savedConsoleWarn: any
   beforeEach(() => {
     savedConsoleWarn = console.warn
-    console.warn = jest.fn()
+    console.warn = vi.fn()
     ;(window as any).__REDUX_DEVTOOLS_EXTENSION__ = undefined
   })
   afterEach(() => {
@@ -227,7 +220,7 @@ describe('when it receives a message of type...', () => {
       const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
-      const setState = jest.spyOn(api, 'setState')
+      const setState = vi.spyOn(api, 'setState')
 
       const [subscriber] = getNamedConnectionSubscribers(undefined)
       subscriber({
@@ -257,8 +250,8 @@ describe('when it receives a message of type...', () => {
       const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
-      ;(api as any).dispatch = jest.fn()
-      const setState = jest.spyOn(api, 'setState')
+      ;(api as any).dispatch = vi.fn()
+      const setState = vi.spyOn(api, 'setState')
 
       const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
       connectionSubscriber({
@@ -275,9 +268,9 @@ describe('when it receives a message of type...', () => {
       const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
-      ;(api as any).dispatch = jest.fn()
+      ;(api as any).dispatch = vi.fn()
       ;(api as any).dispatchFromDevtools = true
-      const setState = jest.spyOn(api, 'setState')
+      const setState = vi.spyOn(api, 'setState')
 
       const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
       connectionSubscriber({
@@ -296,11 +289,11 @@ describe('when it receives a message of type...', () => {
       const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
-      ;(api as any).dispatch = jest.fn()
+      ;(api as any).dispatch = vi.fn()
       ;(api as any).dispatchFromDevtools = true
-      const setState = jest.spyOn(api, 'setState')
+      const setState = vi.spyOn(api, 'setState')
       const originalConsoleError = console.error
-      console.error = jest.fn()
+      console.error = vi.fn()
 
       const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
       expect(() => {
@@ -409,7 +402,7 @@ describe('when it receives a message of type...', () => {
         const initialState = { count: 0, increment }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const [connection] = getNamedConnectionApis(undefined)
         connection.init.mockClear()
@@ -464,7 +457,7 @@ describe('when it receives a message of type...', () => {
         const initialState = { count: 0, increment: () => {} }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
@@ -517,7 +510,7 @@ describe('when it receives a message of type...', () => {
         const initialState = { count: 0, increment }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const [connection] = getNamedConnectionApis(undefined)
         connection.send.mockClear()
@@ -661,7 +654,7 @@ describe('with redux middleware', () => {
 
   it('[DEV-ONLY] warns about misusage', () => {
     const originalConsoleWarn = console.warn
-    console.warn = jest.fn()
+    console.warn = vi.fn()
     ;(api as any).dispatch({ type: '__setState' as any })
     expect(console.warn).toHaveBeenLastCalledWith(
       '[zustand devtools middleware] "__setState" action type is reserved ' +
@@ -1146,9 +1139,9 @@ describe('when create devtools was called multiple times with `name` option unde
             ...options3,
           })
         )
-        const setState1 = jest.spyOn(api1, 'setState')
-        const setState2 = jest.spyOn(api2, 'setState')
-        const setState3 = jest.spyOn(api3, 'setState')
+        const setState1 = vi.spyOn(api1, 'setState')
+        const setState2 = vi.spyOn(api2, 'setState')
+        const setState3 = vi.spyOn(api3, 'setState')
 
         const [subscriber] = getUnnamedConnectionSubscribers(
           options1.testConnectionId
@@ -1214,12 +1207,12 @@ describe('when create devtools was called multiple times with `name` option unde
         const api3 = createStore(
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
-        ;(api1 as any).dispatch = jest.fn()
-        ;(api2 as any).dispatch = jest.fn()
-        ;(api3 as any).dispatch = jest.fn()
-        const setState1 = jest.spyOn(api1, 'setState')
-        const setState2 = jest.spyOn(api2, 'setState')
-        const setState3 = jest.spyOn(api3, 'setState')
+        ;(api1 as any).dispatch = vi.fn()
+        ;(api2 as any).dispatch = vi.fn()
+        ;(api3 as any).dispatch = vi.fn()
+        const setState1 = vi.spyOn(api1, 'setState')
+        const setState2 = vi.spyOn(api2, 'setState')
+        const setState3 = vi.spyOn(api3, 'setState')
 
         const subscribers = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
@@ -1260,15 +1253,15 @@ describe('when create devtools was called multiple times with `name` option unde
         const api3 = createStore(
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
-        ;(api1 as any).dispatch = jest.fn()
+        ;(api1 as any).dispatch = vi.fn()
         ;(api1 as any).dispatchFromDevtools = true
-        ;(api2 as any).dispatch = jest.fn()
+        ;(api2 as any).dispatch = vi.fn()
         ;(api2 as any).dispatchFromDevtools = true
-        ;(api3 as any).dispatch = jest.fn()
+        ;(api3 as any).dispatch = vi.fn()
         ;(api3 as any).dispatchFromDevtools = true
-        const setState1 = jest.spyOn(api1, 'setState')
-        const setState2 = jest.spyOn(api2, 'setState')
-        const setState3 = jest.spyOn(api3, 'setState')
+        const setState1 = vi.spyOn(api1, 'setState')
+        const setState2 = vi.spyOn(api2, 'setState')
+        const setState3 = vi.spyOn(api3, 'setState')
 
         const subscribers = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
@@ -1315,17 +1308,17 @@ describe('when create devtools was called multiple times with `name` option unde
         const api3 = createStore(
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
-        ;(api1 as any).dispatch = jest.fn()
+        ;(api1 as any).dispatch = vi.fn()
         ;(api1 as any).dispatchFromDevtools = true
-        ;(api2 as any).dispatch = jest.fn()
+        ;(api2 as any).dispatch = vi.fn()
         ;(api2 as any).dispatchFromDevtools = true
-        ;(api3 as any).dispatch = jest.fn()
+        ;(api3 as any).dispatch = vi.fn()
         ;(api3 as any).dispatchFromDevtools = true
-        const setState1 = jest.spyOn(api1, 'setState')
-        const setState2 = jest.spyOn(api2, 'setState')
-        const setState3 = jest.spyOn(api3, 'setState')
+        const setState1 = vi.spyOn(api1, 'setState')
+        const setState2 = vi.spyOn(api2, 'setState')
+        const setState3 = vi.spyOn(api3, 'setState')
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const [
           connectionSubscriber1,
@@ -1635,7 +1628,7 @@ describe('when create devtools was called multiple times with `name` option unde
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
@@ -1801,7 +1794,7 @@ describe('when create devtools was called multiple times with `name` option unde
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
@@ -1965,7 +1958,7 @@ describe('when create devtools was called multiple times with `name` option unde
           devtools(() => initialState3, { enabled: true, ...options3 })
         )
         const originalConsoleError = console.error
-        console.error = jest.fn()
+        console.error = vi.fn()
 
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
@@ -2313,10 +2306,10 @@ describe('when create devtools was called multiple times with `name` and `store`
               ...options2,
             })
           )
-          const setState1 = jest.spyOn(api1, 'setState')
-          const setState2 = jest.spyOn(api2, 'setState')
-          const setState3 = jest.spyOn(api3, 'setState')
-          const setState4 = jest.spyOn(api4, 'setState')
+          const setState1 = vi.spyOn(api1, 'setState')
+          const setState2 = vi.spyOn(api2, 'setState')
+          const setState3 = vi.spyOn(api3, 'setState')
+          const setState4 = vi.spyOn(api4, 'setState')
 
           const [subscriber] = getUnnamedConnectionSubscribers(
             options1.testConnectionId
@@ -2361,7 +2354,7 @@ describe('when create devtools was called multiple times with `name` and `store`
             devtools(() => initialState2, { enabled: true, ...options2 })
           )
           const originalConsoleError = console.error
-          console.error = jest.fn()
+          console.error = vi.fn()
 
           const [connectionSubscriber] = getNamedConnectionSubscribers(
             getKeyFromOptions(options1)
@@ -2417,10 +2410,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const api2 = createStore(
             devtools(() => initialState2, { enabled: true, ...options2 })
           )
-          ;(api1 as any).dispatch = jest.fn()
-          ;(api2 as any).dispatch = jest.fn()
-          const setState1 = jest.spyOn(api1, 'setState')
-          const setState2 = jest.spyOn(api2, 'setState')
+          ;(api1 as any).dispatch = vi.fn()
+          ;(api2 as any).dispatch = vi.fn()
+          const setState1 = vi.spyOn(api1, 'setState')
+          const setState2 = vi.spyOn(api2, 'setState')
 
           const subscribers = getNamedConnectionSubscribers(
             getKeyFromOptions(options1),
@@ -2464,12 +2457,12 @@ describe('when create devtools was called multiple times with `name` and `store`
           const api2 = createStore(
             devtools(() => initialState2, { enabled: true, ...options2 })
           )
-          ;(api1 as any).dispatch = jest.fn()
+          ;(api1 as any).dispatch = vi.fn()
           ;(api1 as any).dispatchFromDevtools = true
-          ;(api2 as any).dispatch = jest.fn()
+          ;(api2 as any).dispatch = vi.fn()
           ;(api2 as any).dispatchFromDevtools = true
-          const setState1 = jest.spyOn(api1, 'setState')
-          const setState2 = jest.spyOn(api2, 'setState')
+          const setState1 = vi.spyOn(api1, 'setState')
+          const setState2 = vi.spyOn(api2, 'setState')
 
           const subscribers = getNamedConnectionSubscribers(
             getKeyFromOptions(options1),

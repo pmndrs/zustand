@@ -8,6 +8,7 @@
     "moduleResolution": "node",
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "zustand": ["./src/index.ts"],

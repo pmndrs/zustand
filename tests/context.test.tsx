@@ -6,8 +6,8 @@ import {
   useEffect,
   useState,
 } from 'react'
-import { afterEach, it, jest } from '@jest/globals'
 import { render } from '@testing-library/react'
+import { afterEach, it, vi } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
 import createContext from 'zustand/context'
@@ -123,7 +123,7 @@ it('uses context store api', async () => {
 })
 
 it('throws error when not using provider', async () => {
-  console.error = jest.fn()
+  console.error = vi.fn()
 
   class ErrorBoundary extends ClassComponent<
     { children?: ReactNode | undefined },

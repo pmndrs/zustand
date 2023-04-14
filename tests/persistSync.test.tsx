@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, jest } from '@jest/globals'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -18,9 +18,9 @@ const createPersistentStore = (initialValue: string | null) => {
     state = null
   }
 
-  const getItemSpy = jest.fn()
-  const setItemSpy = jest.fn()
-  const removeItemSpy = jest.fn()
+  const getItemSpy = vi.fn()
+  const setItemSpy = vi.fn()
+  const removeItemSpy = vi.fn()
 
   return {
     storage: { getItem, setItem, removeItem },
@@ -46,7 +46,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const onRehydrateStorageSpy = jest.fn()
+    const onRehydrateStorageSpy = vi.fn()
     const useBoundStore = create(
       persist(
         () => ({
@@ -80,7 +80,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const spy = jest.fn()
+    const spy = vi.fn()
     create(
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
@@ -96,7 +96,7 @@ describe('persist middleware with sync configuration', () => {
     const { storage, setItemSpy } = createPersistentStore(null)
 
     const createStore = () => {
-      const onRehydrateStorageSpy = jest.fn()
+      const onRehydrateStorageSpy = vi.fn()
       const useBoundStore = create(
         persist(() => ({ count: 0 }), {
           name: 'test-storage',
@@ -131,9 +131,9 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can migrate persisted state', () => {
-    const setItemSpy = jest.fn<() => void>()
-    const onRehydrateStorageSpy = jest.fn()
-    const migrateSpy = jest.fn(() => ({ count: 99 }))
+    const setItemSpy = vi.fn()
+    const onRehydrateStorageSpy = vi.fn()
+    const migrateSpy = vi.fn(() => ({ count: 99 }))
 
     const storage = {
       getItem: () =>
@@ -168,8 +168,8 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can correclty handle a missing migrate function', () => {
-    console.error = jest.fn()
-    const onRehydrateStorageSpy = jest.fn()
+    console.error = vi.fn()
+    const onRehydrateStorageSpy = vi.fn()
     const storage = {
       getItem: () =>
         JSON.stringify({
@@ -195,7 +195,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can throw migrate error', () => {
-    const onRehydrateStorageSpy = jest.fn()
+    const onRehydrateStorageSpy = vi.fn()
 
     const storage = {
       getItem: () =>
@@ -227,8 +227,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('passes the latest state to onRehydrateStorage and onHydrate on first hydrate', () => {
-    const onRehydrateStorageSpy =
-      jest.fn<<S>(s: S) => (s?: S, e?: unknown) => void>()
+    const onRehydrateStorageSpy = vi.fn()
 
     const storage = {
       getItem: () => JSON.stringify({ state: { count: 1 } }),
@@ -250,7 +249,7 @@ describe('persist middleware with sync configuration', () => {
      * the 'onHydrate' listener set (which will be empty) is evaluated before the
      * 'persist' API is exposed to the caller of 'create'/'createStore'.
      *
-     * const onHydrateSpy = jest.fn()
+     * const onHydrateSpy = vi.fn()
      * useBoundStore.persist.onHydrate(onHydrateSpy)
      * expect(onHydrateSpy).toBeCalledWith({ count: 0 })
      */
@@ -262,7 +261,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('gives the merged state to onRehydrateStorage', () => {
-    const onRehydrateStorageSpy = jest.fn()
+    const onRehydrateStorageSpy = vi.fn()
 
     const storage = {
       getItem: () =>
@@ -355,7 +354,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can filter the persisted value', () => {
-    const setItemSpy = jest.fn<() => void>()
+    const setItemSpy = vi.fn()
 
     const storage = {
       getItem: () => '',
@@ -422,7 +421,7 @@ describe('persist middleware with sync configuration', () => {
   it('can access the options through the api', () => {
     const storage = {
       getItem: () => null,
-      setItem: jest.fn<() => void>(),
+      setItem: vi.fn(),
       removeItem: () => {},
     }
 
@@ -437,7 +436,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can change the options through the api', () => {
-    const setItemSpy = jest.fn<() => void>()
+    const setItemSpy = vi.fn()
 
     const storage = {
       getItem: () => null,
@@ -474,7 +473,7 @@ describe('persist middleware with sync configuration', () => {
   })
 
   it('can clear the storage through the api', () => {
-    const removeItemSpy = jest.fn<() => void>()
+    const removeItemSpy = vi.fn()
 
     const storage = {
       getItem: () => null,
@@ -540,10 +539,10 @@ describe('persist middleware with sync configuration', () => {
     const storageValue1 = '{"state":{"count":1},"version":0}'
     const storageValue2 = '{"state":{"count":2},"version":0}'
 
-    const onHydrateSpy1 = jest.fn()
-    const onHydrateSpy2 = jest.fn()
-    const onFinishHydrationSpy1 = jest.fn()
-    const onFinishHydrationSpy2 = jest.fn()
+    const onHydrateSpy1 = vi.fn()
+    const onHydrateSpy2 = vi.fn()
+    const onFinishHydrationSpy1 = vi.fn()
+    const onFinishHydrationSpy2 = vi.fn()
 
     const storage = {
       getItem: () => '',
@@ -594,7 +593,7 @@ describe('persist middleware with sync configuration', () => {
       removeItem: () => {},
     }
 
-    const onRehydrateStorageSpy = jest.fn()
+    const onRehydrateStorageSpy = vi.fn()
     const useBoundStore = create(
       persist(
         () => ({

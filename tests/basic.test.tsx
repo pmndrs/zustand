@@ -6,9 +6,9 @@ import {
   useLayoutEffect,
   useState,
 } from 'react'
-import { afterEach, expect, it, jest } from '@jest/globals'
 import { act, fireEvent, render } from '@testing-library/react'
 import ReactDOM from 'react-dom'
+import { afterEach, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
 
@@ -306,7 +306,7 @@ it('can call useBoundStore with progressively more arguments', async () => {
 })
 
 it('can throw an error in selector', async () => {
-  console.error = jest.fn()
+  console.error = vi.fn()
   type State = { value: string | number }
 
   const initialState: State = { value: 'foo' }
@@ -353,7 +353,7 @@ it('can throw an error in selector', async () => {
 })
 
 it('can throw an error in equality checker', async () => {
-  console.error = jest.fn()
+  console.error = vi.fn()
   type State = { value: string | number }
 
   const initialState: State = { value: 'foo' }
@@ -442,7 +442,7 @@ it('can set the store', () => {
 it('both NaN should not update', () => {
   const { setState, subscribe } = create<number>(() => NaN)
 
-  const fn = jest.fn()
+  const fn = vi.fn()
   subscribe(fn)
 
   setState(NaN)
