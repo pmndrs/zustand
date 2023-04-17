@@ -296,7 +296,7 @@ import { useBoundStore } from './path-to-store';
 export function StoreConsumer(){
   // hydrate persisted store after on mount
   useEffect(() => {
-    store.persist.reHydrate();
+    useBoundStore.persist.reHydrate();
   }, [])
 
   return (
