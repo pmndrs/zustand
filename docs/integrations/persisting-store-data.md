@@ -291,9 +291,9 @@ export const useBoundStore = create(
 ```
 
 ```tsx
-export function StoreConsumer(){
-  const store = useBoundStore();
+import { useBoundStore } from './path-to-store';
 
+export function StoreConsumer(){
   // hydrate persisted store after on mount
   useEffect(() => {
     store.persist.reHydrate();
