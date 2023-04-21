@@ -1,6 +1,6 @@
-import { StrictMode, useEffect } from 'react'
 import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { act, render, waitFor } from '@testing-library/react'
+import { StrictMode, useEffect } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -44,7 +44,11 @@ describe('persist middleware with async configuration', () => {
     const storage = {
       getItem: async (name: string) =>
         JSON.stringify({
-          state: { count: 42, name },
+          state: {
+            count: 42,
+            name,
+            map: { type: 'Map', value: [['foo', 'bar']] },
+          },
           version: 0,
         }),
       setItem: () => {},
@@ -56,6 +60,7 @@ describe('persist middleware with async configuration', () => {
         () => ({
           count: 0,
           name: 'empty',
+          map: new Map(),
         }),
         {
           name: 'test-storage',
@@ -66,10 +71,10 @@ describe('persist middleware with async configuration', () => {
     )
 
     function Counter() {
-      const { count, name } = useBoundStore()
+      const { count, name, map } = useBoundStore()
       return (
         <div>
-          count: {count}, name: {name}
+          count: {count}, name: {name}, map: {map.get('foo')}
         </div>
       )
     }
@@ -80,10 +85,10 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>
     )
 
-    await findByText('count: 0, name: empty')
-    await findByText('count: 42, name: test-storage')
+    await findByText('count: 0, name: empty, map:')
+    await findByText('count: 42, name: test-storage, map: bar')
     expect(onRehydrateStorageSpy).toBeCalledWith(
-      { count: 42, name: 'test-storage' },
+      { count: 42, name: 'test-storage', map: new Map([['foo', 'bar']]) },
       undefined
     )
   })
@@ -129,11 +134,12 @@ describe('persist middleware with async configuration', () => {
 
   it('can persist state', async () => {
     const { storage, setItemSpy } = createPersistantStore(null)
+    const map = new Map()
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
       const useBoundStore = create(
-        persist(() => ({ count: 0 }), {
+        persist(() => ({ count: 0, map }), {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
@@ -157,15 +163,19 @@ describe('persist middleware with async configuration', () => {
     )
     await findByText('count: 0')
     await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0, map }, undefined)
     })
 
     // Write something to the store
-    act(() => useBoundStore.setState({ count: 42 }))
+    const updatedMap = map.set('foo', 'bar')
+    act(() => useBoundStore.setState({ count: 42, map: updatedMap }))
     await findByText('count: 42')
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
-      JSON.stringify({ state: { count: 42 }, version: 0 })
+      JSON.stringify({
+        state: { count: 42, map: { type: 'Map', value: [['foo', 'bar']] } },
+        version: 0,
+      })
     )
 
     // Create the same store a second time and check if the persisted state
@@ -175,8 +185,12 @@ describe('persist middleware with async configuration', () => {
       onRehydrateStorageSpy: onRehydrateStorageSpy2,
     } = createStore()
     function Counter2() {
-      const { count } = useBoundStore2()
-      return <div>count: {count}</div>
+      const { count, map } = useBoundStore2()
+      return (
+        <div>
+          count: {count}, map-content: {[...map]}
+        </div>
+      )
     }
 
     const { findByText: findByText2 } = render(
@@ -186,7 +200,10 @@ describe('persist middleware with async configuration', () => {
     )
     await findByText2('count: 42')
     await waitFor(() => {
-      expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
+      expect(onRehydrateStorageSpy2).toBeCalledWith(
+        { count: 42, map: updatedMap },
+        undefined
+      )
     })
   })
 

@@ -41,17 +41,20 @@ describe('persist middleware with sync configuration', () => {
         JSON.stringify({
           state: { count: 42, name },
           version: 0,
+          map: { type: 'Map', value: [['foo', 'bar']] },
         }),
       setItem: () => {},
       removeItem: () => {},
     }
 
+    const map = new Map()
     const onRehydrateStorageSpy = jest.fn()
     const useBoundStore = create(
       persist(
         () => ({
           count: 0,
           name: 'empty',
+          map,
         }),
         {
           name: 'test-storage',
@@ -61,12 +64,14 @@ describe('persist middleware with sync configuration', () => {
       )
     )
 
+    const updatedMap = map.set('foo', 'bar')
     expect(useBoundStore.getState()).toEqual({
       count: 42,
       name: 'test-storage',
+      map: updatedMap,
     })
     expect(onRehydrateStorageSpy).toBeCalledWith(
-      { count: 42, name: 'test-storage' },
+      { count: 42, name: 'test-storage', map: updatedMap },
       undefined
     )
   })
@@ -94,11 +99,12 @@ describe('persist middleware with sync configuration', () => {
 
   it('can persist state', () => {
     const { storage, setItemSpy } = createPersistentStore(null)
+    const map = new Map()
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
       const useBoundStore = create(
-        persist(() => ({ count: 0 }), {
+        persist(() => ({ count: 0, map }), {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
@@ -109,15 +115,22 @@ describe('persist middleware with sync configuration', () => {
 
     // Initialize from empty storage
     const { useBoundStore, onRehydrateStorageSpy } = createStore()
-    expect(useBoundStore.getState()).toEqual({ count: 0 })
-    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
+    expect(useBoundStore.getState()).toEqual({ count: 0, map })
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0, map }, undefined)
 
     // Write something to the store
-    useBoundStore.setState({ count: 42 })
-    expect(useBoundStore.getState()).toEqual({ count: 42 })
+    const updatedMap = map.set('foo', 'bar')
+    useBoundStore.setState({ count: 42, map: updatedMap })
+    expect(useBoundStore.getState()).toEqual({
+      count: 42,
+      map: updatedMap,
+    })
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
-      JSON.stringify({ state: { count: 42 }, version: 0 })
+      JSON.stringify({
+        state: { count: 42, map: { type: 'Map', value: [['foo', 'bar']] } },
+        version: 0,
+      })
     )
 
     // Create the same store a second time and check if the persisted state
@@ -126,8 +139,11 @@ describe('persist middleware with sync configuration', () => {
       useBoundStore: useBoundStore2,
       onRehydrateStorageSpy: onRehydrateStorageSpy2,
     } = createStore()
-    expect(useBoundStore2.getState()).toEqual({ count: 42 })
-    expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
+    expect(useBoundStore2.getState()).toEqual({ count: 42, map: updatedMap })
+    expect(onRehydrateStorageSpy2).toBeCalledWith(
+      { count: 42, map: updatedMap },
+      undefined
+    )
   })
 
   it('can migrate persisted state', () => {
