@@ -401,6 +401,8 @@ If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice
 
 ### Bounded `useStore` hook for vanilla stores
 
+laksdfjlksadjfkl;asdjflksadjlkasf
+
 ```ts
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
