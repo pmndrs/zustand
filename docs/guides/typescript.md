@@ -428,7 +428,7 @@ function useBearStore<T>(
 }
 ```
 
-You can also make an abstract `createBoundedUseStore` generator function if you need to create bounded `useStore` hooks often and want to DRY things up...
+You can also make an abstract `createBoundedUseStore` function if you need to create bounded `useStore` hooks often and want to DRY things up...
 
 ```ts
 import { useStore, StoreApi } from 'zustand'
