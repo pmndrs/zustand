@@ -401,8 +401,6 @@ If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice
 
 ### Bounded `useStore` hook for vanilla stores
 
-laksdfjlksadjfkl;asdjflksadjlkasf
-
 ```ts
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
@@ -430,7 +428,7 @@ function useBearStore<T>(
 }
 ```
 
-You can also make an abstract `createBoundedUseStore` if you create bounded `useStore`s often and want to DRY things up...
+You can also make an abstract `createBoundedUseStore` generator function if you need to create bounded `useStore` hooks often and want to DRY things up...
 
 ```ts
 import { useStore, StoreApi } from 'zustand'
@@ -447,12 +445,12 @@ const bearStore = createStore<BearState>()((set) => ({
 }))
 
 const createBoundedUseStore = ((store) => (selector, equals) =>
-  useStore(store, selector as any, equals)) as <S extends StoreApi<unknown>>(
+  useStore(store, selector as never, equals)) as <S extends StoreApi<unknown>>(
   store: S
 ) => {
   (): ExtractState<S>
   <T>(
-    selector?: (state: ExtractState<S>) => T,
+    selector: (state: ExtractState<S>) => T,
     equals?: (a: T, b: T) => boolean
   ): T
 }
