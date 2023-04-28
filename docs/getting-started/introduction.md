@@ -43,6 +43,7 @@ yarn add zustand
 Your store is a hook!
 You can put anything in it: primitives, objects, functions.
 The `set` function _merges_ state.
+Create a store on store.js file.
 
 ```js
 import { create } from 'zustand'
@@ -61,6 +62,7 @@ Select your state and the consuming component
 will re-render when that state changes.
 
 ```jsx
+import { useStore } from './store';
 function BearCounter() {
   const bears = useStore((state) => state.bears)
   return <h1>{bears} around here...</h1>
