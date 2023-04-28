@@ -3,6 +3,7 @@ import { act, render, waitFor } from '@testing-library/react'
 import { StrictMode, useEffect } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { replacer, reviver } from './test-utils'
 
 const createPersistantStore = (initialValue: string | null) => {
   let state = initialValue
@@ -64,7 +65,7 @@ describe('persist middleware with async configuration', () => {
         }),
         {
           name: 'test-storage',
-          storage: createJSONStorage(() => storage),
+          storage: createJSONStorage(() => storage, { replacer, reviver }),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         }
       )
@@ -141,7 +142,7 @@ describe('persist middleware with async configuration', () => {
       const useBoundStore = create(
         persist(() => ({ count: 0, map }), {
           name: 'test-storage',
-          storage: createJSONStorage(() => storage),
+          storage: createJSONStorage(() => storage, { replacer, reviver }),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         })
       )

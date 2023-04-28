@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { replacer, reviver } from './test-utils'
 
 const createPersistentStore = (initialValue: string | null) => {
   let state = initialValue
@@ -106,7 +107,7 @@ describe('persist middleware with sync configuration', () => {
       const useBoundStore = create(
         persist(() => ({ count: 0, map }), {
           name: 'test-storage',
-          storage: createJSONStorage(() => storage),
+          storage: createJSONStorage(() => storage, { replacer, reviver }),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         })
       )

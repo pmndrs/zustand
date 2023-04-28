@@ -19,8 +19,14 @@ export interface PersistStorage<S> {
   removeItem: (name: string) => void | Promise<void>
 }
 
+type JsonStorageOptions = {
+  reviver: (key: string, value: unknown) => unknown
+  replacer: (key: string, value: unknown) => unknown
+}
+
 export function createJSONStorage<S>(
-  getStorage: () => StateStorage
+  getStorage: () => StateStorage,
+  options?: JsonStorageOptions
 ): PersistStorage<S> | undefined {
   let storage: StateStorage | undefined
   try {
@@ -35,7 +41,7 @@ export function createJSONStorage<S>(
         if (str === null) {
           return null
         }
-        return JSON.parse(str, reviver) as StorageValue<S>
+        return JSON.parse(str, options?.reviver) as StorageValue<S>
       }
       const str = (storage as StateStorage).getItem(name) ?? null
       if (str instanceof Promise) {
@@ -46,7 +52,7 @@ export function createJSONStorage<S>(
     setItem: (name, newValue) =>
       (storage as StateStorage).setItem(
         name,
-        JSON.stringify(newValue, replacer)
+        JSON.stringify(newValue, options?.replacer)
       ),
     removeItem: (name) => (storage as StateStorage).removeItem(name),
   }
@@ -542,37 +548,6 @@ const persistImpl: PersistImpl = (config, baseOptions) => {
     return oldImpl(config, baseOptions)
   }
   return newImpl(config, baseOptions)
-}
-
-const replacer = (key: string, value: unknown): ReplacedMap | unknown => {
-  if (value instanceof Map) {
-    return {
-      type: 'Map',
-      value: Array.from(value.entries()),
-    }
-  } else {
-    return value
-  }
-}
-
-const reviver = (key: string, value: ReplacedMap | unknown) => {
-  if (isReplacedMap(value)) {
-    return new Map(value.value)
-  }
-  return value
-}
-
-const isReplacedMap = (value: any): value is ReplacedMap => {
-  if (value && value.type === 'Map') {
-    return true
-  }
-
-  return false
-}
-
-type ReplacedMap = {
-  type: 'Map'
-  value: [string, unknown][]
 }
 
 type Persist = <
