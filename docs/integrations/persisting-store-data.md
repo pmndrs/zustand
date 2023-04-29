@@ -452,6 +452,73 @@ If your app does depends on the persisted state at page load,
 see [_How can I check if my store has been hydrated_](#how-can-i-check-if-my-store-has-been-hydrated)
 in the [FAQ](#faq) section below.
 
+### Usage in Next.js
+NextJS use Server Side Rendering, and it will compare the rendered component on the server with the one rendered on client. But since you are using data from browser to change your component, the two renders will differ and Next will throw an error at you.
+
+The errors usually are:
+* Text content does not match server-rendered HTML
+* Hydration failed because the initial UI does not match what was rendered on the server
+* There was an error while hydrating. Because the error happened outside of a Suspense boundary, the entire root will switch to client rendering
+
+To solve these errors, you will need to create a custom hook that makes so that zustand waits a little bit before changing your components.
+
+create a file and put this code:
+
+```typescript
+// useStore.ts
+import { useState, useEffect } from "react";
+
+const useStore = <T, F>(
+  store: (callback: (state: T) => unknown) => unknown,
+  callback: (state: T) => F
+) => {
+  const result = store(callback) as F;
+  const [data, setData] = useState<F>();
+
+  useEffect(() => {
+    setData(result);
+  }, [result]);
+
+  return data;
+};
+
+export default useStore;
+
+```
+
+Now on your pages, you will use the hook a little bit differently:
+```typescript
+// useBearStore.ts
+
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+
+// the store itself does not need any change
+export const useBearStore = create(
+  persist(
+    (set, get) => ({
+      bears: 0,
+      addABear: () => set({ bears: get().bears + 1 }),
+    }),
+    {
+      name: 'food-storage',
+    }
+  )
+)
+```
+
+```typescript
+// yourComponent.tsx
+
+import useStore from "./use_store";
+import { useBearStore } from "./stores/bear";
+
+const bears = useStore(useBearStore, state => state.categorias)
+```
+Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#issuecomment-1481801942) which points to [this blog post](https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5). Kudos for them!
+
+
 ## FAQ
 
 ### How can I check if my store has been hydrated
