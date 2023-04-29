@@ -43,7 +43,7 @@ yarn add zustand
 Your store is a hook!
 You can put anything in it: primitives, objects, functions.
 The `set` function _merges_ state.
-Create a store on store.js file.
+Create a store on `store.js` file.
 
 ```js
 import { create } from 'zustand'
