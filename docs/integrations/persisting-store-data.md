@@ -454,7 +454,7 @@ in the [FAQ](#faq) section below.
 
 ### Usage in Next.js
 
-NextJS use Server Side Rendering, and it will compare the rendered component on the server with the one rendered on client. But since you are using data from browser to change your component, the two renders will differ and Next will throw an error at you.
+NextJS uses Server Side Rendering, and it will compare the rendered component on the server with the one rendered on client. But since you are using data from browser to change your component, the two renders will differ and Next will throw an warning at you.
 
 The errors usually are:
 
@@ -512,13 +512,13 @@ export const useBearStore = create(
 ```typescript
 // yourComponent.tsx
 
-import useStore from './use_store'
-import { useBearStore } from './stores/bear'
+import useStore from './useStore'
+import { useBearStore } from './stores/useBearStore'
 
 const bears = useStore(useBearStore, (state) => state.categorias)
 ```
 
-Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#issuecomment-1481801942) which points to [this blog post](https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5). Kudos for them!
+Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#issuecomment-1481801942) which points to [this blog post](https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5). Kudos to them!
 
 ## FAQ
 
