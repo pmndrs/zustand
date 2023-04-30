@@ -75,6 +75,7 @@ const useCountStore = create<State & Actions>((set) => ({
   dispatch: (action: Action) => set((state) => countReducer(state, action)),
 }))
 ```
+
 **Redux**
 
 ```ts
