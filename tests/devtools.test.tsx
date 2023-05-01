@@ -6,13 +6,8 @@ import {
   it,
   jest,
 } from '@jest/globals'
-import { StoreApi } from 'zustand/vanilla'
-
-const getImports = async () => {
-  const { devtools } = await import('zustand/middleware')
-  const { createStore } = await import('zustand/vanilla')
-  return { createStore, devtools }
-}
+import { devtools, redux } from 'zustand/middleware'
+import { StoreApi, createStore } from 'zustand/vanilla'
 
 type TupleOfEqualLengthH<
   Arr extends unknown[],
@@ -133,7 +128,6 @@ beforeEach(() => {
 })
 
 it('connects to the extension by passing the options and initializes', async () => {
-  const { devtools, createStore } = await getImports()
   const options = { name: 'test', foo: 'bar' }
   const initialState = { count: 0 }
   createStore(devtools(() => initialState, { enabled: true, ...options }))
@@ -157,32 +151,27 @@ describe('If there is no extension installed...', () => {
   })
 
   it('does not throw', async () => {
-    const { devtools, createStore } = await getImports()
     expect(() => {
       createStore(devtools(() => ({ count: 0 })))
     }).not.toThrow()
   })
 
   it('does not warn if not enabled', async () => {
-    const { devtools, createStore } = await getImports()
     createStore(devtools(() => ({ count: 0 })))
     expect(console.warn).not.toBeCalled()
   })
 
   it('[DEV-ONLY] warns if enabled in dev mode', async () => {
-    const { devtools, createStore } = await getImports()
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).toBeCalled()
   })
 
   it.skip('[PRD-ONLY] does not warn if not in dev env', async () => {
-    const { devtools, createStore } = await getImports()
     createStore(devtools(() => ({ count: 0 })))
     expect(console.warn).not.toBeCalled()
   })
 
   it.skip('[PRD-ONLY] does not warn if not in dev env even if enabled', async () => {
-    const { devtools, createStore } = await getImports()
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).not.toBeCalled()
   })
@@ -190,7 +179,6 @@ describe('If there is no extension installed...', () => {
 
 describe('When state changes...', () => {
   it("sends { type: setStateName || 'anonymous`, ...rest } as the action with current state", async () => {
-    const { devtools, createStore } = await getImports()
     const options = {
       name: 'testOptionsName',
       enabled: true,
@@ -224,7 +212,6 @@ describe('When state changes...', () => {
 describe('when it receives a message of type...', () => {
   describe('ACTION...', () => {
     it('does nothing', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       const setState = jest.spyOn(api, 'setState')
@@ -240,7 +227,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('unless action type is __setState', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
 
@@ -254,7 +240,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('does nothing even if there is `api.dispatch`', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       ;(api as any).dispatch = jest.fn()
@@ -272,7 +257,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       ;(api as any).dispatch = jest.fn()
@@ -293,7 +277,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('does not throw for unsupported payload', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       ;(api as any).dispatch = jest.fn()
@@ -342,7 +325,6 @@ describe('when it receives a message of type...', () => {
 
   describe('DISPATCH and payload of type...', () => {
     it('RESET, it inits with initial state', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       api.setState({ count: 1 })
@@ -361,7 +343,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('COMMIT, it inits with current state', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0 }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       api.setState({ count: 2 })
@@ -381,7 +362,6 @@ describe('when it receives a message of type...', () => {
 
     describe('ROLLBACK...', () => {
       it('it updates state without recording and inits with `message.state`', async () => {
-        const { devtools, createStore } = await getImports()
         const initialState = { count: 0, increment: () => {} }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
@@ -404,7 +384,6 @@ describe('when it receives a message of type...', () => {
       })
 
       it('does not throw for unparsable `message.state`', async () => {
-        const { devtools, createStore } = await getImports()
         const increment = () => {}
         const initialState = { count: 0, increment }
         const api = createStore(devtools(() => initialState, { enabled: true }))
@@ -442,7 +421,6 @@ describe('when it receives a message of type...', () => {
     describe('JUMP_TO_STATE...', () => {
       const increment = () => {}
       it('it updates state without recording with `message.state`', async () => {
-        const { devtools, createStore } = await getImports()
         const initialState = { count: 0, increment }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
@@ -460,7 +438,6 @@ describe('when it receives a message of type...', () => {
       })
 
       it('does not throw for unparsable `message.state`', async () => {
-        const { devtools, createStore } = await getImports()
         const initialState = { count: 0, increment: () => {} }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const originalConsoleError = console.error
@@ -494,7 +471,6 @@ describe('when it receives a message of type...', () => {
 
     describe('JUMP_TO_ACTION...', () => {
       it('it updates state without recording with `message.state`', async () => {
-        const { devtools, createStore } = await getImports()
         const initialState = { count: 0, increment: () => {} }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
@@ -512,7 +488,6 @@ describe('when it receives a message of type...', () => {
       })
 
       it('does not throw for unparsable `message.state`', async () => {
-        const { devtools, createStore } = await getImports()
         const increment = () => {}
         const initialState = { count: 0, increment }
         const api = createStore(devtools(() => initialState, { enabled: true }))
@@ -546,7 +521,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('IMPORT_STATE, it updates state without recording and inits the last computedState', async () => {
-      const { devtools, createStore } = await getImports()
       const initialState = { count: 0, increment: () => {} }
       const api = createStore(devtools(() => initialState, { enabled: true }))
       const nextLiftedState = {
@@ -571,7 +545,6 @@ describe('when it receives a message of type...', () => {
     })
 
     it('PAUSE_RECORDING, it toggles the sending of actions', async () => {
-      const { devtools, createStore } = await getImports()
       const api = createStore(devtools(() => ({ count: 0 }), { enabled: true }))
 
       api.setState({ count: 1 }, false, 'increment')
@@ -614,8 +587,6 @@ describe('with redux middleware', () => {
   }>
 
   it('works as expected', async () => {
-    const { devtools, redux } = await import('zustand/middleware')
-    const { createStore } = await import('zustand/vanilla')
     api = createStore(
       devtools(
         redux(
@@ -673,7 +644,6 @@ describe('with redux middleware', () => {
 })
 
 it('works in non-browser env', async () => {
-  const { devtools, createStore } = await getImports()
   const originalWindow = global.window
   global.window = undefined as any
 
@@ -685,7 +655,6 @@ it('works in non-browser env', async () => {
 })
 
 it('works in react native env', async () => {
-  const { devtools, createStore } = await getImports()
   const originalWindow = global.window
   global.window = {} as any
 
@@ -697,7 +666,6 @@ it('works in react native env', async () => {
 })
 
 it('preserves isRecording after setting from devtools', async () => {
-  const { devtools, createStore } = await getImports()
   const api = createStore(devtools(() => ({ count: 0 }), { enabled: true }))
   const [connection] = getNamedConnectionApis(undefined)
   const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
@@ -729,7 +697,6 @@ it('preserves isRecording after setting from devtools', async () => {
 
 describe('when redux connection was called on multiple stores with `name` undefined in `devtools` options', () => {
   it('should create separate connection for each devtools store with .connect call', async () => {
-    const { devtools, createStore } = await getImports()
     const options1 = { foo: 'bar', testConnectionId: 'asdf' }
     const options2 = { foo: 'barr', testConnectionId: '123asd' }
     const initialState1 = { count: 0 }
@@ -743,7 +710,6 @@ describe('when redux connection was called on multiple stores with `name` undefi
   })
 
   it('should call .init on each different connection object', async () => {
-    const { devtools, createStore } = await getImports()
     const options1 = { foo: 'bar', testConnectionId: 'asdf' }
     const options2 = { foo: 'barr', testConnectionId: '123asd' }
     const initialState1 = { count: 0 }
@@ -761,15 +727,22 @@ describe('when redux connection was called on multiple stores with `name` undefi
   })
 
   describe('when `store` property was provided in `devtools` call in options', () => {
-    it('should create single connection for all indernal calls of .connect and `store` is not passed to .connect', async () => {
-      const { devtools, createStore } = await getImports()
+    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+    // Relevant issues https://github.com/nodejs/node/issues/35889
+    it('[CI-MATRIX-1] should create single connection for all indernal calls of .connect and `store` is not passed to .connect', async () => {
+      const { devtools: newDevtools } = await import('zustand/middleware')
+
       const options1 = { store: 'store1123', foo: 'bar1' }
       const options2 = { store: 'store2313132', foo: 'bar2' }
       const initialState1 = { count: 0 }
       const initialState2 = { count1: 1 }
 
-      createStore(devtools(() => initialState1, { enabled: true, ...options1 }))
-      createStore(devtools(() => initialState2, { enabled: true, ...options2 }))
+      createStore(
+        newDevtools(() => initialState1, { enabled: true, ...options1 })
+      )
+      createStore(
+        newDevtools(() => initialState2, { enabled: true, ...options2 })
+      )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
       expect(extensionConnector.connect).toHaveBeenCalledWith({
@@ -777,15 +750,22 @@ describe('when redux connection was called on multiple stores with `name` undefi
       })
     })
 
-    it('should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
-      const { devtools, createStore } = await getImports()
+    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+    // Relevant issues https://github.com/nodejs/node/issues/35889
+    it('[CI-MATRIX-2] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+      const { devtools: newDevtools } = await import('zustand/middleware')
+
       const options1 = { store: 'store12' }
       const options2 = { store: 'store21' }
       const initialState1 = { count1: 0 }
       const initialState2 = { count2: 1 }
 
-      createStore(devtools(() => initialState1, { enabled: true, ...options1 }))
-      createStore(devtools(() => initialState2, { enabled: true, ...options2 }))
+      createStore(
+        newDevtools(() => initialState1, { enabled: true, ...options1 })
+      )
+      createStore(
+        newDevtools(() => initialState2, { enabled: true, ...options2 })
+      )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
       const [connection] = getNamedConnectionApis(undefined)
@@ -804,7 +784,6 @@ describe('when redux connection was called on multiple stores with `name` undefi
 describe('when redux connection was called on multiple stores with `name` provided in `devtools` options', () => {
   describe('when same `name` is provided to all stores in devtools options', () => {
     it('should call .connect of redux extension with `name` that was passed from `devtools` options', async () => {
-      const { devtools, createStore } = await getImports()
       const connectionName = 'test'
       const options1 = { name: connectionName, store: 'store1123', foo: 'bar1' }
       const options2 = { name: connectionName, store: 'store1414', foo: 'bar1' }
@@ -824,7 +803,6 @@ describe('when redux connection was called on multiple stores with `name` provid
 
   describe('when different `name` props were provided for different group of stores in devtools options', () => {
     it('should call .connect of redux extension with `name` that was passed from `devtools` options', async () => {
-      const { devtools, createStore } = await getImports()
       const connectionNameGroup1 = 'test1'
       const connectionNameGroup2 = 'test2'
       const options1 = {
@@ -868,8 +846,10 @@ describe('when redux connection was called on multiple stores with `name` provid
       })
     })
 
-    it('should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
-      const { devtools, createStore } = await getImports()
+    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+    // Relevant issues https://github.com/nodejs/node/issues/35889
+    it('[CI-MATRIX-3] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+      const { devtools: newDevtools } = await import('zustand/middleware')
       const connectionNameGroup1 = 'test1'
       const connectionNameGroup2 = 'test2'
       const options1 = {
@@ -897,10 +877,18 @@ describe('when redux connection was called on multiple stores with `name` provid
       const initialState3 = { count: 5 }
       const initialState4 = { count: 7 }
 
-      createStore(devtools(() => initialState1, { enabled: true, ...options1 }))
-      createStore(devtools(() => initialState2, { enabled: true, ...options2 }))
-      createStore(devtools(() => initialState3, { enabled: true, ...options3 }))
-      createStore(devtools(() => initialState4, { enabled: true, ...options4 }))
+      createStore(
+        newDevtools(() => initialState1, { enabled: true, ...options1 })
+      )
+      createStore(
+        newDevtools(() => initialState2, { enabled: true, ...options2 })
+      )
+      createStore(
+        newDevtools(() => initialState3, { enabled: true, ...options3 })
+      )
+      createStore(
+        newDevtools(() => initialState4, { enabled: true, ...options4 })
+      )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(2)
       const [connection1, connection2] = getNamedConnectionApis(
@@ -926,7 +914,6 @@ describe('when redux connection was called on multiple stores with `name` provid
     })
 
     it('preserves isRecording after setting from devtools on proper connection subscriber', async () => {
-      const { devtools, createStore } = await getImports()
       const options1 = { name: 'asdf1' }
       const options2 = { name: 'asdf2' }
       const api1 = createStore(
@@ -967,8 +954,6 @@ describe('when redux connection was called on multiple stores with `name` provid
       }>
 
       it('works as expected', async () => {
-        const { devtools, redux } = await import('zustand/middleware')
-        const { createStore } = await import('zustand/vanilla')
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         api1 = createStore(
@@ -1065,7 +1050,6 @@ describe('when redux connection was called on multiple stores with `name` provid
 describe('when create devtools was called multiple times with `name` option undefined', () => {
   describe('When state changes...', () => {
     it("sends { type: setStateName || 'anonymous`, ...rest } as the action with current state, isolated from other connections", async () => {
-      const { devtools, createStore } = await getImports()
       const options1 = {
         enabled: true,
         testConnectionId: '123',
@@ -1121,7 +1105,6 @@ describe('when create devtools was called multiple times with `name` option unde
   describe('when it receives a message of type...', () => {
     describe('ACTION...', () => {
       it('does nothing, connections isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: '123' }
         const options2 = { testConnectionId: '231' }
         const options3 = { testConnectionId: '4342' }
@@ -1167,7 +1150,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('unless action type is __setState, connections isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1198,7 +1180,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1244,7 +1225,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1299,7 +1279,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('does not throw for unsupported payload, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1437,7 +1416,6 @@ describe('when create devtools was called multiple times with `name` option unde
 
     describe('DISPATCH and payload of type...', () => {
       it('RESET, it inits with initial state, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1485,7 +1463,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('COMMIT, it inits with current state, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1535,7 +1512,6 @@ describe('when create devtools was called multiple times with `name` option unde
 
     describe('ROLLBACK...', () => {
       it('it updates state without recording and inits with `message.state, connections are isolated from each other`', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1615,7 +1591,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('does not throw for unparsable `message.state`, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const increment1 = () => {}
         const increment2 = () => {}
         const increment3 = () => {}
@@ -1717,7 +1692,6 @@ describe('when create devtools was called multiple times with `name` option unde
       const increment3 = () => {}
 
       it('it updates state without recording with `message.state`, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1784,7 +1758,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('does not throw for unparsable `message.state`, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1880,7 +1853,6 @@ describe('when create devtools was called multiple times with `name` option unde
       const increment3 = () => {}
 
       it('it updates state without recording with `message.state`, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1948,7 +1920,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('does not throw for unparsable `message.state`, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -2037,7 +2008,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('IMPORT_STATE, it updates state without recording and inits the last computedState, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -2129,7 +2099,6 @@ describe('when create devtools was called multiple times with `name` option unde
       })
 
       it('PAUSE_RECORDING, it toggles the sending of actions, connections are isolated from each other', async () => {
-        const { devtools, createStore } = await getImports()
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -2243,7 +2212,6 @@ describe('when create devtools was called multiple times with `name` and `store`
   describe('when `type` was provided in store state methods as option', () => {
     describe('When state changes...', () => {
       it("sends { type: setStateName || 'anonymous`, ...rest } as the action with current state", async () => {
-        const { devtools, createStore } = await getImports()
         const options = {
           name: 'testOptionsName',
           store: 'someStore',
@@ -2282,7 +2250,6 @@ describe('when create devtools was called multiple times with `name` and `store`
     describe('when it receives a message of type...', () => {
       describe('ACTION...', () => {
         it('does nothing, connections isolated from each other', async () => {
-          const { devtools, createStore } = await getImports()
           const options1 = { testConnectionId: '123', store: 'store1' }
           const options2 = { testConnectionId: '231', store: 'store2' }
           const initialState1 = { count: 0 }
@@ -2337,7 +2304,6 @@ describe('when create devtools was called multiple times with `name` and `store`
         })
 
         it('unless action type is __setState, connections isolated from each other', async () => {
-          const { devtools, createStore } = await getImports()
           const name1 = 'name1'
           const name2 = 'name2'
           const store1 = 'someStore1'
@@ -2393,8 +2359,11 @@ describe('when create devtools was called multiple times with `name` and `store`
           console.error = originalConsoleError
         })
 
-        it('does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
-          const { devtools, createStore } = await getImports()
+        // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+        // Relevant issues https://github.com/nodejs/node/issues/35889
+        it('[CI-MATRIX-4] does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
+          const { devtools: newDevtools } = await import('zustand/middleware')
+
           const name1 = 'name1'
           const name2 = 'name2'
           const store1 = 'someStore1'
@@ -2412,10 +2381,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            devtools(() => initialState1, { enabled: true, ...options1 })
+            newDevtools(() => initialState1, { enabled: true, ...options1 })
           )
           const api2 = createStore(
-            devtools(() => initialState2, { enabled: true, ...options2 })
+            newDevtools(() => initialState2, { enabled: true, ...options2 })
           )
           ;(api1 as any).dispatch = jest.fn()
           ;(api2 as any).dispatch = jest.fn()
@@ -2440,8 +2409,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           expect((api2 as any).dispatch).not.toBeCalled()
         })
 
-        it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
-          const { devtools, createStore } = await getImports()
+        // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
+        // Relevant issues https://github.com/nodejs/node/issues/35889
+        it('[CI-MATRIX-5] dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
+          const { devtools: newDevtools } = await import('zustand/middleware')
           const name1 = 'name1'
           const name2 = 'name2'
           const store1 = 'someStore1'
@@ -2459,10 +2430,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            devtools(() => initialState1, { enabled: true, ...options1 })
+            newDevtools(() => initialState1, { enabled: true, ...options1 })
           )
           const api2 = createStore(
-            devtools(() => initialState2, { enabled: true, ...options2 })
+            newDevtools(() => initialState2, { enabled: true, ...options2 })
           )
           ;(api1 as any).dispatch = jest.fn()
           ;(api1 as any).dispatchFromDevtools = true

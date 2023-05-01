@@ -35,6 +35,22 @@ jobs:
           - 18.2.0
           - 18.3.0-next-1308e49a6-20230330
           - 0.0.0-experimental-1308e49a6-20230330
+        devtools-skip:
+          - CI-MATRIX-NOSKIP
+        include:
+          - devtools-skip: CI-MATRIX-[2345]
+            react: 16.8.0
+          - devtools-skip: CI-MATRIX-[1345]
+            react: 16.8.0
+          - devtools-skip: CI-MATRIX-[1245]
+            react: 16.8.0
+          - devtools-skip: CI-MATRIX-[1235]
+            react: 16.8.0
+          - devtools-skip: CI-MATRIX-[1234]
+            react: 16.8.0
+        exclude:
+          - devtools-skip: CI-MATRIX-NOSKIP
+            react: 16.8.0
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -53,7 +69,11 @@ jobs:
           sed -i~ 's/"jsx": "react-jsx"/"jsx": "react"/' tsconfig.json
           sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
-      - name: Test ${{ matrix.react }}
+          sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
+          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
+        env:
+          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
+      - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
           yarn test:ci

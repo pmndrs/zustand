@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
     "strict": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "nodenext",
+    "skipLibCheck": true /* FIXME remove this once redux fixes it */,
+    "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "baseUrl": ".",

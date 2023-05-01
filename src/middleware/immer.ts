@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import type { StateCreator, StoreMutatorIdentifier } from '../vanilla'
+import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
 
 type Immer = <
   T,

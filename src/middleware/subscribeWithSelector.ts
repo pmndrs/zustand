@@ -1,4 +1,4 @@
-import type { StateCreator, StoreMutatorIdentifier } from '../vanilla'
+import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
 
 type SubscribeWithSelector = <
   T,

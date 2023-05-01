@@ -14,6 +14,22 @@ jobs:
       matrix:
         build: [cjs, umd] # [cjs, esm, umd, system]
         env: [development, production]
+        devtools-skip:
+          - CI-MATRIX-NOSKIP
+        include:
+          - devtools-skip: CI-MATRIX-[2345]
+            build: umd
+          - devtools-skip: CI-MATRIX-[1345]
+            build: umd
+          - devtools-skip: CI-MATRIX-[1245]
+            build: umd
+          - devtools-skip: CI-MATRIX-[1235]
+            build: umd
+          - devtools-skip: CI-MATRIX-[1234]
+            build: umd
+        exclude:
+          - devtools-skip: CI-MATRIX-NOSKIP
+            build: umd
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -48,13 +64,23 @@ jobs:
           sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
-      - name: Patch for UMD/SystemJS
-        if: ${{ matrix.build == 'umd' || matrix.build == 'system' }}
+      - name: Patch for UMD
+        if: ${{ matrix.build == 'umd' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/${BUILD}\1.${NODE_ENV}.js/" package.json
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.${NODE_ENV}.js/" package.json
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
+          sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
         env:
-          BUILD: ${{ matrix.build }}
+          NODE_ENV: ${{ matrix.env }}
+        run: |
+          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
+        env:
+          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
+      - name: Patch for SystemJS
+        if: ${{ matrix.build == 'system' }}
+        run: |
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/system\1.${NODE_ENV}.js/" package.json
+        env:
           NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}
         run: |

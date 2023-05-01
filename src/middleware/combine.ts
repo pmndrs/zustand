@@ -1,4 +1,4 @@
-import type { StateCreator, StoreMutatorIdentifier } from '../vanilla'
+import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
 
 type Write<T, U> = Omit<T, keyof U> & U
 
