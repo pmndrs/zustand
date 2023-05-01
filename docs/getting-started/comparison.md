@@ -21,6 +21,8 @@ both are based on an immutable state model.
 However, Redux requires your app to be wrapped
 in context providers; Zustand does not.
 
+**Zustand**
+
 ```ts
 import { create } from 'zustand'
 
@@ -73,6 +75,8 @@ const useCountStore = create<State & Actions>((set) => ({
   dispatch: (action: Action) => set((state) => countReducer(state, action)),
 }))
 ```
+
+**Redux**
 
 ```ts
 import { createStore } from 'redux'
