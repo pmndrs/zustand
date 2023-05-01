@@ -64,15 +64,21 @@ jobs:
           sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
-      - name: Patch for UMD
-        if: ${{ matrix.build == 'umd' }}
+      - name: Patch for UMD (DEV)
+        if: ${{ matrix.build == 'umd' && matrix.env == 'development' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.${NODE_ENV}.js/" package.json
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.development.js/" package.json
           sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
           sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
+          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
         env:
-          NODE_ENV: ${{ matrix.env }}
+          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
+      - name: Patch for UMD (PRD)
+        if: ${{ matrix.build == 'umd' && matrix.env == 'production' }}
         run: |
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.production.js/" package.json
+          sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
+          sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
           sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
