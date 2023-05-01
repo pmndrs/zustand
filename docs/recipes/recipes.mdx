@@ -201,15 +201,14 @@ This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws)
 performance impact, when you are allowed to mutate the view directly.
 
 ```jsx
-const useStore = create(set => ({ scratches: 0, ... }))
+const useScratchStore = create(set => ({ scratches: 0, ... }))
 
 function Component() {
   // Fetch initial state
-  const scratchRef = useRef(useStore.getState().scratches)
+  const scratchRef = useRef(useScratchStore.getState().scratches)
   // Connect to the store on mount, disconnect on unmount, catch state-changes in a reference
-  useEffect(() => useStore.subscribe(
-    scratches => (scratchRef.current = scratches),
-    state => state.scratches
+  useEffect(() => useScratchStore.subscribe(
+    (state) => (scratchRef.current = state.scratches)
   ), [])
   // ...
 }

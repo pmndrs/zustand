@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import CodePreview from './components/CodePreview'
 import Details from './components/Details'
-import code from './resources/code'
 
 const useStore = create((set) => ({
   count: 1,
@@ -23,7 +22,7 @@ export default function App() {
     <div className="main">
       <div className="code">
         <div className="code-container">
-          <CodePreview code={code} />
+          <CodePreview />
           <Counter />
         </div>
       </div>

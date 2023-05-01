@@ -13,7 +13,7 @@ export const useBoundStore = create((set) => ({
   text: 'hello',
   inc: () => set((state) => ({ count: state.count + 1 })),
   setText: (text) => set({ text }),
-})
+}))
 ```
 
 This creates a self-contained store with data and actions together.

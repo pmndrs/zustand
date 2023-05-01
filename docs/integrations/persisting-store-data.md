@@ -273,7 +273,7 @@ In some applications you may need to control when the first hydration occurs.
 For example, in server-rendered apps.
 
 If you set `skipHydration`, the initial call for hydration isn't called,
-and it is left up to you to manually call `reHydrate()`.
+and it is left up to you to manually call `rehydrate()`.
 
 ```ts
 export const useBoundStore = create(
@@ -291,12 +291,12 @@ export const useBoundStore = create(
 ```
 
 ```tsx
-export function StoreConsumer(){
-  const store = useBoundStore();
+import { useBoundStore } from './path-to-store';
 
+export function StoreConsumer() {
   // hydrate persisted store after on mount
   useEffect(() => {
-    store.persist.reHydrate();
+    useBoundStore.persist.rehydrate();
   }, [])
 
   return (
