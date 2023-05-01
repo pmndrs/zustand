@@ -454,7 +454,7 @@ in the [FAQ](#faq) section below.
 
 ### Usage in Next.js
 
-NextJS uses Server Side Rendering, and it will compare the rendered component on the server with the one rendered on client. But since you are using data from browser to change your component, the two renders will differ and Next will throw an warning at you.
+NextJS uses Server Side Rendering, and it will compare the rendered component on the server with the one rendered on client. But since you are using data from browser to change your component, the two renders will differ and Next will throw a warning at you.
 
 The errors usually are:
 
