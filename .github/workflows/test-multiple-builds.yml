@@ -75,7 +75,6 @@ jobs:
         if: ${{ matrix.build == 'umd' && matrix.env == 'production' }}
         run: |
           sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.production.js/" package.json
-          sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
           sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
