@@ -1,6 +1,6 @@
+import { StrictMode, useEffect } from 'react'
 import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { act, render, waitFor } from '@testing-library/react'
-import { StrictMode, useEffect } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { replacer, reviver } from './test-utils'
@@ -45,11 +45,7 @@ describe('persist middleware with async configuration', () => {
     const storage = {
       getItem: async (name: string) =>
         JSON.stringify({
-          state: {
-            count: 42,
-            name,
-            map: { type: 'Map', value: [['foo', 'bar']] },
-          },
+          state: { count: 42, name },
           version: 0,
         }),
       setItem: () => {},
@@ -61,21 +57,20 @@ describe('persist middleware with async configuration', () => {
         () => ({
           count: 0,
           name: 'empty',
-          map: new Map(),
         }),
         {
           name: 'test-storage',
-          storage: createJSONStorage(() => storage, { replacer, reviver }),
+          storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         }
       )
     )
 
     function Counter() {
-      const { count, name, map } = useBoundStore()
+      const { count, name } = useBoundStore()
       return (
         <div>
-          count: {count}, name: {name}, map: {map.get('foo')}
+          count: {count}, name: {name}
         </div>
       )
     }
@@ -86,10 +81,10 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>
     )
 
-    await findByText('count: 0, name: empty, map:')
-    await findByText('count: 42, name: test-storage, map: bar')
+    await findByText('count: 0, name: empty')
+    await findByText('count: 42, name: test-storage')
     expect(onRehydrateStorageSpy).toBeCalledWith(
-      { count: 42, name: 'test-storage', map: new Map([['foo', 'bar']]) },
+      { count: 42, name: 'test-storage' },
       undefined
     )
   })
@@ -135,14 +130,13 @@ describe('persist middleware with async configuration', () => {
 
   it('can persist state', async () => {
     const { storage, setItemSpy } = createPersistantStore(null)
-    const map = new Map()
 
     const createStore = () => {
       const onRehydrateStorageSpy = jest.fn()
       const useBoundStore = create(
-        persist(() => ({ count: 0, map }), {
+        persist(() => ({ count: 0 }), {
           name: 'test-storage',
-          storage: createJSONStorage(() => storage, { replacer, reviver }),
+          storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
         })
       )
@@ -164,19 +158,15 @@ describe('persist middleware with async configuration', () => {
     )
     await findByText('count: 0')
     await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0, map }, undefined)
+      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
     })
 
     // Write something to the store
-    const updatedMap = map.set('foo', 'bar')
-    act(() => useBoundStore.setState({ count: 42, map: updatedMap }))
+    act(() => useBoundStore.setState({ count: 42 }))
     await findByText('count: 42')
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
-      JSON.stringify({
-        state: { count: 42, map: { type: 'Map', value: [['foo', 'bar']] } },
-        version: 0,
-      })
+      JSON.stringify({ state: { count: 42 }, version: 0 })
     )
 
     // Create the same store a second time and check if the persisted state
@@ -186,12 +176,8 @@ describe('persist middleware with async configuration', () => {
       onRehydrateStorageSpy: onRehydrateStorageSpy2,
     } = createStore()
     function Counter2() {
-      const { count, map } = useBoundStore2()
-      return (
-        <div>
-          count: {count}, map-content: {[...map]}
-        </div>
-      )
+      const { count } = useBoundStore2()
+      return <div>count: {count}</div>
     }
 
     const { findByText: findByText2 } = render(
@@ -201,10 +187,7 @@ describe('persist middleware with async configuration', () => {
     )
     await findByText2('count: 42')
     await waitFor(() => {
-      expect(onRehydrateStorageSpy2).toBeCalledWith(
-        { count: 42, map: updatedMap },
-        undefined
-      )
+      expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
     })
   })
 
@@ -715,5 +698,121 @@ describe('persist middleware with async configuration', () => {
 
     await findByText('count: 2')
     expect(useBoundStore.getState().count).toEqual(2)
+  })
+
+  it('can rehydrate state with custom deserialized Map', async () => {
+    const onRehydrateStorageSpy = jest.fn()
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: {
+            map: { type: 'Map', value: [['foo', 'bar']] },
+          },
+        }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(
+        () => ({
+          map: new Map(),
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage, { replacer, reviver }),
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+        }
+      )
+    )
+
+    function MapDisplay() {
+      const { map } = useBoundStore()
+      return <div>map: {map.get('foo')}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <MapDisplay />
+      </StrictMode>
+    )
+
+    await findByText('map: bar')
+    expect(onRehydrateStorageSpy).toBeCalledWith(
+      { map: new Map([['foo', 'bar']]) },
+      undefined
+    )
+  })
+
+  it('can persist state with custom serialization of Map', async () => {
+    const { storage, setItemSpy } = createPersistantStore(null)
+    const map = new Map()
+
+    const createStore = () => {
+      const onRehydrateStorageSpy = jest.fn()
+      const useBoundStore = create(
+        persist(() => ({ map }), {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage, { replacer, reviver }),
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+        })
+      )
+      return { useBoundStore, onRehydrateStorageSpy }
+    }
+
+    // Initialize from empty storage
+    const { useBoundStore, onRehydrateStorageSpy } = createStore()
+
+    function MapDisplay() {
+      const { map } = useBoundStore()
+      return <div>map-content: {map.get('foo')}</div>
+    }
+
+    const { findByText } = render(
+      <StrictMode>
+        <MapDisplay />
+      </StrictMode>
+    )
+    await findByText('map-content:')
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy).toBeCalledWith({ map }, undefined)
+    })
+
+    // Write something to the store
+    const updatedMap = new Map(map).set('foo', 'bar')
+    act(() => useBoundStore.setState({ map: updatedMap }))
+    await findByText('map-content: bar')
+
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: { map: { type: 'Map', value: [['foo', 'bar']] } },
+        version: 0,
+      })
+    )
+
+    // Create the same store a second time and check if the persisted state
+    // is loaded correctly
+    const {
+      useBoundStore: useBoundStore2,
+      onRehydrateStorageSpy: onRehydrateStorageSpy2,
+    } = createStore()
+    function MapDisplay2() {
+      const { map } = useBoundStore2()
+      return <div>map-content: {map.get('foo')}</div>
+    }
+
+    const { findByText: findByText2 } = render(
+      <StrictMode>
+        <MapDisplay2 />
+      </StrictMode>
+    )
+    await findByText2('map-content: bar')
+    await waitFor(() => {
+      expect(onRehydrateStorageSpy2).toBeCalledWith(
+        { map: updatedMap },
+        undefined
+      )
+    })
   })
 })

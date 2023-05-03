@@ -20,8 +20,8 @@ export interface PersistStorage<S> {
 }
 
 type JsonStorageOptions = {
-  reviver: (key: string, value: unknown) => unknown
-  replacer: (key: string, value: unknown) => unknown
+  reviver?: (key: string, value: unknown) => unknown
+  replacer?: (key: string, value: unknown) => unknown
 }
 
 export function createJSONStorage<S>(
