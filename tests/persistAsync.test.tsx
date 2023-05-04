@@ -700,7 +700,7 @@ describe('persist middleware with async configuration', () => {
   })
 
   it('can rehydrate state with custom deserialized Map', async () => {
-    const onRehydrateStorageSpy = jest.fn()
+    const onRehydrateStorageSpy = vi.fn()
     const storage = {
       getItem: async () =>
         JSON.stringify({
@@ -748,7 +748,7 @@ describe('persist middleware with async configuration', () => {
     const map = new Map()
 
     const createStore = () => {
-      const onRehydrateStorageSpy = jest.fn()
+      const onRehydrateStorageSpy = vi.fn()
       const useBoundStore = create(
         persist(() => ({ map }), {
           name: 'test-storage',

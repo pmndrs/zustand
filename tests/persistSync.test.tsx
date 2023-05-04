@@ -670,7 +670,7 @@ describe('persist middleware with sync configuration', () => {
     }
 
     const map = new Map()
-    const onRehydrateStorageSpy = jest.fn()
+    const onRehydrateStorageSpy = vi.fn()
     const useBoundStore = create(
       persist(
         () => ({
@@ -696,7 +696,7 @@ describe('persist middleware with sync configuration', () => {
     const map = new Map()
 
     const createStore = () => {
-      const onRehydrateStorageSpy = jest.fn()
+      const onRehydrateStorageSpy = vi.fn()
       const useBoundStore = create(
         persist(() => ({ map }), {
           name: 'test-storage',
