@@ -23,8 +23,14 @@ export interface PersistStorage<S> {
   removeItem: (name: string) => void | Promise<void>
 }
 
+type JsonStorageOptions = {
+  reviver?: (key: string, value: unknown) => unknown
+  replacer?: (key: string, value: unknown) => unknown
+}
+
 export function createJSONStorage<S>(
-  getStorage: () => StateStorage
+  getStorage: () => StateStorage,
+  options?: JsonStorageOptions
 ): PersistStorage<S> | undefined {
   let storage: StateStorage | undefined
   try {
@@ -39,7 +45,7 @@ export function createJSONStorage<S>(
         if (str === null) {
           return null
         }
-        return JSON.parse(str) as StorageValue<S>
+        return JSON.parse(str, options?.reviver) as StorageValue<S>
       }
       const str = (storage as StateStorage).getItem(name) ?? null
       if (str instanceof Promise) {
@@ -48,7 +54,10 @@ export function createJSONStorage<S>(
       return parse(str)
     },
     setItem: (name, newValue) =>
-      (storage as StateStorage).setItem(name, JSON.stringify(newValue)),
+      (storage as StateStorage).setItem(
+        name,
+        JSON.stringify(newValue, options?.replacer)
+      ),
     removeItem: (name) => (storage as StateStorage).removeItem(name),
   }
   return persistStorage
