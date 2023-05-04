@@ -68,8 +68,6 @@ jobs:
           sed -i~ '1s/^/import React from "react";/' tests/*.tsx
           sed -i~ 's/"jsx": "react-jsx"/"jsx": "react"/' tsconfig.json
           sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
-          sed -i~ 's/"test:ci":.*,$/"test:ci": "jest",/' package.json
-          sed -i~ 's/= await import(/= require(/' tests/devtools.test.tsx
           sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
         env:
           DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}

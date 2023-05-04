@@ -91,12 +91,10 @@
     "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "eslint:ci": "eslint  --no-eslintrc --c .eslintrc.json '*.{js,json}' '{src,tests}/**/*.{ts,tsx}'",
     "pretest": "tsc --noEmit",
-    "test": "yarn node --experimental-vm-modules $(yarn bin jest)",
-    "test:ci": "yarn node --experimental-vm-modules $(yarn bin jest)",
-    "test:dev": "yarn node --experimental-vm-modules $(yarn bin jest) --watch --no-coverage",
-    "test:coverage:watch": "yarn node --experimental-vm-modules $(yarn bin jest) --watch",
+    "test": "vitest --ui --coverage",
+    "test:ci": "vitest",
     "patch-d-ts": "node -e \"var {entries}=require('./rollup.config.js');require('shelljs').find('dist/**/*.d.ts').forEach(f=>{entries.forEach(({find,replacement})=>require('shelljs').sed('-i',new RegExp(' from \\''+find.source.slice(0,-1)+'\\';$'),' from \\''+replacement+'\\';',f));require('shelljs').sed('-i',/ from '(\\.[^']+)\\.ts';$/,' from \\'\\$1\\';',f)})\"",
-    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined; this.jest=undefined;\"",
+    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
     "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').copyFileSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
   },
   "engines": {
@@ -132,44 +130,9 @@
     "url": "https://github.com/pmndrs/zustand/issues"
   },
   "homepage": "https://github.com/pmndrs/zustand",
-  "jest": {
-    "rootDir": ".",
-    "testEnvironment": "jsdom",
-    "preset": "ts-jest/presets/default-esm",
-    "transform": {
-      "^.+\\.(t|j)sx?$": [
-        "ts-jest",
-        {
-          "useESM": true
-        }
-      ]
-    },
-    "extensionsToTreatAsEsm": [
-      ".ts",
-      ".tsx"
-    ],
-    "moduleNameMapper": {
-      "^zustand$": "<rootDir>/src/index.ts",
-      "^zustand/(.*)$": "<rootDir>/src/$1.ts"
-    },
-    "modulePathIgnorePatterns": [
-      "dist"
-    ],
-    "testRegex": "test.(js|ts|tsx)$",
-    "coverageDirectory": "./coverage/",
-    "collectCoverage": true,
-    "coverageReporters": [
-      "json",
-      "html",
-      "text",
-      "text-summary"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.{js,ts,tsx}",
-      "tests/**/*.{js,ts,tsx}"
-    ]
-  },
   "dependencies": {
+    "@vitest/ui": "^0.30.1",
+    "eslint-plugin-vitest": "^0.1.4",
     "use-sync-external-store": "1.2.0"
   },
   "devDependencies": {
@@ -192,6 +155,7 @@
     "@types/use-sync-external-store": "^0.0.3",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
+    "@vitest/coverage-c8": "^0.30.1",
     "concurrently": "^8.0.1",
     "downlevel-dts": "^0.11.0",
     "esbuild": "^0.17.14",
@@ -199,13 +163,11 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "immer": "^9.0.21",
-    "jest": "^29.5.0",
-    "jest-environment-jsdom": "^29.5.0",
+    "jsdom": "^21.1.1",
     "json": "^11.0.0",
     "prettier": "^2.8.7",
     "react": "^18.2.0",
@@ -214,8 +176,8 @@
     "rollup": "^3.20.2",
     "rollup-plugin-esbuild": "^5.0.0",
     "shx": "^0.3.4",
-    "ts-jest": "^29.0.5",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.3",
+    "vitest": "^0.30.1"
   },
   "peerDependencies": {
     "immer": ">=9.0",
