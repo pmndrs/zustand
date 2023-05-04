@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { replacer, reviver } from './test-utils'
 
 const createPersistentStore = (initialValue: string | null) => {
   let state = initialValue
@@ -657,5 +658,85 @@ describe('persist middleware with sync configuration', () => {
     )
 
     expect(useBoundStore.getState().count).toEqual(2)
+  })
+
+  it('can rehydrate state with custom deserialized Map', () => {
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          map: { type: 'Map', value: [['foo', 'bar']] },
+        }),
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const map = new Map()
+    const onRehydrateStorageSpy = jest.fn()
+    const useBoundStore = create(
+      persist(
+        () => ({
+          map,
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage),
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+        }
+      )
+    )
+
+    const updatedMap = map.set('foo', 'bar')
+    expect(useBoundStore.getState()).toEqual({
+      map: updatedMap,
+    })
+    expect(onRehydrateStorageSpy).toBeCalledWith({ map: updatedMap }, undefined)
+  })
+
+  it('can persist state with custom serialization of Map', () => {
+    const { storage, setItemSpy } = createPersistentStore(null)
+    const map = new Map()
+
+    const createStore = () => {
+      const onRehydrateStorageSpy = jest.fn()
+      const useBoundStore = create(
+        persist(() => ({ map }), {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage, { replacer, reviver }),
+          onRehydrateStorage: () => onRehydrateStorageSpy,
+        })
+      )
+      return { useBoundStore, onRehydrateStorageSpy }
+    }
+
+    // Initialize from empty storage
+    const { useBoundStore, onRehydrateStorageSpy } = createStore()
+    expect(useBoundStore.getState()).toEqual({ map })
+    expect(onRehydrateStorageSpy).toBeCalledWith({ map }, undefined)
+
+    // Write something to the store
+    const updatedMap = map.set('foo', 'bar')
+    useBoundStore.setState({ map: updatedMap })
+    expect(useBoundStore.getState()).toEqual({
+      map: updatedMap,
+    })
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: { map: { type: 'Map', value: [['foo', 'bar']] } },
+        version: 0,
+      })
+    )
+
+    // Create the same store a second time and check if the persisted state
+    // is loaded correctly
+    const {
+      useBoundStore: useBoundStore2,
+      onRehydrateStorageSpy: onRehydrateStorageSpy2,
+    } = createStore()
+    expect(useBoundStore2.getState()).toEqual({ map: updatedMap })
+    expect(onRehydrateStorageSpy2).toBeCalledWith(
+      { map: updatedMap },
+      undefined
+    )
   })
 })
