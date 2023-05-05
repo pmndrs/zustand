@@ -94,6 +94,8 @@ const { nuts, honey } = useBearStore(
   (state) => ({ nuts: state.nuts, honey: state.honey }),
   shallow
 )
+// or use helper with createSelector
+const { nuts, honey } = useBearStore(createSelector('nuts', 'honey'), shallow)
 
 // Array pick, re-renders the component when either state.nuts or state.honey change
 const [nuts, honey] = useBearStore(

@@ -73,6 +73,15 @@
       },
       "module": "./esm/context.js",
       "default": "./context.js"
+    },
+    "./createSelector": {
+      "types": "./createSelector.d.ts",
+      "import": {
+        "types": "./esm/createSelector.d.mts",
+        "default": "./esm/createSelector.mjs"
+      },
+      "module": "./esm/createSelector.js",
+      "default": "./createSelector.js"
     }
   },
   "sideEffects": false,
