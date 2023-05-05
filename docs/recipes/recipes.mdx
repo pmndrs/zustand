@@ -410,8 +410,8 @@ const useStore = create(devtools(store, { enabled: false }))
 ```
 
 The `devtools` middleware takes the store function as its first argument.
-Optionally, you can name the store with a second argument:
-`devtools(store, "MyStore")`, which will be prefixed to your actions.
+Optionally, you can name the store with a second argument `devtoolsOptions`:
+`devtools(store, { store: "MyStore" })`, which will be prefixed to your actions.
 
 `devtools` will only log actions from each separated store,
 unlike in a typical _combined reducers_ Redux store.
