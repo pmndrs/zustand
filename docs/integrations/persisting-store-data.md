@@ -519,7 +519,7 @@ import { useBearStore } from './stores/useBearStore'
 const bears = useStore(useBearStore, (state) => state.categorias)
 ```
 
-Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#issuecomment-1481801942) which points to [this blog post](https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5). Kudos to them!
+Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#issuecomment-1481801942), which points to [this blog post](https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5).
 
 ## FAQ
 
