@@ -467,7 +467,7 @@ To solve these errors, create a custom hook so that Zustand waits a little befor
 
 Create a file with the following:
 
-```typescript
+```ts
 // useStore.ts
 import { useState, useEffect } from 'react'
 
@@ -490,7 +490,7 @@ export default useStore
 
 Now in your pages, you will use the hook a little bit differently:
 
-```typescript
+```ts
 // useBearStore.ts
 
 import { create } from 'zustand'
@@ -510,13 +510,13 @@ export const useBearStore = create(
 )
 ```
 
-```typescript
+```ts
 // yourComponent.tsx
 
 import useStore from './useStore'
 import { useBearStore } from './stores/useBearStore'
 
-const bears = useStore(useBearStore, (state) => state.categorias)
+const bears = useStore(useBearStore, (state) => state.bears)
 ```
 
 Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#issuecomment-1481801942), which points to [this blog post](https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5).
