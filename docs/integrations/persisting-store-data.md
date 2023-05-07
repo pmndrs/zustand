@@ -488,7 +488,7 @@ const useStore = <T, F>(
 export default useStore
 ```
 
-Now on your pages, you will use the hook a little bit differently:
+Now in your pages, you will use the hook a little bit differently:
 
 ```typescript
 // useBearStore.ts
