@@ -465,7 +465,7 @@ The errors usually are:
 
 To solve these errors, create a custom hook so that Zustand waits a little before changing your components.
 
-create a file and put this code:
+Create a file with the following:
 
 ```typescript
 // useStore.ts
