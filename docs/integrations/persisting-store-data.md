@@ -463,7 +463,7 @@ The errors usually are:
 - Hydration failed because the initial UI does not match what was rendered on the server
 - There was an error while hydrating. Because the error happened outside of a Suspense boundary, the entire root will switch to client rendering
 
-To solve these errors, you will need to create a custom hook that makes so that zustand waits a little bit before changing your components.
+To solve these errors, create a custom hook so that Zustand waits a little before changing your components.
 
 create a file and put this code:
 
