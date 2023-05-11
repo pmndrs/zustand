@@ -15,7 +15,7 @@ const hashStorage: StateStorage = {
   getItem: (key): string => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
     const storedValue = searchParams.get(key) ?? ''
-    return storedValue
+    return JSON.parse(storedValue)
   },
   setItem: (key, newValue): void => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
@@ -45,4 +45,4 @@ export const useBoundStore = create(
 
 ## CodeSandbox Demo
 
-https://codesandbox.io/s/zustand-state-with-url-hash-demo-pn20n5?file=/src/store/index.ts
+https://codesandbox.io/s/zustand-state-with-url-hash-demo-f29b88?file=/src/store/index.ts
