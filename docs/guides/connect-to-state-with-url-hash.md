@@ -56,100 +56,103 @@ If you want the URL params to always populate, the conditional check on `window.
 The implementation below will update the URL in place, without refresh, as the relevant states change.
 
 ```ts
-import { create } from 'zustand';
-import { persist, StateStorage, createJSONStorage } from 'zustand/middleware';
+import { create } from 'zustand'
+import { persist, StateStorage, createJSONStorage } from 'zustand/middleware'
 
 const persistentStorage: StateStorage = {
-    getItem: (key): string => {
-        // Check URL first
-        if (window.location.search.slice(1)) {
-            const searchParams = new URLSearchParams(window.location.search.slice(1));
-            const storedValue = searchParams.get(key);
-            return JSON.parse(storedValue); // **
-        } else {
-            // Otherwise, we should load from localstorage or alternative storage
-            return JSON.parse(localStorage.getItem(key));
-        }
-    },
-    setItem: (key, newValue): void => {
-        // Check if query params exist at all, can remove check if always want to set URL
-        if (window.location.search.slice(1)) {
-            const searchParams = new URLSearchParams(window.location.search.slice(1));
-            searchParams.set(key, JSON.stringify(newValue)); // **
-            window.history.replaceState(null, null, `?${searchParams.toString()}`);
-        }
+  getItem: (key): string => {
+    // Check URL first
+    if (window.location.search.slice(1)) {
+      const searchParams = new URLSearchParams(window.location.search.slice(1))
+      const storedValue = searchParams.get(key)
+      return JSON.parse(storedValue) // **
+    } else {
+      // Otherwise, we should load from localstorage or alternative storage
+      return JSON.parse(localStorage.getItem(key))
+    }
+  },
+  setItem: (key, newValue): void => {
+    // Check if query params exist at all, can remove check if always want to set URL
+    if (window.location.search.slice(1)) {
+      const searchParams = new URLSearchParams(window.location.search.slice(1))
+      searchParams.set(key, JSON.stringify(newValue)) // **
+      window.history.replaceState(null, null, `?${searchParams.toString()}`)
+    }
 
-        localStorage.setItem(key, JSON.stringify(newValue));
-    },
-    removeItem: (key): void => {
-        const searchParams = new URLSearchParams(window.location.search.slice(1));
-        searchParams.delete(key);
-        window.location.search = searchParams.toString();
-    },
+    localStorage.setItem(key, JSON.stringify(newValue))
+  },
+  removeItem: (key): void => {
+    const searchParams = new URLSearchParams(window.location.search.slice(1))
+    searchParams.delete(key)
+    window.location.search = searchParams.toString()
+  },
 }
 
 let localAndUrlStore = (set) => ({
-    searchGameDifficulty: {
-        beginner: false,
-        intermediate: true,
-        expert: false,
-    },
-    setSearchGameDifficulty: (difficulty, selection) => set((state) => ({
-        searchGameDifficulty: {...state.searchGameDifficulty, [difficulty]: selection}
+  searchGameDifficulty: {
+    beginner: false,
+    intermediate: true,
+    expert: false,
+  },
+  setSearchGameDifficulty: (difficulty, selection) =>
+    set((state) => ({
+      searchGameDifficulty: {
+        ...state.searchGameDifficulty,
+        [difficulty]: selection,
+      },
     })),
 
-    searchRatings: {
-        1: false,
-        2: false,
-        3: false,
-        4: true,
-        5: true
-    },
-    setSearchRatings: (rating, selection) => set((state) => ({
-        searchRatings: {...state.searchRatings, [rating]: selection}
+  searchRatings: {
+    1: false,
+    2: false,
+    3: false,
+    4: true,
+    5: true,
+  },
+  setSearchRatings: (rating, selection) =>
+    set((state) => ({
+      searchRatings: { ...state.searchRatings, [rating]: selection },
     })),
-});
+})
 
 let storageOptions = {
-    name: "gameSearchPreferences",
-    storage: persistentStorage,
-};
+  name: 'gameSearchPreferences',
+  storage: persistentStorage,
+}
 
 const useLocalAndUrlStore = create(
-    persist(
-        devtools(localAndUrlStore),
-        storageOptions
-    )
-);
+  persist(devtools(localAndUrlStore), storageOptions)
+)
 
-export default localAndUrlStore;
+export default localAndUrlStore
 ```
 
 When generating the URL from a component, you can call buildShareableUrl:
 
 ```ts
 const buildURLSuffix = (params, version = 0) => {
-    const searchParams = new URLSearchParams();
+  const searchParams = new URLSearchParams()
 
-    const zustandStoreParams = {
-        "state":{
-            searchGameDifficulty: params.searchGameDifficulty,
-            searchRatings: params.searchRatings,
-        }, 
-        "version": version // version is here because that is included with how Zustand sets the state
-    };
+  const zustandStoreParams = {
+    state: {
+      searchGameDifficulty: params.searchGameDifficulty,
+      searchRatings: params.searchRatings,
+    },
+    version: version, // version is here because that is included with how Zustand sets the state
+  }
 
-    // The URL param key should match the name of the store, as specified as in storageOptions above
-    searchParams.set("gameSearchPreferences", JSON.stringify(zustandStoreParams)); // **
-    return searchParams.toString();
-};
+  // The URL param key should match the name of the store, as specified as in storageOptions above
+  searchParams.set('gameSearchPreferences', JSON.stringify(zustandStoreParams)) // **
+  return searchParams.toString()
+}
 
 export const buildShareableUrl = (params, version) => {
-    return `${window.location.origin}?${buildURLSuffix(params, version)}`;
+  return `${window.location.origin}?${buildURLSuffix(params, version)}`
 }
 ```
 
 The generated URL would look like (here without any encoding, for readability):
 
 https://localhost/search?gameSearchPreferences={"state":{"searchGameDifficulty":{"beginner":false,"intermediate":true,"expert":false},"searchRatings":{"1":false,"2":false,"3":false,"4":true,"5":true}},"version":0}}
->>>>>>> 3f67f7a (docs: persist and connect state with url)
+
+> > > > > > > 3f67f7a (docs: persist and connect state with url)
