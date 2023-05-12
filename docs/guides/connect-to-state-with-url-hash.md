@@ -154,5 +154,3 @@ export const buildShareableUrl = (params, version) => {
 The generated URL would look like (here without any encoding, for readability):
 
 https://localhost/search?gameSearchPreferences={"state":{"searchGameDifficulty":{"beginner":false,"intermediate":true,"expert":false},"searchRatings":{"1":false,"2":false,"3":false,"4":true,"5":true}},"version":0}}
-
-> > > > > > > 3f67f7a (docs: persist and connect state with url)
