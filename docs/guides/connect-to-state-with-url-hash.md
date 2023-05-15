@@ -45,11 +45,13 @@ export const useBoundStore = create(
 
 ### CodeSandbox Demo
 
-https://codesandbox.io/s/zustand-state-with-url-hash-demo-f29b88?file=/src/store/index.ts
+<https://codesandbox.io/s/zustand-state-with-url-hash-demo-f29b88?file=/src/store/index.ts>
 
 ## Persist and Connect State with URL Parameters (Example: URL Query Parameters)
 
-This example is for when you want to conditionally connect the state to the URL (here we use URL query parameters) when visiting the website from a populated URL, and always want it synced and consistent with something like localstorage.
+There are times when you want to conditionally connect the state to the URL.
+This example depicts usage of the URL query parameters
+while keeping it synced with another persistence implementation, like `localstorage`.
 
 If you want the URL params to always populate, the conditional check on `window.location.search.slice(1)` can be removed.
 
