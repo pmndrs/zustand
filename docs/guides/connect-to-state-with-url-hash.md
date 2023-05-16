@@ -53,7 +53,7 @@ There are times when you want to conditionally connect the state to the URL.
 This example depicts usage of the URL query parameters
 while keeping it synced with another persistence implementation, like `localstorage`.
 
-If you want the URL params to always populate, the conditional check on `window.location.search.slice(1)` can be removed.
+If you want the URL params to always populate, the conditional check on `getUrlSearch()` can be removed.
 
 The implementation below will update the URL in place, without refresh, as the relevant states change.
 
@@ -61,13 +61,17 @@ The implementation below will update the URL in place, without refresh, as the r
 import { create } from 'zustand'
 import { persist, StateStorage, createJSONStorage } from 'zustand/middleware'
 
+const getUrlSearch = () => {
+  return window.location.search.slice(1)
+}
+
 const persistentStorage: StateStorage = {
   getItem: (key): string => {
     // Check URL first
-    if (window.location.search.slice(1)) {
-      const searchParams = new URLSearchParams(window.location.search.slice(1))
+    if (getUrlSearch()) {
+      const searchParams = new URLSearchParams(getUrlSearch())
       const storedValue = searchParams.get(key)
-      return JSON.parse(storedValue) // **
+      return JSON.parse(storedValue)
     } else {
       // Otherwise, we should load from localstorage or alternative storage
       return JSON.parse(localStorage.getItem(key))
@@ -75,56 +79,37 @@ const persistentStorage: StateStorage = {
   },
   setItem: (key, newValue): void => {
     // Check if query params exist at all, can remove check if always want to set URL
-    if (window.location.search.slice(1)) {
-      const searchParams = new URLSearchParams(window.location.search.slice(1))
-      searchParams.set(key, JSON.stringify(newValue)) // **
+    if (getUrlSearch()) {
+      const searchParams = new URLSearchParams(getUrlSearch())
+      searchParams.set(key, JSON.stringify(newValue))
       window.history.replaceState(null, null, `?${searchParams.toString()}`)
     }
 
     localStorage.setItem(key, JSON.stringify(newValue))
   },
   removeItem: (key): void => {
-    const searchParams = new URLSearchParams(window.location.search.slice(1))
+    const searchParams = new URLSearchParams(getUrlSearch())
     searchParams.delete(key)
     window.location.search = searchParams.toString()
   },
 }
 
 let localAndUrlStore = (set) => ({
-  searchGameDifficulty: {
-    beginner: false,
-    intermediate: true,
-    expert: false,
-  },
-  setSearchGameDifficulty: (difficulty, selection) =>
-    set((state) => ({
-      searchGameDifficulty: {
-        ...state.searchGameDifficulty,
-        [difficulty]: selection,
-      },
-    })),
+  typesOfFish: [],
+  addTypeOfFish: (fishType) =>
+    set((state) => ({ typesOfFish: [...state.typesOfFish, fishType] })),
 
-  searchRatings: {
-    1: false,
-    2: false,
-    3: false,
-    4: true,
-    5: true,
-  },
-  setSearchRatings: (rating, selection) =>
-    set((state) => ({
-      searchRatings: { ...state.searchRatings, [rating]: selection },
-    })),
+  numberOfBears: 0,
+  setNumberOfBears: (newNumber) =>
+    set((state) => ({ numberOfBears: newNumber })),
 })
 
 let storageOptions = {
-  name: 'gameSearchPreferences',
+  name: 'fishAndBearsStore',
   storage: persistentStorage,
 }
 
-const useLocalAndUrlStore = create(
-  persist(devtools(localAndUrlStore), storageOptions)
-)
+const useLocalAndUrlStore = create(persist(localAndUrlStore, storageOptions))
 
 export default localAndUrlStore
 ```
@@ -137,14 +122,14 @@ const buildURLSuffix = (params, version = 0) => {
 
   const zustandStoreParams = {
     state: {
-      searchGameDifficulty: params.searchGameDifficulty,
-      searchRatings: params.searchRatings,
+      typesOfFish: params.typesOfFish,
+      numberOfBears: params.numberOfBears,
     },
     version: version, // version is here because that is included with how Zustand sets the state
   }
 
   // The URL param key should match the name of the store, as specified as in storageOptions above
-  searchParams.set('gameSearchPreferences', JSON.stringify(zustandStoreParams)) // **
+  searchParams.set('fishAndBearsStore', JSON.stringify(zustandStoreParams))
   return searchParams.toString()
 }
 
@@ -155,4 +140,4 @@ export const buildShareableUrl = (params, version) => {
 
 The generated URL would look like (here without any encoding, for readability):
 
-https://localhost/search?gameSearchPreferences={"state":{"searchGameDifficulty":{"beginner":false,"intermediate":true,"expert":false},"searchRatings":{"1":false,"2":false,"3":false,"4":true,"5":true}},"version":0}}
+`https://localhost/search?fishAndBearsStore={"state":{"typesOfFish":["tilapia","salmon"],"numberOfBears":15},"version":0}}`
