@@ -62,7 +62,7 @@ Now the selectors are auto generated and you can access them directly:
 const bears = useBearStore.use.bears()
 
 // get the action
-const increase = useBearStore.use.increment()
+const increment = useBearStore.use.increment()
 ```
 
 ## Live Demo
