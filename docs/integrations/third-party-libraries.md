@@ -16,7 +16,7 @@ This can be done using third-party libraries created by the community.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
-- [zustand-fetching](https://github.com/hecmatyar/zustand-fetching) - Cleans your store from boilerplate for requests and data transformation.
+- [zustand-fetching](https://github.com/hecmatyar/zustand-fetching) — Cleans your store from boilerplate for requests and data transformation.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook) — Automatic generation of Zustand hooks with Typescript support.
 - [derive-zustand](https://github.com/dai-shi/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
