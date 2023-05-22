@@ -16,7 +16,6 @@ This can be done using third-party libraries created by the community.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
-- [zustand-fetching](https://github.com/hecmatyar/zustand-fetching) — Cleans your store from boilerplate for requests and data transformation.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook) — Automatic generation of Zustand hooks with Typescript support.
 - [derive-zustand](https://github.com/dai-shi/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
@@ -34,6 +33,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
 - [zustand-di](https://github.com/charkour/zustand-di) - use react props to init zustand stores
+- [zustand-fetching](https://github.com/hecmatyar/zustand-fetching) — Cleans your store from boilerplate for requests and data transformation.
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
