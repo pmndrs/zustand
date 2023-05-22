@@ -33,6 +33,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
 - [zustand-di](https://github.com/charkour/zustand-di) - use react props to init zustand stores
+- [zustand-fetching](https://github.com/hecmatyar/zustand-fetching) — Cleans your store from boilerplate for requests and data transformation.
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
