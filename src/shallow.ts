@@ -55,14 +55,14 @@ export function shallow<T>(objA: T, objB: T) {
   return true
 }
 
-/**	
- * @deprecated Use `import { shallow } from 'zustand/shallow'`	
- */	
-export default ((objA, objB) => {	
-  if (import.meta.env?.MODE !== 'production') {	
-    console.warn(	
-      "[DEPRECATED] Default export is deprecated. Instead use `import { shallow } from 'zustand/shallow'`."	
-    )	
-  }	
-  return shallow(objA, objB)	
+/**
+ * @deprecated Use `import { shallow } from 'zustand/shallow'`
+ */
+export default ((objA, objB) => {
+  if (import.meta.env?.MODE !== 'production') {
+    console.warn(
+      "[DEPRECATED] Default export is deprecated. Instead use `import { shallow } from 'zustand/shallow'`."
+    )
+  }
+  return shallow(objA, objB)
 }) as typeof shallow
