@@ -1,5 +1,12 @@
+export function isEqual<T>(objA: T, objB: T) {
+  if (objA instanceof Date && objB instanceof Date) {
+    return objA.getTime() === objB.getTime();
+  }
+  return Object.is(objA, objB);
+}
+
 export function shallow<T>(objA: T, objB: T) {
-  if (Object.is(objA, objB)) {
+  if (isEqual(objA, objB)) {
     return true
   }
   if (
@@ -15,7 +22,7 @@ export function shallow<T>(objA: T, objB: T) {
     if (objA.size !== objB.size) return false
 
     for (const [key, value] of objA) {
-      if (!Object.is(value, objB.get(key))) {
+      if (!isEqual(value, objB.get(key))) {
         return false
       }
     }
@@ -32,10 +39,6 @@ export function shallow<T>(objA: T, objB: T) {
     }
     return true
   }
-  
-  if (objA instanceof Date && objB instanceof Date) {
-    return objA.getTime() === objB.getTime();
-  }
 
   const keysA = Object.keys(objA)
   if (keysA.length !== Object.keys(objB).length) {
@@ -44,22 +47,10 @@ export function shallow<T>(objA: T, objB: T) {
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i] as string) ||
-      !Object.is(objA[keysA[i] as keyof T], objB[keysA[i] as keyof T])
+      !isEqual(objA[keysA[i] as keyof T], objB[keysA[i] as keyof T])
     ) {
       return false
     }
   }
   return true
 }
-
-/**
- * @deprecated Use `import { shallow } from 'zustand/shallow'`
- */
-export default ((objA, objB) => {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn(
-      "[DEPRECATED] Default export is deprecated. Instead use `import { shallow } from 'zustand/shallow'`."
-    )
-  }
-  return shallow(objA, objB)
-}) as typeof shallow
