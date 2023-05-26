@@ -570,7 +570,7 @@ You can also create a custom `useHydration` hook:
 const useBoundStore = create(persist(...))
 
 const useHydration = () => {
-  const [hydrated, setHydrated] = useState(useBoundStore.persist.hasHydrated)
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
     // Note: This is just in case you want to take into account manual rehydration.
