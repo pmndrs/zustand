@@ -129,7 +129,8 @@ subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubs
 
 ```jsx
 import { create } from 'zustand'
-import { subscribeWithSelector, shallow } from 'zustand/middleware'
+import { subscribeWithSelector } from 'zustand/middleware'
+import { shallow } from 'zustand/shallow'
 const useStore = create(
   subscribeWithSelector(() => ({ paw: true, snout: true, fur: true }))
 )
