@@ -214,7 +214,9 @@ const devtoolsImpl: DevtoolsImpl =
       | false
     try {
       extensionConnector =
-        (enabled ?? import.meta.env?.MODE !== 'production') &&
+        (typeof enabled === 'boolean'
+          ? enabled
+          : import.meta.env?.MODE !== 'production') &&
         window.__REDUX_DEVTOOLS_EXTENSION__
     } catch (e) {
       // ignored
