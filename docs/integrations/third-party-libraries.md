@@ -26,6 +26,7 @@ This can be done using third-party libraries created by the community.
 - [shared-zustand](https://github.com/Tom-Julux/shared-zustand) — Cross-tab state sharing for Zustand.
 - [simple-zustand-devtools](https://github.com/beerose/simple-zustand-devtools) — 🐻⚛️ Inspect your Zustand store in React DevTools.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
+- [use-broadcast-ts](https://github.com/Romainlg29/use-broadcast) — Zustand middleware to share state between tabs.
 - [use-zustand](https://github.com/dai-shi/use-zustand) — Another custom hook to use Zustand vanilla store.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
