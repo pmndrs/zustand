@@ -261,7 +261,7 @@ const Component = () => {
 Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
 ```jsx
-import produce from 'immer'
+import { produce } from 'immer'
 
 const useLushStore = create((set) => ({
   lush: { forest: { contains: { a: 'bear' } } },
