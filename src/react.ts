@@ -17,11 +17,21 @@ const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
+type PartObjFromArrOfKeys<Obj, KeyArray extends readonly (keyof Obj)[]> = {
+  [Key in KeyArray[number]]: Obj[Key]
+}
+
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
 type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
+
+export function useStore<
+  S extends WithReact<StoreApi<unknown>>,
+  U extends PartObjFromArrOfKeys<S, A>,
+  A extends (keyof S)[]
+>(api: S, selector: A, equals?: (a: U, b: U) => boolean): U
 
 export function useStore<S extends WithReact<StoreApi<unknown>>>(
   api: S
@@ -29,20 +39,35 @@ export function useStore<S extends WithReact<StoreApi<unknown>>>(
 
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
-  selector: (state: ExtractState<S>) => U,
+  selector: (state: S) => U,
   equalityFn?: (a: U, b: U) => boolean
 ): U
 
 export function useStore<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
-  selector: (state: TState) => StateSlice = api.getState as any,
+  selector:
+    | ((state: TState) => StateSlice)
+    | (keyof TState)[] = api.getState as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean
 ) {
+  let selectorFn: (snapshot: TState) => StateSlice
+
+  if (typeof selector === 'function') {
+    selectorFn = selector
+  } else {
+    selectorFn = (snapshot: TState) => {
+      const selection: Partial<TState> = {}
+      selector.forEach((key) => {
+        selection[key] = snapshot[key]
+      })
+      return selection as StateSlice
+    }
+  }
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
     api.getServerState || api.getState,
-    selector,
+    selectorFn,
     equalityFn
   )
   useDebugValue(slice)
