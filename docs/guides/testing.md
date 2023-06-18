@@ -8,14 +8,11 @@ nav: 9
 
 ### Test Runners
 
-Typically, your test runner needs to be configured to run JavaScript/TypeScript syntax. If you're
+Usually, your test runner needs to be configured to run JavaScript/TypeScript syntax. If you're
 going to be testing UI components, you will likely need to configure the test runner to use JSDOM
 to provide a mock DOM environment.
 
-The examples in this page will assume you're using Jest, but the same patterns apply no matter what
-test runner you're using.
-
-See these resources for typical test runner configuration instructions:
+See these resources for test runner configuration instructions:
 
 - **Jest**
   - [Jest: Getting Started](https://jestjs.io/docs/getting-started)
@@ -28,7 +25,7 @@ See these resources for typical test runner configuration instructions:
 
 #### Web
 
-**We recommends using [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro)
+**We recommend using [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro)
 to test React components that connect to Zustand**. `RTL` is a simple and complete React DOM
 testing utility that encourages good testing practices. It uses `ReactDOM`'s render function and
 act from `react-dom/tests-utils`. (The [Testing Library](https://testing-library.com/) family of
@@ -36,7 +33,7 @@ tools also includes adapters for many other popular frameworks too.)
 
 #### Native
 
-**We recommends using [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro)
+**We recommend using [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro)
 to test React Native components that connect to Zustand**. `RTL` is a simple and complete native
 testing utility that encourages good testing practices. The API is the same as `RTL` library with
 some mire differences like `RNTL` queries are implemented independently, unlike other wrappers that
@@ -60,7 +57,8 @@ this means your application logic does not need to be changed or mocked when wri
 
 ## Setting Up Zustand for testing
 
-Since `Jest` and `Vitest` have slight differences.
+Since `Jest` and `Vitest` have slight difference like `Vitest` uses **ES modules** and `Jest`
+uses **CommonJS modules**, you need to keep that if you using `Vitest` instead of `Jest`.
 
 ### Jest
 
@@ -125,9 +123,31 @@ beforeEach(() => {
     })
   })
 })
+```
 
-// since vitest does not auto-mocking you need to use `vi.mock()` to make it works like `Jest`
-vi.mock('zustand')
+> **Note:** you can remove `import { beforeEach, vi } from 'vitest'` when [globals configuration](https://vitest.dev/config/#globals)
+> is enabled
+
+```ts
+// setup-vitest.ts
+import { vi } from 'vitest'
+vi.mock('zustand') // to make it works like `Jest` (auto-mocking)
+```
+
+> **Note**: you can remove `import { vi } from 'vitest'` when [globals configuration](https://vitest.dev/config/#globals)
+> is enabled
+
+```ts
+// vite.config.ts or vitest.config.ts
+import { defineConfig } from 'vite'
+// import { defineConfig } from 'vitest/config' // if you are using vitest without vite
+
+export default defineConfig({
+  test: {
+    // ...
+    setupFiles: ['setup-vitest.ts'],
+  },
+})
 ```
 
 In the next examples we are going to use `useStore`
@@ -168,6 +188,8 @@ function Counter() {
 ```
 
 ### Testing stores
+
+Still in progres. TBD
 
 ## References
 
