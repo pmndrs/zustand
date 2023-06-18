@@ -22,7 +22,7 @@ If you have a large application, Zustand supports [splitting the store into slic
 ### Use `set` / `setState` to update the store
 
 Always use `set` (or `setState`) to perform updates to your store.
-`set` (and `setState`) ensures the described update is immutably performed to the store.
+`set` (and `setState`) ensures the described update is correctly merged and listeners are appropriately notified.
 
 ### Colocate store actions
 
