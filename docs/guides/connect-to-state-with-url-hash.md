@@ -45,7 +45,7 @@ export const useBoundStore = create(
 
 ### CodeSandbox Demo
 
-<https://codesandbox.io/s/zustand-state-with-url-hash-demo-f29b88?file=/src/store/index.ts>
+https://codesandbox.io/s/zustand-state-with-url-hash-demo-f29b88?file=/src/store/index.ts
 
 ## Persist and Connect State with URL Parameters (Example: URL Query Parameters)
 
