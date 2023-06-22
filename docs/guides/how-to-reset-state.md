@@ -47,7 +47,7 @@ const useSlice = create<State & Actions>()((set, get) => ({
 Resetting multiple stores at once
 
 ```ts
-import { create: _create, StateCreator } from 'zustand'
+import { create as _create, StateCreator } from 'zustand'
 
 const resetters: (() => void)[] = []
 
