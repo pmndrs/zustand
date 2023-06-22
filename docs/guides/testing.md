@@ -24,11 +24,11 @@ See these resources for test runner configuration instructions:
 ### UI and Network Testing Tools
 
 **We recommend using [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro)
-to test out React components that connect to Zustand**. `RTL` is a simple and complete React DOM
-testing utility that encourages good testing practices. It uses `ReactDOM`'s render function and
-act from `react-dom/tests-utils`. Futhermore [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro) is the alternative to `RTL` to test out
-React Native components. The [Testing Library](https://testing-library.com/) family of
-tools also includes adapters for many other popular frameworks.
+to test out React components that connect to Zustand**. RTL is a simple and complete React DOM
+testing utility that encourages good testing practices. It uses ReactDOM's `render` function and
+`act` from `react-dom/tests-utils`. Futhermore, [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro)
+is the alternative to RTL to test out React Native components. The [Testing Library](https://testing-library.com/)
+family of tools also includes adapters for many other popular frameworks.
 
 We also recommend using [Mock Service Worker (MSW)](https://mswjs.io/) to mock network requests, as
 this means your application logic does not need to be changed or mocked when writing tests.
@@ -52,13 +52,12 @@ this means your application logic does not need to be changed or mocked when wri
 
 ## Setting Up Zustand for testing
 
-Since `Jest` and `Vitest` have slight differences, like `Vitest` using **ES modules** and `Jest`
-using **CommonJS modules**, you need to keep that in mind if you are using `Vitest` instead of
-`Jest`.
+Since Jest and Vitest have slight differences, like Vitest using **ES modules** and Jest using
+**CommonJS modules**, you need to keep that in mind if you are using Vitest instead of Jest.
 
 ### Jest
 
-In the next steps we are going to setup our `Jest` environment in order to mock `Zustand`
+In the next steps we are going to setup our Jest environment in order to mock Zustand
 
 ```ts
 // src/__mocks__/zustand.ts
@@ -116,7 +115,7 @@ export default config
 
 ### Vitest
 
-In the next steps we are going to setup our `Vitest` environment in order to mock `Zustand`
+In the next steps we are going to setup our Vitest environment in order to mock Zustand
 
 ```ts
 // src/__mocks__/zustand.ts
@@ -154,18 +153,18 @@ afterEach(() => {
 })
 ```
 
-> **Note:** without [globals configuration](https://vitest.dev/config/#globals) enabled you need to
-> use `import { beforeEach, vi } from 'vitest'` at top level
+> **Note:** without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
+> to add `import { afterEach, vi } from 'vitest'` at the top
 
 ```ts
 // src/setup-vitest.ts
 import '@testing-library/jest-dom'
 
-vi.mock('zustand') // to make it works like `Jest` (auto-mocking)
+vi.mock('zustand') // to make it works like Jest (auto-mocking)
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled you need to
-> use `import { vi } from 'vitest'` at top level
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
+> to add `import { vi } from 'vitest'` at the top
 
 ```ts
 // vitest.config.ts
@@ -243,7 +242,7 @@ describe('Counter', () => {
     ).toBeInTheDocument()
   })
 
-  test('should increase count', async () => {
+  test('should increase count by clicking a button', async () => {
     const user = userEvent.setup()
 
     renderCounter()
@@ -261,8 +260,8 @@ const renderCounter = () => {
 }
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled you need to
-> use `import { describe, test, expect } from 'vitest'` at top level
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
+> to add `import { describe, test, expect } from 'vitest'` at the top of each test file
 
 **CodeSandbox Demos:**
 
@@ -272,13 +271,12 @@ const renderCounter = () => {
 ## References
 
 - **React Testing Library**: [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro)
-  is a very light-weight solution for testing React components. It provides light utility functions
-  on top of `react-dom` and `react-dom/test-utils`, in a way that encourages better testing
-  practices. Its primary guiding principle is: "The more your tests resemble the way your software
-  is used, the more confidence they can give you."
+  is a very lightweight solution for testing React components. It provides utility functions on top
+  of `react-dom` and `react-dom/test-utils`, in a way that encourages better testing practices. Its
+  primary guiding principle is: "The more your tests resemble the way your software is used, the
+  more confidence they can give you."
 - **Native Testing Library**: [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro)
-  is a very light-weight solution for testing React Native components. It provides light utility
-  functions on top of `react-test-renderer`, in a way that encourages better testing practices. Its
-  primary guiding principle is as `RTL`.
+  is a very lightweight solution for testing React Native components, similarly to RTL, but its
+  functions are built on top of `react-test-renderer`.
 - **Testing Implementation Details**: Blog post by Kent C. Dodds on why he recommends to avoid
   [testing implementation details](https://kentcdodds.com/blog/testing-implementation-details).
