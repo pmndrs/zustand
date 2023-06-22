@@ -23,23 +23,12 @@ See these resources for test runner configuration instructions:
 
 ### UI and Network Testing Tools
 
-#### Web
-
 **We recommend using [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro)
-to test React components that connect to Zustand**. `RTL` is a simple and complete React DOM
+to test out React components that connect to Zustand**. `RTL` is a simple and complete React DOM
 testing utility that encourages good testing practices. It uses `ReactDOM`'s render function and
-act from `react-dom/tests-utils`. The [Testing Library](https://testing-library.com/) family of
+act from `react-dom/tests-utils`. Futhermore [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro) is the alternative to `RTL` to test out
+React Native components. The [Testing Library](https://testing-library.com/) family of
 tools also includes adapters for many other popular frameworks.
-
-#### Native
-
-**We recommend using [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro)
-to test React Native components that connect to Zustand**. `RNTL` is a simple and complete native
-testing utility that encourages good testing practices. The API is the same as `RTL` library with
-some minor differences like `RNTL` queries are implemented independently, unlike other wrappers
-that use `DOM Testing Library`.
-
-#### Network Requests
 
 We also recommend using [Mock Service Worker (MSW)](https://mswjs.io/) to mock network requests, as
 this means your application logic does not need to be changed or mocked when writing tests.
@@ -52,6 +41,10 @@ this means your application logic does not need to be changed or mocked when wri
   - [Native Testing Library: Setup](https://testing-library.com/docs/react-native-testing-library/setup)
 - **User Event Testing Library (DOM)**
   - [User Event Testing Library: Setup](https://testing-library.com/docs/user-event/setup)
+- **TypeScript for Jest**
+  - [TypeScript for Jest: Setup](https://kulshekhar.github.io/ts-jest/docs/getting-started/installation)
+- **TypeScript for Node**
+  - [TypeScript for Node: Setup](https://typestrong.org/ts-node/docs/installation)
 - **Mock Service Worker**
   - [MSW: Installation](https://mswjs.io/docs/getting-started/install)
   - [MSW: Setting up mock requests](https://mswjs.io/docs/getting-started/mocks/rest-api)
@@ -65,28 +58,34 @@ using **CommonJS modules**, you need to keep that in mind if you are using `Vite
 
 ### Jest
 
+In the next steps we are going to setup our `Jest` environment in order to mock `Zustand`
+
 ```ts
-// __mocks__/zustand.ts
-import type { StateCreator } from 'zustand'
+// src/__mocks__/zustand.ts
+import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
-const { create: actualCreate } = jest.requireActual('zustand')
+const { create: actualCreate } = jest.requireActual<typeof zustand>('zustand')
 
 // a variable to hold reset functions for all stores declared in the app
 export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = (<T extends unknown>(stateCreator: StateCreator<T>) => {
-  const store = actualCreate(stateCreator)
-  const initialState = store.getState()
-  storeResetFns.add(() => {
-    store.setState(initialState, true)
-  })
-  return store
-}) as typeof actualCreate
+export const create = (<T extends unknown>() => {
+  console.log('zustand create mock')
 
-// Reset all stores after each test run
-beforeEach(() => {
+  return (stateCreator: zustand.StateCreator<T>) => {
+    const store = actualCreate(stateCreator)
+    const initialState = store.getState()
+    storeResetFns.add(() => {
+      store.setState(initialState, true)
+    })
+    return store
+  }
+}) as typeof zustand.create
+
+// reset all stores after each test run
+afterEach(() => {
   act(() => {
     storeResetFns.forEach((resetFn) => {
       resetFn()
@@ -95,10 +94,32 @@ beforeEach(() => {
 })
 ```
 
-### Vitest
+```ts
+// src/setup-jest.ts
+import '@testing-library/jest-dom'
+```
 
 ```ts
-// __mocks__/zustand.ts
+// jest.config.ts
+import type { JestConfigWithTsJest } from 'ts-jest'
+
+const config: JestConfigWithTsJest = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['./src/setup-jest.ts'],
+}
+
+export default config
+```
+
+> **Note**: to use typescript we need to install two packages `ts-jest` and `ts-node`
+
+### Vitest
+
+In the next steps we are going to setup our `Vitest` environment in order to mock `Zustand`
+
+```ts
+// src/__mocks__/zustand.ts
 import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
@@ -110,19 +131,21 @@ const { create: actualCreate } = await vi.importActual<typeof zustand>(
 export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = (<T extends unknown>(
-  stateCreator: zustand.StateCreator<T>
-) => {
-  const store = actualCreate(stateCreator)
-  const initialState = store.getState()
-  storeResetFns.add(() => {
-    store.setState(initialState, true)
-  })
-  return store
+export const create = (<T extends unknown>() => {
+  console.log('zustand create mock')
+
+  return (stateCreator: zustand.StateCreator<T>) => {
+    const store = actualCreate(stateCreator)
+    const initialState = store.getState()
+    storeResetFns.add(() => {
+      store.setState(initialState, true)
+    })
+    return store
+  }
 }) as typeof zustand.create
 
 // reset all stores after each test run
-beforeEach(() => {
+afterEach(() => {
   act(() => {
     storeResetFns.forEach((resetFn) => {
       resetFn()
@@ -135,7 +158,7 @@ beforeEach(() => {
 > use `import { beforeEach, vi } from 'vitest'` at top level
 
 ```ts
-// setup-vitest.ts
+// src/setup-vitest.ts
 import '@testing-library/jest-dom'
 
 vi.mock('zustand') // to make it works like `Jest` (auto-mocking)
@@ -203,8 +226,6 @@ export function Counter() {
 export * from './counter'
 ```
 
-### Vitest
-
 ```tsx
 // components/counter/counter.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -243,16 +264,21 @@ const renderCounter = () => {
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled you need to
 > use `import { describe, test, expect } from 'vitest'` at top level
 
-### Testing stores
+**CodeSandbox Demos:**
 
-Still in progress. TBD
+- Jest Demo: https://codesandbox.io/p/sandbox/friendly-breeze-276c28
+- Vitest Demo: https://codesandbox.io/p/sandbox/zustand-vitest-demo-ph5gnj
 
 ## References
 
-- **React Testing Library**: [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- **React Testing Library**: [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro)
   is a very light-weight solution for testing React components. It provides light utility functions
-  on top of react-dom and react-dom/test-utils, in a way that encourages better testing practices.
-  Its primary guiding principle is: "The more your tests resemble the way your software is used, the
-  more confidence they can give you."
+  on top of `react-dom` and `react-dom/test-utils`, in a way that encourages better testing
+  practices. Its primary guiding principle is: "The more your tests resemble the way your software
+  is used, the more confidence they can give you."
+- **Native Testing Library**: [Native Testing Library (RNTL)](https://testing-library.com/docs/react-native-testing-library/intro)
+  is a very light-weight solution for testing React Native components. It provides light utility
+  functions on top of `react-test-renderer`, in a way that encourages better testing practices. Its
+  primary guiding principle is as `RTL`.
 - **Testing Implementation Details**: Blog post by Kent C. Dodds on why he recommends to avoid
   [testing implementation details](https://kentcdodds.com/blog/testing-implementation-details).
