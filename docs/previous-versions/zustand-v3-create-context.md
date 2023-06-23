@@ -110,7 +110,7 @@ Discussion: https://github.com/pmndrs/zustand/discussions/1276
 Here's the diff showing how to migrate from v3 createContext to v4 API.
 
 ```diff
-// store.ts
+// store.tsx
 + import { createContext, useContext } from "react";
 - import create from "zustand";
 - import createContext from "zustand/context";
