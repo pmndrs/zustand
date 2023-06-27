@@ -60,7 +60,7 @@ Since Jest and Vitest have slight differences, like Vitest using **ES modules** 
 In the next steps we are going to setup our Jest environment in order to mock Zustand
 
 ```ts
-// src/__mocks__/zustand.ts
+// __mocks__/zustand.ts
 import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
@@ -71,8 +71,6 @@ export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
 export const create = (<T extends unknown>() => {
-  console.log('zustand create mock')
-
   return (stateCreator: zustand.StateCreator<T>) => {
     const store = actualCreate(stateCreator)
     const initialState = store.getState()
@@ -111,14 +109,14 @@ const config: JestConfigWithTsJest = {
 export default config
 ```
 
-> **Note**: to use typescript we need to install two packages `ts-jest` and `ts-node`
+> **Note**: to use TypeScript we need to install two packages `ts-jest` and `ts-node`.
 
 ### Vitest
 
 In the next steps we are going to setup our Vitest environment in order to mock Zustand
 
 ```ts
-// src/__mocks__/zustand.ts
+// __mocks__/zustand.ts
 import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
@@ -131,8 +129,6 @@ export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
 export const create = (<T extends unknown>() => {
-  console.log('zustand create mock')
-
   return (stateCreator: zustand.StateCreator<T>) => {
     const store = actualCreate(stateCreator)
     const initialState = store.getState()
@@ -153,8 +149,17 @@ afterEach(() => {
 })
 ```
 
-> **Note:** without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
-> to add `import { afterEach, vi } from 'vitest'` at the top
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
+> to add `import { afterEach, vi } from 'vitest'` at the top.
+
+```ts
+// __mocks__/vitest-env.d.ts
+/// <reference types="vite/client" />
+/// <reference types="vitest/globals" />
+```
+
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we do
+> need to remove `/// <reference types="vitest/globals" />`.
 
 ```ts
 // src/setup-vitest.ts
@@ -163,8 +168,8 @@ import '@testing-library/jest-dom'
 vi.mock('zustand') // to make it works like Jest (auto-mocking)
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
-> to add `import { vi } from 'vitest'` at the top
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
+> to add `import { vi } from 'vitest'` at the top.
 
 ```ts
 // vitest.config.ts
@@ -187,7 +192,7 @@ export default mergeConfig(
 
 In the next examples we are going to use `useCounterStore`
 
-> **Note**: all of these examples are written using `TypeScript`
+> **Note**: all of these examples are written using TypeScript.
 
 ```ts
 // stores/user-counter-store.ts
@@ -260,10 +265,10 @@ const renderCounter = () => {
 }
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
-> to add `import { describe, test, expect } from 'vitest'` at the top of each test file
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
+> to add `import { describe, test, expect } from 'vitest'` at the top of each test file.
 
-**CodeSandbox Demos:**
+**CodeSandbox Demos**
 
 - Jest Demo: https://codesandbox.io/p/sandbox/friendly-breeze-276c28
 - Vitest Demo: https://codesandbox.io/p/sandbox/zustand-vitest-demo-ph5gnj
