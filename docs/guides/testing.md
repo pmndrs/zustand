@@ -158,7 +158,7 @@ afterEach(() => {
 /// <reference types="vitest/globals" />
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you do not
+> **Note**: if [globals configuration](https://vitest.dev/config/#globals) is not enabled, you do not
 > need `/// <reference types="vitest/globals" />`.
 
 ```ts
