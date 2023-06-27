@@ -149,7 +149,7 @@ afterEach(() => {
 })
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
 > to add `import { afterEach, vi } from 'vitest'` at the top.
 
 ```ts
@@ -158,8 +158,8 @@ afterEach(() => {
 /// <reference types="vitest/globals" />
 ```
 
-> **Note**: if [globals configuration](https://vitest.dev/config/#globals) is not enabled, you do not
-> need `/// <reference types="vitest/globals" />`.
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we do
+> need to remove `/// <reference types="vitest/globals" />`.
 
 ```ts
 // src/setup-vitest.ts
@@ -168,7 +168,7 @@ import '@testing-library/jest-dom'
 vi.mock('zustand') // to make it works like Jest (auto-mocking)
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
 > to add `import { vi } from 'vitest'` at the top.
 
 ```ts
@@ -265,7 +265,7 @@ const renderCounter = () => {
 }
 ```
 
-> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, you need
+> **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
 > to add `import { describe, test, expect } from 'vitest'` at the top of each test file.
 
 **CodeSandbox Demos**
