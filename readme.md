@@ -395,8 +395,8 @@ One redux devtools connection for multiple stores
 import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
-const usePlainStore1 = create(devtools(store), { name, store: storeName1 })
-const usePlainStore2 = create(devtools(store), { name, store: storeName2 })
+const usePlainStore1 = create(devtools(store, { name, store: storeName1 }))
+const usePlainStore2 = create(devtools(store, { name, store: storeName2 }))
 // Usage with a redux store, it will log full action types
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName3 })
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName4 })
