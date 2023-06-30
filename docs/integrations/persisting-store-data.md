@@ -267,7 +267,7 @@ export const useBoundStore = create(
 
 > Default: `undefined`
 
-By default the store with be hydrated on initialization.
+By default the store will be hydrated on initialization.
 
 In some applications you may need to control when the first hydration occurs.
 For example, in server-rendered apps.
