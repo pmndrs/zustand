@@ -8,9 +8,9 @@
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
 
-A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy API based on hooks, isn't boilerplatey or opinionated.
+A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy API based on hooks that isn't boilerplatey or opinionated.
 
-Don't disregard it because it's cute. It has quite the claws, lots of time was spent dealing with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
+Don't disregard it because it's cute. It has quite the claws, lots of time was spent dealing with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these rights.
 
 You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/examples/demo).
 
@@ -159,7 +159,7 @@ const useSoundStore = create((set, get) => ({
 
 ## Reading/writing state and reacting to changes outside of components
 
-Sometimes you need to access state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
+Sometimes you need to access state in a non-reactive way or act upon the store. For these cases, the resulting hook has utility functions attached to its prototype.
 
 ```jsx
 const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
@@ -181,7 +181,7 @@ const Component = () => {
 
 ### Using subscribe with selector
 
-If you need to subscribe with selector,
+If you need to subscribe with a selector,
 `subscribeWithSelector` middleware will help.
 
 With this middleware `subscribe` accepts an additional signature:
@@ -256,7 +256,7 @@ const Component = () => {
   ...
 ```
 
-## Sick of reducers and changing nested state? Use Immer!
+## Sick of reducers and changing nested states? Use Immer!
 
 Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
@@ -370,7 +370,7 @@ const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla API.
+Or, just use our redux-middleware. It wires up your main-reducer, sets the initial state, and adds a dispatch function to the state itself and the vanilla API.
 
 ```jsx
 import { redux } from 'zustand/middleware'
@@ -511,12 +511,12 @@ A more complete TypeScript guide is [here](docs/guides/typescript.md).
 
 - You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/guides/slices-pattern.md).
 - Recommended usage for this unopinionated library: [Flux inspired practice](./docs/guides/flux-inspired-practice.md).
-- [Calling actions outside a React event handler in pre React 18](./docs/guides/event-handler-in-pre-react-18.md).
+- [Calling actions outside a React event handler in pre-React 18](./docs/guides/event-handler-in-pre-react-18.md).
 - [Testing](./docs/guides/testing.md)
 
 ## Third-Party Libraries
 
-Some users may want to extends Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
+Some users may want to extend Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
 
 ## Comparison with other libraries
 
