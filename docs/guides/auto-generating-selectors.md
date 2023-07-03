@@ -65,6 +65,54 @@ const bears = useBearStore.use.bears()
 const increment = useBearStore.use.increment()
 ```
 
+## Vanilla Store
+
+If you are using a vanilla store, then consider the function below.
+
+```typescript
+import { useStore, StoreApi } from "zustand";
+
+type WithSelectors<S> = S extends { getState: () => infer T }
+  ? S & { use: { [K in keyof T]: () => T[K] } }
+  : never;
+const createSelectors = <S extends StoreApi<object>>(_store: S) => {
+  const store = _store as WithSelectors<typeof _store>;
+  store.use = {};
+  for (const k of Object.keys(store.getState())) {
+    (store.use as any)[k] = () =>
+      useStore(_store, (s) => s[k as keyof typeof s]);
+  }
+
+  return store;
+};
+```
+
+The usage is the same as a React store.
+
+```typescript
+import { createStore } from "zustand";
+
+interface BearState {
+  bears: number
+  increase: (by: number) => void
+  increment: () => void
+}
+
+const bearStoreBase = createStore<BearState>()((set) => ({
+  bears: 0,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+  increment: () => set((state) => ({ bears: state.bears + 1 })),
+}))
+
+const bearStoreWithHooks = createSelectors(bearStoreBase);
+
+// get the property
+const bears = bearStoreWithHooks.use.bears()
+
+// get the action
+const increment = bearStoreWithHooks.use.increment()
+```
+
 ## Live Demo
 
 For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/zustand-auto-generate-selectors-forked-rl8v5e?file=/src/selectors.ts).
