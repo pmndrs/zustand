@@ -159,7 +159,7 @@ const useSoundStore = create((set, get) => ({
 
 ## Reading/writing state and reacting to changes outside of components
 
-Sometimes you need to access state in a non-reactive way, or act upon the store. For these cases the resulting hook has utility functions attached to its prototype.
+Sometimes you need to access state in a non-reactive way or act upon the store. For these cases, the resulting hook has utility functions attached to its prototype.
 
 ```jsx
 const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
@@ -181,7 +181,7 @@ const Component = () => {
 
 ### Using subscribe with selector
 
-If you need to subscribe with selector,
+If you need to subscribe with a selector,
 `subscribeWithSelector` middleware will help.
 
 With this middleware `subscribe` accepts an additional signature:
@@ -256,7 +256,7 @@ const Component = () => {
   ...
 ```
 
-## Sick of reducers and changing nested state? Use Immer!
+## Sick of reducers and changing nested states? Use Immer!
 
 Reducing nested structures is tiresome. Have you tried [immer](https://github.com/mweststrate/immer)?
 
@@ -370,7 +370,7 @@ const dispatch = useGrumpyStore((state) => state.dispatch)
 dispatch({ type: types.increase, by: 2 })
 ```
 
-Or, just use our redux-middleware. It wires up your main-reducer, sets initial state, and adds a dispatch function to the state itself and the vanilla API.
+Or, just use our redux-middleware. It wires up your main-reducer, sets the initial state, and adds a dispatch function to the state itself and the vanilla API.
 
 ```jsx
 import { redux } from 'zustand/middleware'
@@ -511,12 +511,12 @@ A more complete TypeScript guide is [here](docs/guides/typescript.md).
 
 - You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/guides/slices-pattern.md).
 - Recommended usage for this unopinionated library: [Flux inspired practice](./docs/guides/flux-inspired-practice.md).
-- [Calling actions outside a React event handler in pre React 18](./docs/guides/event-handler-in-pre-react-18.md).
+- [Calling actions outside a React event handler in pre-React 18](./docs/guides/event-handler-in-pre-react-18.md).
 - [Testing](./docs/guides/testing.md)
 
 ## Third-Party Libraries
 
-Some users may want to extends Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
+Some users may want to extend Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
 
 ## Comparison with other libraries
 
