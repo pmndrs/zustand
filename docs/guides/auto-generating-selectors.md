@@ -67,7 +67,7 @@ const increment = useBearStore.use.increment()
 
 ## Vanilla Store
 
-If you are using a vanilla store, then consider the function below.
+If you are using a vanilla store, use the following approach:
 
 ```typescript
 import { useStore, StoreApi } from "zustand";
