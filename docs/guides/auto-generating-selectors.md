@@ -67,14 +67,15 @@ const increment = useBearStore.use.increment()
 
 ## Vanilla Store
 
-If you are using a vanilla store, use the following approach:
+If you are using a vanilla store, use the following `createSelectors` function:
 
 ```typescript
-import { useStore, StoreApi } from "zustand";
+import { StoreApi, useStore } from "zustand";
 
 type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
   : never;
+
 const createSelectors = <S extends StoreApi<object>>(_store: S) => {
   const store = _store as WithSelectors<typeof _store>;
   store.use = {};
@@ -87,7 +88,7 @@ const createSelectors = <S extends StoreApi<object>>(_store: S) => {
 };
 ```
 
-The usage is the same as a React store.
+The usage is the same as a React store. If you have a store like this:
 
 ```typescript
 import { createStore } from "zustand";
@@ -98,19 +99,27 @@ interface BearState {
   increment: () => void
 }
 
-const bearStoreBase = createStore<BearState>()((set) => ({
+const store = createStore<BearState>((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
   increment: () => set((state) => ({ bears: state.bears + 1 })),
 }))
+```
 
-const bearStoreWithHooks = createSelectors(bearStoreBase);
+Apply that function to your store:
 
+```typescript
+const useBearStore = createSelectors(store)
+```
+
+Now the selectors are auto generated and you can access them directly:
+
+```typescript
 // get the property
-const bears = bearStoreWithHooks.use.bears()
+const bears = useBearStore.use.bears()
 
 // get the action
-const increment = bearStoreWithHooks.use.increment()
+const increment = useBearStore.use.increment()
 ```
 
 ## Live Demo
