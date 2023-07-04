@@ -65,7 +65,7 @@ function createESMConfig(input, output) {
             }
           : {
               'import.meta.env?.MODE':
-                '(import.meta.env && import.meta.env.MODE)',
+                '(import.meta.env ? import.meta.env.MODE : undefined)',
             }),
         // a workround for #829
         'use-sync-external-store/shim/with-selector':
