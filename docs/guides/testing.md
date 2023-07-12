@@ -55,9 +55,11 @@ this means your application logic does not need to be changed or mocked when wri
 Since Jest and Vitest have slight differences, like Vitest using **ES modules** and Jest using
 **CommonJS modules**, you need to keep that in mind if you are using Vitest instead of Jest.
 
+The mock provided below will enable both test runners to clear all zustand stores after each test.
+
 ### Jest
 
-In the next steps we are going to setup our Jest environment in order to mock Zustand
+In the next steps we are going to setup our Jest environment in order to mock Zustand.
 
 ```ts
 // __mocks__/zustand.ts
