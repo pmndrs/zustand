@@ -239,7 +239,7 @@ import { Counter } from './counter'
 
 describe('Counter', () => {
   test('should render successfully', async () => {
-    renderCounter()
+    render(<Counter />)
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
     expect(
@@ -250,7 +250,7 @@ describe('Counter', () => {
   test('should increase count by clicking a button', async () => {
     const user = userEvent.setup()
 
-    renderCounter()
+    render(<Counter />)
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
 
@@ -260,9 +260,6 @@ describe('Counter', () => {
   })
 })
 
-const renderCounter = () => {
-  return render(<Counter />)
-}
 ```
 
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
