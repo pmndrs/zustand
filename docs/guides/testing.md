@@ -52,12 +52,14 @@ this means your application logic does not need to be changed or mocked when wri
 
 ## Setting Up Zustand for testing
 
-Since Jest and Vitest have slight differences, like Vitest using **ES modules** and Jest using
-**CommonJS modules**, you need to keep that in mind if you are using Vitest instead of Jest.
+> **Note**: Since Jest and Vitest have slight differences, like Vitest using **ES modules** and Jest using
+> **CommonJS modules**, you need to keep that in mind if you are using Vitest instead of Jest.
+
+The mock provided below will enable the relevant test runner to reset the zustand stores after each test.
 
 ### Jest
 
-In the next steps we are going to setup our Jest environment in order to mock Zustand
+In the next steps we are going to setup our Jest environment in order to mock Zustand.
 
 ```ts
 // __mocks__/zustand.ts
@@ -239,7 +241,7 @@ import { Counter } from './counter'
 
 describe('Counter', () => {
   test('should render successfully', async () => {
-    renderCounter()
+    render(<Counter />)
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
     expect(
@@ -250,7 +252,7 @@ describe('Counter', () => {
   test('should increase count by clicking a button', async () => {
     const user = userEvent.setup()
 
-    renderCounter()
+    render(<Counter />)
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
 
@@ -259,10 +261,6 @@ describe('Counter', () => {
     expect(await screen.findByText(/^2$/)).toBeInTheDocument()
   })
 })
-
-const renderCounter = () => {
-  return render(<Counter />)
-}
 ```
 
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need

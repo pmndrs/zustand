@@ -89,7 +89,7 @@ So we have two problems: lack of inference and unsoundness. Lack of inference ca
 </details>
 
 <details>
-  <summary>Why that currying `()(...)`?</summary>
+  <summary>Why the currying `()(...)`?</summary>
 
   <br/>
 
