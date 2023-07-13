@@ -53,7 +53,7 @@ this means your application logic does not need to be changed or mocked when wri
 ## Setting Up Zustand for testing
 
 > **Note**: Since Jest and Vitest have slight differences, like Vitest using **ES modules** and Jest using
-**CommonJS modules**, you need to keep that in mind if you are using Vitest instead of Jest.
+> **CommonJS modules**, you need to keep that in mind if you are using Vitest instead of Jest.
 
 The mock provided below will enable the relevant test runner to reset the zustand stores after each test.
 
