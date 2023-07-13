@@ -261,7 +261,6 @@ describe('Counter', () => {
     expect(await screen.findByText(/^2$/)).toBeInTheDocument()
   })
 })
-
 ```
 
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
