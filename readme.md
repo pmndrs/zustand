@@ -149,12 +149,12 @@ const useFishStore = create((set) => ({
 
 ```jsx
 const useSoundStore = create((set, get) => ({
-  sound: "grunt",
+  sound: 'grunt',
   action: () => {
     const sound = get().sound
     // ...
-  }
-})
+  },
+}))
 ```
 
 ## Reading/writing state and reacting to changes outside of components
