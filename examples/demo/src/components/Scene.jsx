@@ -32,9 +32,9 @@ function Experience() {
 
   useFrame((state, delta) => {
     movement.lerp(temp.set(state.pointer.x, state.pointer.y * 0.2, 0), 0.2)
-    group.current.position.x = MathUtils.lerp(group.current.position.x, state.pointer.x * 20, 0.2)
-    group.current.rotation.x = MathUtils.lerp(group.current.rotation.x, state.pointer.y / 20, 0.2)
-    group.current.rotation.y = MathUtils.lerp(group.current.rotation.y, -state.pointer.x / 2, 0.2)
+    group.current.position.x = MathUtils.lerp(group.current.position.x, state.pointer.x * 20, 0.05)
+    group.current.rotation.x = MathUtils.lerp(group.current.rotation.x, state.pointer.y / 20, 0.05)
+    group.current.rotation.y = MathUtils.lerp(group.current.rotation.y, -state.pointer.x / 2, 0.05)
     layersRef.current[4].uniforms.time.value = layersRef.current[5].uniforms.time.value += delta
   }, 1)
 
@@ -105,7 +105,7 @@ function Canvas({ children }) {
     const resize = () => root.current.configure({ width: window.innerWidth, height: window.innerHeight })
     window.addEventListener('resize', resize)
     root.current.render(children)
-    return () => window.removeEventListener(resize)
+    return () => window.removeEventListener('resize', resize)
   }, [])
 
   return <canvas ref={canvas} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'block' }} />

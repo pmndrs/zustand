@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { Highlight } from 'prism-react-renderer'
 import CopyButton from './CopyButton'
 import SnippetLang from './SnippetLang'
-import 'prismjs/themes/prism-okaidia.css'
 import javascriptCode from '../resources/javascript-code'
 import typescriptCode from '../resources/typescript-code'
 

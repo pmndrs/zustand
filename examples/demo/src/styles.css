@@ -19,8 +19,8 @@ body,
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto,
-    segoe ui, arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
+    sans-serif;
 }
 
 .main {
@@ -30,49 +30,6 @@ body {
   width: 100%;
   height: 100%;
   color: white;
-}
-
-@media only screen and (max-width: 700px) {
-  #root {
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
-  }
-  .canvas-container {
-    height: unset;
-    flex: 1 0 0px;
-    margin-bottom: -100px;
-  }
-  .canvas-container::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    height: 100px;
-    width: 100%;
-    background: linear-gradient(0deg, black, transparent);
-  }
-
-  .main {
-    position: relative;
-    flex: 0 0 auto;
-    height: auto;
-  }
-
-  .main > div {
-    position: relative;
-    height: auto;
-  }
-}
-
-@media only screen and (max-width: 500px) {
-  .canvas-container {
-    margin-bottom: -40px;
-  }
-  .canvas-container::after {
-    display: none;
-  }
 }
 
 .main > .code {
@@ -110,7 +67,7 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
-  margin-top: -10px;
+  margin-top: -15px;
   transform: translate3d(-50%, -50%, 0);
 }
 
@@ -136,127 +93,8 @@ body {
   padding: 40px 50px 40px 45px;
   font-size: 0.8rem !important;
   border-radius: 10px !important;
-  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 1);
   white-space: pre-wrap !important;
-}
-
-@media only screen and (max-width: 700px) {
-  .main > .code {
-    position: relative;
-    height: auto;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-  }
-
-  .code-container {
-    bottom: 0;
-    margin-bottom: -60px;
-  }
-  .code-container > pre[class*='language-'] {
-    font-size: 0.6rem;
-    padding: 20px 50px 70px 20px;
-    border-radius: 10px 10px 0 0 !important;
-  }
-  .counter {
-    top: -100px;
-    right: 20px;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  .code-container {
-    width: 100%;
-  }
-
-  .code-container > pre[class*='language-'] {
-    font-size: 0.6rem !important;
-    padding: 20px 20px 70px;
-    width: 100% !important;
-  }
-
-  .counter {
-    top: 70px;
-    right: 20px;
-  }
-}
-
-@media only screen and (max-height: 600px) {
-  .code-container {
-    bottom: 0;
-    margin-bottom: -60px;
-  }
-  .code-container > pre[class*='language-'] {
-    font-size: 0.6rem;
-    padding: 20px 20px 70px;
-  }
-
-  .counter {
-    transform: scale(0.8);
-    transform-origin: bottom right;
-    top: 100px;
-    right: -30px;
-  }
-}
-@media only screen and (max-width: 600px) {
-  .counter {
-    top: -160px;
-    right: 20px;
-  }
-}
-
-@media only screen and (max-width: 430px) {
-  .code-container {
-    margin-bottom: -60px;
-  }
-  .code-container > pre[class*='language-'] {
-    font-size: 0.6rem;
-    padding: 20px 20px 70px;
-  }
-
-  .counter {
-    transform: scale(0.8);
-    transform-origin: bottom right;
-    top: -160px;
-    right: 20px;
-  }
-}
-@media only screen and (max-height: 480px) {
-  .counter {
-    transform: scale(0.8);
-    transform-origin: bottom right;
-    bottom: 70px;
-    right: 20px;
-    top: unset;
-  }
-}
-
-@media only screen and (max-height: 500px) {
-  .code-container > pre[class*='language-'] {
-    font-size: 0.5rem !important;
-  }
-
-  .counter {
-    top: 40px;
-    right: 20px;
-  }
-}
-
-@media only screen and (max-height: 500px) and (min-width: 600px) {
-  .counter {
-    top: 40px;
-    right: -80px;
-  }
-}
-
-@media only screen and (max-height: 360px) and (min-width: 600px) {
-  .counter {
-    top: 50px;
-    right: -80px;
-  }
 }
 
 span.header-left {
@@ -264,40 +102,16 @@ span.header-left {
   text-transform: uppercase;
   position: absolute;
   display: inline-block;
-  top: 30px;
+  top: 40px;
   left: 40px;
   font-size: 3em;
   color: white;
-}
-
-@media only screen and (max-width: 1200px) {
-  .bear {
-    left: -20%;
-  }
-}
-
-@media only screen and (max-width: 1140px) {
-  .bear {
-    left: -25%;
-  }
-}
-
-@media only screen and (max-width: 1024px) {
-  .bear {
-    left: -20%;
-  }
-  .code {
-    justify-content: center;
-    margin-left: 0;
-  }
-  pre[class*='language-'] {
-    font-size: 0.7rem !important;
-  }
+  line-height: 1em;
 }
 
 a {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto,
-    segoe ui, arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
+    sans-serif;
   font-weight: 400;
   font-size: 16px;
   color: inherit;
@@ -306,19 +120,12 @@ a {
   text-decoration: none;
 }
 
-a.top-left {
-  font-size: 0.8em;
-  top: 90px;
-  left: 40px;
-}
-
 .nav {
   align-items: center;
   display: flex;
   gap: 16px;
   justify-content: flex-end;
   left: 40px;
-  min-height: 38px;
   position: fixed;
   right: 40px;
   top: 40px;
@@ -337,71 +144,6 @@ a.bottom-left {
 a.bottom-right {
   bottom: 40px;
   right: 40px;
-}
-
-@media only screen and (max-width: 700px) {
-  .main .bottom {
-    bottom: 0;
-    height: 60px;
-    background-color: rgba(0, 0, 0, 0.2);
-  }
-
-  a.bottom-left {
-    bottom: 20px;
-    left: 20px;
-  }
-
-  a.bottom-right {
-    bottom: 20px;
-    right: 20px;
-  }
-  a.top-left {
-    position: fixed;
-    font-size: 0.8em;
-    top: 90px;
-    left: 40px;
-  }
-
-  .nav {
-    justify-content: flex-start;
-    left: 40px;
-    right: 40px;
-    top: 90px;
-  }
-
-  span.header-left {
-    position: fixed;
-    top: 30px;
-    left: 40px;
-  }
-}
-
-@media only screen and (max-width: 500px) {
-  pre[class*='language-'] {
-    font-size: 0.6rem !important;
-  }
-  span.header-left {
-    top: 10px;
-    left: 20px;
-  }
-  a.top-left {
-    top: 70px;
-    left: 20px;
-  }
-
-  .nav {
-    left: 20px;
-    right: 20px;
-    top: 60px;
-  }
-
-  a.bottom-left {
-    left: 20px;
-  }
-
-  a.bottom-right {
-    right: 20px;
-  }
 }
 
 .snippet-container {
@@ -439,4 +181,21 @@ a.bottom-right {
 
 .copy-button:hover {
   background-color: #5f5e5d;
+}
+
+@media only screen and (max-width: 700px) {
+  span.header-left {
+    font-size: 1em;
+  }
+  .main > .code {
+    margin-right: -0px;
+  }
+  .code-container > pre[class*='language-'] {
+    font-size: 0.6rem!important;    
+    border-radius: 10px 10px 0 0 !important;
+  }
+  .counter {
+    position: absolute;
+    top: -120px;
+  }
 }

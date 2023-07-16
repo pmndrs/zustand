@@ -1,0 +1,123 @@
+/**
+ * Pmndrs theme for JavaScript, CSS and HTML
+ * Loosely based on https://marketplace.visualstudio.com/items?itemName=pmndrs.pmndrs
+ * @author Paul Henschel
+ */
+
+ code[class*='language-'],
+ pre[class*='language-'] {
+   color: #e4f0fb!important;
+   background: none!important;
+   text-shadow: 0 1px rgba(0, 0, 0, 0.3)!important;
+   font-family: Menlo, Monaco, 'Courier New', monospace!important;
+   font-size: 0.95em!important;
+   text-align: left!important;
+   white-space: pre!important;
+   word-spacing: normal!important;
+   word-break: normal!important;
+   word-wrap: normal!important;
+   line-height: 1.5!important;
+ 
+   -moz-tab-size: 4!important;
+   -o-tab-size: 4!important;
+   tab-size: 4!important;
+ 
+   -webkit-hyphens: none!important;
+   -moz-hyphens: none!important;
+   -ms-hyphens: none!important;
+   hyphens: none!important;
+ }
+ 
+ /* Code blocks */
+ pre[class*='language-'] {
+   padding: 3.75em!important;
+   margin: -2.5em 0!important;
+   overflow: auto!important;
+   border-radius: 0.75em!important;
+ }
+ 
+ :not(pre) > code[class*='language-'],
+ pre[class*='language-'] {
+   background: #252b37!important;
+ }
+ 
+ /* Inline code */
+ :not(pre) > code[class*='language-'] {
+   padding: 0.1em!important;
+   border-radius: 0.3em!important;
+   white-space: normal!important;
+ }
+ 
+ .token.comment,
+ .token.prolog,
+ .token.doctype,
+ .token.cdata {
+   color: #a6accd!important;
+ }
+ 
+ .token.punctuation {
+   color: #e4f0fb!important;
+ }
+ 
+ .token.namespace {
+   opacity: 0.7!important;
+ }
+ 
+ .token.property,
+ .token.tag,
+ .token.constant,
+ .token.symbol,
+ .token.deleted {
+   color: #e4f0fb!important;
+ }
+ 
+ .token.boolean,
+ .token.number {
+   color: #5de4c7!important;
+ }
+ 
+ .token.selector,
+ .token.attr-value,
+ .token.string,
+ .token.char,
+ .token.builtin,
+ .token.inserted {
+   color: #5de4c7!important;
+ }
+ 
+ .token.attr-name,
+ .token.operator,
+ .token.entity,
+ .token.url,
+ .language-css .token.string,
+ .style .token.string,
+ .token.variable {
+   color: #add7ff!important;
+ }
+ 
+ .token.atrule,
+ .token.function,
+ .token.class-name {
+   color: #5de4c7!important;
+ }
+ 
+ .token.keyword {
+   color: #add7ff!important;
+ }
+ 
+ .token.regex,
+ .token.important {
+   color: #fffac2!important;
+ }
+ 
+ .token.important,
+ .token.bold {
+   font-weight: bold!important;
+ }
+ .token.italic {
+   font-style: italic!important;
+ }
+ 
+ .token.entity {
+   cursor: help!important;
+ }

@@ -12,7 +12,6 @@ const useStore = create<Store>()((set) => ({
 
 function Counter() {
   const { count, inc } = useStore()
-
   return (
     <div>
       <span>{count}</span>
