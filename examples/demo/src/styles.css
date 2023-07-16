@@ -10,11 +10,6 @@ body,
   margin: 0;
   padding: 0;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
   overflow: hidden;
   background: #010101;
 }
@@ -35,17 +30,6 @@ body {
   width: 100%;
   height: 100%;
   color: white;
-  pointer-events: none;
-}
-
-.main > div {
-  pointer-events: none;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
 }
 
 @media only screen and (max-width: 700px) {
@@ -91,18 +75,6 @@ body {
   }
 }
 
-.bg {
-  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/DWLR-bg.jpg');
-}
-
-.stars {
-  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/OiNX-stars.png');
-}
-
-.ground {
-  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/xyC5-ground.png');
-}
-
 .main > .code {
   position: absolute;
   right: 10vw;
@@ -132,8 +104,6 @@ body {
   width: 120px;
   height: 120px;
   font-size: 3em;
-  z-index: 20000;
-  pointer-events: all;
 }
 
 .counter > span {
@@ -168,7 +138,6 @@ body {
   border-radius: 10px !important;
   box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.5);
   white-space: pre-wrap !important;
-  pointer-events: all;
 }
 
 @media only screen and (max-width: 700px) {
@@ -290,31 +259,6 @@ body {
   }
 }
 
-.bear {
-  top: 12.5%;
-  height: 80% !important;
-  min-height: 600px;
-  left: -19%;
-  background-size: 1000px !important;
-  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/TiR4-bear.png');
-}
-
-.leaves1 {
-  left: -2.5%;
-  top: -2.5%;
-  width: 105% !important;
-  height: 105% !important;
-  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/zjhf-leaves1.png');
-}
-
-.leaves2 {
-  left: -2.5%;
-  top: -2.5%;
-  width: 105% !important;
-  height: 105% !important;
-  background-image: url('https://uploads.codesandbox.io/uploads/user/b3e56831-8b98-4fee-b941-0e27f39883ab/3n-p-leaves2.png');
-}
-
 span.header-left {
   font-weight: 700;
   text-transform: uppercase;
@@ -324,7 +268,6 @@ span.header-left {
   left: 40px;
   font-size: 3em;
   color: white;
-  z-index: 1000;
 }
 
 @media only screen and (max-width: 1200px) {
@@ -345,7 +288,6 @@ span.header-left {
   }
   .code {
     justify-content: center;
-    z-index: 1000;
     margin-left: 0;
   }
   pre[class*='language-'] {
@@ -362,8 +304,6 @@ a {
   position: absolute;
   display: inline;
   text-decoration: none;
-  z-index: 1;
-  pointer-events: all;
 }
 
 a.top-left {
@@ -382,7 +322,6 @@ a.top-left {
   position: fixed;
   right: 40px;
   top: 40px;
-  z-index: 1000;
 }
 
 .nav a {
@@ -398,10 +337,6 @@ a.bottom-left {
 a.bottom-right {
   bottom: 40px;
   right: 40px;
-}
-
-.main .bottom {
-  z-index: 1000;
 }
 
 @media only screen and (max-width: 700px) {
@@ -492,7 +427,6 @@ a.bottom-right {
   font-size: 14px;
   font-family: sans-serif;
   line-height: 1;
-  pointer-events: all;
   padding: 12px;
   width: auto;
   border-radius: 5px;

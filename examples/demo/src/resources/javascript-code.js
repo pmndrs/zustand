@@ -1,11 +1,6 @@
-import { create } from 'zustand'
+export default `import { create } from 'zustand'
 
-type Store = {
-  count: number
-  inc: () => void
-}
-
-const useStore = create<Store>()((set) => ({
+const useStore = create((set) => ({
   count: 1,
   inc: () => set((state) => ({ count: state.count + 1 })),
 }))
@@ -19,4 +14,4 @@ function Counter() {
       <button onClick={inc}>one up</button>
     </div>
   )
-}
+}`
