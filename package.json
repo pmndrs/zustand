@@ -65,6 +65,15 @@
       "module": "./esm/shallow.js",
       "default": "./shallow.js"
     },
+    "./traditional": {
+      "types": "./traditional.d.ts",
+      "import": {
+        "types": "./esm/traditional.d.mts",
+        "default": "./esm/traditional.mjs"
+      },
+      "module": "./esm/traditional.js",
+      "default": "./traditional.js"
+    },
     "./context": {
       "types": "./context.d.ts",
       "import": {
@@ -84,6 +93,7 @@
     "build:middleware": "rollup -c --config-middleware",
     "build:middleware:immer": "rollup -c --config-middleware_immer",
     "build:shallow": "rollup -c --config-shallow",
+    "build:traditional": "rollup -c --config-traditional",
     "build:context": "rollup -c --config-context",
     "postbuild": "yarn patch-d-ts && yarn copy && yarn patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",

@@ -29,8 +29,16 @@ export function useStore<S extends WithReact<StoreApi<unknown>>>(
 
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
+  selector: (state: ExtractState<S>) => U
+): U
+
+/**
+ * @deprecated Use `useStoreWithEqualityFn` from 'zustand/traditional'
+ */
+export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
+  api: S,
   selector: (state: ExtractState<S>) => U,
-  equalityFn?: (a: U, b: U) => boolean
+  equalityFn: (a: U, b: U) => boolean
 ): U
 
 export function useStore<TState, StateSlice>(
@@ -38,6 +46,11 @@ export function useStore<TState, StateSlice>(
   selector: (state: TState) => StateSlice = api.getState as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean
 ) {
+  if (import.meta.env?.MODE !== 'production' && equalityFn) {
+    console.warn(
+      "[DEPRECATED] Use `createWithEqualityFn` from 'zustand/traditional'."
+    )
+  }
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
@@ -51,9 +64,13 @@ export function useStore<TState, StateSlice>(
 
 export type UseBoundStore<S extends WithReact<ReadonlyStoreApi<unknown>>> = {
   (): ExtractState<S>
+  <U>(selector: (state: ExtractState<S>) => U): U
+  /**
+   * @deprecated Use `createWithEqualityFn` from 'zustand/traditional'
+   */
   <U>(
     selector: (state: ExtractState<S>) => U,
-    equals?: (a: U, b: U) => boolean
+    equalityFn: (a: U, b: U) => boolean
   ): U
 } & S
 

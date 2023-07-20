@@ -6,8 +6,9 @@ import {
   useRef,
 } from 'react'
 import type { ReactNode } from 'react'
-import { useStore } from 'zustand'
 import type { StoreApi } from 'zustand'
+// eslint-disable-next-line import/extensions
+import { useStoreWithEqualityFn } from 'zustand/traditional'
 
 type UseContextStore<S extends StoreApi<unknown>> = {
   (): ExtractState<S>
@@ -62,7 +63,7 @@ function createContext<S extends StoreApi<unknown>>() {
         'Seems like you have not used zustand provider as an ancestor.'
       )
     }
-    return useStore(
+    return useStoreWithEqualityFn(
       store,
       selector as (state: ExtractState<S>) => StateSlice,
       equalityFn

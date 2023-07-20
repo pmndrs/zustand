@@ -11,6 +11,7 @@ import ReactDOM from 'react-dom'
 import { afterEach, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
+import { createWithEqualityFn } from 'zustand/traditional'
 
 const consoleError = console.error
 afterEach(() => {
@@ -89,7 +90,10 @@ it('uses the store with selectors', async () => {
 })
 
 it('uses the store with a selector and equality checker', async () => {
-  const useBoundStore = create(() => ({ item: { value: 0 } }))
+  const useBoundStore = createWithEqualityFn(
+    () => ({ item: { value: 0 } }),
+    Object.is
+  )
   const { setState } = useBoundStore
   let renderCount = 0
 
@@ -214,7 +218,10 @@ it('can update the selector', async () => {
 it('can update the equality checker', async () => {
   type State = { value: number }
   type Props = { equalityFn: (a: State, b: State) => boolean }
-  const useBoundStore = create<State>(() => ({ value: 0 }))
+  const useBoundStore = createWithEqualityFn<State>(
+    () => ({ value: 0 }),
+    Object.is
+  )
   const { setState } = useBoundStore
   const selector = (s: State) => s
 
@@ -258,7 +265,10 @@ it('can call useBoundStore with progressively more arguments', async () => {
     equalityFn?: (a: number, b: number) => boolean
   }
 
-  const useBoundStore = create<State>(() => ({ value: 0 }))
+  const useBoundStore = createWithEqualityFn<State>(
+    () => ({ value: 0 }),
+    Object.is
+  )
   const { setState } = useBoundStore
 
   let renderCount = 0
@@ -357,7 +367,7 @@ it('can throw an error in equality checker', async () => {
   type State = { value: string | number }
 
   const initialState: State = { value: 'foo' }
-  const useBoundStore = create(() => initialState)
+  const useBoundStore = createWithEqualityFn(() => initialState, Object.is)
   const { setState } = useBoundStore
   const selector = (s: State) => s
   const equalityFn = (a: State, b: State) =>
