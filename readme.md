@@ -522,4 +522,4 @@ Some users may want to extend Zustand's feature set which can be done using thir
 ## Comparison with other libraries
 
 - [Difference between zustand and valtio](https://github.com/pmndrs/zustand/wiki/Difference-between-zustand-and-valtio)
-- [NPM Package Downloads Trend of React State Management Libraries](https://npm-compare.com/react-redux,zustand,xstate,mobx,jotai,recoil,valtio,mobx-state-tree,constate,@datorama/akita,unstated,@hookstate/core,easy-peasy,@ngneat/elf,nanostores,alt,storeon,overmind/#timeRange=THREE_YEARS)
+- [NPM package downloads trend of zustand](https://npm-compare.com/zustand/#timeRange=THREE_YEARS)
