@@ -484,6 +484,6 @@ const Component = () => {
 
 ## Npm Downloads Trend
 
-- [Npm Downloads Trend of State Management Libraries for React](https://npm-compare.com/react-redux,jotai,recoil,valtio/#timeRange=THREE_YEARS)
+- [Npm Downloads Trend of State Management Libraries for React](https://npm-compare.com/@reduxjs/toolkit,zustand,recoil,jotai,valtio/#timeRange=THREE_YEARS)
 
 
