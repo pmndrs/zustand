@@ -698,17 +698,28 @@ Let's say your state uses `Map` to handle a list of `transactions`,
 then you can convert the Map into an Array in the storage prop:
 
 ```ts
+
+interface BearState {
+  .
+  .
+  .
+  transactions: Map<any>
+}
+
   storage: {
     getItem: (name) => {
-      const str = localStorage.getItem(name)
+      const str = localStorage.getItem(name);
+      if (!str) return null;
+      const { state } = JSON.parse(str);
       return {
         state: {
-          ...JSON.parse(str).state,
-          transactions: new Map(JSON.parse(str).state.transactions),
+          ...state,
+          transactions: new Map(state.transactions),
         },
       }
     },
-    setItem: (name, newValue) => {
+    setItem: (name, newValue: StorageValue<BearState>) => {
+      // functions cannot be JSON encoded
       const str = JSON.stringify({
         state: {
           ...newValue.state,
