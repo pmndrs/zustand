@@ -521,5 +521,4 @@ Some users may want to extend Zustand's feature set which can be done using thir
 
 ## Comparison with other libraries
 
-- [Difference between zustand and valtio](https://github.com/pmndrs/zustand/wiki/Difference-between-zustand-and-valtio)
-- [NPM package downloads trend of zustand](https://npm-compare.com/zustand/#timeRange=THREE_YEARS)
+- [Difference between zustand and other state management libraries for React](https://docs.pmnd.rs/zustand/getting-started/comparison)
