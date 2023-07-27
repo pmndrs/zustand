@@ -17,7 +17,7 @@ so some terminology may not perfectly align to other libraries.
 
 Your applications global state should be located in a single Zustand store.
 
-If you have a large application, Zustand supports [splitting the store into slices](./slices-pattern).
+If you have a large application, Zustand supports [splitting the store into slices](./slices-pattern.md).
 
 ### Use `set` / `setState` to update the store
 
