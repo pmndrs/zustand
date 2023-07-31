@@ -34,6 +34,7 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
 
 /**
  * @deprecated Use `useStoreWithEqualityFn` from 'zustand/traditional'
+ * https://github.com/pmndrs/zustand/discussions/1937
  */
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
@@ -48,7 +49,7 @@ export function useStore<TState, StateSlice>(
 ) {
   if (import.meta.env?.MODE !== 'production' && equalityFn) {
     console.warn(
-      "[DEPRECATED] Use `createWithEqualityFn` from 'zustand/traditional'."
+      "[DEPRECATED] Use `createWithEqualityFn` from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937"
     )
   }
   const slice = useSyncExternalStoreWithSelector(
