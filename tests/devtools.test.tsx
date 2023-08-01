@@ -5,7 +5,7 @@ import { StoreApi, createStore } from 'zustand/vanilla'
 type TupleOfEqualLengthH<
   Arr extends unknown[],
   T,
-  Acc extends T[]
+  Acc extends T[],
 > = Arr extends [unknown, ...infer Rest]
   ? TupleOfEqualLengthH<Rest, T, [T, ...Acc]>
   : Acc

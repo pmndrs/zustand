@@ -571,7 +571,7 @@ describe('more complex state spec with subscribeWithSelector', () => {
         () =>
           ({
             foo: 1,
-          } as MyState) // NOTE: Asserting the entire state works too.
+          }) as MyState // NOTE: Asserting the entire state works too.
       )
     )
     const TestComponent = () => {
@@ -624,7 +624,7 @@ describe('create with explicitly annotated mutators', () => {
       CounterState,
       [
         ['zustand/subscribeWithSelector', never],
-        ['zustand/persist', CounterState]
+        ['zustand/persist', CounterState],
       ]
     >(
       subscribeWithSelector(

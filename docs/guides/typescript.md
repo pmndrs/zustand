@@ -115,9 +115,9 @@ declare const withError: {
   <E>(): <T>(
     p: Promise<T>
   ) => Promise<[error: undefined, value: T] | [error: E, value: undefined]>
-  <T, E>(p: Promise<T>): Promise<
-    [error: undefined, value: T] | [error: E, value: undefined]
-  >
+  <T, E>(
+    p: Promise<T>
+  ): Promise<[error: undefined, value: T] | [error: E, value: undefined]>
 }
 declare const doSomething: () => Promise<string>
 interface Foo {
@@ -239,7 +239,7 @@ import { create, State, StateCreator, StoreMutatorIdentifier } from 'zustand'
 type Logger = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   f: StateCreator<T, Mps, Mcs>,
   name?: string
@@ -292,7 +292,7 @@ type Foo = <
   T extends State,
   A,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   f: StateCreator<T, [...Mps, ['foo', A]], Mcs>,
   bar: A

@@ -3,7 +3,7 @@ import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
 type SubscribeWithSelector = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   initializer: StateCreator<
     T,

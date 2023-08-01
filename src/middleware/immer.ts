@@ -5,7 +5,7 @@ import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
 type Immer = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs>
 ) => StateCreator<T, Mps, [['zustand/immer', never], ...Mcs]>

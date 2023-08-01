@@ -19,7 +19,7 @@ type WithRedux<S, A> = Write<S, StoreRedux<A>>
 type Redux = <
   T,
   A extends Action,
-  Cms extends [StoreMutatorIdentifier, unknown][] = []
+  Cms extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   reducer: (state: T, action: A) => T,
   initialState: T
