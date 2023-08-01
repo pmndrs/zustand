@@ -191,10 +191,14 @@
   },
   "peerDependencies": {
     "immer": ">=9.0",
+    "@types/react": ">=16.8",
     "react": ">=16.8"
   },
   "peerDependenciesMeta": {
     "immer": {
+      "optional": true
+    },
+    "@types/react": {
       "optional": true
     },
     "react": {
