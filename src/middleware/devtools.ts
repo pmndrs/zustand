@@ -132,7 +132,7 @@ export interface DevtoolsOptions extends Config {
 type Devtools = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs>,
   devtoolsOptions?: DevtoolsOptions

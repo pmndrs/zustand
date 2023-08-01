@@ -6,7 +6,7 @@ type Combine = <
   T extends object,
   U extends object,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   initialState: T,
   additionalStateCreator: StateCreator<T, Mps, Mcs, U>

@@ -29,7 +29,7 @@ export function useStoreWithEqualityFn<S extends WithReact<StoreApi<unknown>>>(
 
 export function useStoreWithEqualityFn<
   S extends WithReact<StoreApi<unknown>>,
-  U
+  U,
 >(
   api: S,
   selector: (state: ExtractState<S>) => U,
@@ -53,7 +53,7 @@ export function useStoreWithEqualityFn<TState, StateSlice>(
 }
 
 export type UseBoundStoreWithEqualityFn<
-  S extends WithReact<ReadonlyStoreApi<unknown>>
+  S extends WithReact<ReadonlyStoreApi<unknown>>,
 > = {
   (): ExtractState<S>
   <U>(
