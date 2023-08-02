@@ -117,7 +117,7 @@ Here's the diff showing how to migrate from v3 createContext to v4 API.
 + import { createStore, useStore } from "zustand";
 
 - const useStore = create((set) => ({
-+ const store =  createStore((set) => ({
++ const store = createStore((set) => ({
     bears: 0,
     increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
     removeAllBears: () => set({ bears: 0 })
@@ -125,7 +125,7 @@ Here's the diff showing how to migrate from v3 createContext to v4 API.
 
 + const MyContext = createContext()
 
-+ export const Provider = ({ children }) = <MyContext.Provider value={store}>{children}</MyContext.Provider>;
++ export const Provider = ({ children }) => <MyContext.Provider value={store}>{children}</MyContext.Provider>;
 
 + export const useMyStore = (selector) => useStore(useContext(MyContext), selector);
 ```
