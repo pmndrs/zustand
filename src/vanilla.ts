@@ -1,9 +1,7 @@
-type SetStateInternal<T> = {
-  _(
-    partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
-    replace?: boolean | undefined
-  ): void
-}['_']
+type SetStateInternal<T> = (
+  partial: T | Partial<T> | { (state: T): T | Partial<T> },
+  replace?: boolean | undefined
+) => void
 
 export interface StoreApi<T> {
   setState: SetStateInternal<T>
