@@ -23,6 +23,8 @@ type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
+let didWarnAboutEqualityFn = false
+
 export function useStore<S extends WithReact<StoreApi<unknown>>>(
   api: S
 ): ExtractState<S>
@@ -41,8 +43,6 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   selector: (state: ExtractState<S>) => U,
   equalityFn: (a: U, b: U) => boolean
 ): U
-
-let didWarnAboutEqualityFn = false
 
 export function useStore<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
