@@ -39,7 +39,7 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
-  equalityFn: (a: U, b: U) => boolean
+  equalityFn: ((a: U, b: U) => boolean) | undefined
 ): U
 
 export function useStore<TState, StateSlice>(
