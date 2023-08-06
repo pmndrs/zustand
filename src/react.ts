@@ -23,6 +23,8 @@ type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
+let didWarnAboutEqualityFn = false
+
 export function useStore<S extends WithReact<StoreApi<unknown>>>(
   api: S
 ): ExtractState<S>
@@ -47,10 +49,15 @@ export function useStore<TState, StateSlice>(
   selector: (state: TState) => StateSlice = api.getState as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean
 ) {
-  if (import.meta.env?.MODE !== 'production' && equalityFn) {
+  if (
+    import.meta.env?.MODE !== 'production' &&
+    equalityFn &&
+    !didWarnAboutEqualityFn
+  ) {
     console.warn(
-      "[DEPRECATED] Use `createWithEqualityFn` from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937"
+      "[DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937"
     )
+    didWarnAboutEqualityFn = true
   }
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
