@@ -418,6 +418,15 @@ Optionally, you can name the store with a second argument `devtoolsOptions`:
 unlike in a typical _combined reducers_ Redux store.
 See an approach to combining stores [here](https://github.com/pmndrs/zustand/issues/163).
 
+#### Use it with TypeScript
+
+It's recommended to install and import types from`@redux-devtools/extension` to get types correctly.
+
+```ts
+import type {} from '@redux-devtools/extension'
+import { devtools } from 'zustand/middleware'
+```
+
 ## TypeScript
 
 ```tsx
