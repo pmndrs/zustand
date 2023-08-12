@@ -60,6 +60,7 @@ type StoreDevtools<S> = S extends {
   : never
 
 export interface DevtoolsOptions extends Config {
+  name?: string
   enabled?: boolean
   anonymousActionType?: string
   store?: string
