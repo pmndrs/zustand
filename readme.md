@@ -86,7 +86,7 @@ const honey = useBearStore((state) => state.honey)
 
 If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
 
-To use a custom equality function, you need `createWithEqualityFn` from `zustand/traditional`. It takes the second argument for the default equality function.
+To use a custom equality function, you need `createWithEqualityFn` instead of `create`. Usually you want to specify `Object.is` as the second argument for the default equality function, but it's configurable.
 
 ```jsx
 import { createWithEqualityFn } from 'zustand/traditional'
