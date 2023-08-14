@@ -663,7 +663,7 @@ except for writing `create<State>()(...)` instead of `create(...)`.
 
 ```tsx
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface MyState {
   bears: number
