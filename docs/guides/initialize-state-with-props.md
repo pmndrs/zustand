@@ -103,7 +103,7 @@ function BearProvider({ children, ...props }: BearProviderProps) {
 ```tsx
 // Mimic the hook returned by `create`
 import { useContext } from 'react'
-import { useStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
 
 function useBearContext<T>(
   selector: (state: BearState) => T,
@@ -111,7 +111,7 @@ function useBearContext<T>(
 ): T {
   const store = useContext(BearContext)
   if (!store) throw new Error('Missing BearContext.Provider in the tree')
-  return useStore(store, selector, equalityFn)
+  return useStoreWithEqualityFn(store, selector, equalityFn)
 }
 ```
 
