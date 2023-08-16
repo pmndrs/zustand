@@ -106,7 +106,7 @@ import { useContext } from 'react'
 import { useStore } from 'zustand'
 
 function useBearContext<T>(
-  selector: (state: BearState) => T,
+  selector: (state: BearState) => T
 ): T {
   const store = useContext(BearContext)
   if (!store) throw new Error('Missing BearContext.Provider in the tree')
