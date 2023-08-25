@@ -354,7 +354,7 @@ const useBearStore = create<
 >(devtools(persist((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
-}), {name: "required name option"}))
+}), { name: 'bearStore' }))
 ```
 
 ### Slices pattern
