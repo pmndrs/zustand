@@ -176,10 +176,13 @@ interface BearState {
 
 const useBearStore = create<BearState>()(
   devtools(
-    persist((set) => ({
-      bears: 0,
-      increase: (by) => set((state) => ({ bears: state.bears + by })),
-    }))
+    persist(
+      (set) => ({
+        bears: 0,
+        increase: (by) => set((state) => ({ bears: state.bears + by })),
+      }),
+      { name: 'bearStore' }
+    )
   )
 )
 ```
@@ -190,7 +193,7 @@ Just make sure you are using them immediately inside `create` so as to make the 
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 
-const myMiddlewares = (f) => devtools(persist(f))
+const myMiddlewares = (f) => devtools(persist(f, { name: 'bearStore' }))
 
 interface BearState {
   bears: number
@@ -351,7 +354,7 @@ const useBearStore = create<
 >(devtools(persist((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
-})))
+}), { name: 'bearStore' }))
 ```
 
 ### Slices pattern
