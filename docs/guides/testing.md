@@ -133,6 +133,7 @@ export default config
 In the next steps we are going to setup our Vitest environment in order to mock Zustand
 
 ```ts
+// __mocks__/zustand.ts
 import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
