@@ -331,7 +331,7 @@ import userEvent from '@testing-library/user-event'
 import { Counter } from './counter'
 
 describe('Counter', () => {
-  test('should render successfully', async () => {
+  test('should render with initial state of 1', async () => {
     renderCounter()
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
@@ -401,7 +401,7 @@ import userEvent from '@testing-library/user-event'
 import { CounterWithContext } from './counter-with-context'
 
 describe('CounterWithContext', () => {
-  test('should render successfully', async () => {
+  test('should render with initial state of 1', async () => {
     renderCounterWithContext()
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
