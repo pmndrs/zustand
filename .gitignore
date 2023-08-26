@@ -11,3 +11,6 @@ package-lock.json
 coverage/
 .rpt2_cache/
 .idea
+
+# lock files
+*lock*
