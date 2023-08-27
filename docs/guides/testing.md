@@ -66,13 +66,16 @@ In the next steps we are going to setup our Jest environment in order to mock Zu
 import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
-const { create: actualCreate } = jest.requireActual<typeof zustand>('zustand')
+const { create: actualCreate, createStore: actualCreateStore } =
+  jest.requireActual<typeof zustand>('zustand')
 
 // a variable to hold reset functions for all stores declared in the app
 export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = (<T extends unknown>() => {
+export const create = (<T,>() => {
+  console.log('zustand create mock')
+
   return (stateCreator: zustand.StateCreator<T>) => {
     const store = actualCreate(stateCreator)
     const initialState = store.getState()
@@ -82,6 +85,18 @@ export const create = (<T extends unknown>() => {
     return store
   }
 }) as typeof zustand.create
+
+// when creating a store, we get its initial state, create a reset function and add it in the set
+export const createStore = (<T,>(stateCreator: zustand.StateCreator<T>) => {
+  console.log('zustand createStore mock')
+
+  const store = actualCreateStore(stateCreator)
+  const initialState = store.getState()
+  storeResetFns.add(() => {
+    store.setState(initialState, true)
+  })
+  return store
+}) as typeof zustand.createStore
 
 // reset all stores after each test run
 afterEach(() => {
@@ -122,15 +137,16 @@ In the next steps we are going to setup our Vitest environment in order to mock 
 import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
 
-const { create: actualCreate } = await vi.importActual<typeof zustand>(
-  'zustand'
-)
+const { create: actualCreate, createStore: actualCreateStore } =
+  await vi.importActual<typeof zustand>('zustand')
 
 // a variable to hold reset functions for all stores declared in the app
 export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = (<T extends unknown>() => {
+export const create = (<T,>() => {
+  console.log('zustand create mock')
+
   return (stateCreator: zustand.StateCreator<T>) => {
     const store = actualCreate(stateCreator)
     const initialState = store.getState()
@@ -140,6 +156,18 @@ export const create = (<T extends unknown>() => {
     return store
   }
 }) as typeof zustand.create
+
+// when creating a store, we get its initial state, create a reset function and add it in the set
+export const createStore = (<T,>(stateCreator: zustand.StateCreator<T>) => {
+  console.log('zustand createStore mock')
+
+  const store = actualCreateStore(stateCreator)
+  const initialState = store.getState()
+  storeResetFns.add(() => {
+    store.setState(initialState, true)
+  })
+  return store
+}) as typeof zustand.createStore
 
 // reset all stores after each test run
 afterEach(() => {
@@ -197,31 +225,94 @@ In the next examples we are going to use `useCounterStore`
 > **Note**: all of these examples are written using TypeScript.
 
 ```ts
-// stores/user-counter-store.ts
-import { create } from 'zustand'
+// stores/counter-store-creator.ts
+import { type StateCreator } from 'zustand'
 
 export type CounterStore = {
   count: number
   inc: () => void
 }
 
-export const useCounterStore = create<CounterStore>()((set) => ({
+export const counterStoreCreator: StateCreator<CounterStore> = (set) => ({
   count: 1,
   inc: () => set((state) => ({ count: state.count + 1 })),
-}))
+})
+```
+
+```ts
+// stores/user-counter-store.ts
+import { create } from 'zustand'
+
+import { type CounterStore, counterStoreCreator } from './counter-store-creator'
+
+export const useCounterStore = create<CounterStore>()(counterStoreCreator)
+```
+
+```tsx
+// stores/use-counter-store-context.tsx
+import {
+  type PropsWithChildren,
+  createContext,
+  useContext,
+  useRef,
+} from 'react'
+import { type StoreApi, createStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { shallow } from 'zustand/shallow'
+
+import { type CounterStore, counterStoreCreator } from './counter-store-creator'
+
+export const createCounterStore = () => {
+  return createStore<CounterStore>(counterStoreCreator)
+}
+
+export const CounterStoreContext = createContext<StoreApi<CounterStore>>(
+  null as never
+)
+
+export type CounterStoreProviderProps = PropsWithChildren
+
+export const CounterStoreProvider = ({
+  children,
+}: CounterStoreProviderProps) => {
+  const counterStoreRef = useRef(createCounterStore())
+
+  return (
+    <CounterStoreContext.Provider value={counterStoreRef.current}>
+      {children}
+    </CounterStoreContext.Provider>
+  )
+}
+
+export type UseCounterStoreContextSelector<T> = (store: CounterStore) => T
+
+export const useCounterStoreContext = <T,>(
+  selector: UseCounterStoreContextSelector<T>
+): T => {
+  const counterStoreContext = useContext(CounterStoreContext)
+
+  if (counterStoreContext === undefined) {
+    throw new Error(
+      'useCounterStoreContext must be used within CounterStoreProvider'
+    )
+  }
+
+  return useStoreWithEqualityFn(counterStoreContext, selector, shallow)
+}
 ```
 
 ```tsx
 // components/counter/counter.tsx
-import { useCounterStore } from '../../stores/user-counter-store'
+import { useCounterStore } from '../../stores/use-counter-store'
 
 export function Counter() {
   const { count, inc } = useCounterStore()
 
   return (
     <div>
-      <span>{count}</span>
-      <button onClick={inc}>one up</button>
+      <h2>Counter Store</h2>
+      <h4>{count}</h4>
+      <button onClick={inc}>One Up</button>
     </div>
   )
 }
@@ -234,14 +325,14 @@ export * from './counter'
 
 ```tsx
 // components/counter/counter.test.tsx
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { Counter } from './counter'
 
 describe('Counter', () => {
-  test('should render successfully', async () => {
-    render(<Counter />)
+  test('should render with initial state of 1', async () => {
+    renderCounter()
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
     expect(
@@ -252,15 +343,91 @@ describe('Counter', () => {
   test('should increase count by clicking a button', async () => {
     const user = userEvent.setup()
 
-    render(<Counter />)
+    renderCounter()
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
 
-    await user.click(await screen.findByRole('button', { name: /one up/ }))
+    await act(async () => {
+      await user.click(await screen.findByRole('button', { name: /one up/i }))
+    })
 
     expect(await screen.findByText(/^2$/)).toBeInTheDocument()
   })
 })
+
+const renderCounter = () => {
+  return render(<Counter />)
+}
+```
+
+```tsx
+// components/counter-with-context/counter-with-context.tsx
+import {
+  CounterStoreProvider,
+  useCounterStoreContext,
+} from '../../stores/use-counter-store-context'
+
+const Counter = () => {
+  const { count, inc } = useCounterStoreContext((state) => state)
+
+  return (
+    <div>
+      <h2>Counter Store Context</h2>
+      <h4>{count}</h4>
+      <button onClick={inc}>One Up</button>
+    </div>
+  )
+}
+
+export const CounterWithContext = () => {
+  return (
+    <CounterStoreProvider>
+      <Counter />
+    </CounterStoreProvider>
+  )
+}
+```
+
+```tsx
+// components/counter-with-context/index.ts
+export * from './counter-with-context'
+```
+
+```tsx
+// components/counter-with-context/counter-with-context.test.tsx
+import { act, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import { CounterWithContext } from './counter-with-context'
+
+describe('CounterWithContext', () => {
+  test('should render with initial state of 1', async () => {
+    renderCounterWithContext()
+
+    expect(await screen.findByText(/^1$/)).toBeInTheDocument()
+    expect(
+      await screen.findByRole('button', { name: /one up/i })
+    ).toBeInTheDocument()
+  })
+
+  test('should increase count by clicking a button', async () => {
+    const user = userEvent.setup()
+
+    renderCounterWithContext()
+
+    expect(await screen.findByText(/^1$/)).toBeInTheDocument()
+
+    await act(async () => {
+      await user.click(await screen.findByRole('button', { name: /one up/i }))
+    })
+
+    expect(await screen.findByText(/^2$/)).toBeInTheDocument()
+  })
+})
+
+const renderCounterWithContext = () => {
+  return render(<CounterWithContext />)
+}
 ```
 
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
