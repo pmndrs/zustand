@@ -13,4 +13,4 @@ coverage/
 .idea
 
 # lock files
-*lock*
+pnpm-lock.*

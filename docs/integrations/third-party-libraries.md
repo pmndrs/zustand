@@ -23,7 +23,7 @@ This can be done using third-party libraries created by the community.
 - [leiten-zustand](https://github.com/hecmatyar/leiten-zustand) — Cleans your store from boilerplate for requests and data transformation.
 - [mobz](https://github.com/2A5F/Mobz) — Zustand-style MobX API.
 - [ngx-zustand](https://github.com/JoaoPauloLousada/ngx-zustand) - A Zustand adapter for Angular.
-- [persist-and-sync](https://www.npmjs.com/package/persist-and-sync) - Zustand middleware to easily persist and sync Zustand state between tabs / windows / iframes (SameOrigin)
+- [persist-and-sync](https://www.npmjs.com/package/persist-and-sync) - Zustand middleware to easily persist and sync Zustand state between tabs / windows / iframes (SameOrigin) [GitHub](https://github.com/mayank1513/persist-and-sync)
 - [shared-zustand](https://github.com/Tom-Julux/shared-zustand) — Cross-tab state sharing for Zustand.
 - [simple-zustand-devtools](https://github.com/beerose/simple-zustand-devtools) — 🐻⚛️ Inspect your Zustand store in React DevTools.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
