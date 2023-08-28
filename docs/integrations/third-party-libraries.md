@@ -47,6 +47,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
 - [zustand-saga](https://github.com/Nowsta/zustand-saga) — A Zustand middleware for redux-saga (minus redux).
 - [zustand-store-addons](https://github.com/Diablow/zustand-store-addons) — React state management addons for Zustand.
+- [zustand-sync-tabs](https://github.com/mayank1513/zustand-sync-tabs) — Zustand middleware to easily sync Zustand state between tabs/windows/iframes with same origin.
 - [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) - State management for vue (Vue3 / Vue2) based on zustand.
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
