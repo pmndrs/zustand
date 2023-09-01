@@ -435,7 +435,7 @@ const renderCounterWithContext = () => {
 
 **CodeSandbox Demos**
 
-- Jest Demo: https://codesandbox.io/p/sandbox/friendly-breeze-276c28
+- Jest Demo: https://codesandbox.io/p/sandbox/zustand-jest-demo-twkypn
 - Vitest Demo: https://codesandbox.io/p/sandbox/zustand-vitest-demo-ph5gnj
 
 ## References
