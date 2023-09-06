@@ -221,7 +221,7 @@ Reducing nested structures is tiresome.
 Have you tried [Immer](https://github.com/immerjs/immer)?
 
 ```jsx
-import produce from 'immer'
+import { produce } from 'immer'
 
 const useStore = create((set) => ({
   lush: { forest: { contains: { a: 'bear' } } },
