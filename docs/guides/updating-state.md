@@ -10,6 +10,8 @@ the new state, and it will be shallowly merged with the existing state in the
 store. **Note** See next section for nested state.
 
 ```tsx
+import { create } from 'zustand'
+
 type State = {
   firstName: string
   lastName: string
@@ -21,7 +23,7 @@ type Action = {
 }
 
 // Create your store, which includes both state and (optionally) actions
-const useStore = create<State & Action>((set) => ({
+const usePersonStore = create<State & Action>((set) => ({
   firstName: '',
   lastName: '',
   updateFirstName: (firstName) => set(() => ({ firstName: firstName })),
@@ -32,10 +34,8 @@ const useStore = create<State & Action>((set) => ({
 function App() {
   // "select" the needed state and actions, in this case, the firstName value
   // and the action updateFirstName
-  const [firstName, updateFirstName] = useStore(
-    (state) => [state.firstName, state.updateFirstName],
-    shallow
-  )
+  const firstName = usePersonStore((state) => state.firstName)
+  const updateFirstName = usePersonStore((state) => state.updateFirstName)
 
   return (
     <main>
