@@ -12,7 +12,7 @@
   "dependencies": {
     "@react-three/drei": "^9.78.2",
     "@react-three/fiber": "^8.13.5",
-    "@react-three/postprocessing": "^2.14.13",
+    "@react-three/postprocessing": "^2.15.0",
     "@types/three": "^0.154.0",
     "meshline": "^3.1.6",
     "prism-react-renderer": "^2.0.6",
