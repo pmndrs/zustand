@@ -456,10 +456,10 @@
   resolved "https://registry.yarnpkg.com/@types/stats.js/-/stats.js-0.17.0.tgz#0ed81d48e03b590c24da85540c1d952077a9fe20"
   integrity sha512-9w+a7bR8PeB0dCT/HBULU2fMqf6BAzvKbxFboYhmDtDkKPiyXYbjoe2auwsXlEFI7CFNMF1dCv3dFH5Poy9R1w==
 
-"@types/three@^0.154.0":
-  version "0.154.0"
-  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.154.0.tgz#91f4384930ed050a14d7f13c09d5785cc167a064"
-  integrity sha512-IioqpGhch6FdLDh4zazRn3rXHj6Vn2nVOziJdXVbJFi9CaI65LtP9qqUtpzbsHK2Ezlox8NtsLNHSw3AQzucjA==
+"@types/three@^0.155.0":
+  version "0.155.1"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.155.1.tgz#03e1cc9bf7132f50606254611ff5f68ccd682b05"
+  integrity sha512-uNUwnz/wWRxahjIqTtDYQ1qdE1R1py21obxfuILkT+kKrjocMwRLQQA1l8nMxfQU7VXb7CXu04ucMo8OqZt4ZA==
   dependencies:
     "@tweenjs/tween.js" "~18.6.4"
     "@types/stats.js" "*"
