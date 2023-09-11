@@ -141,4 +141,4 @@ const useStoreInContext = (selector) => {
 Or reach out to some third-party libraries that provide Zustand v3-like APIs:
 
 - <https://github.com/charkour/zustand-di>
-- https://github.com/arvinxx/zustand-utils
+- <https://github.com/arvinxx/zustand-utils>
