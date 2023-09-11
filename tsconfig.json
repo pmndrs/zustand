@@ -10,6 +10,7 @@
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "zustand": ["./src/index.ts"],
