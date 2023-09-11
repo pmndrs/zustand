@@ -412,7 +412,7 @@ const createSharedSlice: StateCreator<
     // or doing from scratch
     // set((state) => ({ bears: state.bears + 1, fishes: state.fishes + 1 })
   },
-  getBoth: () => get().bears + get().fishes
+  getBoth: () => get().bears + get().fishes,
 })
 
 const useBoundStore = create<BearSlice & FishSlice & SharedSlice>()((...a) => ({
