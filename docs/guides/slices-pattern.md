@@ -67,13 +67,10 @@ export default App
 You can update multiple stores, at the same time, in a single function.
 
 ```js
-import { createBearSlice } from './bearSlice'
-import { createFishSlice } from './fishSlice'
-
-export const createBearFishSlice = (set) => ({
+export const createBearFishSlice = (set, get) => ({
   addBearAndFish: () => {
-    createBearSlice(set).addBear()
-    createFishSlice(set).addFish()
+    get().addBear()
+    get().addFish()
   },
 })
 ```
