@@ -221,7 +221,7 @@ Reducing nested structures is tiresome.
 Have you tried [Immer](https://github.com/immerjs/immer)?
 
 ```jsx
-import produce from 'immer'
+import { produce } from 'immer'
 
 const useStore = create((set) => ({
   lush: { forest: { contains: { a: 'bear' } } },
@@ -270,7 +270,7 @@ const useStore = create(
 
 ```js
 import { create } from 'zustand'
-import produce from 'immer'
+import { produce } from 'immer'
 import pipe from 'ramda/es/pipe'
 
 /* log and immer functions from previous example */
@@ -294,7 +294,7 @@ For a TS example see the following [discussion](https://github.com/pmndrs/zustan
 
 ```ts
 import { State, StateCreator } from 'zustand'
-import produce, { Draft } from 'immer'
+import { produce, Draft } from 'immer'
 
 // Immer V8 or lower
 const immer =
