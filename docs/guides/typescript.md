@@ -406,7 +406,7 @@ const createSharedSlice: StateCreator<
   SharedSlice
 > = (set, get) => ({
   addBoth: () => {
-    // reusing previous methods
+    // you can reuse previous methods
     get().addBear()
     get().addFish()
     // or doing from scratch
