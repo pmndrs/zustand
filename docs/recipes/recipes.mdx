@@ -183,13 +183,13 @@ const store = createStore(() => ({ ... }))
 const { getState, setState, subscribe, destroy } = store
 ```
 
-You can even consume an existing vanilla store with React:
+You can use a vanilla store in React with a `useStore` hook.
 
 ```jsx
-import { create } from 'zustand'
+import { useStore } from 'zustand'
 import { vanillaStore } from './vanillaStore'
 
-const useStore = create(vanillaStore)
+const useBoundStore = (selector) => useStore(vanillaStore, selector)
 ```
 
 ## Transient updates (for frequent state changes)
