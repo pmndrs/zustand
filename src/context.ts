@@ -44,7 +44,7 @@ function createContext<S extends StoreApi<unknown>>() {
 
     return createElement(
       ZustandContext.Provider,
-      { value: storeRef.current ||= createStore() },
+      { value: (storeRef.current ||= createStore()) },
       children
     )
   }
