@@ -14,7 +14,7 @@ and we will compare key differences and similarities between each.
 
 ## Redux
 
-### State Model
+### State Model (vs Redux)
 
 Conceptually, Zustand and Redux are quite similar,
 both are based on an immutable state model.
@@ -126,7 +126,7 @@ const countSlice = createSlice({
 const countStore = configureStore({ reducer: countSlice.reducer })
 ```
 
-### Render Optimization
+### Render Optimization (vs Redux)
 
 When it comes to render optimizations within your app,
 there are no major differences in approach between Zustand and Redux.
@@ -232,7 +232,7 @@ const Component = () => {
 
 ## Valtio
 
-### State Model
+### State Model (vs Valtio)
 
 Zustand and Valtio approach state management
 in a fundamentally different way.
@@ -263,7 +263,7 @@ const state = proxy({ obj: { count: 0 } })
 state.obj.count += 1
 ```
 
-### Render Optimization
+### Render Optimization (vs Valtio)
 
 The other difference between Zustand and Valtio
 is Valtio makes render optimizations through property access.
@@ -306,7 +306,7 @@ const Component = () => {
 
 ## Jotai
 
-### State Model
+### State Model (vs Jotai)
 
 There are two major differences between Zustand and Jotai.
 Firstly, Zustand is a single store,
@@ -345,7 +345,7 @@ import { atom } from 'jotai'
 const countAtom = atom<number>(0)
 ```
 
-### Render Optimization
+### Render Optimization (vs Jotai)
 
 Jotai achieves render optimizations through atom dependency.
 However, with Zustand it is recommended that
@@ -394,7 +394,7 @@ const Component = () => {
 
 ## Recoil
 
-### State Model
+### State Model (vs Recoil)
 
 The difference between Zustand and Recoil
 is similar to that between Zustand and Jotai.
@@ -433,7 +433,7 @@ const count = atom({
 })
 ```
 
-### Render Optimization
+### Render Optimization (vs Recoil)
 
 Similar to previous optimization comparisons,
 Recoil makes render optimizations through atom dependency.
