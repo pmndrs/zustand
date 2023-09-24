@@ -8,7 +8,7 @@ nav: 0
   <img src="https://github.com/pmndrs/zustand/raw/main/bear.jpg" />
 </div>
 
-A small, fast, and scalable bearbones state management solution.
+A small, fast, and scalable barebones state management solution.
 Zustand has a comfy API based on hooks.
 It isn't boilerplatey or opinionated,
 but has enough convention to be explicit and flux-like.
