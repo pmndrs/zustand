@@ -189,8 +189,7 @@ unsub1()
 // You can of course use the hook as you always would
 function Component() {
   const paw = useDogStore((state) => state.paw)
-  // ...
-}
+  ...
 ```
 
 ### Using subscribe with selector
