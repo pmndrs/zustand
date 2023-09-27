@@ -268,7 +268,6 @@ const Component = () => {
     state => (scratchRef.current = state.scratches)
   ), [])
   ...
-}
 ```
 
 ## Sick of reducers and changing nested states? Use Immer!
