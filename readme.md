@@ -165,7 +165,7 @@ const useSoundStore = create((set, get) => ({
   sound: 'grunt',
   action: () => {
     const sound = get().sound
-    // ...
+    ...
   },
 }))
 ```
