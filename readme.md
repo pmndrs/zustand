@@ -185,8 +185,6 @@ const unsub1 = useDogStore.subscribe(console.log)
 useDogStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
-// Destroying the store (removing all listeners)
-useStore.destroy()
 
 // You can of course use the hook as you always would
 function Component() {
