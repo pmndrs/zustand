@@ -185,11 +185,14 @@ const unsub1 = useDogStore.subscribe(console.log)
 useDogStore.setState({ paw: false })
 // Unsubscribe listeners
 unsub1()
+// Destroying the store (removing all listeners)
+useStore.destroy()
 
 // You can of course use the hook as you always would
-const Component = () => {
+function Component() {
   const paw = useDogStore((state) => state.paw)
-  ...
+  // ...
+}
 ```
 
 ### Using subscribe with selector
@@ -267,6 +270,7 @@ const Component = () => {
     state => (scratchRef.current = state.scratches)
   ), [])
   ...
+}
 ```
 
 ## Sick of reducers and changing nested states? Use Immer!
@@ -332,7 +336,7 @@ const useFishStore = create(
       addAFish: () => set({ fishes: get().fishes + 1 }),
     }),
     {
-      name: 'food-storage', // unique name
+      name: 'food-storage', // name of the item in the storage (must be unique)
       storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
     }
   )
