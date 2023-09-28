@@ -165,9 +165,7 @@ const useSoundStore = create((set, get) => ({
   sound: 'grunt',
   action: () => {
     const sound = get().sound
-    // ...
-  },
-}))
+    ...
 ```
 
 ## Reading/writing state and reacting to changes outside of components
@@ -187,7 +185,7 @@ useDogStore.setState({ paw: false })
 unsub1()
 
 // You can of course use the hook as you always would
-const Component = () => {
+function Component() {
   const paw = useDogStore((state) => state.paw)
   ...
 ```
@@ -332,7 +330,7 @@ const useFishStore = create(
       addAFish: () => set({ fishes: get().fishes + 1 }),
     }),
     {
-      name: 'food-storage', // unique name
+      name: 'food-storage', // name of the item in the storage (must be unique)
       storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
     }
   )
