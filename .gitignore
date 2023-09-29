@@ -8,6 +8,7 @@ $RECYCLE.BIN/
 .vscode
 .docz/
 package-lock.json
+pnpm-lock.yaml
 coverage/
 .rpt2_cache/
 .idea

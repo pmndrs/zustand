@@ -105,13 +105,10 @@ function BearProvider({ children, ...props }: BearProviderProps) {
 import { useContext } from 'react'
 import { useStore } from 'zustand'
 
-function useBearContext<T>(
-  selector: (state: BearState) => T,
-  equalityFn?: (left: T, right: T) => boolean
-): T {
+function useBearContext<T>(selector: (state: BearState) => T): T {
   const store = useContext(BearContext)
   if (!store) throw new Error('Missing BearContext.Provider in the tree')
-  return useStore(store, selector, equalityFn)
+  return useStore(store, selector)
 }
 ```
 
@@ -126,6 +123,23 @@ function CommonConsumer() {
       <button onClick={addBear}>Add bear</button>
     </>
   )
+}
+```
+
+### Optionally allow using a custom equality function
+
+```tsx
+// Allow custom equality function by using useStoreWithEqualityFn instead of useStore
+import { useContext } from 'react'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
+
+function useBearContext<T>(
+  selector: (state: BearState) => T,
+  equalityFn?: (left: T, right: T) => boolean
+): T {
+  const store = useContext(BearContext)
+  if (!store) throw new Error('Missing BearContext.Provider in the tree')
+  return useStoreWithEqualityFn(store, selector, equalityFn)
 }
 ```
 
