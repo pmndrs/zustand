@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { act, fireEvent, render, renderHook } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { act, fireEvent, render } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import { useStore } from 'zustand/react'
 import { shallow, useShallow } from 'zustand/shallow'
@@ -136,63 +136,89 @@ describe('unsupported cases', () => {
 })
 
 describe('useShallow', () => {
-  const useTestShallowSimple = <S, U>(props: {
-    selector: (state: S) => U
-    state: S
-  }): { selectorOutput: U; useShallowOutput: U } => {
-    const useShallowOutput = useShallow(props.selector)(props.state)
-    return {
-      selectorOutput: props.selector(props.state),
-      useShallowOutput,
-    }
+  const testUseShallowSimpleCallback =
+    vi.fn<[{ selectorOutput: string[]; useShallowOutput: string[] }]>()
+  const TestUseShallowSimple = ({
+    selector,
+    state,
+  }: {
+    state: Record<string, unknown>
+    selector: (state: Record<string, unknown>) => string[]
+  }) => {
+    const selectorOutput = selector(state)
+    const useShallowOutput = useShallow(selector)(state)
+
+    return (
+      <div
+        data-testid="test-shallow"
+        onClick={() =>
+          testUseShallowSimpleCallback({ selectorOutput, useShallowOutput })
+        }
+      />
+    )
   }
 
+  beforeEach(() => {
+    testUseShallowSimpleCallback.mockClear()
+  })
+
   it('input and output selectors always return shallow equal values', () => {
-    const initialProps = {
-      selector: (state: Record<string, number>) => Object.keys(state),
-      state: { a: 1, b: 2 } as Record<string, number>,
-    }
-
-    const res = renderHook((props) => useTestShallowSimple(props), {
-      initialProps,
-    })
-
-    expect(res.result.current.selectorOutput).toEqual(
-      res.result.current.useShallowOutput
+    const res = render(
+      <TestUseShallowSimple state={{ a: 1, b: 2 }} selector={Object.keys} />
     )
 
-    res.rerender({
-      state: { a: 1, b: 2, c: 3 },
-      selector: initialProps.selector,
-    })
+    expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(0)
+    fireEvent.click(res.getByTestId('test-shallow'))
 
-    expect(res.result.current.selectorOutput).toEqual(
-      res.result.current.useShallowOutput
+    expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(1)
+    expect(testUseShallowSimpleCallback.mock.lastCall?.[0]).toBeTruthy()
+    expect(
+      testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput
+    ).toEqual(testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput)
+
+    res.rerender(
+      <TestUseShallowSimple
+        state={{ a: 1, b: 2, c: 3 }}
+        selector={Object.keys}
+      />
     )
+
+    fireEvent.click(res.getByTestId('test-shallow'))
+    expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(2)
+    expect(testUseShallowSimpleCallback.mock.lastCall?.[0]).toBeTruthy()
+    expect(
+      testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput
+    ).toEqual(testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput)
   })
 
   it('returns the previously computed instance when possible', () => {
-    const initialProps = {
-      selector: Object.keys,
-      state: { a: 1, b: 2 } as Record<string, number>,
-    }
+    const state = { a: 1, b: 2 }
+    const res = render(
+      <TestUseShallowSimple state={state} selector={Object.keys} />
+    )
 
-    const res = renderHook((props) => useTestShallowSimple(props), {
-      initialProps,
-    })
+    fireEvent.click(res.getByTestId('test-shallow'))
+    expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(1)
+    const output1 =
+      testUseShallowSimpleCallback.mock.lastCall?.[0]?.useShallowOutput
+    expect(output1).toBeTruthy()
 
-    const output1 = res.result.current.useShallowOutput
+    // Change selector, same output
+    res.rerender(
+      <TestUseShallowSimple
+        state={state}
+        selector={(state) => Object.keys(state)}
+      />
+    )
 
-    res.rerender({
-      state: initialProps.state,
-      selector: (state: Record<string, number>) => Object.keys(state), // New selector instance
-    })
-    const output2 = res.result.current.useShallowOutput
+    fireEvent.click(res.getByTestId('test-shallow'))
+    expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(2)
 
-    expect(output1).toBe(output2)
-    res.rerender(initialProps)
+    const output2 =
+      testUseShallowSimpleCallback.mock.lastCall?.[0]?.useShallowOutput
+    expect(output2).toBeTruthy()
 
-    expect(res.result.current.useShallowOutput).toBe(output1)
+    expect(output2).toBe(output1)
   })
 
   it('only re-renders if selector output has changed according to shallow', () => {
