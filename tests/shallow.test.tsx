@@ -165,6 +165,10 @@ describe('useShallow', () => {
       state: { a: 1, b: 2, c: 3 },
       selector: initialProps.selector,
     })
+
+    expect(res.result.current.selectorOutput).toEqual(
+      res.result.current.useShallowOutput
+    )
   })
 
   it('returns the previously computed instance when possible', () => {
@@ -226,7 +230,7 @@ describe('useShallow', () => {
     expect(res.getByTestId('test-shallow').textContent).toBe('a,b,c,d')
   })
 
-  it('does not cause state closure issues', () => {
+  it('does not cause stale closure issues', () => {
     const store = create((): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }))
     const TestShallowWithState = () => {
       const [count, setCount] = useState(0)
