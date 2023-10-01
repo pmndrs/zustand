@@ -4,11 +4,9 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { create } from 'zustand'
 
-if (!React.version.startsWith('18')) {
-  it.only('Skip the test as the React version is not 18 or higher.', () => {})
-}
+const describeTest = React.version.startsWith('18') ? describe : describe.skip
 
-describe('ssr behavior with react 18', () => {
+describeTest('ssr behavior with react 18', () => {
   interface BearStoreState {
     bears: number
   }
@@ -53,7 +51,8 @@ describe('ssr behavior with react 18', () => {
 
     await act(async () => {
       // Using dynamic import for 'react-dom/client' as it’s not accessible in React versions below 18.
-      const { hydrateRoot } = await import('react-dom/client')
+      // eslint-disable-next-line import/no-unresolved
+      const { hydrateRoot } = await require('react-dom/client')
       hydrateRoot(
         container,
         <React.Suspense fallback={<div>Loading...</div>}>
