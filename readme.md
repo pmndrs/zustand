@@ -84,9 +84,7 @@ const nuts = useBearStore((state) => state.nuts)
 const honey = useBearStore((state) => state.honey)
 ```
 
-If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
-
-To prevent unnecessary rerenders when the selector output does not change according to shallow equal, you can use [useShallow](./docs/guides/prevent-rerenders-with-use-shallow.md).
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can use [useShallow](./docs/guides/prevent-rerenders-with-use-shallow.md) to prevent unnecessary rerenders when the selector output does not change according to shallow equal.
 
 ```jsx
 import { create } from 'zustand'
