@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
-import { useStore } from 'zustand/react'
 import { shallow, useShallow } from 'zustand/shallow'
 
 describe('shallow', () => {
@@ -170,11 +169,11 @@ describe('useShallow', () => {
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(0)
     fireEvent.click(res.getByTestId('test-shallow'))
 
+    const firstRender = testUseShallowSimpleCallback.mock.lastCall?.[0]
+
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(1)
-    expect(testUseShallowSimpleCallback.mock.lastCall?.[0]).toBeTruthy()
-    expect(
-      testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput
-    ).toEqual(testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput)
+    expect(firstRender).toBeTruthy()
+    expect(firstRender?.selectorOutput).toEqual(firstRender?.useShallowOutput)
 
     res.rerender(
       <TestUseShallowSimple
@@ -185,10 +184,11 @@ describe('useShallow', () => {
 
     fireEvent.click(res.getByTestId('test-shallow'))
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(2)
-    expect(testUseShallowSimpleCallback.mock.lastCall?.[0]).toBeTruthy()
-    expect(
-      testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput
-    ).toEqual(testUseShallowSimpleCallback.mock.lastCall?.[0]?.selectorOutput)
+
+    const secondRender = testUseShallowSimpleCallback.mock.lastCall?.[0]
+
+    expect(secondRender).toBeTruthy()
+    expect(secondRender?.selectorOutput).toEqual(secondRender?.useShallowOutput)
   })
 
   it('returns the previously computed instance when possible', () => {
@@ -223,13 +223,15 @@ describe('useShallow', () => {
 
   it('only re-renders if selector output has changed according to shallow', () => {
     let countRenders = 0
-    const store = create((): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }))
+    const useMyStore = create(
+      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 })
+    )
     const TestShallow = ({
       selector = (state) => Object.keys(state).sort(),
     }: {
       selector?: (state: Record<string, unknown>) => string[]
     }) => {
-      const output = useStore(store, useShallow(selector))
+      const output = useMyStore(useShallow(selector))
 
       ++countRenders
 
@@ -243,13 +245,13 @@ describe('useShallow', () => {
     expect(res.getByTestId('test-shallow').textContent).toBe('a,b,c')
 
     act(() => {
-      store.setState({ a: 4 }) // This will not cause a re-render.
+      useMyStore.setState({ a: 4 }) // This will not cause a re-render.
     })
 
     expect(countRenders).toBe(1)
 
     act(() => {
-      store.setState({ d: 10 }) // This will cause a re-render.
+      useMyStore.setState({ d: 10 }) // This will cause a re-render.
     })
 
     expect(countRenders).toBe(2)
@@ -257,11 +259,12 @@ describe('useShallow', () => {
   })
 
   it('does not cause stale closure issues', () => {
-    const store = create((): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }))
+    const useMyStore = create(
+      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 })
+    )
     const TestShallowWithState = () => {
       const [count, setCount] = useState(0)
-      const output = useStore(
-        store,
+      const output = useMyStore(
         useShallow((state) => Object.keys(state).concat([count.toString()]))
       )
 
