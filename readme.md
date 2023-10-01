@@ -92,7 +92,6 @@ To prevent unnecessary rerenders when the selector output does not change accord
 import { create } from 'zustand'
 import { useShallow } from 'zustand/shallow'
 
-// Use createWithEqualityFn instead of create
 const useBearStore = create((set) => ({
   bears: 0,
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
