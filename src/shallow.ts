@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 
 export function shallow<T>(objA: T, objB: T) {
   if (Object.is(objA, objB)) {
