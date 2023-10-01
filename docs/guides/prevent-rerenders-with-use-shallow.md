@@ -61,4 +61,3 @@ export const BearNames = () => {
 ```
 
 Now they can all order other meals without causing unnecessary rerenders of `BearNames`.
-
