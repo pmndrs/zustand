@@ -13,7 +13,7 @@ equal the previous one.
 
 ## Example
 
-We have a store that associate to each bear a meal and we want to render their names.
+We have a store that associates to each bear a meal and we want to render their names.
 
 ```js
 import { create } from 'zustand'
@@ -60,4 +60,4 @@ export const BearNames = () => {
 }
 ```
 
-Now they can all order other meals without causing unnecessary rerenders of `BearNames`.
+Now they can all order other meals without causing unnecessary rerenders of our `BearNames` component.
