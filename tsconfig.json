@@ -5,7 +5,7 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "skipLibCheck": true /* FIXME remove this once redux fixes it */,
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
