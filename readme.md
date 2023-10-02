@@ -495,6 +495,7 @@ Basic typescript usage doesn't require anything special except for writing `crea
 ```ts
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
+import type {} from '@redux-devtools/extension' // required for devtools typing
 
 interface BearState {
   bears: number
