@@ -35,7 +35,7 @@ function Counter() {
 
 describe.skipIf(!React.version.startsWith('18'))(
   'ssr behavior with react 18',
-  async () => {
+  () => {
     it('should handle different states between server and client correctly', async () => {
       const { hydrateRoot } = await vi.importActual<
         typeof import('react-dom/client')
