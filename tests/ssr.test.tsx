@@ -37,9 +37,10 @@ describe.skipIf(!React.version.startsWith('18'))(
   'ssr behavior with react 18',
   () => {
     it('should handle different states between server and client correctly', async () => {
-      const { hydrateRoot } = await vi.importActual<
-        typeof import('react-dom/client')
-      >('react-dom/client')
+      const { hydrateRoot } =
+        await vi.importActual<typeof import('react-dom/client')>(
+          'react-dom/client'
+        )
 
       const markup = renderToString(
         <React.Suspense fallback={<div>Loading...</div>}>

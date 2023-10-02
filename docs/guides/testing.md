@@ -73,7 +73,7 @@ const { create: actualCreate, createStore: actualCreateStore } =
 export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = (<T,>() => {
+export const create = (<T>() => {
   console.log('zustand create mock')
 
   return (stateCreator: zustand.StateCreator<T>) => {
@@ -87,7 +87,7 @@ export const create = (<T,>() => {
 }) as typeof zustand.create
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const createStore = (<T,>(stateCreator: zustand.StateCreator<T>) => {
+export const createStore = (<T>(stateCreator: zustand.StateCreator<T>) => {
   console.log('zustand createStore mock')
 
   const store = actualCreateStore(stateCreator)
@@ -144,7 +144,7 @@ const { create: actualCreate, createStore: actualCreateStore } =
 export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const create = (<T,>() => {
+export const create = (<T>() => {
   console.log('zustand create mock')
 
   return (stateCreator: zustand.StateCreator<T>) => {
@@ -158,7 +158,7 @@ export const create = (<T,>() => {
 }) as typeof zustand.create
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
-export const createStore = (<T,>(stateCreator: zustand.StateCreator<T>) => {
+export const createStore = (<T>(stateCreator: zustand.StateCreator<T>) => {
   console.log('zustand createStore mock')
 
   const store = actualCreateStore(stateCreator)

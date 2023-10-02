@@ -38,7 +38,7 @@ jobs:
           sed -i~ 's/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//' tests/*.tsx
           sed -i~ 's/"target":/"skipLibCheck":true,"target":/' tsconfig.json
           sed -i~ 's/"exactOptionalPropertyTypes": true,//' tsconfig.json
-          sed -i~ 's/"moduleResolution": "nodenext",/"moduleResolution": "node",/' tsconfig.json
+          sed -i~ 's/"moduleResolution": "bundler",/"moduleResolution": "node",/' tsconfig.json
           sed -i~ 's/"allowImportingTsExtensions": true,//' tsconfig.json
           sed -i~ 's/"zustand": \["\.\/src\/index\.ts"\],/"zustand": [".\/dist\/index.d.ts"],/' tsconfig.json
           sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/*.d.ts"]/' tsconfig.json
