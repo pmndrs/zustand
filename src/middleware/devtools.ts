@@ -5,75 +5,11 @@ import type {
   StoreMutatorIdentifier,
 } from '../vanilla.ts'
 
-// Copy types to avoid import type { Config } from '@redux-devtools/extension'
-// https://github.com/pmndrs/zustand/issues/1205
-type Action<T = any> = {
-  type: T
-}
-type ActionCreator<A, P extends any[] = any[]> = {
-  (...args: P): A
-}
-type EnhancerOptions = {
-  name?: string
-  actionCreators?:
-    | ActionCreator<any>[]
-    | {
-        [key: string]: ActionCreator<any>
-      }
-  latency?: number
-  maxAge?: number
-  serialize?:
-    | boolean
-    | {
-        options?:
-          | undefined
-          | boolean
-          | {
-              date?: true
-              regex?: true
-              undefined?: true
-              error?: true
-              symbol?: true
-              map?: true
-              set?: true
-              function?: true | ((fn: (...args: any[]) => any) => string)
-            }
-        replacer?: (key: string, value: unknown) => any
-        reviver?: (key: string, value: unknown) => any
-        immutable?: any
-        refs?: any
-      }
-  actionSanitizer?: <A extends Action>(action: A, id: number) => A
-  stateSanitizer?: <S>(state: S, index: number) => S
-  actionsBlacklist?: string | string[]
-  actionsWhitelist?: string | string[]
-  actionsDenylist?: string | string[]
-  actionsAllowlist?: string | string[]
-  predicate?: <S, A extends Action>(state: S, action: A) => boolean
-  shouldRecordChanges?: boolean
-  pauseActionType?: string
-  autoPause?: boolean
-  shouldStartLocked?: boolean
-  shouldHotReload?: boolean
-  shouldCatchErrors?: boolean
-  features?: {
-    pause?: boolean
-    lock?: boolean
-    persist?: boolean
-    export?: boolean | 'custom'
-    import?: boolean | 'custom'
-    jump?: boolean
-    skip?: boolean
-    reorder?: boolean
-    dispatch?: boolean
-    test?: boolean
-  }
-  trace?: boolean | (<A extends Action>(action: A) => string)
-  traceLimit?: number
-}
-type Config = EnhancerOptions & {
-  type?: string
-}
+type Config = Parameters<
+  (Window extends { __REDUX_DEVTOOLS_EXTENSION__?: infer T }
+    ? T
+    : any)['connect']
+>[0]
 
 declare module '../vanilla' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -124,6 +60,7 @@ type StoreDevtools<S> = S extends {
   : never
 
 export interface DevtoolsOptions extends Config {
+  name?: string
   enabled?: boolean
   anonymousActionType?: string
   store?: string
@@ -236,7 +173,7 @@ const devtoolsImpl: DevtoolsImpl =
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       const r = set(state, replace)
       if (!isRecording) return r
-      const action: Action<unknown> =
+      const action: { type: unknown } =
         nameOrAction === undefined
           ? { type: anonymousActionType || 'anonymous' }
           : typeof nameOrAction === 'string'

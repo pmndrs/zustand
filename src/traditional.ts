@@ -65,11 +65,11 @@ export type UseBoundStoreWithEqualityFn<
 type CreateWithEqualityFn = {
   <T, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>,
-    defaultEqualityFn: <U>(a: U, b: U) => boolean
+    defaultEqualityFn?: <U>(a: U, b: U) => boolean
   ): UseBoundStoreWithEqualityFn<Mutate<StoreApi<T>, Mos>>
   <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>,
-    defaultEqualityFn: <U>(a: U, b: U) => boolean
+    defaultEqualityFn?: <U>(a: U, b: U) => boolean
   ) => UseBoundStoreWithEqualityFn<Mutate<StoreApi<T>, Mos>>
 }
 
