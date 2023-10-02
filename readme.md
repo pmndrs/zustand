@@ -84,38 +84,30 @@ const nuts = useBearStore((state) => state.nuts)
 const honey = useBearStore((state) => state.honey)
 ```
 
-If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can tell zustand that you want the object to be diffed shallowly by passing the `shallow` equality function.
-
-To use a custom equality function, you need `createWithEqualityFn` instead of `create`. Usually you want to specify `Object.is` as the second argument for the default equality function, but it's configurable.
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can use [useShallow](./docs/guides/prevent-rerenders-with-use-shallow.md) to prevent unnecessary rerenders when the selector output does not change according to shallow equal.
 
 ```jsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/shallow'
+import { create } from 'zustand'
+import { useShallow } from 'zustand/shallow'
 
-// Use createWithEqualityFn instead of create
-const useBearStore = createWithEqualityFn(
-  (set) => ({
-    bears: 0,
-    increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-    removeAllBears: () => set({ bears: 0 }),
-  }),
-  Object.is // Specify the default equality function, which can be shallow
-)
+const useBearStore = create((set) => ({
+  bears: 0,
+  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+  removeAllBears: () => set({ bears: 0 }),
+}))
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
 const { nuts, honey } = useBearStore(
-  (state) => ({ nuts: state.nuts, honey: state.honey }),
-  shallow
+  useShallow((state) => ({ nuts: state.nuts, honey: state.honey }))
 )
 
 // Array pick, re-renders the component when either state.nuts or state.honey change
 const [nuts, honey] = useBearStore(
-  (state) => [state.nuts, state.honey],
-  shallow
+  useShallow((state) => [state.nuts, state.honey])
 )
 
 // Mapped picks, re-renders the component when state.treats changes in order, count or keys
-const treats = useBearStore((state) => Object.keys(state.treats), shallow)
+const treats = useBearStore(useShallow((state) => Object.keys(state.treats)))
 ```
 
 For more control over re-rendering, you may provide any custom equality function.

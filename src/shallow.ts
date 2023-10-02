@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+
 export function shallow<T>(objA: T, objB: T) {
   if (Object.is(objA, objB)) {
     return true
@@ -59,3 +61,14 @@ export default ((objA, objB) => {
   }
   return shallow(objA, objB)
 }) as typeof shallow
+
+export function useShallow<S, U>(selector: (state: S) => U): (state: S) => U {
+  const prev = useRef<U>()
+
+  return (state) => {
+    const next = selector(state)
+    return shallow(prev.current, next)
+      ? (prev.current as U)
+      : (prev.current = next)
+  }
+}
