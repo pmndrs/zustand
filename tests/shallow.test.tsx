@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
-import { shallow } from 'zustand/shallow'
-import { useShallow } from 'zustand/shallow/react'
+import { shallow, useShallow } from 'zustand/shallow'
 
 describe('types', () => {
   it('works with useBoundStore and array selector (#1107)', () => {
