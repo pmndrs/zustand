@@ -57,6 +57,11 @@ this means your application logic does not need to be changed or mocked when wri
 
 The mock provided below will enable the relevant test runner to reset the zustand stores after each test.
 
+> **Warning:** In the following examples we are only supporting the curried version of create `(create()(...))`,
+> since it is supported on both JavaScript and TypeScript. If you are using the uncurried version of
+> `create(...)` you will need to update your hooks to use the curried version, or update the mocks in order
+> to support the uncurried version.
+
 ### Jest
 
 In the next steps we are going to setup our Jest environment in order to mock Zustand.
@@ -130,7 +135,13 @@ export default config
 
 ### Vitest
 
-In the next steps we are going to setup our Vitest environment in order to mock Zustand
+In the next steps we are going to setup our Vitest environment in order to mock Zustand.
+
+> **Warning:** In Vitest you can change the [root](https://vitest.dev/config/#root).
+> Due to that, you need make sure that you are creating your `__mocks__` directory in the right place.
+> Let's say that you change the **root** to `./src`, that means you need to create a `__mocks__`
+> directory under `./src`. The end result would be `./src/__mocks__`, rather than `./__mocks__`.
+> Creating `__mocks__` directory in the wrong place can lead to issues when using Vitest.
 
 ```ts
 // __mocks__/zustand.ts
