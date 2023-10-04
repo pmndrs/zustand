@@ -137,8 +137,8 @@ export default config
 
 In the next steps we are going to setup our Vitest environment in order to mock Zustand.
 
-> **Warning:** In Vitest you can change the [root](https://vitest.dev/config/#root), due to
-> that, you need make sure that you are creating your `__mocks__` directory in the right place.
+> **Warning:** In Vitest you can change the [root](https://vitest.dev/config/#root).
+> Due to that, you need make sure that you are creating your `__mocks__` directory in the right place.
 > Let's say that you change the **root** to `./src`, that means you need to create a `__mocks__`
 > directory under `./src`. The end result would be `./src/__mocks__`, rather than `./__mocks__`.
 > Creating `__mocks__` directory in the wrong place can lead to issues when using Vitest.
