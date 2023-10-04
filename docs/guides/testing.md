@@ -141,7 +141,7 @@ In the next steps we are going to setup our Vitest environment in order to mock 
 > that, you need make sure that you are creating your `__mocks__` directory in the right place.
 > Let's say that you change the **root** to `./src`, that means you need to create a `__mocks__`
 > directory under `./src`. The end result would be `./src/__mocks__`, rather than `./__mocks__`.
-> Creating `__mocks__` directory in the wrong place could lead to issues while using Vitest.
+> Creating `__mocks__` directory in the wrong place can lead to issues when using Vitest.
 
 ```ts
 // __mocks__/zustand.ts
