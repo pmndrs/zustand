@@ -8,7 +8,7 @@ import type {
 type Config = Parameters<
   (Window extends { __REDUX_DEVTOOLS_EXTENSION__?: infer T }
     ? T
-    : any)['connect']
+    : { connect: (param: any) => any })['connect']
 >[0]
 
 declare module '../vanilla' {
