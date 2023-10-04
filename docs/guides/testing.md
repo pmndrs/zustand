@@ -57,10 +57,10 @@ this means your application logic does not need to be changed or mocked when wri
 
 The mock provided below will enable the relevant test runner to reset the zustand stores after each test.
 
-> **Warning:** on these examples we are supporting only the curried version `create()(...)` since that
-> works for JavaScript and Typescript, if you are using the uncurried version `create(...)` you need
-> to update your hooks to use the curried version or update the mocks in order to support the uncurried
-> version.
+> **Warning:** In the following examples we are only supporting the curried version of create `(create()(...))`,
+> due to that is compatible with both JavaScript and Typescript, If you are using the uncurried version of
+> `create(...)` you will need to update your hooks to use the curried version, or update the mocks in order
+> to support the uncurried version.
 
 ### Jest
 
@@ -137,11 +137,11 @@ export default config
 
 In the next steps we are going to setup our Vitest environment in order to mock Zustand.
 
-> **Warning:** due to in Vitest you can change the [root](https://vitest.dev/config/#root) you
-> need make sure that you are creating your `__mocks__` folder in the right place. Let's say
-> that you change the **root** to `./src`, that means you need to create `__mocks__` folder
-> under `./src` ending up with `./src/__mocks__` rather than `./__mocks__`. Creating `__mocks__`
-> folder in the wrong place could lead you to some issues while using Vitest.
+> **Warning:** In Vitest you can change the [root](https://vitest.dev/config/#root), due to
+> that, you need make sure that you are creating your `__mocks__` directory in the right place.
+> Let's say that you change the **root** to `./src`, that means you need to create a `__mocks__`
+> directory under `./src`. The end result would be `./src/__mocks__`, rather than `./__mocks__`.
+> Creating `__mocks__` directory in the wrong place could lead to issues while using Vitest.
 
 ```ts
 // __mocks__/zustand.ts
