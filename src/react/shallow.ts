@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { shallow } from '../shallow.ts'
+import { shallow } from '../vanilla/shallow.ts'
 
 export function useShallow<S, U>(selector: (state: S) => U): (state: S) => U {
   const prev = useRef<U>()
