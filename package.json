@@ -65,14 +65,23 @@
       "module": "./esm/shallow.js",
       "default": "./shallow.js"
     },
-    "./shallow/react": {
-      "types": "./shallow/react.d.ts",
+    "./vanilla/shallow": {
+      "types": "./vanilla/shallow.d.ts",
       "import": {
-        "types": "./esm/shallow/react.d.mts",
-        "default": "./esm/shallow/react.mjs"
+        "types": "./esm/vanilla/shallow.d.mts",
+        "default": "./esm/vanilla/shallow.mjs"
       },
-      "module": "./esm/shallow/react.js",
-      "default": "./shallow/react.js"
+      "module": "./esm/vanilla/shallow.js",
+      "default": "./vanilla/shallow.js"
+    },
+    "./react/shallow": {
+      "types": "./react/shallow.d.ts",
+      "import": {
+        "types": "./esm/react/shallow.d.mts",
+        "default": "./esm/react/shallow.mjs"
+      },
+      "module": "./esm/react/shallow.js",
+      "default": "./react/shallow.js"
     },
     "./traditional": {
       "types": "./traditional.d.ts",
