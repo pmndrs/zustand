@@ -58,7 +58,7 @@ this means your application logic does not need to be changed or mocked when wri
 The mock provided below will enable the relevant test runner to reset the zustand stores after each test.
 
 > **Warning:** In the following examples we are only supporting the curried version of create `(create()(...))`,
-> due to that is supported on both JavaScript and Typescript. If you are using the uncurried version of
+> since it is supported on both JavaScript and Typescript. If you are using the uncurried version of
 > `create(...)` you will need to update your hooks to use the curried version, or update the mocks in order
 > to support the uncurried version.
 
