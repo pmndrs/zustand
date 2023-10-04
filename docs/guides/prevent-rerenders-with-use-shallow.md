@@ -45,7 +45,7 @@ We can fix that using `useShallow`!
 
 ```js
 import { create } from 'zustand'
-import { useShallow } from 'zustand/shallow/react'
+import { useShallow } from 'zustand/shallow'
 
 const useMeals = create(() => ({
   papaBear: 'large porridge-pot',

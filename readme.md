@@ -88,7 +88,7 @@ If you want to construct a single object with multiple state-picks inside, simil
 
 ```jsx
 import { create } from 'zustand'
-import { useShallow } from 'zustand/shallow/react'
+import { useShallow } from 'zustand/shallow'
 
 const useBearStore = create((set) => ({
   bears: 0,
