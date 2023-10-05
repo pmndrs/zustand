@@ -65,6 +65,24 @@
       "module": "./esm/shallow.js",
       "default": "./shallow.js"
     },
+    "./vanilla/shallow": {
+      "types": "./vanilla/shallow.d.ts",
+      "import": {
+        "types": "./esm/vanilla/shallow.d.mts",
+        "default": "./esm/vanilla/shallow.mjs"
+      },
+      "module": "./esm/vanilla/shallow.js",
+      "default": "./vanilla/shallow.js"
+    },
+    "./react/shallow": {
+      "types": "./react/shallow.d.ts",
+      "import": {
+        "types": "./esm/react/shallow.d.mts",
+        "default": "./esm/react/shallow.mjs"
+      },
+      "module": "./esm/react/shallow.js",
+      "default": "./react/shallow.js"
+    },
     "./traditional": {
       "types": "./traditional.d.ts",
       "import": {
@@ -93,6 +111,8 @@
     "build:middleware": "rollup -c --config-middleware",
     "build:middleware:immer": "rollup -c --config-middleware_immer",
     "build:shallow": "rollup -c --config-shallow",
+    "build:vanilla:shallow": "rollup -c --config-vanilla_shallow",
+    "build:react:shallow": "rollup -c --config-react_shallow",
     "build:traditional": "rollup -c --config-traditional",
     "build:context": "rollup -c --config-context",
     "postbuild": "yarn patch-d-ts && yarn copy && yarn patch-esm-ts",
