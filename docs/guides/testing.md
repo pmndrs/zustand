@@ -79,25 +79,15 @@ export const storeResetFns = new Set<() => void>()
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
 export const create = (<T>(stateCreator: zustand.StateCreator<T> | undefined) => {
-  const addRestoreInitialState = (store: ReturnType<typeof zustand.create>) => {
-    const initialState = store.getState()
+    const makeStore = (stateCreator: zustand.StateCreator<T>) => {
+    const store = actualCreate(stateCreator);
+    const initialState = store.getState();
     storeResetFns.add(() => {
-      store.setState(initialState, true)
-    })
-    return store
+      store.setState(initialState, true);
+    });
+    return store;
   };
-
-  if (!stateCreator) {
-    return (stateCreator: zustand.StateCreator<T>) => {
-      const store = actualCreate(stateCreator)
-      return addRestoreInitialState(store)
-    }
-  }
-
-  const store = actualCreate(stateCreator)
-  return Object.assign(() => {
-    return addRestoreInitialState(store)
-  }, store)
+  return stateCreator ? makeStore(stateCreator) : makeStore;
 }) as typeof zustand.create
 
 // when creating a store, we get its initial state, create a reset function and add it in the set
