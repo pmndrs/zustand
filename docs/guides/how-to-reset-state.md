@@ -46,24 +46,24 @@ Resetting multiple stores at once
 ```ts
 import { create as _create, type StateCreator } from 'zustand'
 
-const storeResetFns = new Set<() => void>();
+const storeResetFns = new Set<() => void>()
 
 const resetAllStores = () => {
   storeResetFns.forEach((resetFn) => {
-    resetFn();
-  });
-};
+    resetFn()
+  })
+}
 
 export const create = (<T extends unknown>() => {
   return (stateCreator: StateCreator<T>) => {
-    const store = _create(stateCreator);
-    const initialState = store.getState();
+    const store = _create(stateCreator)
+    const initialState = store.getState()
     storeResetFns.add(() => {
-      store.setState(initialState, true);
-    });
-    return store;
-  };
-}) as typeof _create;
+      store.setState(initialState, true)
+    })
+    return store
+  }
+}) as typeof _create
 ```
 
 Resetting bound store using Slices pattern
@@ -71,13 +71,13 @@ Resetting bound store using Slices pattern
 ```ts
 import create, { type StateCreator } from 'zustand'
 
-const sliceResetFns = new Set<() => void>();
+const sliceResetFns = new Set<() => void>()
 
 export const resetAllSlices = () => {
   sliceResetFns.forEach((resetFn) => {
-    resetFn();
-  });
-};
+    resetFn()
+  })
+}
 
 const initialBearState = { bears: 0 }
 
