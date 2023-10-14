@@ -29,15 +29,12 @@ const initialState: State = {
 // create store
 const useSlice = create<State & Actions>()((set, get) => ({
   ...initialState,
-
   addSalmon: (qty: number) => {
     set({ salmon: get().salmon + qty })
   },
-
   addTuna: (qty: number) => {
     set({ tuna: get().tuna + qty })
   },
-
   reset: () => {
     set(initialState)
   },
@@ -47,33 +44,42 @@ const useSlice = create<State & Actions>()((set, get) => ({
 Resetting multiple stores at once
 
 ```ts
-import { create as _create, StateCreator } from 'zustand'
+import { create as _create } from 'zustand'
+import type { StateCreator } from 'zustand'
 
-const resetters: (() => void)[] = []
+const storeResetFns = new Set<() => void>()
 
-export const create = (<T extends unknown>(f: StateCreator<T> | undefined) => {
-  if (f === undefined) return create
-  const store = _create(f)
-  const initialState = store.getState()
-  resetters.push(() => {
-    store.setState(initialState, true)
+const resetAllStores = () => {
+  storeResetFns.forEach((resetFn) => {
+    resetFn()
   })
-  return store
-}) as typeof _create
-
-export const resetAllStores = () => {
-  for (const resetter of resetters) {
-    resetter()
-  }
 }
+
+export const create = (<T extends unknown>() => {
+  return (stateCreator: StateCreator<T>) => {
+    const store = _create(stateCreator)
+    const initialState = store.getState()
+    storeResetFns.add(() => {
+      store.setState(initialState, true)
+    })
+    return store
+  }
+}) as typeof _create
 ```
 
 Resetting bound store using Slices pattern
 
 ```ts
-import create, { StateCreator } from 'zustand'
+import create from 'zustand'
+import type { StateCreator } from 'zustand'
 
-const resetters: (() => void)[] = []
+const sliceResetFns = new Set<() => void>()
+
+export const resetAllSlices = () => {
+  sliceResetFns.forEach((resetFn) => {
+    resetFn()
+  })
+}
 
 const initialBearState = { bears: 0 }
 
@@ -89,7 +95,7 @@ const createBearSlice: StateCreator<
   [],
   BearSlice
 > = (set) => {
-  resetters.push(() => set(initialBearState))
+  sliceResetFns.add(() => set(initialBearState))
   return {
     ...initialBearState,
     addBear: () => set((state) => ({ bears: state.bears + 1 })),
@@ -110,7 +116,7 @@ const createFishSlice: StateCreator<
   [],
   FishSlice
 > = (set) => {
-  resetters.push(() => set(initialStateFish))
+  sliceResetFns.add(() => set(initialStateFish))
   return {
     ...initialStateFish,
     addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
@@ -121,8 +127,6 @@ const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
   ...createBearSlice(...a),
   ...createFishSlice(...a),
 }))
-
-export const resetAllSlices = () => resetters.forEach((resetter) => resetter())
 
 export default useBoundStore
 ```
