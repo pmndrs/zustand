@@ -70,7 +70,8 @@ export const create = (<T extends unknown>() => {
 Resetting bound store using Slices pattern
 
 ```ts
-import create, { type StateCreator } from 'zustand'
+import create from 'zustand'
+import type { StateCreator } from 'zustand'
 
 const sliceResetFns = new Set<() => void>()
 
