@@ -141,6 +141,8 @@ const devtoolsImpl: DevtoolsImpl =
   (set, get, api) => {
     const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
+    if (typeof window === 'undefined') return fn(set, get, api)
+
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
     }
