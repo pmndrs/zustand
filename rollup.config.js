@@ -185,7 +185,7 @@ module.exports = function (args) {
           createStore: 'vanilla.createStore',
         },
         vanilla: { default: 'vanilla', createStore: 'createStore' },
-        shallow: { default: 'shallow$1', shallow: 'shallow' },
+        shallow: { default: 'shallow', shallow: 'shallow$1' },
       }[c],
     }),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),
