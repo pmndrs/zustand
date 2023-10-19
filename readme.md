@@ -225,7 +225,7 @@ Zustand core can be imported and used without the React dependency. The only dif
 ```jsx
 import { createStore } from 'zustand/vanilla'
 
-const store = createStore(() => ({ ... }))
+const store = createStore((set) => ...)
 const { getState, setState, subscribe } = store
 
 export default store
@@ -247,7 +247,7 @@ const useBoundStore = (selector) => useStore(vanillaStore, selector)
 The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
 ```jsx
-const useScratchStore = create(set => ({ scratches: 0, ... }))
+const useScratchStore = create((set) => ({ scratches: 0, ... }))
 
 const Component = () => {
   // Fetch initial state
@@ -387,7 +387,7 @@ const useGrumpyStore = create(redux(reducer, initialState))
 import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
-const usePlainStore = create(devtools(store))
+const usePlainStore = create(devtools((set) => ...))
 // Usage with a redux store, it will log full action types
 const useReduxStore = create(devtools(redux(reducer, initialState)))
 ```
@@ -398,8 +398,8 @@ One redux devtools connection for multiple stores
 import { devtools } from 'zustand/middleware'
 
 // Usage with a plain action store, it will log actions as "setState"
-const usePlainStore1 = create(devtools(store, { name, store: storeName1 }))
-const usePlainStore2 = create(devtools(store, { name, store: storeName2 }))
+const usePlainStore1 = create(devtools((set) => ..., { name, store: storeName1 }))
+const usePlainStore2 = create(devtools((set) => ..., { name, store: storeName2 }))
 // Usage with a redux store, it will log full action types
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName3 })
 const useReduxStore = create(devtools(redux(reducer, initialState)), , { name, store: storeName4 })
@@ -409,9 +409,9 @@ Assigning different connection names will separate stores in redux devtools. Thi
 
 devtools takes the store function as its first argument, optionally you can name the store or configure [serialize](https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md#serialize) options with a second argument.
 
-Name store: `devtools(store, {name: "MyStore"})`, which will create a separate instance named "MyStore" in the devtools.
+Name store: `devtools(..., {name: "MyStore"})`, which will create a separate instance named "MyStore" in the devtools.
 
-Serialize options: `devtools(store, { serialize: { options: true } })`.
+Serialize options: `devtools(..., { serialize: { options: true } })`.
 
 #### Logging Actions
 
@@ -420,26 +420,26 @@ devtools will only log actions from each separated store unlike in a typical _co
 You can log a specific action type for each `set` function by passing a third parameter:
 
 ```jsx
-const createBearSlice = (set, get) => ({
-  eatFish: () =>
-    set(
-      (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
-      false,
-      'bear/eatFish'
-    ),
-})
+const useBearStore = create(devtools((set) => ({
+  ...
+  eatFish: () => set(
+    (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
+    false,
+    'bear/eatFish'
+  ),
+  ...
 ```
 
 You can also log the action's type along with its payload:
 
 ```jsx
-const createBearSlice = (set, get) => ({
-  addFishes: (count) =>
-    set((prev) => ({ fishes: prev.fishes + count }), false, {
-      type: 'bear/addFishes',
-      count,
-    }),
-})
+  ...
+  addFishes: (count) => set(
+    (prev) => ({ fishes: prev.fishes + count }),
+    false,
+    { type: 'bear/addFishes', count, }
+  ),
+  ...
 ```
 
 If an action type is not provided, it is defaulted to "anonymous". You can customize this default value by providing an `anonymousActionType` parameter:
