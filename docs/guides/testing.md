@@ -91,7 +91,7 @@ export const create = (<T>() => {
   console.log('zustand create mock')
 
   // to support curried version of create
-  return typeof stateCreator === "function"
+  return typeof stateCreator === 'function'
     ? createUncurried(stateCreator)
     : createUncurried
 }) as typeof zustand.create
@@ -110,7 +110,7 @@ export const createStore = (<T>(stateCreator: zustand.StateCreator<T>) => {
   console.log('zustand createStore mock')
 
   // to support curried version of createStore
-  return typeof stateCreator === "function"
+  return typeof stateCreator === 'function'
     ? createStoreUncurried(stateCreator)
     : createStoreUncurried
 }) as typeof zustand.createStore
@@ -180,7 +180,7 @@ export const create = (<T>() => {
   console.log('zustand create mock')
 
   // to support curried version of create
-  return typeof stateCreator === "function"
+  return typeof stateCreator === 'function'
     ? createUncurried(stateCreator)
     : createUncurried
 }) as typeof zustand.create
@@ -199,7 +199,7 @@ export const createStore = (<T>(stateCreator: zustand.StateCreator<T>) => {
   console.log('zustand createStore mock')
 
   // to support curried version of createStore
-  return typeof stateCreator === "function"
+  return typeof stateCreator === 'function'
     ? createStoreUncurried(stateCreator)
     : createStoreUncurried
 }) as typeof zustand.createStore
