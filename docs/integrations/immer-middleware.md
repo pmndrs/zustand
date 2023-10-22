@@ -19,6 +19,8 @@ npm install immer
 
 ## Usage
 
+(Notice the extra parentheses after the type parameter as mentioned in the [Typescript Guide](../guides/typescript.md)).
+
 Updating simple states
 
 ```ts
@@ -34,8 +36,8 @@ type Actions = {
   decrement: (qty: number) => void
 }
 
-export const useCountStore = create(
-  immer<State & Actions>((set) => ({
+export const useCountStore = create<State & Actions>()(
+  immer((set) => ({
     count: 0,
     increment: (qty: number) =>
       set((state) => {
@@ -69,8 +71,8 @@ type Actions = {
   toggleTodo: (todoId: string) => void
 }
 
-export const useTodoStore = create(
-  immer<State & Actions>((set) => ({
+export const useTodoStore = create<State & Actions>()(
+  immer((set) => ({
     todos: {
       '82471c5f-4207-4b1d-abcb-b98547e01a3e': {
         id: '82471c5f-4207-4b1d-abcb-b98547e01a3e',
