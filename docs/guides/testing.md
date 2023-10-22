@@ -77,7 +77,7 @@ const { create: actualCreate, createStore: actualCreateStore } =
 // a variable to hold reset functions for all stores declared in the app
 export const storeResetFns = new Set<() => void>()
 
-const createInternalFn = <T>(stateCreator: zustand.StateCreator<T>) => {
+const createUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreate(stateCreator)
   const initialState = store.getState()
   storeResetFns.add(() => {
@@ -92,11 +92,11 @@ export const create = (<T>() => {
 
   // to support curried version of create
   return typeof stateCreator === "function"
-    ? createInternalFn(stateCreator)
-    : createInternalFn
+    ? createUncurried(stateCreator)
+    : createUncurried
 }) as typeof zustand.create
 
-const createStoreInternalFn = <T>(stateCreator: zustand.StateCreator<T>) => {
+const createStoreUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreateStore(stateCreator)
   const initialState = store.getState()
   storeResetFns.add(() => {
@@ -111,8 +111,8 @@ export const createStore = (<T>(stateCreator: zustand.StateCreator<T>) => {
 
   // to support curried version of createStore
   return typeof stateCreator === "function"
-    ? createStoreInternalFn(stateCreator)
-    : createStoreInternalFn
+    ? createStoreUncurried(stateCreator)
+    : createStoreUncurried
 }) as typeof zustand.createStore
 
 // reset all stores after each test run
@@ -166,7 +166,7 @@ const { create: actualCreate, createStore: actualCreateStore } =
 // a variable to hold reset functions for all stores declared in the app
 export const storeResetFns = new Set<() => void>()
 
-const createInternalFn = <T>(stateCreator: zustand.StateCreator<T>) => {
+const createUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreate(stateCreator)
   const initialState = store.getState()
   storeResetFns.add(() => {
@@ -181,11 +181,11 @@ export const create = (<T>() => {
 
   // to support curried version of create
   return typeof stateCreator === "function"
-    ? createInternalFn(stateCreator)
-    : createInternalFn
+    ? createUncurried(stateCreator)
+    : createUncurried
 }) as typeof zustand.create
 
-const createStoreInternalFn = <T>(stateCreator: zustand.StateCreator<T>) => {
+const createStoreUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreateStore(stateCreator)
   const initialState = store.getState()
   storeResetFns.add(() => {
@@ -200,8 +200,8 @@ export const createStore = (<T>(stateCreator: zustand.StateCreator<T>) => {
 
   // to support curried version of createStore
   return typeof stateCreator === "function"
-    ? createStoreInternalFn(stateCreator)
-    : createStoreInternalFn
+    ? createStoreUncurried(stateCreator)
+    : createStoreUncurried
 }) as typeof zustand.createStore
 
 // reset all stores after each test run
