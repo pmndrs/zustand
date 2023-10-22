@@ -2,6 +2,9 @@
   "name": "zustand",
   "private": true,
   "version": "4.4.4",
+  "publishConfig": {
+    "tag": "next"
+  },
   "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
   "types": "./index.d.ts",
