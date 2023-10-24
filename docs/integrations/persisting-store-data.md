@@ -731,3 +731,32 @@ interface BearState {
     removeItem: (name) => localStorage.removeItem(name),
   },
 ```
+
+If writing serialisation and deserialisation code is tedious, you can use third-party libraries to serialise and deserialise different types of data.
+
+SuperJSON serialises data along with its type, allowing the data to be parsed back to its original type upon deserialisation
+
+```ts
+import superjson from "superjson";
+import { StorageValue } from "zustand/middleware";
+
+
+interface BearState {
+// ...
+}
+//...
+
+  storage: {
+    getItem: (name) => {
+      const str = localStorage.getItem(name);
+      if (!str) return null;
+      return {
+        state: superjson.parse<StorageValue<BearState>>(str).state,
+      };
+    },
+    setItem: (name, value) => {
+      localStorage.setItem(name, superjson.stringify(value));
+    },
+    removeItem: (name) => localStorage.removeItem(name),
+  }
+```
