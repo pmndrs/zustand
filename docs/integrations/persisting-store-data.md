@@ -630,6 +630,37 @@ export const useBoundStore = create(
 )
 ```
 
+If you're using a type that JSON.stringify() doesn't support, you'll need to write your own serialization/deserialization code. However, if this is tedious, you can use third-party libraries to serialize and deserialize different types of data.
+
+For example, [Superjson](https://github.com/blitz-js/superjson) can serialize data along with its type, allowing the data to be parsed back to its original type upon deserialization
+
+```ts
+import superjson from "superjson"; //  can use anything: serialize-javascript, devalue, etc.
+import { StorageValue } from "zustand/middleware";
+
+interface BearState {
+  ...: Map<string, string>;
+  ...: Set<string>;
+  ...: Date,
+  ...: RegExp;
+}
+//...
+
+  storage: {
+    getItem: (name) => {
+      const str = localStorage.getItem(name);
+      if (!str) return null;
+      return {
+        state: superjson.parse<StorageValue<BearState>>(str).state,
+      };
+    },
+    setItem: (name, value) => {
+      localStorage.setItem(name, superjson.stringify(value));
+    },
+    removeItem: (name) => localStorage.removeItem(name),
+  }
+```
+
 ### How can I rehydrate on storage event
 
 You can use the Persist API to create your own implementation,
@@ -730,32 +761,4 @@ interface BearState {
     },
     removeItem: (name) => localStorage.removeItem(name),
   },
-```
-
-If writing serialization and deserialization code is tedious, you can use third-party libraries to serialize and deserialize different types of data
-
-SuperJSON serialize data along with its type, allowing the data to be parsed back to its original type upon deserialization
-
-```ts
-import superjson from "superjson";
-import { StorageValue } from "zustand/middleware";
-
-interface BearState {
-// ...
-}
-//...
-
-  storage: {
-    getItem: (name) => {
-      const str = localStorage.getItem(name);
-      if (!str) return null;
-      return {
-        state: superjson.parse<StorageValue<BearState>>(str).state,
-      };
-    },
-    setItem: (name, value) => {
-      localStorage.setItem(name, superjson.stringify(value));
-    },
-    removeItem: (name) => localStorage.removeItem(name),
-  }
 ```
