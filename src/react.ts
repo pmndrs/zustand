@@ -3,10 +3,10 @@
 // Those don't work in ESM, because React libs are CJS only.
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
-/* eslint-disable import/extensions */
+// eslint-disable-next-line import/extensions
 import ReactExports from 'react'
+// eslint-disable-next-line import/extensions
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
-/* eslint-enable import/extensions */
 import { createStore } from './vanilla.ts'
 import type {
   Mutate,
