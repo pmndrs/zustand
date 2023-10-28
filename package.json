@@ -25,7 +25,7 @@
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "require": {
+      "default": {
         "types": "./index.d.ts",
         "default": "./index.js"
       }
