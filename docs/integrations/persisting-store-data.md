@@ -635,30 +635,47 @@ If you're using a type that JSON.stringify() doesn't support, you'll need to wri
 For example, [Superjson](https://github.com/blitz-js/superjson) can serialize data along with its type, allowing the data to be parsed back to its original type upon deserialization
 
 ```ts
-import superjson from "superjson"; //  can use anything: serialize-javascript, devalue, etc.
-import { StorageValue } from "zustand/middleware";
+import superjson from 'superjson' //  can use anything: serialize-javascript, devalue, etc.
+import { PersistStorage } from 'zustand/middleware'
 
 interface BearState {
-  ...: Map<string, string>;
-  ...: Set<string>;
-  ...: Date,
-  ...: RegExp;
+  bear: Map<string, string>
+  fish: Set<string>
+  time: Date
+  query: RegExp
 }
-//...
 
-  storage: {
-    getItem: (name) => {
-      const str = localStorage.getItem(name);
-      if (!str) return null;
-      return {
-        state: superjson.parse<StorageValue<BearState>>(str).state,
-      };
-    },
-    setItem: (name, value) => {
-      localStorage.setItem(name, superjson.stringify(value));
-    },
-    removeItem: (name) => localStorage.removeItem(name),
-  }
+const storage: PersistStorage<BearState> = {
+  getItem: (name) => {
+    const str = localStorage.getItem(name)
+    if (!str) return null
+    return superjson.parse(str)
+  },
+  setItem: (name, value) => {
+    localStorage.setItem(name, superjson.stringify(value))
+  },
+  removeItem: (name) => localStorage.removeItem(name),
+}
+
+const initialState: BearState = {
+  bear: new Map(),
+  fish: new Set(),
+  time: new Date(),
+  query: new RegExp(''),
+}
+
+export const useBearStore = create<BearState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+      // ...
+    }),
+    {
+      name: 'food-storage',
+      storage,
+    }
+  )
+)
 ```
 
 ### How can I rehydrate on storage event
