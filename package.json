@@ -21,13 +21,13 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "module": {
-        "types": "./index.d.ts",
-        "default": "./esm/index.js"
-      },
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
+      },
+      "module": {
+        "types": "./index.d.ts",
+        "default": "./esm/index.js"
       },
       "default": {
         "types": "./index.d.ts",
