@@ -21,7 +21,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./esm/index.d.ts",
+      "types": "./index.d.ts",
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
