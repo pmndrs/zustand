@@ -1,7 +1,7 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "4.4.4",
+  "version": "4.4.5",
   "publishConfig": {
     "tag": "next"
   },
@@ -24,13 +24,18 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./index.d.ts",
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "module": "./esm/index.js",
-      "default": "./index.js"
+      "module": {
+        "types": "./index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "default": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      }
     },
     "./vanilla": {
       "types": "./vanilla.d.ts",
@@ -177,15 +182,15 @@
     "@rollup/plugin-alias": "^5.0.1",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-replace": "^5.0.4",
+    "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
     "@testing-library/react": "^14.0.0",
-    "@types/react": "^18.2.31",
+    "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
     "@types/use-sync-external-store": "^0.0.5",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.1",
+    "@typescript-eslint/parser": "^6.9.1",
     "@vitest/coverage-c8": "^0.33.0",
     "@vitest/ui": "^0.34.6",
     "concurrently": "^8.2.2",
@@ -194,11 +199,11 @@
     "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-vitest": "^0.3.3",
+    "eslint-plugin-vitest": "^0.3.8",
     "immer": "^10.0.3",
     "jsdom": "^22.1.0",
     "json": "^11.0.0",
@@ -206,7 +211,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "redux": "5.0.0-alpha.1",
-    "rollup": "^4.1.4",
+    "rollup": "^4.2.0",
     "rollup-plugin-esbuild": "^6.1.0",
     "shx": "^0.3.4",
     "typescript": "^5.2.2",

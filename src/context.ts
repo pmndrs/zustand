@@ -1,14 +1,26 @@
-import {
-  createElement,
-  createContext as reactCreateContext,
-  useContext,
-  useMemo,
-  useRef,
-} from 'react'
+// import {
+//   createElement,
+//   createContext as reactCreateContext,
+//   useContext,
+//   useMemo,
+//   useRef,
+// } from 'react'
+// That doesnt work in ESM, because React libs are CJS only.
+// The following is a workaround until ESM is supported.
+// eslint-disable-next-line import/extensions
+import ReactExports from 'react'
 import type { ReactNode } from 'react'
 import type { StoreApi } from 'zustand'
 // eslint-disable-next-line import/extensions
 import { useStoreWithEqualityFn } from 'zustand/traditional'
+
+const {
+  createElement,
+  createContext: reactCreateContext,
+  useContext,
+  useMemo,
+  useRef,
+} = ReactExports
 
 type UseContextStore<S extends StoreApi<unknown>> = {
   (): ExtractState<S>
