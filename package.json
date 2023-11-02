@@ -21,32 +21,85 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "types": "./index.d.ts",
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "module": {
-        "types": "./esm/index.d.ts",
-        "default": "./esm/index.js"
-      },
-      "default": {
-        "types": "./index.d.ts",
-        "default": "./index.js"
-      }
+      "module": "./esm/index.js",
+      "default": "./index.js"
     },
-    "./*": {
+    "./vanilla": {
+      "types": "./vanilla.d.ts",
       "import": {
-        "types": "./esm/*.d.mts",
-        "default": "./esm/*.mjs"
+        "types": "./esm/vanilla.d.mts",
+        "default": "./esm/vanilla.mjs"
       },
-      "module": {
-        "types": "./esm/*.d.ts",
-        "default": "./esm/*.js"
+      "module": "./esm/vanilla.js",
+      "default": "./vanilla.js"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "import": {
+        "types": "./esm/middleware.d.mts",
+        "default": "./esm/middleware.mjs"
       },
-      "default": {
-        "types": "./*.d.ts",
-        "default": "./*.js"
-      }
+      "module": "./esm/middleware.js",
+      "default": "./middleware.js"
+    },
+    "./middleware/immer": {
+      "types": "./middleware/immer.d.ts",
+      "import": {
+        "types": "./esm/middleware/immer.d.mts",
+        "default": "./esm/middleware/immer.mjs"
+      },
+      "module": "./esm/middleware/immer.js",
+      "default": "./middleware/immer.js"
+    },
+    "./shallow": {
+      "types": "./shallow.d.ts",
+      "import": {
+        "types": "./esm/shallow.d.mts",
+        "default": "./esm/shallow.mjs"
+      },
+      "module": "./esm/shallow.js",
+      "default": "./shallow.js"
+    },
+    "./vanilla/shallow": {
+      "types": "./vanilla/shallow.d.ts",
+      "import": {
+        "types": "./esm/vanilla/shallow.d.mts",
+        "default": "./esm/vanilla/shallow.mjs"
+      },
+      "module": "./esm/vanilla/shallow.js",
+      "default": "./vanilla/shallow.js"
+    },
+    "./react/shallow": {
+      "types": "./react/shallow.d.ts",
+      "import": {
+        "types": "./esm/react/shallow.d.mts",
+        "default": "./esm/react/shallow.mjs"
+      },
+      "module": "./esm/react/shallow.js",
+      "default": "./react/shallow.js"
+    },
+    "./traditional": {
+      "types": "./traditional.d.ts",
+      "import": {
+        "types": "./esm/traditional.d.mts",
+        "default": "./esm/traditional.mjs"
+      },
+      "module": "./esm/traditional.js",
+      "default": "./traditional.js"
+    },
+    "./context": {
+      "types": "./context.d.ts",
+      "import": {
+        "types": "./esm/context.d.mts",
+        "default": "./esm/context.mjs"
+      },
+      "module": "./esm/context.js",
+      "default": "./context.js"
     }
   },
   "sideEffects": false,
