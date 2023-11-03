@@ -630,6 +630,54 @@ export const useBoundStore = create(
 )
 ```
 
+If you're using a type that JSON.stringify() doesn't support, you'll need to write your own serialization/deserialization code. However, if this is tedious, you can use third-party libraries to serialize and deserialize different types of data.
+
+For example, [Superjson](https://github.com/blitz-js/superjson) can serialize data along with its type, allowing the data to be parsed back to its original type upon deserialization
+
+```ts
+import superjson from 'superjson' //  can use anything: serialize-javascript, devalue, etc.
+import { PersistStorage } from 'zustand/middleware'
+
+interface BearState {
+  bear: Map<string, string>
+  fish: Set<string>
+  time: Date
+  query: RegExp
+}
+
+const storage: PersistStorage<BearState> = {
+  getItem: (name) => {
+    const str = localStorage.getItem(name)
+    if (!str) return null
+    return superjson.parse(str)
+  },
+  setItem: (name, value) => {
+    localStorage.setItem(name, superjson.stringify(value))
+  },
+  removeItem: (name) => localStorage.removeItem(name),
+}
+
+const initialState: BearState = {
+  bear: new Map(),
+  fish: new Set(),
+  time: new Date(),
+  query: new RegExp(''),
+}
+
+export const useBearStore = create<BearState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+      // ...
+    }),
+    {
+      name: 'food-storage',
+      storage,
+    }
+  )
+)
+```
+
 ### How can I rehydrate on storage event
 
 You can use the Persist API to create your own implementation,
