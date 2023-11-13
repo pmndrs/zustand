@@ -38,8 +38,8 @@ export const useBoundStore = create(
     {
       name: 'food-storage', // unique name
       storage: createJSONStorage(() => hashStorage),
-    }
-  )
+    },
+  ),
 )
 ```
 

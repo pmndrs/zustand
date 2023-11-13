@@ -29,12 +29,12 @@ type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
 let didWarnAboutEqualityFn = false
 
 export function useStore<S extends WithReact<StoreApi<unknown>>>(
-  api: S
+  api: S,
 ): ExtractState<S>
 
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
-  selector: (state: ExtractState<S>) => U
+  selector: (state: ExtractState<S>) => U,
 ): U
 
 /**
@@ -44,13 +44,13 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
-  equalityFn: ((a: U, b: U) => boolean) | undefined
+  equalityFn: ((a: U, b: U) => boolean) | undefined,
 ): U
 
 export function useStore<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
   selector: (state: TState) => StateSlice = api.getState as any,
-  equalityFn?: (a: StateSlice, b: StateSlice) => boolean
+  equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
   if (
     import.meta.env?.MODE !== 'production' &&
@@ -58,7 +58,7 @@ export function useStore<TState, StateSlice>(
     !didWarnAboutEqualityFn
   ) {
     console.warn(
-      "[DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937"
+      "[DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937",
     )
     didWarnAboutEqualityFn = true
   }
@@ -67,7 +67,7 @@ export function useStore<TState, StateSlice>(
     api.getState,
     api.getServerState || api.getState,
     selector,
-    equalityFn
+    equalityFn,
   )
   useDebugValue(slice)
   return slice
@@ -81,16 +81,16 @@ export type UseBoundStore<S extends WithReact<ReadonlyStoreApi<unknown>>> = {
    */
   <U>(
     selector: (state: ExtractState<S>) => U,
-    equalityFn: (a: U, b: U) => boolean
+    equalityFn: (a: U, b: U) => boolean,
   ): U
 } & S
 
 type Create = {
   <T, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
-    initializer: StateCreator<T, [], Mos>
+    initializer: StateCreator<T, [], Mos>,
   ): UseBoundStore<Mutate<StoreApi<T>, Mos>>
   <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
-    initializer: StateCreator<T, [], Mos>
+    initializer: StateCreator<T, [], Mos>,
   ) => UseBoundStore<Mutate<StoreApi<T>, Mos>>
   /**
    * @deprecated Use `useStore` hook to bind store
@@ -104,7 +104,7 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
     typeof createState !== 'function'
   ) {
     console.warn(
-      "[DEPRECATED] Passing a vanilla store will be unsupported in a future version. Instead use `import { useStore } from 'zustand'`."
+      "[DEPRECATED] Passing a vanilla store will be unsupported in a future version. Instead use `import { useStore } from 'zustand'`.",
     )
   }
   const api =
@@ -127,7 +127,7 @@ export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
 export default ((createState: any) => {
   if (import.meta.env?.MODE !== 'production') {
     console.warn(
-      "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand'`."
+      "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand'`.",
     )
   }
   return create(createState)

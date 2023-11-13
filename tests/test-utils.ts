@@ -5,7 +5,7 @@ type ReplacedMap = {
 
 export const replacer = (
   key: string,
-  value: unknown
+  value: unknown,
 ): ReplacedMap | unknown => {
   if (value instanceof Map) {
     return {

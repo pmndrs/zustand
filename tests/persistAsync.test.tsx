@@ -62,8 +62,8 @@ describe('persist middleware with async configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        }
-      )
+        },
+      ),
     )
 
     function Counter() {
@@ -78,14 +78,14 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 0, name: empty')
     await findByText('count: 42, name: test-storage')
     expect(onRehydrateStorageSpy).toBeCalledWith(
       { count: 42, name: 'test-storage' },
-      undefined
+      undefined,
     )
   })
 
@@ -105,7 +105,7 @@ describe('persist middleware with async configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     function Counter() {
@@ -116,14 +116,14 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 0')
     await waitFor(() => {
       expect(onRehydrateStorageSpy).toBeCalledWith(
         undefined,
-        new Error('getItem error')
+        new Error('getItem error'),
       )
     })
   })
@@ -138,7 +138,7 @@ describe('persist middleware with async configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        })
+        }),
       )
       return { useBoundStore, onRehydrateStorageSpy }
     }
@@ -154,7 +154,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
     await findByText('count: 0')
     await waitFor(() => {
@@ -166,7 +166,7 @@ describe('persist middleware with async configuration', () => {
     await findByText('count: 42')
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
-      JSON.stringify({ state: { count: 42 }, version: 0 })
+      JSON.stringify({ state: { count: 42 }, version: 0 }),
     )
 
     // Create the same store a second time and check if the persisted state
@@ -183,7 +183,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText: findByText2 } = render(
       <StrictMode>
         <Counter2 />
-      </StrictMode>
+      </StrictMode>,
     )
     await findByText2('count: 42')
     await waitFor(() => {
@@ -213,7 +213,7 @@ describe('persist middleware with async configuration', () => {
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
         migrate: migrateSpy,
-      })
+      }),
     )
 
     function Counter() {
@@ -224,7 +224,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 0')
@@ -235,7 +235,7 @@ describe('persist middleware with async configuration', () => {
       JSON.stringify({
         state: { count: 99 },
         version: 13,
-      })
+      }),
     )
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
   })
@@ -266,8 +266,8 @@ describe('persist middleware with async configuration', () => {
         {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
-        }
-      )
+        },
+      ),
     )
 
     function Component() {
@@ -286,7 +286,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Component />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 42')
@@ -296,7 +296,7 @@ describe('persist middleware with async configuration', () => {
       expect.objectContaining({
         count: 42,
         name: 'test',
-      })
+      }),
     )
   })
 
@@ -319,7 +319,7 @@ describe('persist middleware with async configuration', () => {
         version: 13,
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     function Counter() {
@@ -330,7 +330,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 0')
@@ -363,7 +363,7 @@ describe('persist middleware with async configuration', () => {
           throw new Error('migrate error')
         },
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     function Counter() {
@@ -374,14 +374,14 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 0')
     await waitFor(() => {
       expect(onRehydrateStorageSpy).toBeCalledWith(
         undefined,
-        new Error('migrate error')
+        new Error('migrate error'),
       )
     })
   })
@@ -400,7 +400,7 @@ describe('persist middleware with async configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: onRehydrateStorageSpy,
-      })
+      }),
     )
 
     /**
@@ -423,7 +423,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 1')
@@ -455,7 +455,7 @@ describe('persist middleware with async configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     function Counter() {
@@ -466,14 +466,14 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 0')
     await waitFor(() => {
       expect(onRehydrateStorageSpy).toBeCalledWith(
         { count: 1, unstorableMethod },
-        undefined
+        undefined,
       )
     })
   })
@@ -507,7 +507,7 @@ describe('persist middleware with async configuration', () => {
             ...persistedState,
           }
         },
-      })
+      }),
     )
 
     function Counter() {
@@ -518,7 +518,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 1')
@@ -546,7 +546,7 @@ describe('persist middleware with async configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     function Counter() {
@@ -557,7 +557,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 1')
@@ -579,7 +579,7 @@ describe('persist middleware with async configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     storage.getItem = async () => storageValue
@@ -600,11 +600,11 @@ describe('persist middleware with async configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
     expect(useBoundStore.persist.hasHydrated()).toBe(false)
     await new Promise((resolve) =>
-      useBoundStore.persist.onFinishHydration(resolve)
+      useBoundStore.persist.onFinishHydration(resolve),
     )
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
 
@@ -634,8 +634,8 @@ describe('persist middleware with async configuration', () => {
           storage: storage,
           onRehydrateStorage: () => onRehydrateStorageSpy,
           skipHydration: true,
-        }
-      )
+        },
+      ),
     )
 
     expect(useBoundStore.getState()).toEqual({
@@ -659,7 +659,7 @@ describe('persist middleware with async configuration', () => {
     })
     expect(onRehydrateStorageSpy).toBeCalledWith(
       { count: 42, name: 'test-storage' },
-      undefined
+      undefined,
     )
   })
 
@@ -680,8 +680,8 @@ describe('persist middleware with async configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => (s) => s?.inc(),
-        }
-      )
+        },
+      ),
     )
 
     function Counter() {
@@ -692,7 +692,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <Counter />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('count: 2')
@@ -721,8 +721,8 @@ describe('persist middleware with async configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage, { replacer, reviver }),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        }
-      )
+        },
+      ),
     )
 
     function MapDisplay() {
@@ -733,13 +733,13 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <MapDisplay />
-      </StrictMode>
+      </StrictMode>,
     )
 
     await findByText('map: bar')
     expect(onRehydrateStorageSpy).toBeCalledWith(
       { map: new Map([['foo', 'bar']]) },
-      undefined
+      undefined,
     )
   })
 
@@ -754,7 +754,7 @@ describe('persist middleware with async configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage, { replacer, reviver }),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        })
+        }),
       )
       return { useBoundStore, onRehydrateStorageSpy }
     }
@@ -770,7 +770,7 @@ describe('persist middleware with async configuration', () => {
     const { findByText } = render(
       <StrictMode>
         <MapDisplay />
-      </StrictMode>
+      </StrictMode>,
     )
     await findByText('map-content:')
     await waitFor(() => {
@@ -787,7 +787,7 @@ describe('persist middleware with async configuration', () => {
       JSON.stringify({
         state: { map: { type: 'Map', value: [['foo', 'bar']] } },
         version: 0,
-      })
+      }),
     )
 
     // Create the same store a second time and check if the persisted state
@@ -804,13 +804,13 @@ describe('persist middleware with async configuration', () => {
     const { findByText: findByText2 } = render(
       <StrictMode>
         <MapDisplay2 />
-      </StrictMode>
+      </StrictMode>,
     )
     await findByText2('map-content: bar')
     await waitFor(() => {
       expect(onRehydrateStorageSpy2).toBeCalledWith(
         { map: updatedMap },
-        undefined
+        undefined,
       )
     })
   })

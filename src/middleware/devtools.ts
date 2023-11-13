@@ -72,7 +72,7 @@ type Devtools = <
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs>,
-  devtoolsOptions?: DevtoolsOptions
+  devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs]>
 
 declare module '../vanilla' {
@@ -84,7 +84,7 @@ declare module '../vanilla' {
 
 type DevtoolsImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
-  devtoolsOptions?: DevtoolsOptions
+  devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, [], []>
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
@@ -102,12 +102,12 @@ type ConnectionInformation = {
 const trackedConnections: Map<ConnectionName, ConnectionInformation> = new Map()
 
 const getTrackedConnectionState = (
-  name: string | undefined
+  name: string | undefined,
 ): Record<string, any> => {
   const api = trackedConnections.get(name)
   if (!api) return {}
   return Object.fromEntries(
-    Object.entries(api.stores).map(([key, api]) => [key, api.getState()])
+    Object.entries(api.stores).map(([key, api]) => [key, api.getState()]),
   )
 }
 
@@ -116,7 +116,7 @@ const extractConnectionInformation = (
   extensionConnector: NonNullable<
     (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
   >,
-  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>
+  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>,
 ) => {
   if (store === undefined) {
     return {
@@ -160,7 +160,7 @@ const devtoolsImpl: DevtoolsImpl =
     if (!extensionConnector) {
       if (import.meta.env?.MODE !== 'production' && enabled) {
         console.warn(
-          '[zustand devtools middleware] Please install/enable Redux devtools extension'
+          '[zustand devtools middleware] Please install/enable Redux devtools extension',
         )
       }
       return fn(set, get, api)
@@ -191,7 +191,7 @@ const devtoolsImpl: DevtoolsImpl =
         {
           ...getTrackedConnectionState(options.name),
           [store]: api.getState(),
-        }
+        },
       )
       return r
     }
@@ -215,8 +215,8 @@ const devtoolsImpl: DevtoolsImpl =
             key === connectionInformation.store
               ? initialState
               : store.getState(),
-          ])
-        )
+          ]),
+        ),
       )
     }
 
@@ -234,7 +234,7 @@ const devtoolsImpl: DevtoolsImpl =
         ) {
           console.warn(
             '[zustand devtools middleware] "__setState" action type is reserved ' +
-              'to set state from the devtools. Avoid using it.'
+              'to set state from the devtools. Avoid using it.',
           )
           didWarnAboutReservedActionType = true
         }
@@ -246,7 +246,7 @@ const devtoolsImpl: DevtoolsImpl =
       connection as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
         subscribe: (
-          listener: (message: Message) => void
+          listener: (message: Message) => void,
         ) => (() => void) | undefined
       }
     ).subscribe((message: any) => {
@@ -254,7 +254,7 @@ const devtoolsImpl: DevtoolsImpl =
         case 'ACTION':
           if (typeof message.payload !== 'string') {
             console.error(
-              '[zustand devtools middleware] Unsupported action format'
+              '[zustand devtools middleware] Unsupported action format',
             )
             return
           }
@@ -272,7 +272,7 @@ const devtoolsImpl: DevtoolsImpl =
                     [zustand devtools middleware] Unsupported __setState action format. 
                     When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
                     and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
-                    `
+                    `,
                   )
                 }
                 const stateFromDevtools = (action.state as S)[store]
@@ -294,7 +294,7 @@ const devtoolsImpl: DevtoolsImpl =
               if (!(api as any).dispatchFromDevtools) return
               if (typeof (api as any).dispatch !== 'function') return
               ;(api as any).dispatch(action)
-            }
+            },
           )
 
         case 'DISPATCH':
@@ -351,7 +351,7 @@ const devtoolsImpl: DevtoolsImpl =
               }
               connection?.send(
                 null as any, // FIXME no-any
-                nextLiftedState
+                nextLiftedState,
               )
               return
             }
@@ -374,7 +374,7 @@ const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   } catch (e) {
     console.error(
       '[zustand devtools middleware] Could not parse the received json',
-      e
+      e,
     )
   }
   if (parsed !== undefined) f(parsed as T)

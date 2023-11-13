@@ -108,8 +108,8 @@ export const useBoundStore = create(
       ...createBearSlice(...a),
       ...createFishSlice(...a),
     }),
-    { name: 'bound-store' }
-  )
+    { name: 'bound-store' },
+  ),
 )
 ```
 

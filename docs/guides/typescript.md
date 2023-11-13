@@ -99,7 +99,7 @@ Imagine you have a scenario like this:
 
 ```ts
 declare const withError: <T, E>(
-  p: Promise<T>
+  p: Promise<T>,
 ) => Promise<[error: undefined, value: T] | [error: E, value: undefined]>
 declare const doSomething: () => Promise<string>
 
@@ -113,10 +113,10 @@ Here, `T` is inferred to be a `string` and `E` is inferred to be `unknown`. You 
 ```ts
 declare const withError: {
   <E>(): <T>(
-    p: Promise<T>
+    p: Promise<T>,
   ) => Promise<[error: undefined, value: T] | [error: E, value: undefined]>
   <T, E>(
-    p: Promise<T>
+    p: Promise<T>,
   ): Promise<[error: undefined, value: T] | [error: E, value: undefined]>
 }
 declare const doSomething: () => Promise<string>
@@ -142,7 +142,7 @@ import { combine } from 'zustand/middleware'
 const useBearStore = create(
   combine({ bears: 0 }, (set) => ({
     increase: (by: number) => set((state) => ({ bears: state.bears + by })),
-  }))
+  })),
 )
 ```
 
@@ -181,9 +181,9 @@ const useBearStore = create<BearState>()(
         bears: 0,
         increase: (by) => set((state) => ({ bears: state.bears + by })),
       }),
-      { name: 'bearStore' }
-    )
-  )
+      { name: 'bearStore' },
+    ),
+  ),
 )
 ```
 
@@ -204,7 +204,7 @@ const useBearStore = create<BearState>()(
   myMiddlewares((set) => ({
     bears: 0,
     increase: (by) => set((state) => ({ bears: state.bears + by })),
-  }))
+  })),
 )
 ```
 
@@ -245,12 +245,12 @@ type Logger = <
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   f: StateCreator<T, Mps, Mcs>,
-  name?: string
+  name?: string,
 ) => StateCreator<T, Mps, Mcs>
 
 type LoggerImpl = <T extends State>(
   f: StateCreator<T, [], []>,
-  name?: string
+  name?: string,
 ) => StateCreator<T, [], []>
 
 const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
@@ -274,8 +274,8 @@ const useBearStore = create<BearState>()(
       bears: 0,
       increase: (by) => set((state) => ({ bears: state.bears + by })),
     }),
-    'bear-store'
-  )
+    'bear-store',
+  ),
 )
 ```
 
@@ -298,7 +298,7 @@ type Foo = <
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   f: StateCreator<T, [...Mps, ['foo', A]], Mcs>,
-  bar: A
+  bar: A,
 ) => StateCreator<T, Mps, [['foo', A], ...Mcs]>
 
 declare module 'zustand' {
@@ -309,7 +309,7 @@ declare module 'zustand' {
 
 type FooImpl = <T extends State, A>(
   f: StateCreator<T, [], []>,
-  bar: A
+  bar: A,
 ) => StateCreator<T, [], []>
 
 const fooImpl: FooImpl = (f, bar) => (set, get, _store) => {
@@ -445,11 +445,11 @@ const bearStore = createStore<BearState>()((set) => ({
 function useBearStore(): BearState
 function useBearStore<T>(
   selector: (state: BearState) => T,
-  equals?: (a: T, b: T) => boolean
+  equals?: (a: T, b: T) => boolean,
 ): T
 function useBearStore<T>(
   selector?: (state: BearState) => T,
-  equals?: (a: T, b: T) => boolean
+  equals?: (a: T, b: T) => boolean,
 ) {
   return useStore(bearStore, selector!, equals)
 }
@@ -473,12 +473,12 @@ const bearStore = createStore<BearState>()((set) => ({
 
 const createBoundedUseStore = ((store) => (selector, equals) =>
   useStore(store, selector as never, equals)) as <S extends StoreApi<unknown>>(
-  store: S
+  store: S,
 ) => {
   (): ExtractState<S>
   <T>(
     selector: (state: ExtractState<S>) => T,
-    equals?: (a: T, b: T) => boolean
+    equals?: (a: T, b: T) => boolean,
   ): T
 }
 

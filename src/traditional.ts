@@ -27,7 +27,7 @@ type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
 }
 
 export function useStoreWithEqualityFn<S extends WithReact<StoreApi<unknown>>>(
-  api: S
+  api: S,
 ): ExtractState<S>
 
 export function useStoreWithEqualityFn<
@@ -36,20 +36,20 @@ export function useStoreWithEqualityFn<
 >(
   api: S,
   selector: (state: ExtractState<S>) => U,
-  equalityFn?: (a: U, b: U) => boolean
+  equalityFn?: (a: U, b: U) => boolean,
 ): U
 
 export function useStoreWithEqualityFn<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
   selector: (state: TState) => StateSlice = api.getState as any,
-  equalityFn?: (a: StateSlice, b: StateSlice) => boolean
+  equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
     api.getServerState || api.getState,
     selector,
-    equalityFn
+    equalityFn,
   )
   useDebugValue(slice)
   return slice
@@ -61,30 +61,30 @@ export type UseBoundStoreWithEqualityFn<
   (): ExtractState<S>
   <U>(
     selector: (state: ExtractState<S>) => U,
-    equalityFn?: (a: U, b: U) => boolean
+    equalityFn?: (a: U, b: U) => boolean,
   ): U
 } & S
 
 type CreateWithEqualityFn = {
   <T, Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>,
-    defaultEqualityFn?: <U>(a: U, b: U) => boolean
+    defaultEqualityFn?: <U>(a: U, b: U) => boolean,
   ): UseBoundStoreWithEqualityFn<Mutate<StoreApi<T>, Mos>>
   <T>(): <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
     initializer: StateCreator<T, [], Mos>,
-    defaultEqualityFn?: <U>(a: U, b: U) => boolean
+    defaultEqualityFn?: <U>(a: U, b: U) => boolean,
   ) => UseBoundStoreWithEqualityFn<Mutate<StoreApi<T>, Mos>>
 }
 
 const createWithEqualityFnImpl = <T>(
   createState: StateCreator<T, [], []>,
-  defaultEqualityFn?: <U>(a: U, b: U) => boolean
+  defaultEqualityFn?: <U>(a: U, b: U) => boolean,
 ) => {
   const api = createStore(createState)
 
   const useBoundStoreWithEqualityFn: any = (
     selector?: any,
-    equalityFn = defaultEqualityFn
+    equalityFn = defaultEqualityFn,
   ) => useStoreWithEqualityFn(api, selector, equalityFn)
 
   Object.assign(useBoundStoreWithEqualityFn, api)
@@ -94,7 +94,7 @@ const createWithEqualityFnImpl = <T>(
 
 export const createWithEqualityFn = (<T>(
   createState: StateCreator<T, [], []> | undefined,
-  defaultEqualityFn?: <U>(a: U, b: U) => boolean
+  defaultEqualityFn?: <U>(a: U, b: U) => boolean,
 ) =>
   createState
     ? createWithEqualityFnImpl(createState, defaultEqualityFn)

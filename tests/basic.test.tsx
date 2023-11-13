@@ -61,7 +61,7 @@ it('uses the store with no args', async () => {
   const { findByText } = render(
     <>
       <Counter />
-    </>
+    </>,
   )
 
   await findByText('count: 1')
@@ -83,7 +83,7 @@ it('uses the store with selectors', async () => {
   const { findByText } = render(
     <>
       <Counter />
-    </>
+    </>,
   )
 
   await findByText('count: 1')
@@ -92,7 +92,7 @@ it('uses the store with selectors', async () => {
 it('uses the store with a selector and equality checker', async () => {
   const useBoundStore = createWithEqualityFn(
     () => ({ item: { value: 0 } }),
-    Object.is
+    Object.is,
   )
   const { setState } = useBoundStore
   let renderCount = 0
@@ -101,7 +101,7 @@ it('uses the store with a selector and equality checker', async () => {
     // Prevent re-render if new value === 1.
     const item = useBoundStore(
       (s) => s.item,
-      (_, newItem) => newItem.value === 1
+      (_, newItem) => newItem.value === 1,
     )
     return (
       <div>
@@ -113,7 +113,7 @@ it('uses the store with a selector and equality checker', async () => {
   const { findByText } = render(
     <>
       <Component />
-    </>
+    </>,
   )
 
   await findByText('renderCount: 1, value: 0')
@@ -151,7 +151,7 @@ it('only re-renders if selected state has changed', async () => {
     <>
       <Counter />
       <Control />
-    </>
+    </>,
   )
 
   fireEvent.click(getByText('button'))
@@ -182,7 +182,7 @@ it('can batch updates', async () => {
   const { findByText } = render(
     <>
       <Counter />
-    </>
+    </>,
   )
 
   await findByText('count: 2')
@@ -203,14 +203,14 @@ it('can update the selector', async () => {
   const { findByText, rerender } = render(
     <StrictMode>
       <Component selector={(s) => s.one} />
-    </StrictMode>
+    </StrictMode>,
   )
   await findByText('one')
 
   rerender(
     <StrictMode>
       <Component selector={(s) => s.two} />
-    </StrictMode>
+    </StrictMode>,
   )
   await findByText('two')
 })
@@ -220,7 +220,7 @@ it('can update the equality checker', async () => {
   type Props = { equalityFn: (a: State, b: State) => boolean }
   const useBoundStore = createWithEqualityFn<State>(
     () => ({ value: 0 }),
-    Object.is
+    Object.is,
   )
   const { setState } = useBoundStore
   const selector = (s: State) => s
@@ -239,7 +239,7 @@ it('can update the equality checker', async () => {
   const { findByText, rerender } = render(
     <>
       <Component equalityFn={() => false} />
-    </>
+    </>,
   )
 
   // This will cause a re-render due to the equality checker.
@@ -250,7 +250,7 @@ it('can update the equality checker', async () => {
   rerender(
     <>
       <Component equalityFn={() => true} />
-    </>
+    </>,
   )
 
   // This will NOT cause a re-render due to the equality checker.
@@ -267,7 +267,7 @@ it('can call useBoundStore with progressively more arguments', async () => {
 
   const useBoundStore = createWithEqualityFn<State>(
     () => ({ value: 0 }),
-    Object.is
+    Object.is,
   )
   const { setState } = useBoundStore
 
@@ -285,7 +285,7 @@ it('can call useBoundStore with progressively more arguments', async () => {
   const { findByText, rerender } = render(
     <>
       <Component />
-    </>
+    </>,
   )
   await findByText('renderCount: 1, value: {"value":0}')
 
@@ -293,7 +293,7 @@ it('can call useBoundStore with progressively more arguments', async () => {
   rerender(
     <>
       <Component selector={(s) => s.value} />
-    </>
+    </>,
   )
   await findByText('renderCount: 2, value: 0')
 
@@ -304,7 +304,7 @@ it('can call useBoundStore with progressively more arguments', async () => {
         selector={(s) => s.value}
         equalityFn={(oldV, newV) => oldV > newV}
       />
-    </>
+    </>,
   )
 
   // Should not cause a re-render because new value is less than previous.
@@ -352,7 +352,7 @@ it('can throw an error in selector', async () => {
       <ErrorBoundary>
         <Component />
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   )
   await findByText('no error')
 
@@ -400,7 +400,7 @@ it('can throw an error in equality checker', async () => {
       <ErrorBoundary>
         <Component />
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   )
   await findByText('no error')
 
@@ -464,7 +464,7 @@ it('can set the store without merging', () => {
   const { setState, getState } = create<{ a: number } | { b: number }>(
     (_set) => ({
       a: 1,
-    })
+    }),
   )
 
   // Should override the state instead of merging.
@@ -512,7 +512,7 @@ it('only calls selectors when necessary', async () => {
   const { rerender, findByText } = render(
     <>
       <Component />
-    </>
+    </>,
   )
   await findByText('inline: 1')
   await findByText('static: 1')
@@ -520,7 +520,7 @@ it('only calls selectors when necessary', async () => {
   rerender(
     <>
       <Component />
-    </>
+    </>,
   )
   await findByText('inline: 2')
   await findByText('static: 1')
@@ -571,7 +571,7 @@ it('ensures parent components subscribe before children', async () => {
   const { getByText, findByText } = render(
     <StrictMode>
       <Parent />
-    </StrictMode>
+    </StrictMode>,
   )
 
   fireEvent.click(getByText('change state'))
@@ -614,7 +614,7 @@ it('ensures the correct subscriber is removed on unmount', async () => {
   const { findAllByText } = render(
     <>
       <Component />
-    </>
+    </>,
   )
 
   expect((await findAllByText('count: 1')).length).toBe(2)
@@ -643,14 +643,14 @@ it('ensures a subscriber is not mistakenly overwritten', async () => {
   const { findAllByText, rerender } = render(
     <StrictMode>
       <Count1 />
-    </StrictMode>
+    </StrictMode>,
   )
 
   // Replace 1st subscriber with another.
   rerender(
     <StrictMode>
       <Count2 />
-    </StrictMode>
+    </StrictMode>,
   )
 
   // Add 2 additional subscribers.
@@ -659,7 +659,7 @@ it('ensures a subscriber is not mistakenly overwritten', async () => {
       <Count2 />
       <Count1 />
       <Count1 />
-    </StrictMode>
+    </StrictMode>,
   )
 
   // Call all subscribers
@@ -686,7 +686,7 @@ it('works with non-object state', async () => {
   const { getByText, findByText } = render(
     <StrictMode>
       <Counter />
-    </StrictMode>
+    </StrictMode>,
   )
 
   await findByText('count: 1')

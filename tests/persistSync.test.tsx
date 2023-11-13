@@ -58,8 +58,8 @@ describe('persist middleware with sync configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        }
-      )
+        },
+      ),
     )
 
     expect(useBoundStore.getState()).toEqual({
@@ -68,7 +68,7 @@ describe('persist middleware with sync configuration', () => {
     })
     expect(onRehydrateStorageSpy).toBeCalledWith(
       { count: 42, name: 'test-storage' },
-      undefined
+      undefined,
     )
   })
 
@@ -87,7 +87,7 @@ describe('persist middleware with sync configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => spy,
-      })
+      }),
     )
 
     expect(spy).toBeCalledWith(undefined, new Error('getItem error'))
@@ -103,7 +103,7 @@ describe('persist middleware with sync configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        })
+        }),
       )
       return { useBoundStore, onRehydrateStorageSpy }
     }
@@ -118,7 +118,7 @@ describe('persist middleware with sync configuration', () => {
     expect(useBoundStore.getState()).toEqual({ count: 42 })
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
-      JSON.stringify({ state: { count: 42 }, version: 0 })
+      JSON.stringify({ state: { count: 42 }, version: 0 }),
     )
 
     // Create the same store a second time and check if the persisted state
@@ -153,7 +153,7 @@ describe('persist middleware with sync configuration', () => {
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
         migrate: migrateSpy,
-      })
+      }),
     )
 
     expect(useBoundStore.getState()).toEqual({ count: 99 })
@@ -163,7 +163,7 @@ describe('persist middleware with sync configuration', () => {
       JSON.stringify({
         state: { count: 99 },
         version: 13,
-      })
+      }),
     )
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
   })
@@ -187,7 +187,7 @@ describe('persist middleware with sync configuration', () => {
         version: 13,
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     expect(useBoundStore.getState()).toEqual({ count: 0 })
@@ -217,13 +217,13 @@ describe('persist middleware with sync configuration', () => {
           throw new Error('migrate error')
         },
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     expect(useBoundStore.getState()).toEqual({ count: 0 })
     expect(onRehydrateStorageSpy).toBeCalledWith(
       undefined,
-      new Error('migrate error')
+      new Error('migrate error'),
     )
   })
 
@@ -241,7 +241,7 @@ describe('persist middleware with sync configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: onRehydrateStorageSpy,
-      })
+      }),
     )
 
     /**
@@ -281,7 +281,7 @@ describe('persist middleware with sync configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         onRehydrateStorage: () => onRehydrateStorageSpy,
-      })
+      }),
     )
 
     const expectedState = { count: 1, unstorableMethod }
@@ -319,7 +319,7 @@ describe('persist middleware with sync configuration', () => {
             ...persistedState,
           }
         },
-      })
+      }),
     )
 
     expect(useBoundStore.getState()).toEqual({
@@ -346,7 +346,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     expect(useBoundStore.getState()).toEqual({
@@ -393,8 +393,8 @@ describe('persist middleware with sync configuration', () => {
               array: state.array.filter((e) => e.value !== '1'),
             }
           },
-        }
-      )
+        },
+      ),
     )
 
     useBoundStore.setState({})
@@ -415,7 +415,7 @@ describe('persist middleware with sync configuration', () => {
           ],
         },
         version: 0,
-      })
+      }),
     )
   })
 
@@ -430,7 +430,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
     expect(useBoundStore.persist.getOptions().name).toBeDefined()
     expect(useBoundStore.persist.getOptions().name).toBe('test-storage')
@@ -450,26 +450,26 @@ describe('persist middleware with sync configuration', () => {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
         partialize: (s) => s as Partial<typeof s>,
-      })
+      }),
     )
 
     useBoundStore.setState({})
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
-      '{"state":{"count":0},"version":0}'
+      '{"state":{"count":0},"version":0}',
     )
 
     useBoundStore.persist.setOptions({
       name: 'test-storage-2',
       partialize: (state) =>
         Object.fromEntries(
-          Object.entries(state).filter(([key]) => key !== 'count')
+          Object.entries(state).filter(([key]) => key !== 'count'),
         ),
     })
     useBoundStore.setState({})
     expect(setItemSpy).toBeCalledWith(
       'test-storage-2',
-      '{"state":{},"version":0}'
+      '{"state":{},"version":0}',
     )
   })
 
@@ -486,7 +486,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     useBoundStore.persist.clearStorage()
@@ -506,7 +506,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     storage.getItem = () => storageValue
@@ -527,7 +527,7 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
@@ -555,14 +555,14 @@ describe('persist middleware with sync configuration', () => {
       persist(() => ({ count: 0 }), {
         name: 'test-storage',
         storage: createJSONStorage(() => storage),
-      })
+      }),
     )
 
     const hydrateUnsub1 = useBoundStore.persist.onHydrate(onHydrateSpy1)
     useBoundStore.persist.onHydrate(onHydrateSpy2)
 
     const finishHydrationUnsub1 = useBoundStore.persist.onFinishHydration(
-      onFinishHydrationSpy1
+      onFinishHydrationSpy1,
     )
     useBoundStore.persist.onFinishHydration(onFinishHydrationSpy2)
 
@@ -606,8 +606,8 @@ describe('persist middleware with sync configuration', () => {
           storage: storage,
           onRehydrateStorage: () => onRehydrateStorageSpy,
           skipHydration: true,
-        }
-      )
+        },
+      ),
     )
 
     expect(useBoundStore.getState()).toEqual({
@@ -631,7 +631,7 @@ describe('persist middleware with sync configuration', () => {
     })
     expect(onRehydrateStorageSpy).toBeCalledWith(
       { count: 42, name: 'test-storage' },
-      undefined
+      undefined,
     )
   })
 
@@ -652,8 +652,8 @@ describe('persist middleware with sync configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => (s) => s?.inc(),
-        }
-      )
+        },
+      ),
     )
 
     expect(useBoundStore.getState().count).toEqual(2)
@@ -680,8 +680,8 @@ describe('persist middleware with sync configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        }
-      )
+        },
+      ),
     )
 
     const updatedMap = map.set('foo', 'bar')
@@ -702,7 +702,7 @@ describe('persist middleware with sync configuration', () => {
           name: 'test-storage',
           storage: createJSONStorage(() => storage, { replacer, reviver }),
           onRehydrateStorage: () => onRehydrateStorageSpy,
-        })
+        }),
       )
       return { useBoundStore, onRehydrateStorageSpy }
     }
@@ -723,7 +723,7 @@ describe('persist middleware with sync configuration', () => {
       JSON.stringify({
         state: { map: { type: 'Map', value: [['foo', 'bar']] } },
         version: 0,
-      })
+      }),
     )
 
     // Create the same store a second time and check if the persisted state
@@ -735,7 +735,7 @@ describe('persist middleware with sync configuration', () => {
     expect(useBoundStore2.getState()).toEqual({ map: updatedMap })
     expect(onRehydrateStorageSpy2).toBeCalledWith(
       { map: updatedMap },
-      undefined
+      undefined,
     )
   })
 })
