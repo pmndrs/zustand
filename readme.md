@@ -98,12 +98,12 @@ const useBearStore = create((set) => ({
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
 const { nuts, honey } = useBearStore(
-  useShallow((state) => ({ nuts: state.nuts, honey: state.honey }))
+  useShallow((state) => ({ nuts: state.nuts, honey: state.honey })),
 )
 
 // Array pick, re-renders the component when either state.nuts or state.honey change
 const [nuts, honey] = useBearStore(
-  useShallow((state) => [state.nuts, state.honey])
+  useShallow((state) => [state.nuts, state.honey]),
 )
 
 // Mapped picks, re-renders the component when state.treats changes in order, count or keys
@@ -115,7 +115,7 @@ For more control over re-rendering, you may provide any custom equality function
 ```jsx
 const treats = useBearStore(
   (state) => state.treats,
-  (oldTreats, newTreats) => compare(oldTreats, newTreats)
+  (oldTreats, newTreats) => compare(oldTreats, newTreats),
 )
 ```
 
@@ -196,7 +196,7 @@ subscribe(selector, callback, options?: { equalityFn, fireImmediately }): Unsubs
 ```js
 import { subscribeWithSelector } from 'zustand/middleware'
 const useDogStore = create(
-  subscribeWithSelector(() => ({ paw: true, snout: true, fur: true }))
+  subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })),
 )
 
 // Listening to selected changes, in this case when "paw" changes
@@ -204,13 +204,13 @@ const unsub2 = useDogStore.subscribe((state) => state.paw, console.log)
 // Subscribe also exposes the previous value
 const unsub3 = useDogStore.subscribe(
   (state) => state.paw,
-  (paw, previousPaw) => console.log(paw, previousPaw)
+  (paw, previousPaw) => console.log(paw, previousPaw),
 )
 // Subscribe also supports an optional equality function
 const unsub4 = useDogStore.subscribe(
   (state) => [state.paw, state.fur],
   console.log,
-  { equalityFn: shallow }
+  { equalityFn: shallow },
 )
 // Subscribe and fire immediately
 const unsub5 = useDogStore.subscribe((state) => state.paw, console.log, {
@@ -272,7 +272,7 @@ const useLushStore = create((set) => ({
     set(
       produce((state) => {
         state.lush.forest.contains = null
-      })
+      }),
     ),
 }))
 
@@ -296,14 +296,14 @@ const log = (config) => (set, get, api) =>
       console.log('  new state', get())
     },
     get,
-    api
+    api,
   )
 
 const useBeeStore = create(
   log((set) => ({
     bees: false,
     setBees: (input) => set({ bees: input }),
-  }))
+  })),
 )
 ```
 
@@ -324,8 +324,8 @@ const useFishStore = create(
     {
       name: 'food-storage', // name of the item in the storage (must be unique)
       storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -346,7 +346,7 @@ const useBeeStore = create(
       set((state) => {
         state.bees += by
       }),
-  }))
+  })),
 )
 ```
 
@@ -503,9 +503,9 @@ const useBearStore = create<BearState>()(
       }),
       {
         name: 'bear-storage',
-      }
-    )
-  )
+      },
+    ),
+  ),
 )
 ```
 

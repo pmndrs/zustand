@@ -30,7 +30,7 @@ it('can use exposed types', () => {
     numGet: () => 2,
   }
   const partialFn: (state: ExampleState) => Partial<ExampleState> = (
-    state
+    state,
   ) => ({
     ...state,
     num: 2,
@@ -82,7 +82,7 @@ it('can use exposed types', () => {
     _destroy: StoreApi<ExampleState>['destroy'],
     _equalityFn: (a: ExampleState, b: ExampleState) => boolean,
     _stateCreator: StateCreator<ExampleState>,
-    _useBoundStore: UseBoundStore<StoreApi<ExampleState>>
+    _useBoundStore: UseBoundStore<StoreApi<ExampleState>>,
   ) {
     expect(true).toBeTruthy()
   }
@@ -99,7 +99,7 @@ it('can use exposed types', () => {
     storeApi.destroy,
     equalityFn,
     stateCreator,
-    useBoundStore
+    useBoundStore,
   )
 })
 

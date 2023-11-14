@@ -177,11 +177,7 @@
   },
   "prettier": {
     "semi": false,
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "bracketSameLine": true,
-    "tabWidth": 2,
-    "printWidth": 80
+    "singleQuote": true
   },
   "repository": {
     "type": "git",

@@ -15,15 +15,15 @@ describe('shallow', () => {
 
   it('compares objects', () => {
     expect(shallow({ foo: 'bar', asd: 123 }, { foo: 'bar', asd: 123 })).toBe(
-      true
+      true,
     )
 
     expect(
-      shallow({ foo: 'bar', asd: 123 }, { foo: 'bar', foobar: true })
+      shallow({ foo: 'bar', asd: 123 }, { foo: 'bar', foobar: true }),
     ).toBe(false)
 
     expect(
-      shallow({ foo: 'bar', asd: 123 }, { foo: 'bar', asd: 123, foobar: true })
+      shallow({ foo: 'bar', asd: 123 }, { foo: 'bar', asd: 123, foobar: true }),
     ).toBe(false)
   })
 
@@ -33,7 +33,7 @@ describe('shallow', () => {
     expect(shallow([1, 2, 3], [2, 3, 4])).toBe(false)
 
     expect(
-      shallow([{ foo: 'bar' }, { asd: 123 }], [{ foo: 'bar' }, { asd: 123 }])
+      shallow([{ foo: 'bar' }, { asd: 123 }], [{ foo: 'bar' }, { asd: 123 }]),
     ).toBe(false)
 
     expect(shallow([{ foo: 'bar' }], [{ foo: 'bar', asd: 123 }])).toBe(false)
@@ -47,22 +47,22 @@ describe('shallow', () => {
     expect(
       shallow(
         createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', asd: 123 })
-      )
+        createMap({ foo: 'bar', asd: 123 }),
+      ),
     ).toBe(true)
 
     expect(
       shallow(
         createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', foobar: true })
-      )
+        createMap({ foo: 'bar', foobar: true }),
+      ),
     ).toBe(false)
 
     expect(
       shallow(
         createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', asd: 123, foobar: true })
-      )
+        createMap({ foo: 'bar', asd: 123, foobar: true }),
+      ),
     ).toBe(false)
   })
 
@@ -72,7 +72,7 @@ describe('shallow', () => {
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 2]))).toBe(false)
 
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 123, true]))).toBe(
-      false
+      false,
     )
   })
 
@@ -98,8 +98,8 @@ describe('unsupported cases', () => {
     expect(
       shallow(
         new Date('2022-07-19T00:00:00.000Z'),
-        new Date('2022-07-20T00:00:00.000Z')
-      )
+        new Date('2022-07-20T00:00:00.000Z'),
+      ),
     ).not.toBe(false)
   })
 })

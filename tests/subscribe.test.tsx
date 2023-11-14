@@ -27,7 +27,7 @@ describe('subscribe()', () => {
     const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = create(
-      subscribeWithSelector(() => initialState)
+      subscribeWithSelector(() => initialState),
     )
 
     subscribe((s) => s.value, spy)
@@ -39,7 +39,7 @@ describe('subscribe()', () => {
     const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = create(
-      subscribeWithSelector(() => initialState)
+      subscribeWithSelector(() => initialState),
     )
 
     subscribe((s) => s.value, spy)
@@ -52,7 +52,7 @@ describe('subscribe()', () => {
     const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = create(
-      subscribeWithSelector(() => initialState)
+      subscribeWithSelector(() => initialState),
     )
 
     subscribe((s) => s, spy, { equalityFn: () => true })
@@ -64,7 +64,7 @@ describe('subscribe()', () => {
     const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = create(
-      subscribeWithSelector(() => initialState)
+      subscribeWithSelector(() => initialState),
     )
 
     subscribe((s) => s.value, spy, { equalityFn: () => false })
@@ -77,7 +77,7 @@ describe('subscribe()', () => {
     const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = create(
-      subscribeWithSelector(() => initialState)
+      subscribeWithSelector(() => initialState),
     )
 
     const unsub = subscribe((s) => s.value, spy)
@@ -94,7 +94,7 @@ describe('subscribe()', () => {
     const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { getState, setState, subscribe } = create(
-      subscribeWithSelector(() => initialState)
+      subscribeWithSelector(() => initialState),
     )
 
     const isRoughEqual = (x: number, y: number) => Math.abs(x - y) < 1

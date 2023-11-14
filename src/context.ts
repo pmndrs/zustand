@@ -26,7 +26,7 @@ type UseContextStore<S extends StoreApi<unknown>> = {
   (): ExtractState<S>
   <U>(
     selector: (state: ExtractState<S>) => U,
-    equalityFn?: (a: U, b: U) => boolean
+    equalityFn?: (a: U, b: U) => boolean,
   ): U
 }
 
@@ -40,7 +40,7 @@ type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
 function createContext<S extends StoreApi<unknown>>() {
   if (import.meta.env?.MODE !== 'production') {
     console.warn(
-      "[DEPRECATED] `context` will be removed in a future version. Instead use `import { createStore, useStore } from 'zustand'`. See: https://github.com/pmndrs/zustand/discussions/1180."
+      "[DEPRECATED] `context` will be removed in a future version. Instead use `import { createStore, useStore } from 'zustand'`. See: https://github.com/pmndrs/zustand/discussions/1180.",
     )
   }
   const ZustandContext = reactCreateContext<S | undefined>(undefined)
@@ -61,24 +61,24 @@ function createContext<S extends StoreApi<unknown>>() {
     return createElement(
       ZustandContext.Provider,
       { value: storeRef.current },
-      children
+      children,
     )
   }
 
   const useContextStore: UseContextStore<S> = <StateSlice = ExtractState<S>>(
     selector?: (state: ExtractState<S>) => StateSlice,
-    equalityFn?: (a: StateSlice, b: StateSlice) => boolean
+    equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
   ) => {
     const store = useContext(ZustandContext)
     if (!store) {
       throw new Error(
-        'Seems like you have not used zustand provider as an ancestor.'
+        'Seems like you have not used zustand provider as an ancestor.',
       )
     }
     return useStoreWithEqualityFn(
       store,
       selector as (state: ExtractState<S>) => StateSlice,
-      equalityFn
+      equalityFn,
     )
   }
 
@@ -86,7 +86,7 @@ function createContext<S extends StoreApi<unknown>>() {
     const store = useContext(ZustandContext)
     if (!store) {
       throw new Error(
-        'Seems like you have not used zustand provider as an ancestor.'
+        'Seems like you have not used zustand provider as an ancestor.',
       )
     }
     return useMemo<WithoutCallSignature<S>>(() => ({ ...store }), [store])

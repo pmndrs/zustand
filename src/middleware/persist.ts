@@ -17,7 +17,7 @@ export type StorageValue<S> = {
 
 export interface PersistStorage<S> {
   getItem: (
-    name: string
+    name: string,
   ) => StorageValue<S> | null | Promise<StorageValue<S> | null>
   setItem: (name: string, value: StorageValue<S>) => void | Promise<void>
   removeItem: (name: string) => void | Promise<void>
@@ -30,7 +30,7 @@ type JsonStorageOptions = {
 
 export function createJSONStorage<S>(
   getStorage: () => StateStorage,
-  options?: JsonStorageOptions
+  options?: JsonStorageOptions,
 ): PersistStorage<S> | undefined {
   let storage: StateStorage | undefined
   try {
@@ -56,7 +56,7 @@ export function createJSONStorage<S>(
     setItem: (name, newValue) =>
       (storage as StateStorage).setItem(
         name,
-        JSON.stringify(newValue, options?.replacer)
+        JSON.stringify(newValue, options?.replacer),
       ),
     removeItem: (name) => (storage as StateStorage).removeItem(name),
   }
@@ -92,7 +92,7 @@ export interface PersistOptions<S, PersistedState = S> {
    * @default JSON.parse
    */
   deserialize?: (
-    str: string
+    str: string,
   ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
   /**
    * Use a custom persist storage.
@@ -115,7 +115,7 @@ export interface PersistOptions<S, PersistedState = S> {
    * The returned function will be called after the state rehydration or when an error occurred.
    */
   onRehydrateStorage?: (
-    state: S
+    state: S,
   ) => ((state?: S, error?: unknown) => void) | void
   /**
    * If the stored state's version mismatch the one specified here, the storage will not be used.
@@ -160,16 +160,16 @@ type StorePersist<S, Ps> = {
 
 type Thenable<Value> = {
   then<V>(
-    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>
+    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>,
   ): Thenable<V>
   catch<V>(
-    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>
+    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>,
   ): Thenable<V>
 }
 
 const toThenable =
   <Result, Input>(
-    fn: (input: Input) => Result | Promise<Result> | Thenable<Result>
+    fn: (input: Input) => Result | Promise<Result> | Thenable<Result>,
   ) =>
   (input: Input): Thenable<Result> => {
     try {
@@ -227,12 +227,12 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     return config(
       (...args) => {
         console.warn(
-          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
+          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`,
         )
         set(...args)
       },
       get,
-      api
+      api,
     )
   }
 
@@ -244,7 +244,7 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     let errorInSync: Error | undefined
     const thenable = thenableSerialize({ state, version: options.version })
       .then((serializedValue) =>
-        (storage as StateStorage).setItem(options.name, serializedValue)
+        (storage as StateStorage).setItem(options.name, serializedValue),
       )
       .catch((e) => {
         errorInSync = e
@@ -268,7 +268,7 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       void setItem()
     },
     get,
-    api
+    api,
   )
 
   // a workaround to solve the issue of not storing rehydrated state in sync storage
@@ -302,11 +302,11 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
             if (options.migrate) {
               return options.migrate(
                 deserializedStorageValue.state,
-                deserializedStorageValue.version
+                deserializedStorageValue.version,
               )
             }
             console.error(
-              `State loaded from storage couldn't be migrated since no migrate function was provided`
+              `State loaded from storage couldn't be migrated since no migrate function was provided`,
             )
           } else {
             return deserializedStorageValue.state
@@ -316,7 +316,7 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       .then((migratedState) => {
         stateFromStorage = options.merge(
           migratedState as S,
-          get() ?? configResult
+          get() ?? configResult,
         )
 
         set(stateFromStorage as S, true)
@@ -392,12 +392,12 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     return config(
       (...args) => {
         console.warn(
-          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
+          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`,
         )
         set(...args)
       },
       get,
-      api
+      api,
     )
   }
 
@@ -422,7 +422,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       void setItem()
     },
     get,
-    api
+    api,
   )
 
   // a workaround to solve the issue of not storing rehydrated state in sync storage
@@ -456,11 +456,11 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
             if (options.migrate) {
               return options.migrate(
                 deserializedStorageValue.state,
-                deserializedStorageValue.version
+                deserializedStorageValue.version,
               )
             }
             console.error(
-              `State loaded from storage couldn't be migrated since no migrate function was provided`
+              `State loaded from storage couldn't be migrated since no migrate function was provided`,
             )
           } else {
             return deserializedStorageValue.state
@@ -470,7 +470,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       .then((migratedState) => {
         stateFromStorage = options.merge(
           migratedState as S,
-          get() ?? configResult
+          get() ?? configResult,
         )
 
         set(stateFromStorage as S, true)
@@ -546,7 +546,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => {
   ) {
     if (import.meta.env?.MODE !== 'production') {
       console.warn(
-        '[DEPRECATED] `getStorage`, `serialize` and `deserialize` options are deprecated. Use `storage` option instead.'
+        '[DEPRECATED] `getStorage`, `serialize` and `deserialize` options are deprecated. Use `storage` option instead.',
       )
     }
     return oldImpl(config, baseOptions)
@@ -561,7 +561,7 @@ type Persist = <
   U = T,
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/persist', unknown]], Mcs>,
-  options: PersistOptions<T, U>
+  options: PersistOptions<T, U>,
 ) => StateCreator<T, Mps, [['zustand/persist', U], ...Mcs]>
 
 declare module '../vanilla' {
@@ -578,7 +578,7 @@ type WithPersist<S, A> = S extends { getState: () => infer T }
 
 type PersistImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
-  options: PersistOptions<T, T>
+  options: PersistOptions<T, T>,
 ) => StateCreator<T, [], []>
 
 export const persist = persistImpl as unknown as Persist

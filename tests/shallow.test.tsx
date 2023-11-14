@@ -24,7 +24,7 @@ describe('types', () => {
     const Component = () => {
       const refetchTimestamp = useBoundStore(
         (state) => state.refetchTimestamp,
-        shallow
+        shallow,
       )
       return <>{refetchTimestamp.toUpperCase()}</>
     }
@@ -61,7 +61,7 @@ describe('useShallow', () => {
 
   it('input and output selectors always return shallow equal values', () => {
     const res = render(
-      <TestUseShallowSimple state={{ a: 1, b: 2 }} selector={Object.keys} />
+      <TestUseShallowSimple state={{ a: 1, b: 2 }} selector={Object.keys} />,
     )
 
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(0)
@@ -77,7 +77,7 @@ describe('useShallow', () => {
       <TestUseShallowSimple
         state={{ a: 1, b: 2, c: 3 }}
         selector={Object.keys}
-      />
+      />,
     )
 
     fireEvent.click(res.getByTestId('test-shallow'))
@@ -92,7 +92,7 @@ describe('useShallow', () => {
   it('returns the previously computed instance when possible', () => {
     const state = { a: 1, b: 2 }
     const res = render(
-      <TestUseShallowSimple state={state} selector={Object.keys} />
+      <TestUseShallowSimple state={state} selector={Object.keys} />,
     )
 
     fireEvent.click(res.getByTestId('test-shallow'))
@@ -106,7 +106,7 @@ describe('useShallow', () => {
       <TestUseShallowSimple
         state={state}
         selector={(state) => Object.keys(state)}
-      />
+      />,
     )
 
     fireEvent.click(res.getByTestId('test-shallow'))
@@ -122,7 +122,7 @@ describe('useShallow', () => {
   it('only re-renders if selector output has changed according to shallow', () => {
     let countRenders = 0
     const useMyStore = create(
-      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 })
+      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }),
     )
     const TestShallow = ({
       selector = (state) => Object.keys(state).sort(),
@@ -158,18 +158,19 @@ describe('useShallow', () => {
 
   it('does not cause stale closure issues', () => {
     const useMyStore = create(
-      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 })
+      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }),
     )
     const TestShallowWithState = () => {
       const [count, setCount] = useState(0)
       const output = useMyStore(
-        useShallow((state) => Object.keys(state).concat([count.toString()]))
+        useShallow((state) => Object.keys(state).concat([count.toString()])),
       )
 
       return (
         <div
           data-testid="test-shallow"
-          onClick={() => setCount((prev) => ++prev)}>
+          onClick={() => setCount((prev) => ++prev)}
+        >
           {output.join(',')}
         </div>
       )

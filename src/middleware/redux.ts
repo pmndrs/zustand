@@ -22,7 +22,7 @@ type Redux = <
   Cms extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   reducer: (state: T, action: A) => T,
-  initialState: T
+  initialState: T,
 ) => StateCreator<Write<T, ReduxState<A>>, Cms, [['zustand/redux', A]]>
 
 declare module '../vanilla' {
@@ -33,7 +33,7 @@ declare module '../vanilla' {
 
 type ReduxImpl = <T, A extends Action>(
   reducer: (state: T, action: A) => T,
-  initialState: T
+  initialState: T,
 ) => StateCreator<T & ReduxState<A>, [], []>
 
 const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {

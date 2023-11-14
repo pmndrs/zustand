@@ -9,7 +9,7 @@ type Combine = <
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
   initialState: T,
-  additionalStateCreator: StateCreator<T, Mps, Mcs, U>
+  additionalStateCreator: StateCreator<T, Mps, Mcs, U>,
 ) => StateCreator<Write<T, U>, Mps, Mcs>
 
 export const combine: Combine =

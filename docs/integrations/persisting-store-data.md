@@ -30,8 +30,8 @@ export const useBearStore = create(
     {
       name: 'food-storage', // name of the item in the storage (must be unique)
       storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -72,8 +72,8 @@ export const useBoundStore = create(
     {
       // ...
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -98,10 +98,10 @@ export const useBoundStore = create(
       // ...
       partialize: (state) =>
         Object.fromEntries(
-          Object.entries(state).filter(([key]) => !['foo'].includes(key))
+          Object.entries(state).filter(([key]) => !['foo'].includes(key)),
         ),
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -117,8 +117,8 @@ export const useBoundStore = create(
     {
       // ...
       partialize: (state) => ({ foo: state.foo }),
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -151,8 +151,8 @@ export const useBoundStore = create(
           }
         }
       },
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -202,8 +202,8 @@ export const useBoundStore = create(
 
         return persistedState
       },
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -256,8 +256,8 @@ export const useBoundStore = create(
       // ...
       merge: (persistedState, currentState) =>
         deepMerge(currentState, persistedState),
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -285,8 +285,8 @@ export const useBoundStore = create(
     {
       // ...
       skipHydration: true,
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -473,7 +473,7 @@ import { useState, useEffect } from 'react'
 
 const useStore = <T, F>(
   store: (callback: (state: T) => unknown) => unknown,
-  callback: (state: T) => F
+  callback: (state: T) => F,
 ) => {
   const result = store(callback) as F
   const [data, setData] = useState<F>()
@@ -505,8 +505,8 @@ export const useBearStore = create(
     }),
     {
       name: 'food-storage',
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -625,8 +625,8 @@ export const useBoundStore = create(
     {
       name: 'food-storage', // unique name
       storage: createJSONStorage(() => storage),
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -673,8 +673,8 @@ export const useBearStore = create<BearState>()(
     {
       name: 'food-storage',
       storage,
-    }
-  )
+    },
+  ),
 )
 ```
 
@@ -728,8 +728,8 @@ export const useBearStore = create<MyState>()(
       name: 'food-storage', // name of item in the storage (must be unique)
       storage: createJSONStorage(() => sessionStorage), // (optional) by default the 'localStorage' is used
       partialize: (state) => ({ bears: state.bears }),
-    }
-  )
+    },
+  ),
 )
 ```
 

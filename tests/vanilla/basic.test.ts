@@ -103,7 +103,7 @@ it('can set the store without merging', () => {
   const { setState, getState } = createStore<{ a: number } | { b: number }>(
     (_set) => ({
       a: 1,
-    })
+    }),
   )
 
   // Should override the state instead of merging.

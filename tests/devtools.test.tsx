@@ -106,7 +106,7 @@ const extensionConnector = {
       {
         subscribers,
         api,
-      }
+      },
     )
     return api
   }),
@@ -182,7 +182,7 @@ describe('When state changes...', () => {
     const [connection] = getNamedConnectionApis(options.name)
     expect(connection.send).toHaveBeenLastCalledWith(
       { type: 'testSetStateName' },
-      { count: 10, foo: 'bar' }
+      { count: 10, foo: 'bar' },
     )
 
     api.setState({ count: 15 }, false, {
@@ -191,13 +191,13 @@ describe('When state changes...', () => {
     })
     expect(connection.send).toHaveBeenLastCalledWith(
       { type: 'testSetStateName', payload: 15 },
-      { count: 15, foo: 'bar' }
+      { count: 15, foo: 'bar' },
     )
 
     api.setState({ count: 5, foo: 'baz' }, true)
     expect(connection.send).toHaveBeenLastCalledWith(
       { type: 'anonymous' },
-      { count: 5, foo: 'baz' }
+      { count: 5, foo: 'baz' },
     )
   })
 })
@@ -294,7 +294,7 @@ describe('when it receives a message of type...', () => {
           } catch (e) {
             return e
           }
-        })()
+        })(),
       )
 
       expect(() => {
@@ -305,7 +305,7 @@ describe('when it receives a message of type...', () => {
       }).not.toThrow()
 
       expect(console.error).toHaveBeenLastCalledWith(
-        '[zustand devtools middleware] Unsupported action format'
+        '[zustand devtools middleware] Unsupported action format',
       )
 
       expect(api.getState()).toBe(initialState)
@@ -401,7 +401,7 @@ describe('when it receives a message of type...', () => {
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         expect(api.getState()).toBe(initialState)
         expect(connection.init).not.toBeCalled()
@@ -453,7 +453,7 @@ describe('when it receives a message of type...', () => {
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         expect(api.getState()).toBe(initialState)
         expect(connection.send).not.toBeCalled()
@@ -504,7 +504,7 @@ describe('when it receives a message of type...', () => {
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         expect(api.getState()).toBe(initialState)
         expect(connection.send).not.toBeCalled()
@@ -545,7 +545,7 @@ describe('when it receives a message of type...', () => {
       const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
       expect(connection.send).toHaveBeenLastCalledWith(
         { type: 'increment' },
-        { count: 1 }
+        { count: 1 },
       )
       connectionSubscriber({
         type: 'DISPATCH',
@@ -555,7 +555,7 @@ describe('when it receives a message of type...', () => {
       api.setState({ count: 2 }, false, 'increment')
       expect(connection.send).toHaveBeenLastCalledWith(
         { type: 'increment' },
-        { count: 1 }
+        { count: 1 },
       )
       connectionSubscriber({
         type: 'DISPATCH',
@@ -565,7 +565,7 @@ describe('when it receives a message of type...', () => {
       api.setState({ count: 3 }, false, 'increment')
       expect(connection.send).toHaveBeenLastCalledWith(
         { type: 'increment' },
-        { count: 3 }
+        { count: 3 },
       )
     })
   })
@@ -575,7 +575,7 @@ describe('with redux middleware', () => {
   let api: StoreApi<{
     count: number
     dispatch: (
-      action: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+      action: { type: 'INCREMENT' } | { type: 'DECREMENT' },
     ) => { type: 'INCREMENT' } | { type: 'DECREMENT' }
   }>
 
@@ -585,14 +585,14 @@ describe('with redux middleware', () => {
         redux(
           (
             { count },
-            { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+            { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' },
           ) => ({
             count: count + (type === 'INCREMENT' ? 1 : -1),
           }),
-          { count: 0 }
+          { count: 0 },
         ),
-        { enabled: true }
-      )
+        { enabled: true },
+      ),
     )
     ;(api as any).dispatch({ type: 'INCREMENT' })
     ;(api as any).dispatch({ type: 'INCREMENT' })
@@ -629,7 +629,7 @@ describe('with redux middleware', () => {
     ;(api as any).dispatch({ type: '__setState' as any })
     expect(console.warn).toHaveBeenLastCalledWith(
       '[zustand devtools middleware] "__setState" action type is reserved ' +
-        'to set state from the devtools. Avoid using it.'
+        'to set state from the devtools. Avoid using it.',
     )
 
     console.warn = originalConsoleWarn
@@ -713,7 +713,7 @@ describe('when redux connection was called on multiple stores with `name` undefi
 
     const [conn1, conn2] = getUnnamedConnectionApis(
       options1.testConnectionId,
-      options2.testConnectionId
+      options2.testConnectionId,
     )
     expect(conn1.init).toHaveBeenCalledWith(initialState1)
     expect(conn2.init).toHaveBeenCalledWith(initialState2)
@@ -731,10 +731,10 @@ describe('when redux connection was called on multiple stores with `name` undefi
       const initialState2 = { count1: 1 }
 
       createStore(
-        newDevtools(() => initialState1, { enabled: true, ...options1 })
+        newDevtools(() => initialState1, { enabled: true, ...options1 }),
       )
       createStore(
-        newDevtools(() => initialState2, { enabled: true, ...options2 })
+        newDevtools(() => initialState2, { enabled: true, ...options2 }),
       )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
@@ -754,10 +754,10 @@ describe('when redux connection was called on multiple stores with `name` undefi
       const initialState2 = { count2: 1 }
 
       createStore(
-        newDevtools(() => initialState1, { enabled: true, ...options1 })
+        newDevtools(() => initialState1, { enabled: true, ...options1 }),
       )
       createStore(
-        newDevtools(() => initialState2, { enabled: true, ...options2 })
+        newDevtools(() => initialState2, { enabled: true, ...options2 }),
       )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
@@ -871,22 +871,22 @@ describe('when redux connection was called on multiple stores with `name` provid
       const initialState4 = { count: 7 }
 
       createStore(
-        newDevtools(() => initialState1, { enabled: true, ...options1 })
+        newDevtools(() => initialState1, { enabled: true, ...options1 }),
       )
       createStore(
-        newDevtools(() => initialState2, { enabled: true, ...options2 })
+        newDevtools(() => initialState2, { enabled: true, ...options2 }),
       )
       createStore(
-        newDevtools(() => initialState3, { enabled: true, ...options3 })
+        newDevtools(() => initialState3, { enabled: true, ...options3 }),
       )
       createStore(
-        newDevtools(() => initialState4, { enabled: true, ...options4 })
+        newDevtools(() => initialState4, { enabled: true, ...options4 }),
       )
 
       expect(extensionConnector.connect).toHaveBeenCalledTimes(2)
       const [connection1, connection2] = getNamedConnectionApis(
         connectionNameGroup1,
-        connectionNameGroup2
+        connectionNameGroup2,
       )
       expect(connection1.init).toHaveBeenCalledTimes(2)
       expect(connection1.init).toHaveBeenNthCalledWith(1, {
@@ -910,14 +910,14 @@ describe('when redux connection was called on multiple stores with `name` provid
       const options1 = { name: 'asdf1' }
       const options2 = { name: 'asdf2' }
       const api1 = createStore(
-        devtools(() => ({ count: 0 }), { enabled: true, ...options1 })
+        devtools(() => ({ count: 0 }), { enabled: true, ...options1 }),
       )
       createStore(
-        devtools(() => ({ count: 0 }), { enabled: true, ...options2 })
+        devtools(() => ({ count: 0 }), { enabled: true, ...options2 }),
       )
       const connections = getNamedConnectionApis(options1.name, options2.name)
       const [connectionSubscriber] = getNamedConnectionSubscribers(
-        options1.name
+        options1.name,
       )
       connectionSubscriber({
         type: 'DISPATCH',
@@ -936,13 +936,13 @@ describe('when redux connection was called on multiple stores with `name` provid
       let api1: StoreApi<{
         count: number
         dispatch: (
-          action: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+          action: { type: 'INCREMENT' } | { type: 'DECREMENT' },
         ) => { type: 'INCREMENT' } | { type: 'DECREMENT' }
       }>
       let api2: StoreApi<{
         count: number
         dispatch: (
-          action: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+          action: { type: 'INCREMENT' } | { type: 'DECREMENT' },
         ) => { type: 'INCREMENT' } | { type: 'DECREMENT' }
       }>
 
@@ -954,28 +954,28 @@ describe('when redux connection was called on multiple stores with `name` provid
             redux(
               (
                 { count },
-                { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+                { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' },
               ) => ({
                 count: count + (type === 'INCREMENT' ? 1 : -1),
               }),
-              { count: 0 }
+              { count: 0 },
             ),
-            { enabled: true, ...options1 }
-          )
+            { enabled: true, ...options1 },
+          ),
         )
         api2 = createStore(
           devtools(
             redux(
               (
                 { count },
-                { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' }
+                { type }: { type: 'INCREMENT' } | { type: 'DECREMENT' },
               ) => ({
                 count: count + (type === 'INCREMENT' ? 1 : -1),
               }),
-              { count: 10 }
+              { count: 10 },
             ),
-            { enabled: true, ...options2 }
-          )
+            { enabled: true, ...options2 },
+          ),
         )
         ;(api1 as any).dispatch({ type: 'INCREMENT' })
         ;(api1 as any).dispatch({ type: 'INCREMENT' })
@@ -983,12 +983,12 @@ describe('when redux connection was called on multiple stores with `name` provid
         ;(api2 as any).dispatch({ type: 'INCREMENT' })
         const [connection1, connection2] = getUnnamedConnectionApis(
           options1.testConnectionId,
-          options2.testConnectionId
+          options2.testConnectionId,
         )
         const [connectionSubscriber1, connectionSubscriber2] =
           getUnnamedConnectionSubscribers(
             options1.testConnectionId,
-            options2.testConnectionId
+            options2.testConnectionId,
           )
         connectionSubscriber1({
           type: 'ACTION',
@@ -1056,7 +1056,7 @@ describe('when create devtools was called multiple times with `name` option unde
         testConnectionId: '412',
       }
       const api1 = createStore(
-        devtools(() => ({ count: 0, foo: 'bar' }), options1)
+        devtools(() => ({ count: 0, foo: 'bar' }), options1),
       )
       createStore(devtools(() => ({ count: 0, foo: 'bar1' }), options2))
       createStore(devtools(() => ({ count: 0, foo: 'bar2' }), options3))
@@ -1065,11 +1065,11 @@ describe('when create devtools was called multiple times with `name` option unde
       const [connection1, connection2, connection3] = getUnnamedConnectionApis(
         options1.testConnectionId,
         options2.testConnectionId,
-        options3.testConnectionId
+        options3.testConnectionId,
       )
       expect(connection1.send).toHaveBeenLastCalledWith(
         { type: 'testSetStateName' },
-        { count: 10, foo: 'bar' }
+        { count: 10, foo: 'bar' },
       )
       expect(connection2.send).not.toBeCalled()
       expect(connection3.send).not.toBeCalled()
@@ -1080,7 +1080,7 @@ describe('when create devtools was called multiple times with `name` option unde
       })
       expect(connection1.send).toHaveBeenLastCalledWith(
         { type: 'testSetStateName', payload: 15 },
-        { count: 15, foo: 'bar' }
+        { count: 15, foo: 'bar' },
       )
       expect(connection2.send).not.toBeCalled()
       expect(connection3.send).not.toBeCalled()
@@ -1088,7 +1088,7 @@ describe('when create devtools was called multiple times with `name` option unde
       api1.setState({ count: 5, foo: 'baz' }, true)
       expect(connection1.send).toHaveBeenLastCalledWith(
         { type: 'anonymous' },
-        { count: 5, foo: 'baz' }
+        { count: 5, foo: 'baz' },
       )
       expect(connection2.send).not.toBeCalled()
       expect(connection3.send).not.toBeCalled()
@@ -1108,26 +1108,26 @@ describe('when create devtools was called multiple times with `name` option unde
           devtools(() => initialState1, {
             enabled: true,
             ...options1,
-          })
+          }),
         )
         const api2 = createStore(
           devtools(() => initialState2, {
             enabled: true,
             ...options2,
-          })
+          }),
         )
         const api3 = createStore(
           devtools(() => initialState3, {
             enabled: true,
             ...options3,
-          })
+          }),
         )
         const setState1 = vi.spyOn(api1, 'setState')
         const setState2 = vi.spyOn(api2, 'setState')
         const setState3 = vi.spyOn(api3, 'setState')
 
         const [subscriber] = getUnnamedConnectionSubscribers(
-          options1.testConnectionId
+          options1.testConnectionId,
         )
         subscriber({
           type: 'ACTION',
@@ -1150,17 +1150,17 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2 }
         const initialState3 = { count: 5 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
 
         const [connectionSubscriber] = getUnnamedConnectionSubscribers(
-          options1.testConnectionId
+          options1.testConnectionId,
         )
         connectionSubscriber({
           type: 'ACTION',
@@ -1180,13 +1180,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2 }
         const initialState3 = { count: 5 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         ;(api1 as any).dispatch = vi.fn()
         ;(api2 as any).dispatch = vi.fn()
@@ -1198,7 +1198,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const subscribers = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         const testPayload = {
           type: 'ACTION',
@@ -1225,13 +1225,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2 }
         const initialState3 = { count: 5 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         ;(api1 as any).dispatch = vi.fn()
         ;(api1 as any).dispatchFromDevtools = true
@@ -1246,7 +1246,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const subscribers = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         const getTestPayload = (n: number) => ({
           type: 'ACTION',
@@ -1279,13 +1279,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2 }
         const initialState3 = { count: 5 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         ;(api1 as any).dispatch = vi.fn()
         ;(api1 as any).dispatchFromDevtools = true
@@ -1306,7 +1306,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         expect(() => {
           connectionSubscriber1({
@@ -1323,7 +1323,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
 
         expect(() => {
@@ -1341,7 +1341,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
 
         expect(() => {
@@ -1359,7 +1359,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
 
         expect(() => {
@@ -1370,7 +1370,7 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           4,
-          '[zustand devtools middleware] Unsupported action format'
+          '[zustand devtools middleware] Unsupported action format',
         )
         expect(() => {
           connectionSubscriber2({
@@ -1380,7 +1380,7 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           5,
-          '[zustand devtools middleware] Unsupported action format'
+          '[zustand devtools middleware] Unsupported action format',
         )
         expect(() => {
           connectionSubscriber3({
@@ -1390,7 +1390,7 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           6,
-          '[zustand devtools middleware] Unsupported action format'
+          '[zustand devtools middleware] Unsupported action format',
         )
 
         expect(api1.getState()).toBe(initialState1)
@@ -1416,13 +1416,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2 }
         const initialState3 = { count: 5 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         api1.setState({ count: 1 })
         api2.setState({ count: 3 })
@@ -1431,14 +1431,14 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         const [connection1, connection2, connection3] = connections
         connections.forEach((conn) => conn.send.mockClear())
         const subscribers = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         const action = {
           type: 'DISPATCH',
@@ -1463,13 +1463,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2 }
         const initialState3 = { count: 5 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         api1.setState({ count: 1 })
         api2.setState({ count: 3 })
@@ -1481,13 +1481,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const subscribers = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         const action = {
           type: 'DISPATCH',
@@ -1512,13 +1512,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: () => {} }
         const initialState3 = { count: 5, increment: () => {} }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const newState1 = { foo: 'bar1' }
         const newState2 = { foo: 'bar2' }
@@ -1527,7 +1527,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const [
@@ -1537,7 +1537,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connectionSubscriber1({
           type: 'DISPATCH',
@@ -1594,13 +1594,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: increment2 }
         const initialState3 = { count: 5, increment: increment3 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const originalConsoleError = console.error
         console.error = vi.fn()
@@ -1608,7 +1608,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.init.mockClear())
         connections.forEach((conn) => conn.send.mockClear())
@@ -1619,7 +1619,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connectionSubscriber1({
           type: 'DISPATCH',
@@ -1634,7 +1634,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         connectionSubscriber2({
           type: 'DISPATCH',
@@ -1649,7 +1649,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         connectionSubscriber3({
           type: 'DISPATCH',
@@ -1664,7 +1664,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
 
         expect(api1.getState()).toBe(initialState1)
@@ -1692,13 +1692,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: increment2 }
         const initialState3 = { count: 5, increment: increment3 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const newState1 = { foo: 'bar1' }
         const newState2 = { foo: 'bar2' }
@@ -1707,7 +1707,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const [
@@ -1717,7 +1717,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connectionSubscriber1({
           type: 'DISPATCH',
@@ -1758,13 +1758,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: increment2 }
         const initialState3 = { count: 5, increment: increment3 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const originalConsoleError = console.error
         console.error = vi.fn()
@@ -1772,7 +1772,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const [
@@ -1782,7 +1782,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
 
         connectionSubscriber1({
@@ -1798,7 +1798,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         connectionSubscriber2({
           type: 'DISPATCH',
@@ -1813,7 +1813,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         connectionSubscriber3({
           type: 'DISPATCH',
@@ -1828,7 +1828,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
 
         expect(api1.getState()).toBe(initialState1)
@@ -1853,13 +1853,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: increment2 }
         const initialState3 = { count: 5, increment: increment3 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const newState1 = { foo: 'bar1' }
         const newState2 = { foo: 'bar2' }
@@ -1868,7 +1868,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const [
@@ -1878,7 +1878,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
 
         connectionSubscriber1({
@@ -1920,13 +1920,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: increment2 }
         const initialState3 = { count: 5, increment: increment3 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const originalConsoleError = console.error
         console.error = vi.fn()
@@ -1934,7 +1934,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const [
@@ -1944,7 +1944,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connectionSubscriber1({
           type: 'DISPATCH',
@@ -1959,7 +1959,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         connectionSubscriber2({
           type: 'DISPATCH',
@@ -1974,7 +1974,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
         connectionSubscriber3({
           type: 'DISPATCH',
@@ -1989,7 +1989,7 @@ describe('when create devtools was called multiple times with `name` option unde
             } catch (e) {
               return e
             }
-          })()
+          })(),
         )
 
         expect(api1.getState()).toBe(initialState1)
@@ -2008,13 +2008,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const initialState2 = { count: 2, increment: increment2 }
         const initialState3 = { count: 5, increment: increment3 }
         const api1 = createStore(
-          devtools(() => initialState1, { enabled: true, ...options1 })
+          devtools(() => initialState1, { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => initialState2, { enabled: true, ...options2 })
+          devtools(() => initialState2, { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => initialState3, { enabled: true, ...options3 })
+          devtools(() => initialState3, { enabled: true, ...options3 }),
         )
         const nextLiftedState1 = {
           computedStates: [{ state: { count: 4 } }, { state: { count: 5 } }],
@@ -2029,7 +2029,7 @@ describe('when create devtools was called multiple times with `name` option unde
         const connections = getUnnamedConnectionApis(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
         connections.forEach((conn) => conn.send.mockClear())
         const [
@@ -2039,7 +2039,7 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
 
         connectionSubscriber1({
@@ -2079,15 +2079,15 @@ describe('when create devtools was called multiple times with `name` option unde
         const [connection1, connection2, connection3] = connections
         expect(connection1.send).toHaveBeenLastCalledWith(
           null,
-          nextLiftedState1
+          nextLiftedState1,
         )
         expect(connection2.send).toHaveBeenLastCalledWith(
           null,
-          nextLiftedState2
+          nextLiftedState2,
         )
         expect(connection3.send).toHaveBeenLastCalledWith(
           null,
-          nextLiftedState3
+          nextLiftedState3,
         )
       })
 
@@ -2096,13 +2096,13 @@ describe('when create devtools was called multiple times with `name` option unde
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
         const api1 = createStore(
-          devtools(() => ({ count: 0 }), { enabled: true, ...options1 })
+          devtools(() => ({ count: 0 }), { enabled: true, ...options1 }),
         )
         const api2 = createStore(
-          devtools(() => ({ count: 2 }), { enabled: true, ...options2 })
+          devtools(() => ({ count: 2 }), { enabled: true, ...options2 }),
         )
         const api3 = createStore(
-          devtools(() => ({ count: 4 }), { enabled: true, ...options3 })
+          devtools(() => ({ count: 4 }), { enabled: true, ...options3 }),
         )
 
         const newState1 = { count: 1 }
@@ -2116,7 +2116,7 @@ describe('when create devtools was called multiple times with `name` option unde
           getUnnamedConnectionApis(
             options1.testConnectionId,
             options2.testConnectionId,
-            options3.testConnectionId
+            options3.testConnectionId,
           )
         const [
           connectionSubscriber1,
@@ -2125,12 +2125,12 @@ describe('when create devtools was called multiple times with `name` option unde
         ] = getUnnamedConnectionSubscribers(
           options1.testConnectionId,
           options2.testConnectionId,
-          options3.testConnectionId
+          options3.testConnectionId,
         )
 
         expect(connection1.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          newState1
+          newState1,
         )
         connectionSubscriber1({
           type: 'DISPATCH',
@@ -2139,7 +2139,7 @@ describe('when create devtools was called multiple times with `name` option unde
         api1.setState({ count: 2 }, false, 'increment')
         expect(connection1.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          newState1
+          newState1,
         )
         connectionSubscriber1({
           type: 'DISPATCH',
@@ -2148,12 +2148,12 @@ describe('when create devtools was called multiple times with `name` option unde
         api1.setState({ count: 3 }, false, 'increment')
         expect(connection1.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          { count: 3 }
+          { count: 3 },
         )
 
         expect(connection2.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          newState2
+          newState2,
         )
         connectionSubscriber2({
           type: 'DISPATCH',
@@ -2162,7 +2162,7 @@ describe('when create devtools was called multiple times with `name` option unde
         api2.setState({ count: 2 }, false, 'increment')
         expect(connection2.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          newState2
+          newState2,
         )
         connectionSubscriber2({
           type: 'DISPATCH',
@@ -2171,12 +2171,12 @@ describe('when create devtools was called multiple times with `name` option unde
         api2.setState({ count: 3 }, false, 'increment')
         expect(connection2.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          { count: 3 }
+          { count: 3 },
         )
 
         expect(connection3.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          newState3
+          newState3,
         )
         connectionSubscriber3({
           type: 'DISPATCH',
@@ -2185,7 +2185,7 @@ describe('when create devtools was called multiple times with `name` option unde
         api3.setState({ count: 2 }, false, 'increment')
         expect(connection3.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          newState3
+          newState3,
         )
         connectionSubscriber3({
           type: 'DISPATCH',
@@ -2194,7 +2194,7 @@ describe('when create devtools was called multiple times with `name` option unde
         api3.setState({ count: 3 }, false, 'increment')
         expect(connection3.send).toHaveBeenLastCalledWith(
           { type: 'increment' },
-          { count: 3 }
+          { count: 3 },
         )
       })
     })
@@ -2211,7 +2211,7 @@ describe('when create devtools was called multiple times with `name` and `store`
           enabled: true,
         }
         const api = createStore(
-          devtools(() => ({ count: 0, foo: 'bar' }), options)
+          devtools(() => ({ count: 0, foo: 'bar' }), options),
         )
 
         const testStateActionType = 'testSetStateName'
@@ -2220,7 +2220,7 @@ describe('when create devtools was called multiple times with `name` and `store`
         const [connection] = getNamedConnectionApis(options.name)
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/${testStateActionType}` },
-          { [options.store]: { count: 10, foo: 'bar' } }
+          { [options.store]: { count: 10, foo: 'bar' } },
         )
 
         api.setState({ count: 15 }, false, {
@@ -2229,13 +2229,13 @@ describe('when create devtools was called multiple times with `name` and `store`
         })
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/${testStateActionType}`, payload: 15 },
-          { [options.store]: { count: 15, foo: 'bar' } }
+          { [options.store]: { count: 15, foo: 'bar' } },
         )
 
         api.setState({ count: 5, foo: 'baz' }, true)
         expect(connection.send).toHaveBeenLastCalledWith(
           { type: `${options.store}/anonymous` },
-          { [options.store]: { count: 5, foo: 'baz' } }
+          { [options.store]: { count: 5, foo: 'baz' } },
         )
       })
     })
@@ -2253,25 +2253,25 @@ describe('when create devtools was called multiple times with `name` and `store`
             devtools(() => initialState1, {
               enabled: true,
               ...options1,
-            })
+            }),
           )
           const api2 = createStore(
             devtools(() => initialState2, {
               enabled: true,
               ...options1,
-            })
+            }),
           )
           const api3 = createStore(
             devtools(() => initialState3, {
               enabled: true,
               ...options2,
-            })
+            }),
           )
           const api4 = createStore(
             devtools(() => initialState4, {
               enabled: true,
               ...options2,
-            })
+            }),
           )
           const setState1 = vi.spyOn(api1, 'setState')
           const setState2 = vi.spyOn(api2, 'setState')
@@ -2279,7 +2279,7 @@ describe('when create devtools was called multiple times with `name` and `store`
           const setState4 = vi.spyOn(api4, 'setState')
 
           const [subscriber] = getUnnamedConnectionSubscribers(
-            options1.testConnectionId
+            options1.testConnectionId,
           )
           subscriber({
             type: 'ACTION',
@@ -2314,16 +2314,16 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            devtools(() => initialState1, { enabled: true, ...options1 })
+            devtools(() => initialState1, { enabled: true, ...options1 }),
           )
           const api2 = createStore(
-            devtools(() => initialState2, { enabled: true, ...options2 })
+            devtools(() => initialState2, { enabled: true, ...options2 }),
           )
           const originalConsoleError = console.error
           console.error = vi.fn()
 
           const [connectionSubscriber] = getNamedConnectionSubscribers(
-            getKeyFromOptions(options1)
+            getKeyFromOptions(options1),
           )
           connectionSubscriber({
             type: 'ACTION',
@@ -2333,8 +2333,8 @@ describe('when create devtools was called multiple times with `name` and `store`
 
           expect(console.error).toHaveBeenCalledWith(
             expect.stringContaining(
-              '[zustand devtools middleware] Unsupported __setState'
-            )
+              '[zustand devtools middleware] Unsupported __setState',
+            ),
           )
           connectionSubscriber({
             type: 'ACTION',
@@ -2374,10 +2374,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            newDevtools(() => initialState1, { enabled: true, ...options1 })
+            newDevtools(() => initialState1, { enabled: true, ...options1 }),
           )
           const api2 = createStore(
-            newDevtools(() => initialState2, { enabled: true, ...options2 })
+            newDevtools(() => initialState2, { enabled: true, ...options2 }),
           )
           ;(api1 as any).dispatch = vi.fn()
           ;(api2 as any).dispatch = vi.fn()
@@ -2386,7 +2386,7 @@ describe('when create devtools was called multiple times with `name` and `store`
 
           const subscribers = getNamedConnectionSubscribers(
             getKeyFromOptions(options1),
-            getKeyFromOptions(options2)
+            getKeyFromOptions(options2),
           )
           const testPayload = {
             type: 'ACTION',
@@ -2423,10 +2423,10 @@ describe('when create devtools was called multiple times with `name` and `store`
           const initialState1 = { count: 0 }
           const initialState2 = { count: 2 }
           const api1 = createStore(
-            newDevtools(() => initialState1, { enabled: true, ...options1 })
+            newDevtools(() => initialState1, { enabled: true, ...options1 }),
           )
           const api2 = createStore(
-            newDevtools(() => initialState2, { enabled: true, ...options2 })
+            newDevtools(() => initialState2, { enabled: true, ...options2 }),
           )
           ;(api1 as any).dispatch = vi.fn()
           ;(api1 as any).dispatchFromDevtools = true
@@ -2437,7 +2437,7 @@ describe('when create devtools was called multiple times with `name` and `store`
 
           const subscribers = getNamedConnectionSubscribers(
             getKeyFromOptions(options1),
-            getKeyFromOptions(options2)
+            getKeyFromOptions(options2),
           )
           const getTestPayload = (n: number) => ({
             type: 'ACTION',
