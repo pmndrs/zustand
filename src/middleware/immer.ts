@@ -7,7 +7,7 @@ type Immer = <
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
-  initializer: StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs>
+  initializer: StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs>,
 ) => StateCreator<T, Mps, [['zustand/immer', never], ...Mcs]>
 
 declare module '../vanilla' {
@@ -50,7 +50,7 @@ type StoreImmer<S> = S extends {
   : never
 
 type ImmerImpl = <T>(
-  storeInitializer: StateCreator<T, [], []>
+  storeInitializer: StateCreator<T, [], []>,
 ) => StateCreator<T, [], []>
 
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {

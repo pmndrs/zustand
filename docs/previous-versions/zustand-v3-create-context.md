@@ -96,7 +96,8 @@ export default function App({ initialBears }) {
           bears: initialBears,
           increase: () => set((state) => ({ bears: state.bears + 1 })),
         }))
-      }>
+      }
+    >
       <Button />
     </Provider>
   )

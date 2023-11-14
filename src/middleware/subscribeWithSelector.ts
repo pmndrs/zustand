@@ -9,7 +9,7 @@ type SubscribeWithSelector = <
     T,
     [...Mps, ['zustand/subscribeWithSelector', never]],
     Mcs
-  >
+  >,
 ) => StateCreator<T, Mps, [['zustand/subscribeWithSelector', never], ...Mcs]>
 
 type Write<T, U> = Omit<T, keyof U> & U
@@ -34,13 +34,13 @@ type StoreSubscribeWithSelector<T> = {
       options?: {
         equalityFn?: (a: U, b: U) => boolean
         fireImmediately?: boolean
-      }
+      },
     ): () => void
   }
 }
 
 type SubscribeWithSelectorImpl = <T extends object>(
-  storeInitializer: StateCreator<T, [], []>
+  storeInitializer: StateCreator<T, [], []>,
 ) => StateCreator<T, [], []>
 
 const subscribeWithSelectorImpl: SubscribeWithSelectorImpl =

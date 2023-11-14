@@ -249,7 +249,7 @@ export default mergeConfig(
       environment: 'jsdom',
       setupFiles: ['./setup-vitest.ts'],
     },
-  })
+  }),
 )
 ```
 
@@ -302,7 +302,7 @@ export const createCounterStore = () => {
 }
 
 export const CounterStoreContext = createContext<StoreApi<CounterStore>>(
-  null as never
+  null as never,
 )
 
 export type CounterStoreProviderProps = PropsWithChildren
@@ -322,13 +322,13 @@ export const CounterStoreProvider = ({
 export type UseCounterStoreContextSelector<T> = (store: CounterStore) => T
 
 export const useCounterStoreContext = <T,>(
-  selector: UseCounterStoreContextSelector<T>
+  selector: UseCounterStoreContextSelector<T>,
 ): T => {
   const counterStoreContext = useContext(CounterStoreContext)
 
   if (counterStoreContext === undefined) {
     throw new Error(
-      'useCounterStoreContext must be used within CounterStoreProvider'
+      'useCounterStoreContext must be used within CounterStoreProvider',
     )
   }
 
@@ -371,7 +371,7 @@ describe('Counter', () => {
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
     expect(
-      await screen.findByRole('button', { name: /one up/i })
+      await screen.findByRole('button', { name: /one up/i }),
     ).toBeInTheDocument()
   })
 
@@ -441,7 +441,7 @@ describe('CounterWithContext', () => {
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
     expect(
-      await screen.findByRole('button', { name: /one up/i })
+      await screen.findByRole('button', { name: /one up/i }),
     ).toBeInTheDocument()
   })
 

@@ -47,7 +47,7 @@ export const useCountStore = create<State & Actions>()(
       set((state) => {
         state.count -= qty
       }),
-  }))
+  })),
 )
 ```
 
@@ -99,7 +99,7 @@ export const useTodoStore = create<State & Actions>()(
       set((state) => {
         state.todos[todoId].done = !state.todos[todoId].done
       }),
-  }))
+  })),
 )
 ```
 

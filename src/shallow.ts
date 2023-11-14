@@ -10,7 +10,7 @@ import { shallow } from './vanilla/shallow.ts'
 export default ((objA, objB) => {
   if (import.meta.env?.MODE !== 'production') {
     console.warn(
-      "[DEPRECATED] Default export is deprecated. Instead use `import { shallow } from 'zustand/shallow'`."
+      "[DEPRECATED] Default export is deprecated. Instead use `import { shallow } from 'zustand/shallow'`.",
     )
   }
   return shallow(objA, objB)

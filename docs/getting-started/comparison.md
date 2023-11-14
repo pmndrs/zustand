@@ -326,7 +326,7 @@ type State = {
 
 type Actions = {
   updateCount: (
-    countCallback: (count: State['count']) => State['count']
+    countCallback: (count: State['count']) => State['count'],
   ) => void
 }
 
@@ -362,7 +362,7 @@ type State = {
 
 type Actions = {
   updateCount: (
-    countCallback: (count: State['count']) => State['count']
+    countCallback: (count: State['count']) => State['count'],
   ) => void
 }
 

@@ -43,7 +43,7 @@ it('creates and uses context store', async () => {
       <Provider createStore={createStore}>
         <Counter />
       </Provider>
-    </>
+    </>,
   )
 
   await findByText('count: 1')
@@ -70,7 +70,7 @@ it('uses context store with selectors', async () => {
       <Provider createStore={createStore}>
         <Counter />
       </Provider>
-    </>
+    </>,
   )
 
   await findByText('count: 1')
@@ -82,7 +82,7 @@ it('uses context store api', async () => {
       subscribeWithSelector((set) => ({
         count: 0,
         inc: () => set((state) => ({ count: state.count + 1 })),
-      }))
+      })),
     )
 
   type CustomStore = ReturnType<typeof createStore>
@@ -95,9 +95,9 @@ it('uses context store api', async () => {
       () =>
         storeApi.subscribe(
           (state) => state.count,
-          () => setCount(storeApi.getState().count)
+          () => setCount(storeApi.getState().count),
         ),
-      [storeApi]
+      [storeApi],
     )
     useEffect(() => {
       storeApi.setState({ count: storeApi.getState().count + 1 })
@@ -116,7 +116,7 @@ it('uses context store api', async () => {
       <Provider createStore={createStore}>
         <Counter />
       </Provider>
-    </>
+    </>,
   )
 
   await findByText('count: 1')
@@ -152,7 +152,7 @@ it('throws error when not using provider', async () => {
       <ErrorBoundary>
         <Component />
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   )
   await findByText('errored')
 })
@@ -169,6 +169,6 @@ const expectAreTypesEqual = <A, B>() => ({
   toBe: (
     _: (<T>() => T extends B ? 1 : 0) extends <T>() => T extends A ? 1 : 0
       ? true
-      : false
+      : false,
   ) => {},
 })
