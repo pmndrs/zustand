@@ -36,6 +36,9 @@ npm install zustand
 
 # Yarn
 yarn add zustand
+
+# Bun
+bun add zustand
 ```
 
 ## First create a store
