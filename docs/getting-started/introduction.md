@@ -33,12 +33,7 @@ Zustand is available as a package on NPM for use:
 ```bash
 # NPM
 npm install zustand
-
-# Yarn
-yarn add zustand
-
-# Bun
-bun add zustand
+# Or, use any package manager of your choice.
 ```
 
 ## First create a store
