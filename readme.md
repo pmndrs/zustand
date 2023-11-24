@@ -164,6 +164,8 @@ const useSoundStore = create((set, get) => ({
 
 Sometimes you need to access state in a non-reactive way or act upon the store. For these cases, the resulting hook has utility functions attached to its prototype.
 
+:warning: This technique is not recommended for adding state in [React Server Components](https://github.com/reactjs/rfcs/blob/main/text/0188-server-components.md) (typically in Next.js 13 and above). It can lead to unexpected bugs and privacy issues for your users. For more details, see [#2200](https://github.com/pmndrs/zustand/discussions/2200).
+
 ```jsx
 const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
 
