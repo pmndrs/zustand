@@ -73,7 +73,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     if (!Object.is(nextState, state)) {
       const previousState = state
       state =
-        replace ?? typeof nextState !== 'object'
+        replace ?? (typeof nextState !== 'object' || nextState === null)
           ? (nextState as TState)
           : Object.assign({}, state, nextState)
       listeners.forEach((listener) => listener(state, previousState))
