@@ -58,53 +58,53 @@ If you want the URL params to always populate, the conditional check on `getUrlS
 The implementation below will update the URL in place, without refresh, as the relevant states change.
 
 ```ts
-import { create } from "zustand";
-import { persist, StateStorage, createJSONStorage } from "zustand/middleware";
+import { create } from 'zustand'
+import { persist, StateStorage, createJSONStorage } from 'zustand/middleware'
 
 const getUrlSearch = () => {
-  return window.location.search.slice(1);
-};
+  return window.location.search.slice(1)
+}
 
 const persistentStorage: StateStorage = {
   getItem: (key): string => {
     // Check URL first
     if (getUrlSearch()) {
-      const searchParams = new URLSearchParams(getUrlSearch());
-      const storedValue = searchParams.get(key);
-      return JSON.parse(storedValue as string);
+      const searchParams = new URLSearchParams(getUrlSearch())
+      const storedValue = searchParams.get(key)
+      return JSON.parse(storedValue as string)
     } else {
       // Otherwise, we should load from localstorage or alternative storage
-      return JSON.parse(localStorage.getItem(key) as string);
+      return JSON.parse(localStorage.getItem(key) as string)
     }
   },
   setItem: (key, newValue): void => {
     // Check if query params exist at all, can remove check if always want to set URL
     if (getUrlSearch()) {
-      const searchParams = new URLSearchParams(getUrlSearch());
-      searchParams.set(key, JSON.stringify(newValue));
-      window.history.replaceState(null, "", `?${searchParams.toString()}`);
+      const searchParams = new URLSearchParams(getUrlSearch())
+      searchParams.set(key, JSON.stringify(newValue))
+      window.history.replaceState(null, '', `?${searchParams.toString()}`)
     }
 
-    localStorage.setItem(key, JSON.stringify(newValue));
+    localStorage.setItem(key, JSON.stringify(newValue))
   },
   removeItem: (key): void => {
-    const searchParams = new URLSearchParams(getUrlSearch());
-    searchParams.delete(key);
-    window.location.search = searchParams.toString();
+    const searchParams = new URLSearchParams(getUrlSearch())
+    searchParams.delete(key)
+    window.location.search = searchParams.toString()
   },
-};
+}
 
 type LocalAndUrlStore = {
-  typesOfFish: string[];
-  addTypeOfFish: (fishType: string) => void;
-  numberOfBears: number;
-  setNumberOfBears: (newNumber: number) => void;
-};
+  typesOfFish: string[]
+  addTypeOfFish: (fishType: string) => void
+  numberOfBears: number
+  setNumberOfBears: (newNumber: number) => void
+}
 
 const storageOptions = {
-  name: "fishAndBearsStore",
+  name: 'fishAndBearsStore',
   storage: createJSONStorage<LocalAndUrlStore>(() => persistentStorage),
-};
+}
 
 const useLocalAndUrlStore = create(
   persist<LocalAndUrlStore>(
@@ -119,9 +119,9 @@ const useLocalAndUrlStore = create(
     }),
     storageOptions,
   ),
-);
+)
 
-export default useLocalAndUrlStore;
+export default useLocalAndUrlStore
 ```
 
 When generating the URL from a component, you can call buildShareableUrl:
