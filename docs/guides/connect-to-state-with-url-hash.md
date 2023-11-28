@@ -114,8 +114,8 @@ const useLocalAndUrlStore = create(
         set((state) => ({ typesOfFish: [...state.typesOfFish, fishType] })),
 
       numberOfBears: 0,
-      setNumberOfBears: (newNumber) =>
-        set(() => ({ numberOfBears: newNumber })),
+      setNumberOfBears: (numberOfBears) =>
+        set(() => ({ numberOfBears })),
     }),
     storageOptions,
   ),
