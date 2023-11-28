@@ -112,6 +112,24 @@ it('can set the store without merging', () => {
   expect(getState()).toEqual({ b: 2 })
 })
 
+it('can set the object store to null', () => {
+  const { setState, getState } = createStore<{ a: number } | null>(() => ({
+    a: 1,
+  }))
+
+  setState(null)
+
+  expect(getState()).toEqual(null)
+})
+
+it('can set the non-object store to null', () => {
+  const { setState, getState } = createStore<string | null>(() => 'value')
+
+  setState(null)
+
+  expect(getState()).toEqual(null)
+})
+
 it('works with non-object state', () => {
   const store = createStore<number>(() => 1)
   const inc = () => store.setState((c) => c + 1)

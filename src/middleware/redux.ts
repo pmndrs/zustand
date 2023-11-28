@@ -3,7 +3,7 @@ import type { NamedSet } from './devtools.ts'
 
 type Write<T, U> = Omit<T, keyof U> & U
 
-type Action = { type: unknown }
+type Action = { type: string }
 
 type StoreRedux<A> = {
   dispatch: (a: A) => A

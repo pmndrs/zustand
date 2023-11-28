@@ -20,10 +20,10 @@ type Get<T, K, F> = K extends keyof T ? T[K] : F
 export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]
   ? S
   : Ms extends []
-  ? S
-  : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
-  ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
-  : never
+    ? S
+    : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+      ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
+      : never
 
 export type StateCreator<
   T,
@@ -73,7 +73,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     if (!Object.is(nextState, state)) {
       const previousState = state
       state =
-        replace ?? typeof nextState !== 'object'
+        replace ?? (typeof nextState !== 'object' || nextState === null)
           ? (nextState as TState)
           : Object.assign({}, state, nextState)
       listeners.forEach((listener) => listener(state, previousState))
