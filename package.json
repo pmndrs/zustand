@@ -251,15 +251,15 @@
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "immer": ">=9.0",
     "@types/react": ">=16.8",
+    "immer": ">=9.0.6",
     "react": ">=16.8"
   },
   "peerDependenciesMeta": {
-    "immer": {
+    "@types/react": {
       "optional": true
     },
-    "@types/react": {
+    "immer": {
       "optional": true
     },
     "react": {
