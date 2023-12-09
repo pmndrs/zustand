@@ -445,13 +445,11 @@ const bearStore = createStore<BearState>()((set) => ({
 function useBearStore(): BearState
 function useBearStore<T>(
   selector: (state: BearState) => T,
-  equals?: (a: T, b: T) => boolean,
 ): T
 function useBearStore<T>(
   selector?: (state: BearState) => T,
-  equals?: (a: T, b: T) => boolean,
 ) {
-  return useStore(bearStore, selector!, equals)
+  return useStore(bearStore, selector!)
 }
 ```
 
@@ -471,14 +469,13 @@ const bearStore = createStore<BearState>()((set) => ({
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
 
-const createBoundedUseStore = ((store) => (selector, equals) =>
-  useStore(store, selector as never, equals)) as <S extends StoreApi<unknown>>(
+const createBoundedUseStore = ((store) => (selector) =>
+  useStore(store, selector as never)) as <S extends StoreApi<unknown>>(
   store: S,
 ) => {
   (): ExtractState<S>
   <T>(
     selector: (state: ExtractState<S>) => T,
-    equals?: (a: T, b: T) => boolean,
   ): T
 }
 
