@@ -10,7 +10,7 @@ import { render } from '@testing-library/react'
 import { afterEach, it, vi } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
-import createContext from 'zustand/context'
+import { createContext } from 'zustand/context'
 import { subscribeWithSelector } from 'zustand/middleware'
 
 const consoleError = console.error

@@ -179,13 +179,12 @@ module.exports = function (args) {
     createCommonJSConfig(`src/${c}.ts`, `dist/${c}`, {
       addModuleExport: {
         index: {
-          default: 'react',
           create: 'create',
           useStore: 'useStore',
           createStore: 'vanilla.createStore',
         },
-        vanilla: { default: 'vanilla', createStore: 'createStore' },
-        shallow: { default: 'shallow', shallow: 'shallow$1' },
+        vanilla: { createStore: 'createStore' },
+        shallow: { shallow: 'shallow$1' },
       }[c],
     }),
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.js`),

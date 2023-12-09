@@ -120,15 +120,3 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
 
 export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
   createState ? createImpl(createState) : createImpl) as Create
-
-/**
- * @deprecated Use `import { create } from 'zustand'`
- */
-export default ((createState: any) => {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn(
-      "[DEPRECATED] Default export is deprecated. Instead use `import { create } from 'zustand'`.",
-    )
-  }
-  return create(createState)
-}) as Create
