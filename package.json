@@ -204,9 +204,6 @@
     "url": "https://github.com/pmndrs/zustand/issues"
   },
   "homepage": "https://github.com/pmndrs/zustand",
-  "dependencies": {
-    "use-sync-external-store": "1.2.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.23.3",
     "@babel/plugin-external-helpers": "^7.23.3",
@@ -251,21 +248,26 @@
     "rollup-plugin-esbuild": "^6.1.0",
     "shx": "^0.3.4",
     "typescript": "^5.3.2",
+    "use-sync-external-store": "^1.2.0",
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "immer": ">=9.0",
     "@types/react": ">=16.8",
-    "react": ">=16.8"
+    "immer": ">=9.0",
+    "react": ">=16.8",
+    "use-sync-external-store": ">=1.2.0"
   },
   "peerDependenciesMeta": {
-    "immer": {
-      "optional": true
-    },
     "@types/react": {
       "optional": true
     },
+    "immer": {
+      "optional": true
+    },
     "react": {
+      "optional": true
+    },
+    "use-sync-external-store": {
       "optional": true
     }
   },
