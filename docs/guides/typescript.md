@@ -443,12 +443,8 @@ const bearStore = createStore<BearState>()((set) => ({
 }))
 
 function useBearStore(): BearState
-function useBearStore<T>(
-  selector: (state: BearState) => T,
-): T
-function useBearStore<T>(
-  selector?: (state: BearState) => T,
-) {
+function useBearStore<T>(selector: (state: BearState) => T): T
+function useBearStore<T>(selector?: (state: BearState) => T) {
   return useStore(bearStore, selector!)
 }
 ```
@@ -474,9 +470,7 @@ const createBoundedUseStore = ((store) => (selector) =>
   store: S,
 ) => {
   (): ExtractState<S>
-  <T>(
-    selector: (state: ExtractState<S>) => T,
-  ): T
+  <T>(selector: (state: ExtractState<S>) => T): T
 }
 
 type ExtractState<S> = S extends { getState: () => infer X } ? X : never
