@@ -30,7 +30,6 @@ it('creates a store hook and api object', () => {
         [Function],
         [Function],
         {
-          "destroy": [Function],
           "getState": [Function],
           "setState": [Function],
           "subscribe": [Function],
@@ -470,20 +469,6 @@ it('can set the store without merging', () => {
   // Should override the state instead of merging.
   setState({ b: 2 }, true)
   expect(getState()).toEqual({ b: 2 })
-})
-
-it('can destroy the store', () => {
-  const { destroy, getState, setState, subscribe } = create(() => ({
-    value: 1,
-  }))
-
-  subscribe(() => {
-    throw new Error('did not clear listener on destroy')
-  })
-  destroy()
-
-  setState({ value: 2 })
-  expect(getState().value).toEqual(2)
 })
 
 it('only calls selectors when necessary', async () => {
