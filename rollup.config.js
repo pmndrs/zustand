@@ -87,11 +87,9 @@ function createCommonJSConfig(input, output, options) {
       esModule: false,
       outro: options.addModuleExport
         ? [
-            `module.exports = ${options.addModuleExport.default};`,
-            ...Object.entries(options.addModuleExport)
-              .filter(([key]) => key !== 'default')
-              .map(([key, value]) => `module.exports.${key} = ${value};`),
-            `exports.default = module.exports;`,
+            ...Object.entries(options.addModuleExport).map(
+              ([key, value]) => `module.exports.${key} = ${value};`,
+            ),
           ].join('\n')
         : '',
     },
