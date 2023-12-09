@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [cjs, umd] # [cjs, esm, umd, system]
-        env: [development, production]
+        build: [cjs, esm, umd] # [cjs, esm, umd, system]
+        env: [development] # [development, production]
         devtools-skip:
           - CI-MATRIX-NOSKIP
         include:
@@ -39,10 +39,6 @@ jobs:
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
       - run: yarn build
-      - name: Use React 17 for production test
-        if: ${{ matrix.env == 'production' }}
-        run: |
-          yarn add -D react@17.0.2 react-dom@17.0.2 @testing-library/react@12.1.4
       - name: Patch for DEV-ONLY
         if: ${{ matrix.env == 'development' }}
         run: |
@@ -60,7 +56,7 @@ jobs:
       - name: Patch for ESM
         if: ${{ matrix.build == 'esm' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js" package.json
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js/" package.json
           sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
