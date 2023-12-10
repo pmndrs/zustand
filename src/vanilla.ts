@@ -105,18 +105,6 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 export const createStore = ((createState) =>
   createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
 
-/**
- * @deprecated Use `import { createStore } from 'zustand/vanilla'`
- */
-export default ((createState) => {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn(
-      "[DEPRECATED] Default export is deprecated. Instead use import { createStore } from 'zustand/vanilla'.",
-    )
-  }
-  return createStore(createState)
-}) as CreateStore
-
 // ---------------------------------------------------------
 
 /**

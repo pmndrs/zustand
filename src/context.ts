@@ -37,7 +37,7 @@ type WithoutCallSignature<T> = { [K in keyof T]: T[K] }
 /**
  * @deprecated Use `createStore` and `useStore` for context usage
  */
-function createContext<S extends StoreApi<unknown>>() {
+export function createContext<S extends StoreApi<unknown>>() {
   if (import.meta.env?.MODE !== 'production') {
     console.warn(
       "[DEPRECATED] `context` will be removed in a future version. Instead use `import { createStore, useStore } from 'zustand'`. See: https://github.com/pmndrs/zustand/discussions/1180.",
@@ -98,5 +98,3 @@ function createContext<S extends StoreApi<unknown>>() {
     useStoreApi,
   }
 }
-
-export default createContext
