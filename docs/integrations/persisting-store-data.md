@@ -630,7 +630,7 @@ export const useBoundStore = create(
 )
 ```
 
-If you're using a type that JSON.stringify() doesn't support, you'll need to write your own serialization/deserialization code. However, if this is tedious, you can use third-party libraries to serialize and deserialize different types of data.
+If you're using a type that `JSON.stringify()` doesn't support, you'll need to write your own serialization/deserialization code. However, if this is tedious, you can use third-party libraries to serialize and deserialize different types of data.
 
 For example, [Superjson](https://github.com/blitz-js/superjson) can serialize data along with its type, allowing the data to be parsed back to its original type upon deserialization
 
@@ -735,15 +735,10 @@ export const useBearStore = create<MyState>()(
 
 ### How do I use it with Map and Set
 
-With the previous persist API, you would use `serialize`/`deserialize`
-to deal with `Map` and `Set` and convert them into
-an Array so they could be parsed into proper JSON.
+In order to persist object types such as `Map` and `Set`, they will need to be converted to JSON-serializable types such as an `Array` which can be done by defining a custom `storage` engine.
 
-The new persist API has deprecated `serialize`/`deserialize`.
-
-Now, you will need to use the `storage` prop.
 Let's say your state uses `Map` to handle a list of `transactions`,
-then you can convert the Map into an Array in the storage prop:
+then you can convert the `Map` into an `Array` in the `storage` prop which is shown below:
 
 ```ts
 
