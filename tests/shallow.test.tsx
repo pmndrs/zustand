@@ -3,11 +3,12 @@ import { act, fireEvent, render } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
+import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
 
 describe('types', () => {
   it('works with useBoundStore and array selector (#1107)', () => {
-    const useBoundStore = create(() => ({
+    const useBoundStore = createWithEqualityFn(() => ({
       villages: [] as { name: string }[],
     }))
     const Component = () => {
@@ -18,7 +19,7 @@ describe('types', () => {
   })
 
   it('works with useBoundStore and string selector (#1107)', () => {
-    const useBoundStore = create(() => ({
+    const useBoundStore = createWithEqualityFn(() => ({
       refetchTimestamp: '',
     }))
     const Component = () => {
