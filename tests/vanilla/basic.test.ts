@@ -22,14 +22,12 @@ it('create a store', () => {
         [Function],
         [Function],
         {
-          "destroy": [Function],
           "getState": [Function],
           "setState": [Function],
           "subscribe": [Function],
         },
       ],
       "result": {
-        "destroy": [Function],
         "getState": [Function],
         "setState": [Function],
         "subscribe": [Function],
@@ -137,18 +135,4 @@ it('works with non-object state', () => {
   inc()
 
   expect(store.getState()).toBe(2)
-})
-
-it('can destroy the store', () => {
-  const { destroy, getState, setState, subscribe } = createStore(() => ({
-    value: 1,
-  }))
-
-  subscribe(() => {
-    throw new Error('did not clear listener on destroy')
-  })
-  destroy()
-
-  setState({ value: 2 })
-  expect(getState().value).toEqual(2)
 })
