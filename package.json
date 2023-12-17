@@ -9,18 +9,23 @@
   "main": "./index.js",
   "types": "./index.d.ts",
   "typesVersions": {
-    "<4.0": {
+    ">=4.0": {
       "esm/*": [
-        "ts3.4/*"
+        "esm/*"
       ],
       "*": [
-        "ts3.4/*"
+        "*"
+      ]
+    },
+    "*": {
+      "esm/*": [
+        "ts_version_4.0_and_above_is_required.d.ts"
+      ],
+      "*": [
+        "ts_version_4.0_and_above_is_required.d.ts"
       ]
     }
   },
-  "files": [
-    "**"
-  ],
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -136,6 +141,9 @@
       }
     }
   },
+  "files": [
+    "**"
+  ],
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
@@ -148,7 +156,7 @@
     "build:vanilla:shallow": "rollup -c --config-vanilla_shallow",
     "build:react:shallow": "rollup -c --config-react_shallow",
     "build:traditional": "rollup -c --config-traditional",
-    "postbuild": "yarn patch-d-ts && yarn copy && yarn patch-esm-ts",
+    "postbuild": "yarn patch-d-ts && yarn copy && yarn patch-old-ts && yarn patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
     "prettier:ci": "prettier '*.{js,json,md}' '{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
     "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'",
@@ -157,7 +165,8 @@
     "test": "vitest --ui --coverage",
     "test:ci": "vitest",
     "patch-d-ts": "node -e \"var {entries}=require('./rollup.config.js');require('shelljs').find('dist/**/*.d.ts').forEach(f=>{entries.forEach(({find,replacement})=>require('shelljs').sed('-i',new RegExp(' from \\''+find.source.slice(0,-1)+'\\';$'),' from \\''+replacement+'\\';',f));require('shelljs').sed('-i',/ from '(\\.[^']+)\\.ts';$/,' from \\'\\$1\\';',f)})\"",
-    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
+    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
+    "patch-old-ts": "shx touch dist/ts_version_4.0_and_above_is_required.d.ts",
     "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').copyFileSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
   },
   "engines": {
@@ -212,7 +221,6 @@
     "@vitest/coverage-v8": "^0.34.6",
     "@vitest/ui": "^0.34.6",
     "concurrently": "^8.2.2",
-    "downlevel-dts": "^0.11.0",
     "esbuild": "^0.19.8",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",

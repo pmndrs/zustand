@@ -26,6 +26,7 @@ jobs:
           - 4.3.5
           - 4.2.3
           - 4.1.5
+          - 4.0.5
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
