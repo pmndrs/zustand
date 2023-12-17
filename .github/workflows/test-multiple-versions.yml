@@ -28,29 +28,11 @@ jobs:
       fail-fast: false
       matrix:
         react:
-          - 16.8.0
-          - 17.0.0
           - 18.0.0
           - 18.1.0
           - 18.2.0
           - 18.3.0-canary-6c7b41da3-20231123
           - 0.0.0-experimental-6c7b41da3-20231123
-        devtools-skip:
-          - CI-MATRIX-NOSKIP
-        include:
-          - devtools-skip: CI-MATRIX-[2345]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1345]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1245]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1235]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1234]
-            react: 16.8.0
-        exclude:
-          - devtools-skip: CI-MATRIX-NOSKIP
-            react: 16.8.0
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -59,19 +41,7 @@ jobs:
           cache: yarn
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
-      - name: Install legacy testing-library
-        if: ${{ startsWith(matrix.react, '16.') || startsWith(matrix.react, '17.') }}
-        run: yarn add -D @testing-library/react@12.1.4
-      - name: Patch for React 16
-        if: ${{ startsWith(matrix.react, '16.') }}
-        run: |
-          sed -i~ '1s/^/import React from "react";/' tests/*.tsx
-          sed -i~ 's/"jsx": "react-jsx"/"jsx": "react"/' tsconfig.json
-          sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
-          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
-        env:
-          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
-      - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
+      - name: Test ${{ matrix.react }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
           yarn test:ci

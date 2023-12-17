@@ -239,9 +239,9 @@
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "@types/react": ">=16.8",
+    "@types/react": ">=18.0",
     "immer": ">=9.0.6",
-    "react": ">=16.8"
+    "react": ">=18.0"
   },
   "peerDependenciesMeta": {
     "@types/react": {
