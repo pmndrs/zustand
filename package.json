@@ -134,20 +134,6 @@
         "types": "./traditional.d.ts",
         "default": "./traditional.js"
       }
-    },
-    "./context": {
-      "import": {
-        "types": "./esm/context.d.mts",
-        "default": "./esm/context.mjs"
-      },
-      "module": {
-        "types": "./esm/context.d.ts",
-        "default": "./esm/context.js"
-      },
-      "default": {
-        "types": "./context.d.ts",
-        "default": "./context.js"
-      }
     }
   },
   "sideEffects": false,
@@ -162,7 +148,6 @@
     "build:vanilla:shallow": "rollup -c --config-vanilla_shallow",
     "build:react:shallow": "rollup -c --config-react_shallow",
     "build:traditional": "rollup -c --config-traditional",
-    "build:context": "rollup -c --config-context",
     "postbuild": "yarn patch-d-ts && yarn copy && yarn patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
     "prettier:ci": "prettier '*.{js,json,md}' '{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
@@ -259,6 +244,9 @@
   },
   "peerDependenciesMeta": {
     "@types/react": {
+      "optional": true
+    },
+    "immer": {
       "optional": true
     },
     "immer": {

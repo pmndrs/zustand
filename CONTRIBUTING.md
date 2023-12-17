@@ -70,7 +70,7 @@ you can use this suggested workflow:
 - Create failing tests for your fix or new feature;
 - Implement your changes and confirm that all test are passing.
   You can run the tests continuously during development
-  with the `yarn test:dev` command.
+  with the `yarn test` command.
 - If you want to test it in a React project:
   - Either use `yarn link`, or
   - Use the `yalc` package.
