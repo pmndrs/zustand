@@ -33,22 +33,6 @@ jobs:
           - 18.2.0
           - 18.3.0-canary-6c7b41da3-20231123
           - 0.0.0-experimental-6c7b41da3-20231123
-        devtools-skip:
-          - CI-MATRIX-NOSKIP
-        include:
-          - devtools-skip: CI-MATRIX-[2345]
-            react: 18.0.0
-          - devtools-skip: CI-MATRIX-[1345]
-            react: 18.0.0
-          - devtools-skip: CI-MATRIX-[1245]
-            react: 18.0.0
-          - devtools-skip: CI-MATRIX-[1235]
-            react: 18.0.0
-          - devtools-skip: CI-MATRIX-[1234]
-            react: 18.0.0
-        exclude:
-          - devtools-skip: CI-MATRIX-NOSKIP
-            react: 18.0.0
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -57,7 +41,7 @@ jobs:
           cache: yarn
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - run: yarn install --frozen-lockfile --check-files
-      - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
+      - name: Test ${{ matrix.react }}
         run: |
           yarn add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
           yarn test:ci
