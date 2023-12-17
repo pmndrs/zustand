@@ -112,9 +112,9 @@ it('should have correct (partial) types for setState', () => {
 
   const store = create<Count>((set) => ({
     count: 0,
-    // @ts-expect-error we shouldn't be able to set count to undefined [LATEST-TS-ONLY]
+    // @ts-expect-error we shouldn't be able to set count to undefined
     a: () => set(() => ({ count: undefined })),
-    // @ts-expect-error we shouldn't be able to set count to undefined [LATEST-TS-ONLY]
+    // @ts-expect-error we shouldn't be able to set count to undefined
     b: () => set({ count: undefined }),
     c: () => set({ count: 1 }),
   }))
@@ -130,9 +130,9 @@ it('should have correct (partial) types for setState', () => {
   store.setState({})
   store.setState((previous) => previous)
 
-  // @ts-expect-error type undefined is not assignable to type number [LATEST-TS-ONLY]
+  // @ts-expect-error type undefined is not assignable to type number
   store.setState({ count: undefined })
-  // @ts-expect-error type undefined is not assignable to type number [LATEST-TS-ONLY]
+  // @ts-expect-error type undefined is not assignable to type number
   store.setState((state) => ({ ...state, count: undefined }))
 })
 
