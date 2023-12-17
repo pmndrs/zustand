@@ -237,16 +237,13 @@
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "@types/react": ">=16.8",
-    "immer": ">=9.0",
-    "react": ">=16.8",
+    "@types/react": ">=18.0",
+    "immer": ">=9.0.6",
+    "react": ">=18.0",
     "use-sync-external-store": ">=1.2.0"
   },
   "peerDependenciesMeta": {
     "@types/react": {
-      "optional": true
-    },
-    "immer": {
       "optional": true
     },
     "immer": {
