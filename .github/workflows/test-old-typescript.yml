@@ -34,7 +34,6 @@ jobs:
       - run: yarn build
       - name: Patch for Old TS
         run: |
-          sed -i~ 's/"target":/"skipLibCheck":true,"target":/' tsconfig.json
           sed -i~ 's/"moduleResolution": "bundler",/"moduleResolution": "node",/' tsconfig.json
           sed -i~ 's/"allowImportingTsExtensions": true,//' tsconfig.json
           sed -i~ 's/"zustand": \["\.\/src\/index\.ts"\],/"zustand": [".\/dist\/index.d.ts"],/' tsconfig.json
