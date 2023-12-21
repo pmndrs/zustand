@@ -14,7 +14,7 @@ This can be done using third-party libraries created by the community.
 > This list aims to provide a good starting point
 > for someone looking to extend Zustand's feature set.
 
-- [zusty](https://github.com/oslabs-beta/Zusty) - Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
+
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
@@ -53,3 +53,4 @@ This can be done using third-party libraries created by the community.
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
+- [zusty](https://github.com/oslabs-beta/Zusty) - Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
