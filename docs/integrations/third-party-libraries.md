@@ -14,7 +14,6 @@ This can be done using third-party libraries created by the community.
 > This list aims to provide a good starting point
 > for someone looking to extend Zustand's feature set.
 
-
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
