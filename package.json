@@ -33,10 +33,6 @@
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "module": {
-        "types": "./esm/index.d.ts",
-        "default": "./esm/index.js"
-      },
       "default": {
         "types": "./index.d.ts",
         "default": "./index.js"
@@ -46,10 +42,6 @@
       "import": {
         "types": "./esm/vanilla.d.mts",
         "default": "./esm/vanilla.mjs"
-      },
-      "module": {
-        "types": "./esm/vanilla.d.ts",
-        "default": "./esm/vanilla.js"
       },
       "default": {
         "types": "./vanilla.d.ts",
@@ -61,10 +53,6 @@
         "types": "./esm/middleware.d.mts",
         "default": "./esm/middleware.mjs"
       },
-      "module": {
-        "types": "./esm/middleware.d.ts",
-        "default": "./esm/middleware.js"
-      },
       "default": {
         "types": "./middleware.d.ts",
         "default": "./middleware.js"
@@ -74,10 +62,6 @@
       "import": {
         "types": "./esm/middleware/immer.d.mts",
         "default": "./esm/middleware/immer.mjs"
-      },
-      "module": {
-        "types": "./esm/middleware/immer.d.ts",
-        "default": "./esm/middleware/immer.js"
       },
       "default": {
         "types": "./middleware/immer.d.ts",
@@ -89,10 +73,6 @@
         "types": "./esm/shallow.d.mts",
         "default": "./esm/shallow.mjs"
       },
-      "module": {
-        "types": "./esm/shallow.d.ts",
-        "default": "./esm/shallow.js"
-      },
       "default": {
         "types": "./shallow.d.ts",
         "default": "./shallow.js"
@@ -102,10 +82,6 @@
       "import": {
         "types": "./esm/vanilla/shallow.d.mts",
         "default": "./esm/vanilla/shallow.mjs"
-      },
-      "module": {
-        "types": "./esm/vanilla/shallow.d.ts",
-        "default": "./esm/vanilla/shallow.js"
       },
       "default": {
         "types": "./vanilla/shallow.d.ts",
@@ -117,10 +93,6 @@
         "types": "./esm/react/shallow.d.mts",
         "default": "./esm/react/shallow.mjs"
       },
-      "module": {
-        "types": "./esm/react/shallow.d.ts",
-        "default": "./esm/react/shallow.js"
-      },
       "default": {
         "types": "./react/shallow.d.ts",
         "default": "./react/shallow.js"
@@ -130,10 +102,6 @@
       "import": {
         "types": "./esm/traditional.d.mts",
         "default": "./esm/traditional.mjs"
-      },
-      "module": {
-        "types": "./esm/traditional.d.ts",
-        "default": "./esm/traditional.js"
       },
       "default": {
         "types": "./traditional.d.ts",
