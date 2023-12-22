@@ -33,10 +33,6 @@
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "module": {
-        "types": "./esm/index.d.ts",
-        "default": "./esm/index.js"
-      },
       "default": {
         "types": "./index.d.ts",
         "default": "./index.js"
@@ -46,10 +42,6 @@
       "import": {
         "types": "./esm/vanilla.d.mts",
         "default": "./esm/vanilla.mjs"
-      },
-      "module": {
-        "types": "./esm/vanilla.d.ts",
-        "default": "./esm/vanilla.js"
       },
       "default": {
         "types": "./vanilla.d.ts",
@@ -61,10 +53,6 @@
         "types": "./esm/middleware.d.mts",
         "default": "./esm/middleware.mjs"
       },
-      "module": {
-        "types": "./esm/middleware.d.ts",
-        "default": "./esm/middleware.js"
-      },
       "default": {
         "types": "./middleware.d.ts",
         "default": "./middleware.js"
@@ -74,10 +62,6 @@
       "import": {
         "types": "./esm/middleware/immer.d.mts",
         "default": "./esm/middleware/immer.mjs"
-      },
-      "module": {
-        "types": "./esm/middleware/immer.d.ts",
-        "default": "./esm/middleware/immer.js"
       },
       "default": {
         "types": "./middleware/immer.d.ts",
@@ -89,10 +73,6 @@
         "types": "./esm/shallow.d.mts",
         "default": "./esm/shallow.mjs"
       },
-      "module": {
-        "types": "./esm/shallow.d.ts",
-        "default": "./esm/shallow.js"
-      },
       "default": {
         "types": "./shallow.d.ts",
         "default": "./shallow.js"
@@ -102,10 +82,6 @@
       "import": {
         "types": "./esm/vanilla/shallow.d.mts",
         "default": "./esm/vanilla/shallow.mjs"
-      },
-      "module": {
-        "types": "./esm/vanilla/shallow.d.ts",
-        "default": "./esm/vanilla/shallow.js"
       },
       "default": {
         "types": "./vanilla/shallow.d.ts",
@@ -117,10 +93,6 @@
         "types": "./esm/react/shallow.d.mts",
         "default": "./esm/react/shallow.mjs"
       },
-      "module": {
-        "types": "./esm/react/shallow.d.ts",
-        "default": "./esm/react/shallow.js"
-      },
       "default": {
         "types": "./react/shallow.d.ts",
         "default": "./react/shallow.js"
@@ -130,10 +102,6 @@
       "import": {
         "types": "./esm/traditional.d.mts",
         "default": "./esm/traditional.mjs"
-      },
-      "module": {
-        "types": "./esm/traditional.d.ts",
-        "default": "./esm/traditional.js"
       },
       "default": {
         "types": "./traditional.d.ts",
@@ -167,7 +135,7 @@
     "patch-d-ts": "node -e \"var {entries}=require('./rollup.config.js');require('shelljs').find('dist/**/*.d.ts').forEach(f=>{entries.forEach(({find,replacement})=>require('shelljs').sed('-i',new RegExp(' from \\''+find.source.slice(0,-1)+'\\';$'),' from \\''+replacement+'\\';',f));require('shelljs').sed('-i',/ from '(\\.[^']+)\\.ts';$/,' from \\'\\$1\\';',f)})\"",
     "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
     "patch-old-ts": "shx touch dist/ts_version_4.5_and_above_is_required.d.ts",
-    "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').copyFileSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
+    "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').renameSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
   },
   "engines": {
     "node": ">=12.7.0"
