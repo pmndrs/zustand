@@ -38,74 +38,14 @@
         "default": "./index.js"
       }
     },
-    "./vanilla": {
+    "./*": {
       "import": {
-        "types": "./esm/vanilla.d.mts",
-        "default": "./esm/vanilla.mjs"
+        "types": "./esm/*.d.mts",
+        "default": "./esm/*.mjs"
       },
       "default": {
-        "types": "./vanilla.d.ts",
-        "default": "./vanilla.js"
-      }
-    },
-    "./middleware": {
-      "import": {
-        "types": "./esm/middleware.d.mts",
-        "default": "./esm/middleware.mjs"
-      },
-      "default": {
-        "types": "./middleware.d.ts",
-        "default": "./middleware.js"
-      }
-    },
-    "./middleware/immer": {
-      "import": {
-        "types": "./esm/middleware/immer.d.mts",
-        "default": "./esm/middleware/immer.mjs"
-      },
-      "default": {
-        "types": "./middleware/immer.d.ts",
-        "default": "./middleware/immer.js"
-      }
-    },
-    "./shallow": {
-      "import": {
-        "types": "./esm/shallow.d.mts",
-        "default": "./esm/shallow.mjs"
-      },
-      "default": {
-        "types": "./shallow.d.ts",
-        "default": "./shallow.js"
-      }
-    },
-    "./vanilla/shallow": {
-      "import": {
-        "types": "./esm/vanilla/shallow.d.mts",
-        "default": "./esm/vanilla/shallow.mjs"
-      },
-      "default": {
-        "types": "./vanilla/shallow.d.ts",
-        "default": "./vanilla/shallow.js"
-      }
-    },
-    "./react/shallow": {
-      "import": {
-        "types": "./esm/react/shallow.d.mts",
-        "default": "./esm/react/shallow.mjs"
-      },
-      "default": {
-        "types": "./react/shallow.d.ts",
-        "default": "./react/shallow.js"
-      }
-    },
-    "./traditional": {
-      "import": {
-        "types": "./esm/traditional.d.mts",
-        "default": "./esm/traditional.mjs"
-      },
-      "default": {
-        "types": "./traditional.d.ts",
-        "default": "./traditional.js"
+        "types": "./*.d.ts",
+        "default": "./*.js"
       }
     }
   },
@@ -138,7 +78,7 @@
     "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').renameSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
   },
   "engines": {
-    "node": ">=12.7.0"
+    "node": ">=12.20.0"
   },
   "prettier": {
     "semi": false,
