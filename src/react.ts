@@ -104,6 +104,11 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
 
+  if (!api.getServerState) {
+    const initialState = api.getState()
+    api.getServerState = () => initialState
+  }
+
   const useBoundStore: any = (selector?: any, equalityFn?: any) =>
     useStore(api, selector, equalityFn)
 
