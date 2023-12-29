@@ -107,8 +107,13 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
       "[DEPRECATED] Passing a vanilla store will be unsupported in a future version. Instead use `import { useStore } from 'zustand'`.",
     )
   }
-  const api =
+  const api = (
     typeof createState === 'function' ? createStore(createState) : createState
+  ) as WithReact<StoreApi<T>>
+
+  const defaultState = api.getState()
+
+  api.getServerState = () => defaultState
 
   const useBoundStore: any = (selector?: any, equalityFn?: any) =>
     useStore(api, selector, equalityFn)

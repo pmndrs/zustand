@@ -31,6 +31,7 @@ it('creates a store hook and api object', () => {
         [Function],
         {
           "destroy": [Function],
+          "getServerState": [Function],
           "getState": [Function],
           "setState": [Function],
           "subscribe": [Function],
