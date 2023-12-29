@@ -8,6 +8,7 @@ type SetStateInternal<T> = {
 export interface StoreApi<T> {
   setState: SetStateInternal<T>
   getState: () => T
+  getServerState?: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
   /**
    * @deprecated Use `unsubscribe` returned by `subscribe`

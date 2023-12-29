@@ -22,17 +22,11 @@ type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
-type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
-  getServerState?: () => ExtractState<S>
-}
-
 let didWarnAboutEqualityFn = false
 
-export function useStore<S extends WithReact<StoreApi<unknown>>>(
-  api: S,
-): ExtractState<S>
+export function useStore<S extends StoreApi<unknown>>(api: S): ExtractState<S>
 
-export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
+export function useStore<S extends StoreApi<unknown>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
 ): U
@@ -41,14 +35,14 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
  * @deprecated Use `useStoreWithEqualityFn` from 'zustand/traditional'
  * https://github.com/pmndrs/zustand/discussions/1937
  */
-export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
+export function useStore<S extends StoreApi<unknown>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
   equalityFn: ((a: U, b: U) => boolean) | undefined,
 ): U
 
 export function useStore<TState, StateSlice>(
-  api: WithReact<StoreApi<TState>>,
+  api: StoreApi<TState>,
   selector: (state: TState) => StateSlice = api.getState as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
@@ -73,7 +67,7 @@ export function useStore<TState, StateSlice>(
   return slice
 }
 
-export type UseBoundStore<S extends WithReact<ReadonlyStoreApi<unknown>>> = {
+export type UseBoundStore<S extends ReadonlyStoreApi<unknown>> = {
   (): ExtractState<S>
   <U>(selector: (state: ExtractState<S>) => U): U
   /**
@@ -107,13 +101,8 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
       "[DEPRECATED] Passing a vanilla store will be unsupported in a future version. Instead use `import { useStore } from 'zustand'`.",
     )
   }
-  const api = (
+  const api =
     typeof createState === 'function' ? createStore(createState) : createState
-  ) as WithReact<StoreApi<T>>
-
-  const defaultState = api.getState()
-
-  api.getServerState = () => defaultState
 
   const useBoundStore: any = (selector?: any, equalityFn?: any) =>
     useStore(api, selector, equalityFn)
