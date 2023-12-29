@@ -672,7 +672,7 @@ export const useBearStore = create<BearState>()(
     }),
     {
       name: 'food-storage',
-      storage,
+      storage: storage,
     },
   ),
 )
