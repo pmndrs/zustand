@@ -61,7 +61,7 @@ export function useStore<TState, StateSlice>(
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    api.getServerState || api.getState,
+    api.getInitialState,
     selector,
     equalityFn,
   )
@@ -105,11 +105,6 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
   }
   const api =
     typeof createState === 'function' ? createStore(createState) : createState
-
-  if (!api.getServerState) {
-    const initialState = api.getState()
-    api.getServerState = () => initialState
-  }
 
   const useBoundStore: any = (selector?: any, equalityFn?: any) =>
     useStore(api, selector, equalityFn)
