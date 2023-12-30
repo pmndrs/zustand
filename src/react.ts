@@ -22,13 +22,19 @@ type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
+type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
+  getServerState?: () => ExtractState<S>
+}
+
 let didWarnAboutEqualityFn = false
 
 const identity = <T>(arg: T): T => arg
 
-export function useStore<S extends StoreApi<unknown>>(api: S): ExtractState<S>
+export function useStore<S extends WithReact<StoreApi<unknown>>>(
+  api: S,
+): ExtractState<S>
 
-export function useStore<S extends StoreApi<unknown>, U>(
+export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
 ): U
@@ -37,14 +43,14 @@ export function useStore<S extends StoreApi<unknown>, U>(
  * @deprecated Use `useStoreWithEqualityFn` from 'zustand/traditional'
  * https://github.com/pmndrs/zustand/discussions/1937
  */
-export function useStore<S extends StoreApi<unknown>, U>(
+export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
   equalityFn: ((a: U, b: U) => boolean) | undefined,
 ): U
 
 export function useStore<TState, StateSlice>(
-  api: StoreApi<TState>,
+  api: WithReact<StoreApi<TState>>,
   selector: (state: TState) => StateSlice = identity as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
@@ -69,7 +75,7 @@ export function useStore<TState, StateSlice>(
   return slice
 }
 
-export type UseBoundStore<S extends ReadonlyStoreApi<unknown>> = {
+export type UseBoundStore<S extends WithReact<ReadonlyStoreApi<unknown>>> = {
   (): ExtractState<S>
   <U>(selector: (state: ExtractState<S>) => U): U
   /**
