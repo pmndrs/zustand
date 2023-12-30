@@ -415,7 +415,7 @@ const createSharedSlice: StateCreator<
   getBoth: () => get().bears + get().fishes,
 })
 
-const useBoundStore = create<BearSlice & FishSlice & SharedSlice>()((...a) => ({
+const useBoundStore = create<BearSlice & FishSlice & SharedSlice>((...a) => ({
   ...createBearSlice(...a),
   ...createFishSlice(...a),
   ...createSharedSlice(...a),
