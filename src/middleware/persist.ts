@@ -425,7 +425,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     api,
   )
 
-  api.getServerState = () => configResult
+  api.getInitialState = () => configResult
 
   // a workaround to solve the issue of not storing rehydrated state in sync storage
   // the set(state) value would be later overridden with initial state by create()

@@ -67,7 +67,7 @@ export function useStore<TState, StateSlice>(
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    api.getInitialState,
+    api.getServerState || api.getInitialState,
     selector,
     equalityFn,
   )

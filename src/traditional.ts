@@ -47,7 +47,7 @@ export function useStoreWithEqualityFn<TState, StateSlice>(
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    api.getServerState || api.getState,
+    api.getServerState || api.getInitialState,
     selector,
     equalityFn,
   )
