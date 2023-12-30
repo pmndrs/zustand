@@ -17,12 +17,13 @@ it('create a store', () => {
     return { value: null }
   })
   expect({ params, result }).toMatchInlineSnapshot(`
-   {
+    {
       "params": [
         [Function],
         [Function],
         {
           "destroy": [Function],
+          "getInitialState": [Function],
           "getState": [Function],
           "setState": [Function],
           "subscribe": [Function],
@@ -30,6 +31,7 @@ it('create a store', () => {
       ],
       "result": {
         "destroy": [Function],
+        "getInitialState": [Function],
         "getState": [Function],
         "setState": [Function],
         "subscribe": [Function],
