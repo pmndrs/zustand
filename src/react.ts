@@ -24,6 +24,8 @@ type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
 let didWarnAboutEqualityFn = false
 
+const identity = <T>(arg: T): T => arg
+
 export function useStore<S extends StoreApi<unknown>>(api: S): ExtractState<S>
 
 export function useStore<S extends StoreApi<unknown>, U>(
@@ -43,7 +45,7 @@ export function useStore<S extends StoreApi<unknown>, U>(
 
 export function useStore<TState, StateSlice>(
   api: StoreApi<TState>,
-  selector: (state: TState) => StateSlice = api.getState as any,
+  selector: (state: TState) => StateSlice = identity as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
   if (
