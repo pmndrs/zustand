@@ -26,22 +26,22 @@ jobs:
       - name: Patch for DEV-ONLY
         if: ${{ matrix.env == 'development' }}
         run: |
-          sed -i~ -e "s/it[.a-zA-Z]*('\[DEV-ONLY\]/it('/" tests/*.tsx
-          sed -i~ -e "s/it[.a-zA-Z]*('\[PRD-ONLY\]/it.skip('/" tests/*.tsx
+          sed -i~ "s/it[.a-zA-Z]*('\[DEV-ONLY\]/it('/" tests/*.tsx
+          sed -i~ "s/it[.a-zA-Z]*('\[PRD-ONLY\]/it.skip('/" tests/*.tsx
       - name: Patch for PRD-ONLY
         if: ${{ matrix.env == 'production' }}
         run: |
-          sed -i~ -e "s/it[.a-zA-Z]*('\[PRD-ONLY\]/it('/" tests/*.tsx
-          sed -i~ -e "s/it[.a-zA-Z]*('\[DEV-ONLY\]/it.skip('/" tests/*.tsx
+          sed -i~ "s/it[.a-zA-Z]*('\[PRD-ONLY\]/it('/" tests/*.tsx
+          sed -i~ "s/it[.a-zA-Z]*('\[DEV-ONLY\]/it.skip('/" tests/*.tsx
       - name: Patch for CJS
         if: ${{ matrix.build == 'cjs' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\1.js/" package.jsonx
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\1.js/" package.json
       - name: Patch for ESM
         if: ${{ matrix.build == 'esm' }}
         run: |
-          sed -i~ -e "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js/" package.json
-          sed -i~ -e "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
+          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js/" package.json
+          sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}
