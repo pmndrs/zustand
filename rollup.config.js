@@ -5,7 +5,6 @@ const resolve = require('@rollup/plugin-node-resolve')
 const replace = require('@rollup/plugin-replace')
 const typescript = require('@rollup/plugin-typescript')
 const { default: esbuild } = require('rollup-plugin-esbuild')
-const createBabelConfig = require('./babel.config.js')
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
@@ -17,7 +16,13 @@ function external(id) {
 
 function getBabelOptions(targets) {
   return {
-    ...createBabelConfig({ env: (env) => env === 'build' }, targets),
+    babelrc: false,
+    ignore: ['./node_modules'],
+    presets: [['@babel/preset-env', { loose: true, modules: false, targets }]],
+    plugins: [
+      ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
+      ['@babel/plugin-transform-typescript', { isTSX: true }],
+    ],
     extensions,
     comments: false,
     babelHelpers: 'bundled',
@@ -109,7 +114,7 @@ module.exports = function (args) {
   return [
     ...(c === 'index' ? [createDeclarationConfig(`src/${c}.ts`, 'dist')] : []),
     createCommonJSConfig(`src/${c}.ts`, `dist/${c}`),
-    createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
+    createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`), // just for testing sed -e flag
   ]
 }
 
