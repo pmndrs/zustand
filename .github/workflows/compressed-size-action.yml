@@ -1,14 +1,13 @@
 name: Compressed Size
 
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - uses: preactjs/compressed-size-action@v4
+      - uses: preactjs/compressed-size-action@v2
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
