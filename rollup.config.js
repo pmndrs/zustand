@@ -3,10 +3,8 @@ const alias = require('@rollup/plugin-alias')
 const babelPlugin = require('@rollup/plugin-babel')
 const resolve = require('@rollup/plugin-node-resolve')
 const replace = require('@rollup/plugin-replace')
-const terser = require('@rollup/plugin-terser')
 const typescript = require('@rollup/plugin-typescript')
 const { default: esbuild } = require('rollup-plugin-esbuild')
-const createBabelConfig = require('./babel.config.js')
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
@@ -18,7 +16,13 @@ function external(id) {
 
 function getBabelOptions(targets) {
   return {
-    ...createBabelConfig({ env: (env) => env === 'build' }, targets),
+    babelrc: false,
+    ignore: ['./node_modules'],
+    presets: [['@babel/preset-env', { loose: true, modules: false, targets }]],
+    plugins: [
+      ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
+      ['@babel/plugin-transform-typescript', { isTSX: true }],
+    ],
     extensions,
     comments: false,
     babelHelpers: 'bundled',
@@ -100,64 +104,6 @@ function createCommonJSConfig(input, output) {
   }
 }
 
-function createUMDConfig(input, output, env) {
-  let name = 'zustand'
-  const fileName = output.slice('dist/umd/'.length)
-  const capitalize = (s) => s.slice(0, 1).toUpperCase() + s.slice(1)
-  if (fileName !== 'index') {
-    name += fileName.replace(/(\w+)\W*/g, (_, p) => capitalize(p))
-  }
-  return {
-    input,
-    output: {
-      file: `${output}.${env}.js`,
-      format: 'umd',
-      name,
-      globals: {
-        react: 'React',
-        immer: 'immer',
-        // FIXME not yet supported
-        'use-sync-external-store/shim/with-selector':
-          'useSyncExternalStoreShimWithSelector',
-        'zustand/vanilla': 'zustandVanilla',
-      },
-    },
-    external,
-    plugins: [
-      alias({ entries: entries.filter((e) => !e.find.test(input)) }),
-      resolve({ extensions }),
-      replace({
-        'import.meta.env?.MODE': JSON.stringify(env),
-        delimiters: ['\\b', '\\b(?!(\\.|/))'],
-        preventAssignment: true,
-      }),
-      babelPlugin(getBabelOptions({ ie: 11 })),
-      ...(env === 'production' ? [terser()] : []),
-    ],
-  }
-}
-
-function createSystemConfig(input, output, env) {
-  return {
-    input,
-    output: {
-      file: `${output}.${env}.js`,
-      format: 'system',
-    },
-    external,
-    plugins: [
-      alias({ entries: entries.filter((e) => !e.find.test(input)) }),
-      resolve({ extensions }),
-      replace({
-        'import.meta.env?.MODE': JSON.stringify(env),
-        delimiters: ['\\b', '\\b(?!(\\.|/))'],
-        preventAssignment: true,
-      }),
-      getEsbuild('node12', env),
-    ],
-  }
-}
-
 module.exports = function (args) {
   let c = Object.keys(args).find((key) => key.startsWith('config-'))
   if (c) {
@@ -168,11 +114,7 @@ module.exports = function (args) {
   return [
     ...(c === 'index' ? [createDeclarationConfig(`src/${c}.ts`, 'dist')] : []),
     createCommonJSConfig(`src/${c}.ts`, `dist/${c}`),
-    createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
-    createUMDConfig(`src/${c}.ts`, `dist/umd/${c}`, 'development'),
-    createUMDConfig(`src/${c}.ts`, `dist/umd/${c}`, 'production'),
-    createSystemConfig(`src/${c}.ts`, `dist/system/${c}`, 'development'),
-    createSystemConfig(`src/${c}.ts`, `dist/system/${c}`, 'production'),
+    createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`), // just for testing sed -e flag
   ]
 }
 
