@@ -8,7 +8,7 @@ import {
   redux,
   subscribeWithSelector,
 } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
+import { immer } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 
 type CounterState = {

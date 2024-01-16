@@ -339,7 +339,7 @@ Immer is available as middleware too.
 
 ```jsx
 import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
+import { immer } from 'zustand/middleware'
 
 const useBeeStore = create(
   immer((set) => ({

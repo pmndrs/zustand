@@ -25,7 +25,7 @@ Updating simple states
 
 ```ts
 import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
+import { immer } from 'zustand/middleware'
 
 type State = {
   count: number
@@ -55,7 +55,7 @@ Updating complex states
 
 ```ts
 import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
+import { immer } from 'zustand/middleware'
 
 interface Todo {
   id: string
