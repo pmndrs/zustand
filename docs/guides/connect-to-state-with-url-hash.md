@@ -71,10 +71,10 @@ const persistentStorage: StateStorage = {
     if (getUrlSearch()) {
       const searchParams = new URLSearchParams(getUrlSearch())
       const storedValue = searchParams.get(key)
-      return JSON.parse(storedValue)
+      return JSON.parse(storedValue as string)
     } else {
       // Otherwise, we should load from localstorage or alternative storage
-      return JSON.parse(localStorage.getItem(key))
+      return JSON.parse(localStorage.getItem(key) as string)
     }
   },
   setItem: (key, newValue): void => {
@@ -82,7 +82,7 @@ const persistentStorage: StateStorage = {
     if (getUrlSearch()) {
       const searchParams = new URLSearchParams(getUrlSearch())
       searchParams.set(key, JSON.stringify(newValue))
-      window.history.replaceState(null, null, `?${searchParams.toString()}`)
+      window.history.replaceState(null, '', `?${searchParams.toString()}`)
     }
 
     localStorage.setItem(key, JSON.stringify(newValue))
@@ -94,24 +94,33 @@ const persistentStorage: StateStorage = {
   },
 }
 
-let localAndUrlStore = (set) => ({
-  typesOfFish: [],
-  addTypeOfFish: (fishType) =>
-    set((state) => ({ typesOfFish: [...state.typesOfFish, fishType] })),
-
-  numberOfBears: 0,
-  setNumberOfBears: (newNumber) =>
-    set((state) => ({ numberOfBears: newNumber })),
-})
-
-let storageOptions = {
-  name: 'fishAndBearsStore',
-  storage: persistentStorage,
+type LocalAndUrlStore = {
+  typesOfFish: string[]
+  addTypeOfFish: (fishType: string) => void
+  numberOfBears: number
+  setNumberOfBears: (newNumber: number) => void
 }
 
-const useLocalAndUrlStore = create(persist(localAndUrlStore, storageOptions))
+const storageOptions = {
+  name: 'fishAndBearsStore',
+  storage: createJSONStorage<LocalAndUrlStore>(() => persistentStorage),
+}
 
-export default localAndUrlStore
+const useLocalAndUrlStore = create(
+  persist<LocalAndUrlStore>(
+    (set) => ({
+      typesOfFish: [],
+      addTypeOfFish: (fishType) =>
+        set((state) => ({ typesOfFish: [...state.typesOfFish, fishType] })),
+
+      numberOfBears: 0,
+      setNumberOfBears: (numberOfBears) => set(() => ({ numberOfBears })),
+    }),
+    storageOptions,
+  ),
+)
+
+export default useLocalAndUrlStore
 ```
 
 When generating the URL from a component, you can call buildShareableUrl:
