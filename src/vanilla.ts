@@ -8,6 +8,7 @@ type SetStateInternal<T> = {
 export interface StoreApi<T> {
   setState: SetStateInternal<T>
   getState: () => T
+  getInitialState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
 }
 
@@ -78,14 +79,17 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 
   const getState: StoreApi<TState>['getState'] = () => state
 
+  const getInitialState: StoreApi<TState>['getInitialState'] = () =>
+    initialState
+
   const subscribe: StoreApi<TState>['subscribe'] = (listener) => {
     listeners.add(listener)
     // Unsubscribe
     return () => listeners.delete(listener)
   }
 
-  const api = { setState, getState, subscribe }
-  state = createState(setState, getState, api)
+  const api = { setState, getState, getInitialState, subscribe }
+  const initialState = (state = createState(setState, getState, api))
   return api as any
 }
 

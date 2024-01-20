@@ -23,8 +23,11 @@ type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
 type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
+  /** @deprecated please use api.getState() */
   getServerState?: () => ExtractState<S>
 }
+
+const identity = <T>(arg: T): T => arg
 
 export function useStore<S extends WithReact<StoreApi<unknown>>>(
   api: S,
@@ -37,12 +40,12 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
 
 export function useStore<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
-  selector: (state: TState) => StateSlice = api.getState as any,
+  selector: (state: TState) => StateSlice = identity as any,
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    api.getServerState || api.getState,
+    api.getServerState || api.getInitialState,
     selector,
   )
   useDebugValue(slice)
