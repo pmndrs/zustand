@@ -23,7 +23,7 @@ type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
 type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
-  /** @deprecated please use api.getState() */
+  /** @deprecated please use api.getInitialState() */
   getServerState?: () => ExtractState<S>
 }
 
