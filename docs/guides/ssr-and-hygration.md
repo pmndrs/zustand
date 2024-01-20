@@ -5,7 +5,7 @@ nav: 15
 
 ## Server Side Rendering (SSR)
 
-Sever Side Rendering (SSR) is a technique that help use to render our components into
+Sever Side Rendering (SSR) is a technique that help us to render our components into
 HTML strings on the server, send them directly to the browser, and finally "hydrate" the
 static markup into a fully interactive app on the client.
 
