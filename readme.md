@@ -228,7 +228,7 @@ Zustand core can be imported and used without the React dependency. The only dif
 import { createStore } from 'zustand/vanilla'
 
 const store = createStore((set) => ...)
-const { getState, setState, subscribe } = store
+const { getState, setState, subscribe, getInitialState } = store
 
 export default store
 ```
