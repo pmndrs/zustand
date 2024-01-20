@@ -56,7 +56,7 @@ import { StateStorage } from 'zustand/middleware'
 
 > Default: `createJSONStorage(() => localStorage)`
 
-Enables you to use your own storage. Simply pass a function that returns the storage you want to use. It's recommended to use the `createJSONStorage` helper function to create a `storage` object that is compliant with the `StateStorage` interface.
+Enables you to use your own storage. Simply pass a function that returns the storage you want to use. It's recommended to use the [`createJSONStorage`](#createjsonstorage) helper function to create a `storage` object that is compliant with the `StateStorage` interface.
 
 Example:
 
