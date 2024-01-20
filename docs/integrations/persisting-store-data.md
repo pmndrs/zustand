@@ -56,8 +56,7 @@ import { StateStorage } from 'zustand/middleware'
 
 > Default: `createJSONStorage(() => localStorage)`
 
-Enables you to use your own storage.
-Simply pass a function that returns the storage you want to use.
+Enables you to use your own storage. Simply pass a function that returns the storage you want to use. It's recommended to use the [`createJSONStorage`](#createjsonstorage) helper function to create a `storage` object that is compliant with the `StateStorage` interface.
 
 Example:
 
@@ -413,6 +412,37 @@ const unsub = useBoundStore.persist.onFinishHydration((state) => {
 
 // later on...
 unsub()
+```
+
+### `createJSONStorage`
+
+> Type: `(getStorage: () => StateStorage, options?: JsonStorageOptions) => StateStorage`
+
+> Returns: `PersistStorage`
+
+This helper function enables you to create a [`storage`](#storage) object which is useful when you want to use a custom storage engine.
+
+`getStorage` is a function that returns the storage engine with the properties `getItem`, `setItem`, and `removeItem`.
+
+`options` is an optional object that can be used to customize the serialization and deserialization of the data. `options.reviver` is a function that is passed to `JSON.parse` to deserialize the data. `options.replacer` is a function that is passed to `JSON.stringify` to serialize the data.
+
+```ts
+import { createJSONStorage } from 'zustand/middleware'
+
+const storage = createJSONStorage(() => sessionStorage, {
+  reviver: (key, value) => {
+    if (value && value.type === 'date') {
+      return new Date(value)
+    }
+    return value
+  },
+  replacer: (key, value) => {
+    if (value instanceof Date) {
+      return { type: 'date', value: value.toISOString() }
+    }
+    return value
+  },
+})
 ```
 
 ## Hydration and asynchronous storages
