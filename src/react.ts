@@ -12,13 +12,30 @@ import type {
   StoreMutatorIdentifier,
 } from './vanilla.ts'
 
-const { useDebugValue, useSyncExternalStore } = ReactExports
+const { useDebugValue, useMemo, useSyncExternalStore } = ReactExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
 const identity = <T>(arg: T): T => arg
+
+const useMemoSelector = <TState, StateSlice>(
+  getState: () => TState,
+  selector: (state: TState) => StateSlice,
+) =>
+  useMemo(() => {
+    let lastSlice: StateSlice
+    let lastState: TState
+    return () => {
+      const state = getState()
+      if (!Object.is(lastState, state)) {
+        lastSlice = selector(state)
+        lastState = state
+      }
+      return lastSlice
+    }
+  }, [getState, selector])
 
 export function useStore<S extends StoreApi<unknown>>(api: S): ExtractState<S>
 
@@ -33,8 +50,8 @@ export function useStore<TState, StateSlice>(
 ) {
   const slice = useSyncExternalStore(
     api.subscribe,
-    () => selector(api.getState()),
-    () => selector(api.getInitialState()),
+    useMemoSelector(api.getState, selector),
+    useMemoSelector(api.getInitialState, selector),
   )
   useDebugValue(slice)
   return slice
