@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "skipLibCheck": true /* FIXME remove this once vite fixes it */,
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -13,9 +14,9 @@
     "baseUrl": ".",
     "paths": {
       "zustand": ["./src/index.ts"],
-      "zustand/*": ["./src/*.ts"]
-    }
+      "zustand/*": ["./src/*.ts"],
+    },
   },
   "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
 }
