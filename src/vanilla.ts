@@ -8,6 +8,7 @@ type SetStateInternal<T> = {
 export interface StoreApi<T> {
   setState: SetStateInternal<T>
   getState: () => T
+  getInitialState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
   /**
    * @deprecated Use `unsubscribe` returned by `subscribe`
@@ -82,6 +83,9 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 
   const getState: StoreApi<TState>['getState'] = () => state
 
+  const getInitialState: StoreApi<TState>['getInitialState'] = () =>
+    initialState
+
   const subscribe: StoreApi<TState>['subscribe'] = (listener) => {
     listeners.add(listener)
     // Unsubscribe
@@ -97,8 +101,8 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     listeners.clear()
   }
 
-  const api = { setState, getState, subscribe, destroy }
-  state = createState(setState, getState, api)
+  const api = { setState, getState, getInitialState, subscribe, destroy }
+  const initialState = (state = createState(setState, getState, api))
   return api as any
 }
 

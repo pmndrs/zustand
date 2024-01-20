@@ -67,5 +67,54 @@ describe.skipIf(!React.version.startsWith('18'))(
       expect(bearCountText).not.toBeNull()
       document.body.removeChild(container)
     })
+    it('should not have hydration errors', async () => {
+      const useStore = create(() => ({
+        bears: 0,
+      }))
+
+      const { hydrateRoot } =
+        await vi.importActual<typeof import('react-dom/client')>(
+          'react-dom/client',
+        )
+
+      const Component = () => {
+        const bears = useStore((state) => state.bears)
+        return <div>bears: {bears}</div>
+      }
+
+      const markup = renderToString(
+        <React.Suspense fallback={<div>Loading...</div>}>
+          <Component />
+        </React.Suspense>,
+      )
+
+      const container = document.createElement('div')
+      document.body.appendChild(container)
+      container.innerHTML = markup
+
+      expect(container.textContent).toContain('bears: 0')
+
+      const consoleMock = vi.spyOn(console, 'error')
+
+      const hydratePromise = act(async () => {
+        hydrateRoot(
+          container,
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <Component />
+          </React.Suspense>,
+        )
+      })
+
+      // set state during hydration
+      useStore.setState({ bears: 1 })
+
+      await hydratePromise
+
+      expect(consoleMock).toHaveBeenCalledTimes(0)
+
+      const bearCountText = await screen.findByText('bears: 1')
+      expect(bearCountText).not.toBeNull()
+      document.body.removeChild(container)
+    })
   },
 )

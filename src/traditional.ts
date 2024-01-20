@@ -26,6 +26,8 @@ type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
   getServerState?: () => ExtractState<S>
 }
 
+const identity = <T>(arg: T): T => arg
+
 export function useStoreWithEqualityFn<S extends WithReact<StoreApi<unknown>>>(
   api: S,
 ): ExtractState<S>
@@ -41,13 +43,13 @@ export function useStoreWithEqualityFn<
 
 export function useStoreWithEqualityFn<TState, StateSlice>(
   api: WithReact<StoreApi<TState>>,
-  selector: (state: TState) => StateSlice = api.getState as any,
+  selector: (state: TState) => StateSlice = identity as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    api.getServerState || api.getState,
+    api.getServerState || api.getInitialState,
     selector,
     equalityFn,
   )
