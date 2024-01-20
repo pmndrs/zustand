@@ -1,12 +1,9 @@
-// import { useDebugValue } from 'react'
-// import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
-// Those don't work in ESM, because React libs are CJS only.
+// import { useDebugValue, useSyncExternalStore } from 'react'
+// That doesn't work in ESM, because React libs are CJS only.
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
 // eslint-disable-next-line import/extensions
 import ReactExports from 'react'
-// eslint-disable-next-line import/extensions
-import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
 import { createStore } from './vanilla.ts'
 import type {
   Mutate,
@@ -15,14 +12,30 @@ import type {
   StoreMutatorIdentifier,
 } from './vanilla.ts'
 
-const { useDebugValue } = ReactExports
-const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
+const { useDebugValue, useMemo, useSyncExternalStore } = ReactExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
 
 const identity = <T>(arg: T): T => arg
+
+const useMemoSelector = <TState, StateSlice>(
+  getState: () => TState,
+  selector: (state: TState) => StateSlice,
+) =>
+  useMemo(() => {
+    let lastSlice: StateSlice
+    let lastState: TState
+    return () => {
+      const state = getState()
+      if (!Object.is(lastState, state)) {
+        lastSlice = selector(state)
+        lastState = state
+      }
+      return lastSlice
+    }
+  }, [getState, selector])
 
 export function useStore<S extends StoreApi<unknown>>(api: S): ExtractState<S>
 
@@ -35,11 +48,10 @@ export function useStore<TState, StateSlice>(
   api: StoreApi<TState>,
   selector: (state: TState) => StateSlice = identity as any,
 ) {
-  const slice = useSyncExternalStoreWithSelector(
+  const slice = useSyncExternalStore(
     api.subscribe,
-    api.getState,
-    api.getInitialState,
-    selector,
+    useMemoSelector(api.getState, selector),
+    useMemoSelector(api.getInitialState, selector),
   )
   useDebugValue(slice)
   return slice
