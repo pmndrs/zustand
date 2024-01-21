@@ -1,7 +1,7 @@
 {
   "name": "zustand",
   "private": true,
-  "version": "5.0.0-alpha.1",
+  "version": "5.0.0-alpha.2",
   "publishConfig": {
     "tag": "next"
   },
