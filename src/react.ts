@@ -25,13 +25,15 @@ const useMemoSelector = <TState, StateSlice>(
   selector: (state: TState) => StateSlice,
 ) =>
   useMemo(() => {
-    let prev: readonly [TState, StateSlice] | undefined
+    let lastSlice: StateSlice
+    let lastState: TState
     return () => {
       const state = getState()
-      if (!prev || !Object.is(prev[0], state)) {
-        prev = [state, selector(state)]
+      if (!Object.is(lastState, state)) {
+        lastSlice = selector(state)
+        lastState = state
       }
-      return prev[1]
+      return lastSlice
     }
   }, [getState, selector])
 
