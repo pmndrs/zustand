@@ -680,3 +680,20 @@ it('works with non-object state', async () => {
   fireEvent.click(getByText('button'))
   await findByText('count: 2')
 })
+
+it('works with "undefined" state', async () => {
+  const useUndefined = create(() => undefined)
+
+  const Component = () => {
+    const str = useUndefined((v) => v || 'undefined')
+    return <div>str: {str}</div>
+  }
+
+  const { findByText } = render(
+    <StrictMode>
+      <Component />
+    </StrictMode>,
+  )
+
+  await findByText('str: undefined')
+})
