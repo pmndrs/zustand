@@ -8,7 +8,12 @@ const { default: esbuild } = require('rollup-plugin-esbuild')
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
-const entries = [{ find: /.*\/vanilla\.ts$/, replacement: 'zustand/vanilla' }]
+const entries = [
+  { find: /.*\/vanilla\/shallow\.ts$/, replacement: 'zustand/vanilla/shallow' },
+  { find: /.*\/react\/shallow\.ts$/, replacement: 'zustand/react/shallow' },
+  { find: /.*\/vanilla\.ts$/, replacement: 'zustand/vanilla' },
+  { find: /.*\/react\.ts$/, replacement: 'zustand/react' },
+]
 
 function external(id) {
   return !id.startsWith('.') && !id.startsWith(root)

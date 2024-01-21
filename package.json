@@ -58,6 +58,7 @@
     "build": "concurrently -m 8 'yarn:build:*'",
     "build:base": "rollup -c",
     "build:vanilla": "rollup -c --config-vanilla",
+    "build:react": "rollup -c --config-react",
     "build:middleware": "rollup -c --config-middleware",
     "build:middleware:immer": "rollup -c --config-middleware_immer",
     "build:shallow": "rollup -c --config-shallow",
