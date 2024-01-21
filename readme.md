@@ -291,6 +291,11 @@ You can functionally compose your store any way you like.
 ```jsx
 // Log every time state is changed
 const log = (config) => (set, get, api) =>
+  api.setState = (...args) => {
+    console.log('  applying', args)
+    api.setState(...args)
+    console.log('  new state', get())
+  }
   config(
     (...args) => {
       console.log('  applying', args)
