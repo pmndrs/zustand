@@ -1,7 +1,6 @@
 export function shallow<T>(objA: T, objB: T) {
-  if (Object.is(objA, objB)) {
-    return true
-  }
+  if (Object.is(objA, objB)) return true
+
   if (
     typeof objA !== 'object' ||
     objA === null ||
@@ -15,9 +14,7 @@ export function shallow<T>(objA: T, objB: T) {
     if (objA.size !== objB.size) return false
 
     for (const [key, value] of objA) {
-      if (!Object.is(value, objB.get(key))) {
-        return false
-      }
+      if (!Object.is(value, objB.get(key))) return false
     }
     return true
   }
@@ -26,17 +23,14 @@ export function shallow<T>(objA: T, objB: T) {
     if (objA.size !== objB.size) return false
 
     for (const value of objA) {
-      if (!objB.has(value)) {
-        return false
-      }
+      if (!objB.has(value)) return false
     }
     return true
   }
 
   const keysA = Object.keys(objA)
-  if (keysA.length !== Object.keys(objB).length) {
-    return false
-  }
+  if (keysA.length !== Object.keys(objB).length) return false
+
   for (let i = 0; i < keysA.length; i++) {
     if (
       !Object.prototype.hasOwnProperty.call(objB, keysA[i] as string) ||
