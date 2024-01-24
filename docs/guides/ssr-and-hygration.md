@@ -30,7 +30,7 @@ const port = Number.parseInt(process.env.PORT || '3000', 10)
 const app = express()
 
 app.get('/', (_, res) => {
-  const hmtl = ReactDOMServer.renderToString(<App />)
+  const html = ReactDOMServer.renderToString(<App />)
 
   res.send(`
     <title>Hello World Website</title>
