@@ -55,6 +55,7 @@ that runs in the browser. The right way to "hydrate" a component is by using `hy
 > - Using checks like typeof window !== 'undefined' in your rendering logic.
 > - Using browser-only APIs like window.matchMedia in your rendering logic.
 > - Rendering different data on the server and the client.
-> - React recovers from some hydration errors, but you must fix them like other bugs. In the best case, they’ll lead to a slowdown; in the worst case, event handlers can get attached to the wrong elements.
+>
+> React recovers from some hydration errors, but you must fix them like other bugs. In the best case, they’ll lead to a slowdown; in the worst case, event handlers can get attached to the wrong elements.
 
 You can read more about the caveats and pitfalls here: [hydrateRoot](https://react.dev/reference/react-dom/client/hydrateRoot)
