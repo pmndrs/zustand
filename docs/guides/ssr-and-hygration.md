@@ -35,6 +35,8 @@ Let's dive into that:
 }
 ```
 
+> **Note:** try not to forget to remove all coments in your `package.json` file
+
 ```tsx
 // app.tsx
 export const App = () => {
@@ -119,6 +121,8 @@ Let's dive into that:
   "include": ["**/*"]
 }
 ```
+
+> **Note:** try not to forget to remove all coments in your `package.json` file
 
 ```tsx
 // app.tsx
