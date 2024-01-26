@@ -97,14 +97,26 @@ export default function App({ Component, pageProps }: AppProps) {
 import { useCounterStore } from 'components/counter-store-provider.ts'
 
 export const HomePage = () => {
-  const counterStore = useCounterStore()
+  const { count, incrementCount, decrementCount } = useCounterStore()
 
-  return <div>
+  return (
+    <div>
+      Count: {count}
+      <hr />
+      <button type="button" onClick={() => void incrementCount()}>
+        Increment Count
+      </button>
+      <button type="button" onClick={() => void decrementCount()}>
+        Increment Count
+      </button>
+    </div>
+  )
 }
 ```
 
 ```tsx
 // pages/index.tsx
+import { CounterStoreProvider } from 'components/counter-store-provider.tsx'
 import { HomePage } from 'components/pages/home-page.tsx'
 
 export default function Home() {
@@ -119,5 +131,37 @@ export default function Home() {
 ## App Router
 
 ```tsx
+// components/pages/home-page.tsx
+import { useCounterStore } from 'components/counter-store-provider.ts'
 
+export const HomePage = () => {
+  const { count, incrementCount, decrementCount } = useCounterStore()
+
+  return (
+    <div>
+      Count: {count}
+      <hr />
+      <button type="button" onClick={() => void incrementCount()}>
+        Increment Count
+      </button>
+      <button type="button" onClick={() => void decrementCount()}>
+        Increment Count
+      </button>
+    </div>
+  )
+}
+```
+
+```tsx
+// app/index.tsx
+import { CounterStoreProvider } from 'components/counter-store-provider.tsx'
+import { HomePage } from 'components/pages/home-page.tsx'
+
+export default function Home() {
+  return (
+    <CounterStoreProvider>
+      <HomePage />
+    </CounterStoreProvider>
+  )
+}
 ```
