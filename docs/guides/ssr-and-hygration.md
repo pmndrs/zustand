@@ -1,6 +1,6 @@
 ---
 title: SSR and Hydration
-nav: 15
+nav: 20
 ---
 
 ## Server Side Rendering (SSR)
@@ -35,7 +35,7 @@ Let's dive into that:
 }
 ```
 
-> **Note:** try not to forget to remove all coments in your `package.json` file
+> **Note:** try not to forget to remove all comments in your `package.json` file
 
 ```tsx
 // app.tsx
@@ -122,7 +122,7 @@ Let's dive into that:
 }
 ```
 
-> **Note:** try not to forget to remove all coments in your `package.json` file
+> **Note:** try not to forget to remove all comments in your `package.json` file
 
 ```tsx
 // app.tsx
