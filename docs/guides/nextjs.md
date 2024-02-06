@@ -15,7 +15,7 @@ These challenges include:
   in "hydration errors." The store will have to be initialized on the server and then
   re-initialized on the client with the same data in order to avoid that. Please read more about
   that in our [SSR and Hydration](./ssr-and-hygration) guide.
-- **SPA routing friendly:** Next.js supports a hybrid model for client side routing which means
+- **SPA routing friendly:** Next.js supports a hybrid model for client side routing, which means
   that in order to reset a store we need to intialize the store at component level using a
   `Context`.
 - **Server caching friendly:** Recent versions of Next.js (specifically applications using the App
