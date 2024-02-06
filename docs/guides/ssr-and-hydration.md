@@ -67,7 +67,7 @@ const port = Number.parseInt(process.env.PORT || '3000', 10)
 const app = express()
 
 app.get('/', (_, res) => {
-  const { pipe } = renderToPipeableStream(<App />, {
+  const { pipe } = ReactDOMServer.renderToPipeableStream(<App />, {
     onShellReady() {
       res.setHeader('content-type', 'text/html')
       pipe(res)
@@ -106,7 +106,7 @@ Let's dive into that:
 - `react-dom/client` helps us hydrate our components on a client.
 
 > **Note:** Do not forget that even if we can render our components on a server, it is
-> important to hydrate them on a client to make them interactive.
+> important to "hydrate" them on a client to make them interactive.
 
 ```json
 // package.json
@@ -163,7 +163,7 @@ const port = Number.parseInt(process.env.PORT || '3000', 10)
 const app = express()
 
 app.use('/', (_, res) => {
-  const { pipe } = renderToPipeableStream(<App />, {
+  const { pipe } = ReactDOMServer.renderToPipeableStream(<App />, {
     bootstrapScripts: ['/main.js'],
     onShellReady() {
       res.setHeader('content-type', 'text/html')
