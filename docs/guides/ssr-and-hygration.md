@@ -17,9 +17,9 @@ since it's a stateless app.
 
 Let's dive into that:
 
-- `express` help us to built a web app that we can run using node
-- `react` help us to built the ui components that we use in our app
-- `react-dom/server` help us to render our components on server side
+- `express` helps us build a web app that we can run using Node,
+- `react` helps us build the UI components that we use in our app,
+- `react-dom/server` helps us render our components on a server.
 
 ```json
 // package.json
