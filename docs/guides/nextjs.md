@@ -12,7 +12,7 @@ These challenges include:
   that the store should be created per request and should not be shared across requests.
 - **SSR friendly:** Next.js applications are rendered twice, first on the server
   and again on the client. Having different outputs on both the client and the server will result
-  in a "hydration errors". So the store will have to be initialized on the server and then
+  in "hydration errors." The store will have to be initialized on the server and then
   re-initialized on the client with the same data in order to avoid that. Please read more about
   that in our [SSR and Hydration](./ssr-and-hygration) guide.
 - **SPA routing friendly:** Next.js supports a hybrid model for client side routing which means
