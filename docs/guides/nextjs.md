@@ -180,7 +180,7 @@ export const HomePage = () => {
         Increment Count
       </button>
       <button type="button" onClick={() => void decrementCount()}>
-        Increment Count
+        Decrement Count
       </button>
     </div>
   )
