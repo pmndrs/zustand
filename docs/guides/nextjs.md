@@ -20,7 +20,7 @@ These challenges include:
   `Context`.
 - **Server caching friendly:** Recent versions of Next.js (specifically applications using the App
   Router architecture) support aggressive server caching. Due to our store being a **module state**,
-  is completely compatible with this caching.
+  it is completely compatible with this caching.
 
 We have these general recommendations for appropriate use of Zustand:
 
