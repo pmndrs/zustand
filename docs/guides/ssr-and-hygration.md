@@ -100,10 +100,10 @@ use `express`, `react`, `react-dom/server` and `react-dom/client`.
 
 Let's dive into that:
 
-- `express` help us to built a web app that we can run using node
-- `react` help us to built the ui components that we use in our app
-- `react-dom/server` help us to render our components on server side
-- `react-dom/client` help us to "hydrate" our components on client side
+- `express` helps us build a web app that we can run using Node,
+- `react` helps us build the UI components that we use in our app,
+- `react-dom/server` helps us render our components on a server,
+- `react-dom/client` helps us hydrate our components on a client.
 
 > **Note:** Do not forget that even if we can render our components on server side is
 > important to "hydrate" them on client side to make them interactive
