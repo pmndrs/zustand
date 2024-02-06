@@ -4,7 +4,8 @@ nav: 21
 ---
 
 [Next.js](https://nextjs.org) is a popular server side rendering framework for React that presents
-some unique challenges for using Zustand properly, keep in mind that Zustand store is a global
+some unique challenges for using Zustand properly.
+Keep in mind that Zustand store is a global
 variable (AKA module state) making it optional to use a `Context`.
 These challenges include:
 
