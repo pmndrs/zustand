@@ -161,7 +161,7 @@ export const CounterStoreProvider = ({
 There are two architectures for a Next.js application: the
 [Pages Router](https://nextjs.org/docs/pages/building-your-application/routing) and the
 [App Router](https://nextjs.org/docs/app/building-your-application/routing). The usage of Zustand on
-both architectures should be the same with slightly differences related to each architecture.
+both architectures should be the same with slight differences related to each architecture.
 
 #### Pages Router
 
