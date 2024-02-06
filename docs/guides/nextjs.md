@@ -67,8 +67,7 @@ export const createCounterStore = (
 
 ### Providing the store
 
-Let's use our `createCounterStore` to create a new component that will create the store and share
-it using a `Context` provider component.
+Let's use the `createCounterStore` in our component and share it using a context provider.
 
 ```tsx
 // components/counter-store-provider.tsx
