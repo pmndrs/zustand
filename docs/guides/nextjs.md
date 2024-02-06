@@ -156,7 +156,7 @@ export const CounterStoreProvider = ({
 // rest of code
 ```
 
-### Using the store on different architectures
+### Using the store with different architectures
 
 There are two architectures for a Next.js application: the
 [Pages Router](https://nextjs.org/docs/pages/building-your-application/routing) and the
