@@ -19,7 +19,7 @@ These challenges include:
   that in order to reset a store, we need to intialize it at the component level using a
   `Context`.
 - **Server caching friendly:** Recent versions of Next.js (specifically applications using the App
-  Router architecture) support aggressive server caching. Due to our store is a **module state**
+  Router architecture) support aggressive server caching. Due to our store being a **module state**,
   is completely compatible with this caching.
 
 We have these general recommendations for appropriate use of Zustand:
