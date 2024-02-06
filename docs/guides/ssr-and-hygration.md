@@ -11,9 +11,9 @@ static markup into a fully interactive app on the client.
 
 ### React
 
-Let's say we want to render an stateless app using react. In order to do that we need
-to use `express`, `react` and `react-dom/server`, we don't need `react-dom/client`
-since it's a statless app.
+Let's say we want to render a stateless app using React. In order to do that, we need
+to use `express`, `react` and `react-dom/server`. We don't need `react-dom/client`
+since it's a stateless app.
 
 Let's dive into that:
 
