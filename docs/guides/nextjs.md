@@ -257,8 +257,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
 }
 ```
 
-> **Note:** creating a store per route would require to create and share the store
-> at page (route) component level. Try not to use this if you do not require create
+> **Note:** creating a store per route would require creating and sharing the store
+> at page (route) component level. Try not to use this if you do not need to create
 > a store per route.
 
 ```tsx
