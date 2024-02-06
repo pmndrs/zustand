@@ -45,7 +45,7 @@ export type CounterState = {
 
 export type CounterActions = {
   decrementCount: () => void
-  incremrentCount: () => void
+  incrementCount: () => void
 }
 
 export type CounterStore = CounterState & CounterActions
