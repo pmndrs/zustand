@@ -105,8 +105,8 @@ Let's dive into that:
 - `react-dom/server` helps us render our components on a server,
 - `react-dom/client` helps us hydrate our components on a client.
 
-> **Note:** Do not forget that even if we can render our components on server side is
-> important to "hydrate" them on client side to make them interactive
+> **Note:** Do not forget that even if we can render our components on a server, it is
+> important to hydrate them on a client to make them interactive.
 
 ```json
 // package.json
