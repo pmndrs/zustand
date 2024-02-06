@@ -91,7 +91,7 @@ node server.js
 ## Hydration
 
 Hydration turns the initial HTML snapshot from the server into a fully interactive app
-that runs in the browser. The right way to "hydrate" a component is by using `hydrateRoot`
+that runs in the browser. The right way to "hydrate" a component is by using `hydrateRoot`.
 
 ### React
 
