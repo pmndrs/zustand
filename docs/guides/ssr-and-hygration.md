@@ -122,7 +122,7 @@ Let's dive into that:
 }
 ```
 
-> **Note:** try not to forget to remove all comments in your `package.json` file
+> **Note:** do not forget to remove all comments in your `package.json` file.
 
 ```tsx
 // app.tsx
