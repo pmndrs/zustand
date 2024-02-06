@@ -22,7 +22,7 @@ These challenges include:
   Router architecture) support aggressive server caching. Due to our store being a **module state**,
   it is completely compatible with this caching.
 
-We have these general recommendations for appropriate use of Zustand:
+We have these general recommendations for the appropriate use of Zustand:
 
 - **No global stores** - Because the store is shared across requests, it should not be defined
   as a global variable. Instead, the store should be created per request.
