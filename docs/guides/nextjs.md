@@ -32,7 +32,7 @@ We have these general recommendations for the appropriate use of Zustand:
 
 ### Creating a store per request
 
-Let's create our create store factory function that will help use create a new store for each
+Let's write our store factory function that will create a new store for each
 request.
 
 ```ts
