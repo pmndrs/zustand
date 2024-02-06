@@ -45,7 +45,7 @@ export const App = () => {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Static Server Side Rendering App</title>
+        <title>Static Server-side-rendered App</title>
       </head>
       <body>
         <div>Hello World!</div>
