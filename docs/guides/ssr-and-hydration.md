@@ -22,7 +22,7 @@ Let's dive into that:
 - `react-dom/server` helps us render our components on a server.
 
 ```json
-// package.json
+// tsconfig.json
 {
   "compilerOptions": {
     "noImplicitAny": false,
