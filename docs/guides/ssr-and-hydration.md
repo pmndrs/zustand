@@ -109,7 +109,7 @@ Let's dive into that:
 > important to "hydrate" them on a client to make them interactive.
 
 ```json
-// package.json
+// tsconfig.json
 {
   "compilerOptions": {
     "noImplicitAny": false,
