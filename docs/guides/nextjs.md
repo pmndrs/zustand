@@ -25,7 +25,7 @@ These challenges include:
 
 We have these general recommendations for the appropriate use of Zustand:
 
-- **No global stores** - Because the store is shared across requests, it should not be defined
+- **No global stores** - Because the store should not be shared across requests, it should not be defined
   as a global variable. Instead, the store should be created per request.
 - **React Server Components should not read from or write to the store** - RSCs cannot use hooks or context. They aren't
   meant to be stateful. Having an RSC read from or write values to a global store violates the
