@@ -190,7 +190,7 @@ node server.js
 >
 > - Extra whitespace (like newlines) around the React-generated HTML inside the root node.
 > - Using checks like typeof window !== 'undefined' in your rendering logic.
-> - Using browser-only APIs like window.matchMedia in your rendering logic.
+> - Using browser-only APIs like `window.matchMedia` in your rendering logic.
 > - Rendering different data on the server and the client.
 >
 > React recovers from some hydration errors, but you must fix them like other bugs. In the best case, they’ll lead to a slowdown; in the worst case, event handlers can get attached to the wrong elements.
