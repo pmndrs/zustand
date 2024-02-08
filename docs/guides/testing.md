@@ -79,7 +79,7 @@ export const storeResetFns = new Set<() => void>()
 
 const createUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreate(stateCreator)
-  const initialState = store.getState()
+  const initialState = store.getInitialState()
   storeResetFns.add(() => {
     store.setState(initialState, true)
   })
@@ -98,7 +98,7 @@ export const create = (<T>(stateCreator: zustand.StateCreator<T>) => {
 
 const createStoreUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreateStore(stateCreator)
-  const initialState = store.getState()
+  const initialState = store.getInitialState()
   storeResetFns.add(() => {
     store.setState(initialState, true)
   })
@@ -168,7 +168,7 @@ export const storeResetFns = new Set<() => void>()
 
 const createUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreate(stateCreator)
-  const initialState = store.getState()
+  const initialState = store.getInitialState()
   storeResetFns.add(() => {
     store.setState(initialState, true)
   })
@@ -187,7 +187,7 @@ export const create = (<T>(stateCreator: zustand.StateCreator<T>) => {
 
 const createStoreUncurried = <T>(stateCreator: zustand.StateCreator<T>) => {
   const store = actualCreateStore(stateCreator)
-  const initialState = store.getState()
+  const initialState = store.getInitialState()
   storeResetFns.add(() => {
     store.setState(initialState, true)
   })
