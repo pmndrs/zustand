@@ -15,7 +15,7 @@ These challenges include:
   and again on the client. Having different outputs on both the client and the server will result
   in "hydration errors." The store will have to be initialized on the server and then
   re-initialized on the client with the same data in order to avoid that. Please read more about
-  that in our [SSR and Hydration](./ssr-and-hygration) guide.
+  that in our [SSR and Hydration](./ssr-and-hydration) guide.
 - **SPA routing friendly:** Next.js supports a hybrid model for client side routing, which means
   that in order to reset a store, we need to intialize it at the component level using a
   `Context`.
