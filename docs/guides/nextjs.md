@@ -51,12 +51,12 @@ export type CounterActions = {
 
 export type CounterStore = CounterState & CounterActions
 
-export const defaultInitState: Partial<CounterState> = {
+export const defaultInitState: CounterState = {
   count: 0,
 }
 
 export const createCounterStore = (
-  initState: Partial<CounterState> = defaultInitState,
+  initState: CounterState = defaultInitState,
 ) => {
   return createStore<CounterStore>()((set) => ({
     ...initState,
