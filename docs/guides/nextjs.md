@@ -36,9 +36,41 @@ We have these general recommendations for the appropriate use of Zustand:
 Let's write our store factory function that will create a new store for each
 request.
 
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+```
+
+> **Note:** do not forget to remove all comments from your `tsconfig.json` file.
+
 ```ts
-// stores/counter-store.ts
-import { createStore } from 'zustand'
+// src/stores/counter-store.ts
+import { createStore } from 'zustand/vanilla'
 
 export type CounterState = {
   count: number
@@ -71,14 +103,22 @@ export const createCounterStore = (
 Let's use the `createCounterStore` in our component and share it using a context provider.
 
 ```tsx
-// components/counter-store-provider.tsx
+// src/providers/counter-store-provider.tsx
 'use client'
 
 import { type ReactNode, createContext, useRef, useContext } from 'react'
+import { type StoreApi } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
 
-import { type CounterStore, createCounterStore } from 'stores/counter-store.ts'
+import {
+  type CounterStore,
+  createCounterStore,
+  initCounterStore,
+} from '@/stores/counter-store'
 
-export const CounterStoreContext = createContext()
+export const CounterStoreContext = createContext<StoreApi<CounterStore> | null>(
+  null,
+)
 
 export interface CounterStoreProviderProps {
   children: ReactNode
@@ -87,9 +127,9 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<CounterStore>()
+  const storeRef = useRef<StoreApi<CounterStore>>()
   if (!storeRef.current) {
-    storeRef.current = createCounterStore()
+    storeRef.current = createCounterStore(initCounterStore())
   }
 
   return (
@@ -99,14 +139,16 @@ export const CounterStoreProvider = ({
   )
 }
 
-export const useCounterStore = (selector: (store: CounterStore) => T): T => {
+export const useCounterStore = <T = unknown,>(
+  selector: (store: CounterStore) => T,
+): T => {
   const counterStoreContext = useContext(CounterStoreContext)
 
-  if (counterStoreContext === undefined) {
+  if (!counterStoreContext) {
     throw new Error(`useCounterStore must be use within CounterStoreProvider`)
   }
 
-  return useStore(counterStoreContext, selector)
+  return useStoreWithEqualityFn(counterStoreContext, selector)
 }
 ```
 
@@ -119,30 +161,65 @@ export const useCounterStore = (selector: (store: CounterStore) => T): T => {
 ### Initializing the store
 
 ```ts
-// stores/counter-store.ts
-// rest of code
+// src/stores/counter-store.ts
+import { createStore } from 'zustand/vanilla'
+
+export type CounterState = {
+  count: number
+}
+
+export type CounterActions = {
+  decrementCount: () => void
+  incrementCount: () => void
+}
+
+export type CounterStore = CounterState & CounterActions
 
 export const initCounterStore = (): CounterState => {
   return { count: new Date().getFullYear() }
 }
+
+export const defaultInitState: CounterState = {
+  count: 0,
+}
+
+export const createCounterStore = (
+  initState: CounterState = defaultInitState,
+) => {
+  return createStore<CounterStore>()((set) => ({
+    ...initState,
+    decrementCount: () => set((state) => ({ count: state.count - 1 })),
+    incrementCount: () => set((state) => ({ count: state.count + 1 })),
+  }))
+}
 ```
 
 ```tsx
-// components/counter-store-provider.tsx
-// rest of code
+// src/providers/counter-store-provider.tsx
+'use client'
+
+import { type ReactNode, createContext, useRef, useContext } from 'react'
+import { type StoreApi } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
 
 import {
   type CounterStore,
   createCounterStore,
   initCounterStore,
-} from 'stores/counter-store.ts'
+} from '@/stores/counter-store'
 
-// rest of code
+export const CounterStoreContext = createContext<StoreApi<CounterStore> | null>(
+  null,
+)
+
+export interface CounterStoreProviderProps {
+  children: ReactNode
+}
 
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<CounterStore>()
+  const storeRef = useRef<StoreApi<CounterStore>>()
   if (!storeRef.current) {
     storeRef.current = createCounterStore(initCounterStore())
   }
@@ -154,7 +231,17 @@ export const CounterStoreProvider = ({
   )
 }
 
-// rest of code
+export const useCounterStore = <T = unknown,>(
+  selector: (store: CounterStore) => T,
+): T => {
+  const counterStoreContext = useContext(CounterStoreContext)
+
+  if (!counterStoreContext) {
+    throw new Error(`useCounterStore must be use within CounterStoreProvider`)
+  }
+
+  return useStoreWithEqualityFn(counterStoreContext, selector)
+}
 ```
 
 ### Using the store with different architectures
@@ -167,8 +254,8 @@ both architectures should be the same with slight differences related to each ar
 #### Pages Router
 
 ```tsx
-// components/pages/home-page.tsx
-import { useCounterStore } from 'components/counter-store-provider.ts'
+// src/components/pages/home-page.tsx
+import { useCounterStore } from '@/providers/counter-store-provider.ts'
 
 export const HomePage = () => {
   const { count, incrementCount, decrementCount } = useCounterStore()
@@ -189,10 +276,10 @@ export const HomePage = () => {
 ```
 
 ```tsx
-// _app.tsx
+// src/_app.tsx
 import type { AppProps } from 'next/app'
 
-import { CounterStoreProvider } from 'components/counter-store-provider.tsx'
+import { CounterStoreProvider } from '@/providers/counter-store-provider.tsx'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -203,14 +290,23 @@ export default function App({ Component, pageProps }: AppProps) {
 }
 ```
 
+```tsx
+// src/pages/index.tsx
+import { HomePage } from '@/components/pages/home-page.tsx'
+
+export default function Home() {
+  return <HomePage />
+}
+```
+
 > **Note:** creating a store per route would require creating and sharing the store
 > at page (route) component level. Try not to use this if you do not need to create
 > a store per route.
 
 ```tsx
-// pages/index.tsx
-import { CounterStoreProvider } from 'components/counter-store-provider.tsx'
-import { HomePage } from 'components/pages/home-page.tsx'
+// src/pages/index.tsx
+import { CounterStoreProvider } from '@/providers/counter-store-provider.tsx'
+import { HomePage } from '@/components/pages/home-page.tsx'
 
 export default function Home() {
   return (
@@ -224,11 +320,15 @@ export default function Home() {
 #### App Router
 
 ```tsx
-// components/pages/home-page.tsx
-import { useCounterStore } from 'components/counter-store-provider.ts'
+// src/components/pages/home-page.tsx
+'use client'
+
+import { useCounterStore } from '@/providers/counter-store-provider'
 
 export const HomePage = () => {
-  const { count, incrementCount, decrementCount } = useCounterStore()
+  const { count, incrementCount, decrementCount } = useCounterStore(
+    (state) => state,
+  )
 
   return (
     <div>
@@ -246,15 +346,41 @@ export const HomePage = () => {
 ```
 
 ```tsx
-// app/layout.tsx
-import { type ReactNode } from 'react'
+// src/app/layout.tsx
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
 
-export interface RootLayoutProps {
-  children: ReactNode
+import { CounterStoreProvider } from '@/providers/counter-store-provider'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'Create Next App',
+  description: 'Generated by create next app',
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  return <CounterStoreProvider>{children}</CounterStoreProvider>
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <CounterStoreProvider>{children}</CounterStoreProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+```tsx
+// src/app/page.tsx
+import { HomePage } from '@/components/pages/home-page'
+
+export default function Home() {
+  return <HomePage />
 }
 ```
 
@@ -263,9 +389,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
 > a store per route.
 
 ```tsx
-// app/index.tsx
-import { CounterStoreProvider } from 'components/counter-store-provider.tsx'
-import { HomePage } from 'components/pages/home-page.tsx'
+// src/app/page.tsx
+import { CounterStoreProvider } from '@/providers/counter-store-provider'
+import { HomePage } from '@/components/pages/home-page'
 
 export default function Home() {
   return (
