@@ -232,7 +232,7 @@ export const CounterStoreProvider = ({
   )
 }
 
-export const useCounterStore = <T = unknown,>(
+export const useCounterStore = <T,>(
   selector: (store: CounterStore) => T,
 ): T => {
   const counterStoreContext = useContext(CounterStoreContext)
