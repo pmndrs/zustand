@@ -284,31 +284,6 @@ clearForest()
 
 [Alternatively, there are some other solutions.](./docs/guides/updating-state.md#with-immer)
 
-## Middleware
-
-You can functionally compose your store any way you like.
-
-```jsx
-// Log every time state is changed
-const log = (config) => (set, get, api) =>
-  config(
-    (...args) => {
-      console.log('  applying', args)
-      set(...args)
-      console.log('  new state', get())
-    },
-    get,
-    api,
-  )
-
-const useBeeStore = create(
-  log((set) => ({
-    bees: false,
-    setBees: (input) => set({ bees: input }),
-  })),
-)
-```
-
 ## Persist middleware
 
 You can persist your store's data using any kind of storage.

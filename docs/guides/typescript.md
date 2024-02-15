@@ -259,7 +259,11 @@ const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
     set(...a)
     console.log(...(name ? [`${name}:`] : []), get())
   }
-  store.setState = loggedSet
+  const setState = store.setState
+  store.setState = (...a) => {
+    setState(...a)
+    console.log(...(name ? [`${name}:`] : []), store.getState())
+  }
 
   return f(loggedSet, get, store)
 }
