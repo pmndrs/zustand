@@ -134,10 +134,8 @@ export const CounterStoreProvider = ({
   )
 }
 
-export const identitySelector = <T,>(store: CounterStore) => store as T
-
-export const useCounterStore = <T = CounterStore,>(
-  selector = identitySelector<T>,
+export const useCounterStore = <T,>(
+  selector: (store: CounterStore) => T,
 ): T => {
   const counterStoreContext = useContext(CounterStoreContext)
 
@@ -256,7 +254,9 @@ both architectures should be the same with slight differences related to each ar
 import { useCounterStore } from '@/providers/counter-store-provider.ts'
 
 export const HomePage = () => {
-  const { count, incrementCount, decrementCount } = useCounterStore()
+  const { count, incrementCount, decrementCount } = useCounterStore(
+    (state) => state,
+  )
 
   return (
     <div>
