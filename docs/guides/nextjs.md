@@ -225,10 +225,8 @@ export const CounterStoreProvider = ({
   )
 }
 
-export const identitySelector = <T,>(store: CounterStore) => store as T
-
-export const useCounterStore = <T = CounterStore,>(
-  selector = identitySelector<T>,
+export const useCounterStore = <T,>(
+  selector: (store: CounterStore) => T,
 ): T => {
   const counterStoreContext = useContext(CounterStoreContext)
 
