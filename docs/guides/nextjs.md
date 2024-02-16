@@ -109,11 +109,7 @@ Let's use the `createCounterStore` in our component and share it using a context
 import { type ReactNode, createContext, useRef, useContext } from 'react'
 import { type StoreApi, useStore } from 'zustand'
 
-import {
-  type CounterStore,
-  createCounterStore,
-  initCounterStore,
-} from '@/stores/counter-store'
+import { type CounterStore, createCounterStore } from '@/stores/counter-store'
 
 export const CounterStoreContext = createContext<StoreApi<CounterStore> | null>(
   null,
@@ -128,7 +124,7 @@ export const CounterStoreProvider = ({
 }: CounterStoreProviderProps) => {
   const storeRef = useRef<StoreApi<CounterStore>>()
   if (!storeRef.current) {
-    storeRef.current = createCounterStore(initCounterStore())
+    storeRef.current = createCounterStore()
   }
 
   return (
@@ -200,8 +196,7 @@ export const createCounterStore = (
 'use client'
 
 import { type ReactNode, createContext, useRef, useContext } from 'react'
-import { type StoreApi } from 'zustand'
-import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { type StoreApi, useStore } from 'zustand'
 
 import {
   type CounterStore,
@@ -232,8 +227,10 @@ export const CounterStoreProvider = ({
   )
 }
 
-export const useCounterStore = <T,>(
-  selector: (store: CounterStore) => T,
+export const identitySelector = <T,>(store: CounterStore) => store as T
+
+export const useCounterStore = <T = CounterStore,>(
+  selector = identitySelector<T>,
 ): T => {
   const counterStoreContext = useContext(CounterStoreContext)
 
@@ -241,7 +238,7 @@ export const useCounterStore = <T,>(
     throw new Error(`useCounterStore must be use within CounterStoreProvider`)
   }
 
-  return useStoreWithEqualityFn(counterStoreContext, selector)
+  return useStore(counterStoreContext, selector)
 }
 ```
 
