@@ -41,7 +41,7 @@ export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
 ): U
 
 /**
- * @deprecated Use `useStoreWithEqualityFn` from 'zustand/traditional'
+ * @deprecated The usage with three arguments is deprecated. Use `useStoreWithEqualityFn` from 'zustand/traditional'. The usage with one or two arguments is not deprecated.
  * https://github.com/pmndrs/zustand/discussions/1937
  */
 export function useStore<S extends WithReact<StoreApi<unknown>>, U>(
