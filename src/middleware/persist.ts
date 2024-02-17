@@ -6,8 +6,8 @@ import type {
 
 export interface StateStorage {
   getItem: (name: string) => string | null | Promise<string | null>
-  setItem: (name: string, value: string) => void | Promise<void>
-  removeItem: (name: string) => void | Promise<void>
+  setItem: (name: string, value: string) => unknown | Promise<unknown>
+  removeItem: (name: string) => unknown | Promise<unknown>
 }
 
 export type StorageValue<S> = {
@@ -19,8 +19,8 @@ export interface PersistStorage<S> {
   getItem: (
     name: string,
   ) => StorageValue<S> | null | Promise<StorageValue<S> | null>
-  setItem: (name: string, value: StorageValue<S>) => void | Promise<void>
-  removeItem: (name: string) => void | Promise<void>
+  setItem: (name: string, value: StorageValue<S>) => unknown | Promise<unknown>
+  removeItem: (name: string) => unknown | Promise<unknown>
 }
 
 type JsonStorageOptions = {
@@ -401,7 +401,7 @@ const newImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     )
   }
 
-  const setItem = (): void | Promise<void> => {
+  const setItem = () => {
     const state = options.partialize({ ...get() })
     return (storage as PersistStorage<S>).setItem(options.name, {
       state,
