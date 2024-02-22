@@ -95,7 +95,7 @@ that runs in the browser. The right way to "hydrate" a component is by using `hy
 
 ### React
 
-Let's say we want to render an statefull app using react. In order to do that we need to
+Let's say we want to render a stateful app using React. In order to do that we need to
 use `express`, `react`, `react-dom/server` and `react-dom/client`.
 
 Let's dive into that:
