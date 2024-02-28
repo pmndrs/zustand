@@ -39,7 +39,7 @@ useMeals.setState({
 })
 ```
 
-This change causes `BearNames` rerenders even tho the actual output of `names` has not changed according to shallow equal.
+This change causes `BearNames` rerenders even though the actual output of `names` has not changed according to shallow equal.
 
 We can fix that using `useShallow`!
 
