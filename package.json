@@ -266,5 +266,6 @@
     "react": {
       "optional": true
     }
-  }
+  },
+  "packageManager": "yarn@1.22.21+sha256.dbed5b7e10c552ba0e1a545c948d5473bc6c5a28ce22a8fd27e493e3e5eb6370"
 }
