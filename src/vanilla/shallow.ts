@@ -39,7 +39,7 @@ export function shallow<T>(objA: T, objB: T) {
   }
   for (let i = 0; i < keysA.length; i++) {
     if (
-      !Object.prototype.hasOwnProperty.call(objB, keysA[i] as string) ||
+      !Object.hasOwn(objB, keysA[i] as string) ||
       !Object.is(objA[keysA[i] as keyof T], objB[keysA[i] as keyof T])
     ) {
       return false
