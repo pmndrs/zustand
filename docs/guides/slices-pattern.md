@@ -113,7 +113,7 @@ export const useBoundStore = create(
 )
 ```
 
-Please, keep in mind you should apply middlewares only in the combined store and avoid applying them inside individual slices to prevent issues.
+Please keep in mind you should only apply middlewares in the combined store. Applying them inside individual slices can lead to unexpected issues.
 
 ## Usage with TypeScript
 
