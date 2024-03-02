@@ -113,6 +113,8 @@ export const useBoundStore = create(
 )
 ```
 
+Please keep in mind you should only apply middlewares in the combined store. Applying them inside individual slices can lead to unexpected issues.
+
 ## Usage with TypeScript
 
 A detailed guide on how to use the slice pattern in Zustand with TypeScript can be found [here](./typescript.md#slices-pattern).

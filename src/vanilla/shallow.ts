@@ -37,10 +37,10 @@ export function shallow<T>(objA: T, objB: T) {
   if (keysA.length !== Object.keys(objB).length) {
     return false
   }
-  for (let i = 0; i < keysA.length; i++) {
+  for (const keyA of keysA) {
     if (
-      !Object.hasOwn(objB, keysA[i] as string) ||
-      !Object.is(objA[keysA[i] as keyof T], objB[keysA[i] as keyof T])
+      !Object.hasOwn(objB, keyA as string) ||
+      !Object.is(objA[keyA as keyof T], objB[keyA as keyof T])
     ) {
       return false
     }
