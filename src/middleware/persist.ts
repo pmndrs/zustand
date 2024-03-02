@@ -126,7 +126,10 @@ export interface PersistOptions<S, PersistedState = S> {
    * A function to perform persisted state migration.
    * This function will be called when persisted state versions mismatch with the one specified here.
    */
-  migrate?: (persistedState: unknown, version: number) => S | Promise<S>
+  migrate?: (
+    persistedState: unknown,
+    version: number,
+  ) => PersistedState | Promise<PersistedState>
   /**
    * A function to perform custom hydration merges when combining the stored state with the current one.
    * By default, this function does a shallow merge.
