@@ -636,26 +636,37 @@ describe('with redux middleware', () => {
   })
 })
 
-it('works in non-browser env', async () => {
-  const originalWindow = global.window
-  global.window = undefined as any
+describe('different envs', () => {
+  let savedConsoleWarn: any
+  beforeEach(() => {
+    savedConsoleWarn = console.warn
+    console.warn = vi.fn()
+  })
+  afterEach(() => {
+    console.warn = savedConsoleWarn
+  })
 
-  expect(() => {
-    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
-  }).not.toThrow()
+  it('works in non-browser env', async () => {
+    const originalWindow = global.window
+    global.window = undefined as any
 
-  global.window = originalWindow
-})
+    expect(() => {
+      createStore(devtools(() => ({ count: 0 }), { enabled: true }))
+    }).not.toThrow()
 
-it('works in react native env', async () => {
-  const originalWindow = global.window
-  global.window = {} as any
+    global.window = originalWindow
+  })
 
-  expect(() => {
-    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
-  }).not.toThrow()
+  it('works in react native env', async () => {
+    const originalWindow = global.window
+    global.window = {} as any
 
-  global.window = originalWindow
+    expect(() => {
+      createStore(devtools(() => ({ count: 0 }), { enabled: true }))
+    }).not.toThrow()
+
+    global.window = originalWindow
+  })
 })
 
 it('preserves isRecording after setting from devtools', async () => {
