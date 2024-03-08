@@ -474,7 +474,7 @@ it('can set the store without merging', () => {
 
 it('only calls selectors when necessary', async () => {
   type State = { a: number; b: number }
-  const useBoundStore = create<State>(() => ({ a: 0, b: 0 }))
+  const useBoundStore = createWithEqualityFn<State>(() => ({ a: 0, b: 0 }))
   const { setState } = useBoundStore
   let inlineSelectorCallCount = 0
   let staticSelectorCallCount = 0

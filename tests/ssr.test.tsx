@@ -19,11 +19,9 @@ const useBearStore = create<BearStoreState & BearStoreAction>((set) => ({
 }))
 
 function Counter() {
-  const { bears, increasePopulation } = useBearStore(
-    ({ bears, increasePopulation }) => ({
-      bears,
-      increasePopulation,
-    }),
+  const bears = useBearStore(({ bears }) => bears)
+  const increasePopulation = useBearStore(
+    ({ increasePopulation }) => increasePopulation,
   )
 
   useEffect(() => {
