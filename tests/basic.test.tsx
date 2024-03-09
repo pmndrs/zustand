@@ -472,9 +472,47 @@ it('can set the store without merging', () => {
   expect(getState()).toEqual({ b: 2 })
 })
 
-it('only calls selectors when necessary', async () => {
+it('only calls selectors when necessary with static selector', async () => {
   type State = { a: number; b: number }
-  const useBoundStore = create<State>(() => ({ a: 0, b: 0 }))
+  const useBoundStore = createWithEqualityFn<State>(() => ({ a: 0, b: 0 }))
+  const { setState } = useBoundStore
+  let staticSelectorCallCount = 0
+
+  function staticSelector(s: State) {
+    staticSelectorCallCount++
+    return s.a
+  }
+
+  function Component() {
+    useBoundStore(staticSelector)
+    return (
+      <>
+        <div>static: {staticSelectorCallCount}</div>
+      </>
+    )
+  }
+
+  const { rerender, findByText } = render(
+    <>
+      <Component />
+    </>,
+  )
+  await findByText('static: 1')
+
+  rerender(
+    <>
+      <Component />
+    </>,
+  )
+  await findByText('static: 1')
+
+  act(() => setState({ a: 1, b: 1 }))
+  await findByText('static: 2')
+})
+
+it('only calls selectors when necessary (traditional)', async () => {
+  type State = { a: number; b: number }
+  const useBoundStore = createWithEqualityFn<State>(() => ({ a: 0, b: 0 }))
   const { setState } = useBoundStore
   let inlineSelectorCallCount = 0
   let staticSelectorCallCount = 0
