@@ -158,7 +158,11 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     if (!extensionConnector) {
-      if (import.meta.env?.MODE !== 'production' && enabled) {
+      if (
+        typeof window !== 'undefined' &&
+        import.meta.env?.MODE !== 'production' &&
+        enabled
+      ) {
         console.warn(
           '[zustand devtools middleware] Please install/enable Redux devtools extension',
         )
