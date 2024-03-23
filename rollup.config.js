@@ -18,9 +18,8 @@ function external(id) {
   return !id.startsWith('.') && !id.startsWith(root)
 }
 
-function getEsbuild(format) {
+function getEsbuild() {
   return esbuild({
-    format,
     target: 'es2018',
     supported: { 'import-meta': true },
     tsconfig: path.resolve('./tsconfig.json'),
@@ -67,7 +66,7 @@ function createESMConfig(input, output) {
         delimiters: ['\\b', '\\b(?!(\\.|/))'],
         preventAssignment: true,
       }),
-      getEsbuild('esm'),
+      getEsbuild(),
     ],
   }
 }
@@ -85,7 +84,7 @@ function createCommonJSConfig(input, output) {
         delimiters: ['\\b', '\\b(?!(\\.|/))'],
         preventAssignment: true,
       }),
-      getEsbuild('cjs'),
+      getEsbuild(),
     ],
   }
 }
