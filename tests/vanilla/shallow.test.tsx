@@ -91,6 +91,12 @@ describe('shallow', () => {
 
     expect(shallow(firstFnCompare, secondFnCompare)).toBe(false)
   })
+
+  it('compares URLSearchParams', () => {
+    const a = new URLSearchParams({ hello: 'world' })
+    const b = new URLSearchParams({ zustand: 'shallow' })
+    expect(shallow(a, b)).toBe(false)
+  })
 })
 
 describe('unsupported cases', () => {
