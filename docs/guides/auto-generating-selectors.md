@@ -131,3 +131,4 @@ For a working example of this, see the [Code Sandbox](https://codesandbox.io/s/z
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook)
 - [react-hooks-global-state](https://github.com/dai-shi/react-hooks-global-state)
 - [zustood](https://github.com/udecode/zustood)
+- [@davstack/store](https://www.npmjs.com/package/@davstack/store)
