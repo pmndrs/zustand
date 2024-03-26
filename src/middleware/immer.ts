@@ -32,7 +32,7 @@ type SkipTwo<T> = T extends { length: 0 }
             ? A
             : never
 
-type WithImmer<S> = Write<S, StoreImmer<S>>
+export type WithImmer<S> = Write<S, StoreImmer<S>>
 
 type StoreImmer<S> = S extends {
   getState: () => infer T
