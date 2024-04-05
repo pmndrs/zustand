@@ -47,7 +47,22 @@ jobs:
           sed -i~ 's/"include": .*/"include": ["src\/types.d.ts", "dist\/**\/*", "tests\/**\/*"],/' tsconfig.json
           yarn json -I -f package.json -e "this.resolutions={}; this.resolutions['@types/node']='18.13.0';"
           yarn add -D @types/node@18.13.0
-      - name: Test ${{ matrix.typescript }}
+      - name: Install old TypeScript
+        run: yarn add -D typescript@${{ matrix.typescript }}
+      - name: Patch testing setup for Old TS
+        if: ${{ matrix.typescript == '4.4.4' || matrix.typescript == '4.3.5' || matrix.typescript == '4.2.3' || matrix.typescript == '4.1.5' }}
         run: |
-          yarn add -D typescript@${{ matrix.typescript }}
-          yarn tsc --noEmit
+          rm node_modules/@vitest/expect/dist/*.d.ts
+          echo "declare module '@vitest/expect'" >> ./src/types.d.ts
+          rm node_modules/@vitest/runner/dist/*.d.ts
+          echo "declare module '@vitest/runner'" >> ./src/types.d.ts
+          rm node_modules/@vitest/spy/dist/*.d.ts
+          echo "declare module '@vitest/spy'" >> ./src/types.d.ts
+          rm node_modules/@vitest/utils/dist/*.d.ts
+          echo "declare module '@vitest/utils'" >> ./src/types.d.ts
+          rm node_modules/vite-node/dist/*.d.ts
+          echo "declare module 'vite-node'" >> ./src/types.d.ts
+          rm node_modules/vitest/dist/*.d.ts
+          echo "declare module 'vitest'" >> ./src/types.d.ts
+      - name: Test ${{ matrix.typescript }}
+        run: yarn tsc --noEmit
