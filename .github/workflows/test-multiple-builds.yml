@@ -19,17 +19,23 @@ jobs:
         include:
           - devtools-skip: CI-MATRIX-[2345]
             build: umd
+            env: [development, production]
           - devtools-skip: CI-MATRIX-[1345]
             build: umd
+            env: [development, production]
           - devtools-skip: CI-MATRIX-[1245]
             build: umd
+            env: [development, production]
           - devtools-skip: CI-MATRIX-[1235]
             build: umd
+            env: [development, production]
           - devtools-skip: CI-MATRIX-[1234]
             build: umd
+            env: [development, production]
         exclude:
           - devtools-skip: CI-MATRIX-NOSKIP
             build: umd
+            env: [development, production]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
