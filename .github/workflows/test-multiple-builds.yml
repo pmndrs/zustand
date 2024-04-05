@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [cjs, umd] # [cjs, esm, umd, system]
+        build: [cjs, esm] # [cjs, esm, umd, system]
         env: [development, production]
         devtools-skip:
           - CI-MATRIX-NOSKIP
