@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [cjs, esm, umd] # [cjs, esm, umd, system]
+        build: [cjs, esm, umd]
         env: [development, production]
     steps:
       - uses: actions/checkout@v2
