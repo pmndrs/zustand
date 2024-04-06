@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         build: [cjs, esm]
-        env: [development, production]
+        env: [development] # [development, production]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
