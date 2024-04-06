@@ -158,11 +158,6 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     if (!extensionConnector) {
-      if (import.meta.env?.MODE !== 'production' && enabled) {
-        console.warn(
-          '[zustand devtools middleware] Please install/enable Redux devtools extension',
-        )
-      }
       return fn(set, get, api)
     }
 
@@ -269,7 +264,7 @@ const devtoolsImpl: DevtoolsImpl =
                 if (Object.keys(action.state as S).length !== 1) {
                   console.error(
                     `
-                    [zustand devtools middleware] Unsupported __setState action format. 
+                    [zustand devtools middleware] Unsupported __setState action format.
                     When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
                     and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
                     `,
