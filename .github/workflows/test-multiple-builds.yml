@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         build: [cjs, esm]
-        env: [development] # [development, production]
+        env: [development, production]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -36,11 +36,12 @@ jobs:
       - name: Patch for CJS
         if: ${{ matrix.build == 'cjs' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\1.js/" package.json
+          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\1.js')/" vitest.config.ts
+          sed -i~ "s/module.exports.createStore = vanilla.createStore;//" dist/index.js
       - name: Patch for ESM
         if: ${{ matrix.build == 'esm' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js/" package.json
+          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/esm\1.mjs')/" vitest.config.ts
           sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
