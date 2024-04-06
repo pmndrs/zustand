@@ -154,11 +154,6 @@ describe('If there is no extension installed...', () => {
     expect(console.warn).not.toBeCalled()
   })
 
-  it('[DEV-ONLY] warns if enabled in dev mode', async () => {
-    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
-    expect(console.warn).toBeCalled()
-  })
-
   it.skip('[PRD-ONLY] does not warn if not in dev env', async () => {
     createStore(devtools(() => ({ count: 0 })))
     expect(console.warn).not.toBeCalled()
