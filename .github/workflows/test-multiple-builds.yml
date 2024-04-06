@@ -12,24 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [cjs, umd] # [cjs, esm, umd, system]
+        build: [cjs, esm, umd]
         env: [development, production]
-        devtools-skip:
-          - CI-MATRIX-NOSKIP
-        include:
-          - devtools-skip: CI-MATRIX-[2345]
-            build: umd
-          - devtools-skip: CI-MATRIX-[1345]
-            build: umd
-          - devtools-skip: CI-MATRIX-[1245]
-            build: umd
-          - devtools-skip: CI-MATRIX-[1235]
-            build: umd
-          - devtools-skip: CI-MATRIX-[1234]
-            build: umd
-        exclude:
-          - devtools-skip: CI-MATRIX-NOSKIP
-            build: umd
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -56,32 +40,25 @@ jobs:
       - name: Patch for CJS
         if: ${{ matrix.build == 'cjs' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\1.js/" package.json
+          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\1.js')/" vitest.config.ts
+          sed -i~ "s/module.exports.createStore = vanilla.createStore;//" dist/index.js
       - name: Patch for ESM
         if: ${{ matrix.build == 'esm' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/esm\1.js" package.json
+          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/esm\1.mjs')/" vitest.config.ts
           sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
-      - name: Patch for UMD (DEV)
-        if: ${{ matrix.build == 'umd' && matrix.env == 'development' }}
+      - name: Patch for UMD
+        if: ${{ matrix.build == 'umd' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.development.js/" package.json
-          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
+          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/umd\1.${NODE_ENV}.js')/" vitest.config.ts
         env:
-          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
-      - name: Patch for UMD (PRD)
-        if: ${{ matrix.build == 'umd' && matrix.env == 'production' }}
-        run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/umd\1.production.js/" package.json
-          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
-        env:
-          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
+          NODE_ENV: ${{ matrix.env }}
       - name: Patch for SystemJS
         if: ${{ matrix.build == 'system' }}
         run: |
-          sed -i~ "s/<rootDir>\/src\(.*\)\.ts/<rootDir>\/dist\/system\1.${NODE_ENV}.js/" package.json
+          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/system\1.${NODE_ENV}.js')/" vitest.config.ts
         env:
           NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}

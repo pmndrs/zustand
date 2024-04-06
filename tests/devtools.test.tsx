@@ -1,4 +1,4 @@
-import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { devtools, redux } from 'zustand/middleware'
 import { StoreApi, createStore } from 'zustand/vanilla'
 
@@ -16,12 +16,12 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: Mock<[f: (m: unknown) => void], () => void>
-    unsubscribe: Mock<any>
-    send: Mock<any>
-    init: Mock<any>
-    error: Mock<any>
-    dispatch?: Mock<any>
+    subscribe: any
+    unsubscribe: any
+    send: any
+    init: any
+    error: any
+    dispatch?: any
   }
 }
 const namedConnections = new Map<string | undefined, Connection>()
