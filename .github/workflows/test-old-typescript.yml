@@ -13,7 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         typescript:
-          - 5.3.2
+          - 5.4.4
+          - 5.3.3
           - 5.2.2
           - 5.1.6
           - 5.0.4
