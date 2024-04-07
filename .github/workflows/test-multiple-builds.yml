@@ -46,7 +46,6 @@ jobs:
         if: ${{ matrix.build == 'esm' }}
         run: |
           sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/esm\1.mjs')/" vitest.config.ts
-          sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
         env:
           NODE_ENV: ${{ matrix.env }}
       - name: Patch for UMD
