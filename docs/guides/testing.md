@@ -314,9 +314,9 @@ export const createCounterStore = () => {
   return createStore<CounterStore>(counterStoreCreator)
 }
 
-export type CounterBoundStore = ReturnType<typeof createCounterStore>
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
 
-export const CounterStoreContext = createContext<CounterBoundStore | undefined>(
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
   undefined,
 )
 
@@ -327,7 +327,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const counterStoreRef = useRef<CounterBoundStore>()
+  const counterStoreRef = useRef<CounterStoreApi>()
   if (!counterStoreRef.current) {
     counterStoreRef.current = createCounterStore()
   }

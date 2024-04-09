@@ -111,9 +111,9 @@ import { useStore } from 'zustand'
 
 import { type CounterStore, createCounterStore } from '@/stores/counter-store'
 
-export type CounterBoundStore = ReturnType<typeof createCounterStore>
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
 
-export const CounterStoreContext = createContext<CounterBoundStore | undefined>(
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
   undefined,
 )
 
@@ -124,7 +124,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<CounterBoundStore>()
+  const storeRef = useRef<CounterStoreApi>()
   if (!storeRef.current) {
     storeRef.current = createCounterStore()
   }
@@ -204,9 +204,9 @@ import {
   initCounterStore,
 } from '@/stores/counter-store'
 
-export type CounterBoundStore = ReturnType<typeof createCounterStore>
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
 
-export const CounterStoreContext = createContext<CounterBoundStore | undefined>(
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
   undefined,
 )
 
@@ -217,7 +217,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<CounterBoundStore>()
+  const storeRef = useRef<CounterStoreApi>()
   if (!storeRef.current) {
     storeRef.current = createCounterStore(initCounterStore())
   }
