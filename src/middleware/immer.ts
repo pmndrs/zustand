@@ -57,9 +57,19 @@ const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>
 
   store.setState = (updater, replace, ...a) => {
-    const nextState = (
-      typeof updater === 'function' ? produce(updater as any) : updater
-    ) as ((s: T) => T) | T | Partial<T>
+    if (replace === false) {
+      throw new Error(
+        '`replace` must be `true` (or nullish) when using the `immer` middleware.',
+      )
+    }
+    // We always want to `replace` with `immer`.
+    replace = true
+    if (typeof updater !== 'function') {
+      throw new Error(
+        'You must pass a function to `setState` when using the `immer` middleware.',
+      )
+    }
+    const nextState = produce(updater as any) as (s: T) => T
 
     return set(nextState as any, replace, ...a)
   }
