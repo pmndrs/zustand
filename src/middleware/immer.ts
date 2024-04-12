@@ -42,7 +42,6 @@ type StoreImmer<S> = S extends {
     ? {
         setState(
           nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
-          shouldReplace?: boolean | undefined,
           ...a: SkipTwo<A>
         ): Sr
       }
@@ -56,22 +55,10 @@ type ImmerImpl = <T>(
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>
 
-  store.setState = (updater, replace, ...a) => {
-    if (replace === false) {
-      throw new Error(
-        '`replace` must be `true` (or nullish) when using the `immer` middleware.',
-      )
-    }
-    // We always want to `replace` with `immer`.
-    replace = true
-    if (typeof updater !== 'function') {
-      throw new Error(
-        'You must pass a function to `setState` when using the `immer` middleware.',
-      )
-    }
+  store.setState = (updater, ...a) => {
     const nextState = produce(updater as any) as (s: T) => T
 
-    return set(nextState as any, replace, ...a)
+    return set(nextState as any, /* replace */ true, ...a)
   }
 
   return initializer(store.setState, get, store)

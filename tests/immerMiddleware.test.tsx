@@ -27,24 +27,6 @@ describe('immer middleware', () => {
     expect(useBoundStore.getState().count).toEqual(1)
   })
 
-  it('`replace` must not be `false` in `setState`', () => {
-    const store = createStore<Record<string, any>>()(immer(() => ({})))
-
-    expect(() => {
-      store.setState((state) => {
-        state.x = 3
-      }, /* replace */ false)
-    }).toThrow('must be `true`')
-  })
-
-  it('must pass a function to `setState`', () => {
-    const store = createStore<Record<string, any>>()(immer(() => ({})))
-
-    expect(() => {
-      store.setState({ x: 3 })
-    }).toThrow('must pass a function')
-  })
-
   // Bug: https://github.com/pmndrs/zustand/discussions/2480
   it('delete key at root of state', () => {
     type State = Record<string, any>
