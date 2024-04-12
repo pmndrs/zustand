@@ -55,7 +55,7 @@ type ImmerImpl = <T>(
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>
 
-  store.setState = (updater, ...a) => {
+  store.setState = (updater, _, ...a) => {
     const nextState = produce(updater as any) as (s: T) => T
 
     return set(nextState as any, /* replace */ true, ...a)
