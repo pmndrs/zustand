@@ -59,6 +59,9 @@ The mock provided below will enable the relevant test runner to reset the zustan
 
 ### Shared code just for testing purposes
 
+This shared code was added to avoid code duplications in our demo since we use the same counter store
+creator for both implementations, with (`createStore`) and without `Context` API (`create`).
+
 ```ts
 // shared/counter-store-creator.ts
 import { type StateCreator } from 'zustand'
