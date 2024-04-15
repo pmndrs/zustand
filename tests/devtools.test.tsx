@@ -149,7 +149,7 @@ describe('If there is no extension installed...', () => {
     }).not.toThrow()
   })
 
-  it('does not warn if not enabled', async () => {
+  it('does not warn', async () => {
     createStore(devtools(() => ({ count: 0 })))
     expect(console.warn).not.toBeCalled()
   })
