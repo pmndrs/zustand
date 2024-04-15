@@ -148,6 +148,11 @@ describe('If there is no extension installed...', () => {
       createStore(devtools(() => ({ count: 0 })))
     }).not.toThrow()
   })
+
+  it('does not warn if not enabled', async () => {
+    createStore(devtools(() => ({ count: 0 })))
+    expect(console.warn).not.toBeCalled()
+  })
 })
 
 describe('When state changes...', () => {
