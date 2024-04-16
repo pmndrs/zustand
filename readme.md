@@ -360,6 +360,8 @@ const useGrumpyStore = create(redux(reducer, initialState))
 
 ## Redux devtools
 
+Install the [Redux DevTools Chrome extension](https://chromewebstore.google.com/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd) to use the devtools middleware.
+
 ```jsx
 import { devtools } from 'zustand/middleware'
 
