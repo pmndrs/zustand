@@ -107,12 +107,14 @@ Let's use the `createCounterStore` in our component and share it using a context
 'use client'
 
 import { type ReactNode, createContext, useRef, useContext } from 'react'
-import { type StoreApi, useStore } from 'zustand'
+import { useStore } from 'zustand'
 
 import { type CounterStore, createCounterStore } from '@/stores/counter-store'
 
-export const CounterStoreContext = createContext<StoreApi<CounterStore> | null>(
-  null,
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
+
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
+  undefined,
 )
 
 export interface CounterStoreProviderProps {
@@ -122,7 +124,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<CounterStore>>()
+  const storeRef = useRef<CounterStoreApi>()
   if (!storeRef.current) {
     storeRef.current = createCounterStore()
   }
@@ -194,7 +196,7 @@ export const createCounterStore = (
 'use client'
 
 import { type ReactNode, createContext, useRef, useContext } from 'react'
-import { type StoreApi, useStore } from 'zustand'
+import { useStore } from 'zustand'
 
 import {
   type CounterStore,
@@ -202,8 +204,10 @@ import {
   initCounterStore,
 } from '@/stores/counter-store'
 
-export const CounterStoreContext = createContext<StoreApi<CounterStore> | null>(
-  null,
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
+
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
+  undefined,
 )
 
 export interface CounterStoreProviderProps {
@@ -213,7 +217,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<CounterStore>>()
+  const storeRef = useRef<CounterStoreApi>()
   if (!storeRef.current) {
     storeRef.current = createCounterStore(initCounterStore())
   }
