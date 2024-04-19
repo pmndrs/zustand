@@ -41,7 +41,10 @@ type StoreImmer<S> = S extends {
   ? SetState extends (...a: infer A) => infer Sr
     ? {
         setState(
-          nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
+          nextStateOrUpdater:
+            | T
+            | Partial<T>
+            | ((state: Draft<T>) => T | Partial<T> | void),
           shouldReplace?: boolean | undefined,
           ...a: SkipTwo<A>
         ): Sr
