@@ -20,7 +20,7 @@ This can be done using third-party libraries created by the community.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook) — Automatic generation of Zustand hooks with Typescript support.
-- [derive-zustand](https://github.com/dai-shi/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
+- [derive-zustand](https://github.com/zustandjs/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
 - [geschichte](https://github.com/BowlingX/geschichte) — Zustand and Immer-based hook to manage query parameters.
 - [leiten-zustand](https://github.com/hecmatyar/leiten-zustand) — Cleans your store from boilerplate for requests and data transformation.
 - [mobz](https://github.com/2A5F/Mobz) — Zustand-style MobX API.
@@ -30,7 +30,7 @@ This can be done using third-party libraries created by the community.
 - [simple-zustand-devtools](https://github.com/beerose/simple-zustand-devtools) — 🐻⚛️ Inspect your Zustand store in React DevTools.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
 - [use-broadcast-ts](https://github.com/Romainlg29/use-broadcast) — Zustand middleware to share state between tabs.
-- [use-zustand](https://github.com/dai-shi/use-zustand) — Another custom hook to use Zustand vanilla store.
+- [use-zustand](https://github.com/zustandjs/use-zustand) — Another custom hook to use Zustand vanilla store.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
@@ -48,6 +48,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
 - [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
 - [zustand-saga](https://github.com/Nowsta/zustand-saga) — A Zustand middleware for redux-saga (minus redux).
+- [zustand-slices](https://github.com/zustandjs/zustand-slices) — A slice utility for Zustand.
 - [zustand-store-addons](https://github.com/Diablow/zustand-store-addons) — React state management addons for Zustand.
 - [zustand-sync-tabs](https://github.com/mayank1513/zustand-sync-tabs) — Zustand middleware to easily sync Zustand state between tabs/windows/iframes with same origin.
 - [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) - State management for vue (Vue3 / Vue2) based on zustand.
