@@ -4,11 +4,7 @@ description:
 nav: 1
 ---
 
-<style>
-  #createstore:not(:has(a)) {
-    display: none;
-  }
-</style>
+<style dangerouslySetInnerHTML={{ __html: `#createstore { display: none; }` }}></style>
 
 # createStore
 
