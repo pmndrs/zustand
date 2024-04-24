@@ -1,9 +1,8 @@
-type SetStateInternal<T> = {
-  _(
-    partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
-    replace?: boolean | undefined,
-  ): void
-}['_']
+type NextState<T> = never | Partial<T> | ((state: T) => Partial<T>)
+type SetStateInternal<T> = (
+  partial: NextState<T>,
+  replace?: boolean | undefined,
+) => void
 
 export interface StoreApi<T> {
   setState: SetStateInternal<T>
@@ -65,12 +64,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   const listeners: Set<Listener> = new Set()
 
   const setState: StoreApi<TState>['setState'] = (partial, replace) => {
-    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
-    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
-    const nextState =
-      typeof partial === 'function'
-        ? (partial as (state: TState) => TState)(state)
-        : partial
+    const nextState = typeof partial === 'function' ? partial(state) : partial
     if (!Object.is(nextState, state)) {
       const previousState = state
       state =
