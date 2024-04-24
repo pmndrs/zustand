@@ -5,8 +5,8 @@ nav: 1
 ---
 
 <style>
-  #create-store:not:has(a) {
-    display: none !important;
+  #createstore:not(:has(a)) {
+    display: none;
   }
 </style>
 
