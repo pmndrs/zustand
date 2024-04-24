@@ -1,8 +1,14 @@
 ---
 title: createStore
-description: 
+description:
 nav: 1
 ---
+
+<style>
+  #create-store:not:has(a) {
+    display: none !important;
+  }
+</style>
 
 # createStore
 
