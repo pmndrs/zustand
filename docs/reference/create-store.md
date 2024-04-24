@@ -4,8 +4,6 @@ description:
 nav: 1
 ---
 
-<div dangerouslySetInnerHTML={{ __html: `<style>#createstore { display: none; }</style>` }}></div>
-
 # createStore
 
 `createStore` lets you create a vanilla store. Lorem ipsum dolor sit amet consectetur adipisicing
@@ -82,3 +80,9 @@ deserunt sed!
 ## Usage
 
 ## Troubleshooting
+
+<style module>
+#createstore:not(:has(a)) {
+  display: none !important;
+}
+</style>
