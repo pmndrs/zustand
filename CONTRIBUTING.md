@@ -34,7 +34,7 @@ If you want to contribute to the [documentation](./docs/):
   As a temporary measure, you can do the following
   (don't commit any changes made in the pmndrs/website repo):
   - In your own Zustand fork, create a new working branch
-    (further related to as `[your-branch]`);
+    (referred to as `[your-branch]` going forward);
   - Inside website codebase, open `src/data/libraries.ts`;
   - Within the `zustand` key,
     change `docs: 'pmndrs/zustand/main/docs'`
