@@ -19,10 +19,10 @@ type Get<T, K, F> = K extends keyof T ? T[K] : F
 export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]
   ? S
   : Ms extends []
-  ? S
-  : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
-  ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
-  : never
+    ? S
+    : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+      ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
+      : never
 
 export type StateCreator<
   T,
@@ -36,7 +36,7 @@ export type StateCreator<
 ) => U) & { $$storeMutators?: Mos }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface
-export interface StoreMutators<S, A> { }
+export interface StoreMutators<S, A> {}
 export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
 
 type CreateStore = {
