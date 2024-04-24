@@ -81,6 +81,5 @@ deserunt sed!
 
 ## Troubleshooting
 
-<script module>
-console.log('gg')
-</script>
+<div id="gg">
+</div>
