@@ -4,7 +4,7 @@ description:
 nav: 1
 ---
 
-<style dangerouslySetInnerHTML={{ __html: `#createstore { display: none; }` }}></style>
+<div dangerouslySetInnerHTML={{ __html: `<style>#createstore { display: none; }</style>` }}></div>
 
 # createStore
 
