@@ -1,18 +1,17 @@
-type NextState<T> = never | Partial<T> | ((state: T) => Partial<T>)
-type SetStateInternal<T> = (
-  partial: NextState<T>,
-  replace?: boolean | undefined,
-) => void
+// This type intentionally shadows globalThis.Partial.
+// Keeping the name the same hides an implementation
+// detail from users, which is that this version is
+// evaluates its type argument _greedily_.
+type Partial<T> = never | { [K in keyof T]+?: T[K] }
 
-export interface StoreApi<T> {
-  setState: SetStateInternal<T>
-  getState: () => T
-  getInitialState: () => T
-  subscribe: (listener: (state: T, prevState: T) => void) => () => void
-  /**
-   * @deprecated Use `unsubscribe` returned by `subscribe`
-   */
-  destroy: () => void
+export interface StoreApi<T> extends Deprecated.Api {
+  getState(): T
+  setState(
+    partial: Partial<T> | ((state: T) => Partial<T>),
+    replace?: boolean,
+  ): void
+  subscribe(listener: (state: T, prevState: T) => void): () => void
+  getInitialState(): T
 }
 
 type Get<T, K, F> = K extends keyof T ? T[K] : F
@@ -20,10 +19,10 @@ type Get<T, K, F> = K extends keyof T ? T[K] : F
 export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]
   ? S
   : Ms extends []
-    ? S
-    : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
-      ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
-      : never
+  ? S
+  : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
+  ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
+  : never
 
 export type StateCreator<
   T,
@@ -37,7 +36,7 @@ export type StateCreator<
 ) => U) & { $$storeMutators?: Mos }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface
-export interface StoreMutators<S, A> {}
+export interface StoreMutators<S, A> { }
 export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
 
 type CreateStore = {
@@ -177,3 +176,13 @@ export type GetState<T extends State> = () => T
  * @deprecated Use `StoreApi<T>['destroy']` instead of `Destroy`.
  */
 export type Destroy = () => void
+
+/* eslint-disable-next-line @typescript-eslint/no-namespace */
+declare namespace Deprecated {
+  interface Api {
+    /**
+     * @deprecated Use `unsubscribe` returned by `subscribe`
+     */
+    destroy(): void
+  }
+}
