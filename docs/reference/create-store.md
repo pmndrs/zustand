@@ -81,8 +81,6 @@ deserunt sed!
 
 ## Troubleshooting
 
-<style module>
-#createstore:not(:has(a)) {
-  display: none !important;
-}
-</style>
+<script module>
+console.log('gg')
+</script>
