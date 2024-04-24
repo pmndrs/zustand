@@ -1,7 +1,4 @@
-// This type intentionally shadows globalThis.Partial.
-// Keeping the name the same hides an implementation
-// detail from users, which is that this version is
-// evaluates its type argument _greedily_.
+// Shows users better types sooner than globalThis.Partial
 type Partial<T> = never | { [K in keyof T]+?: T[K] }
 
 export interface StoreApi<T> extends Deprecated.Api {
