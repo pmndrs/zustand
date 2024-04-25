@@ -6,7 +6,7 @@ nav: 204
 
 # create
 
-`create` let's create a store and bound store to a hook custom. Lorem ipsum dolor sit, amet
+`create` lets you create a store and bound store to a hook custom. Lorem ipsum dolor sit, amet
 consectetur adipisicing elit. Consequuntur dolorum quaerat hic ipsum, perspiciatis enim laudantium
 minima porro tempore laboriosam praesentium obcaecati modi nesciunt voluptatibus at fugit libero
 iusto cum.
