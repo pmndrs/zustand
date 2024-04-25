@@ -1,5 +1,5 @@
 ---
 title: Thinking in Zustand
-description:
+description: Motivation, principles, and glossary
 nav: 101
 ---
