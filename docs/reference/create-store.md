@@ -28,13 +28,11 @@ createStore(initializer)
   - [`subscribe` function](#subscribe-function)
   - [`destroy` function](#destroy-function)
 - [Usage](#usage)
-  - [Usage 1](#usage-1)
-  - [Usage 2](#usage-2)
-  - [Usage 3](#usage-3)
+  - [Updating state based on previous state](#updating-state-base-on-a-previous-state)
+  - [Updating objects and non-objects in state](#updating-objects-and-non-objects-in-state)
+  - [Subscribing to state updates](#subscribing-to-state-updates)
 - [Troubleshooting](#troubleshooting)
-  - [Troubleshoot 1](#troubleshoot-1)
-  - [Troubleshoot 2](#troubleshoot-2)
-  - [Troubleshoot 3](#troubleshoot-3)
+  - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
 ## Reference
 
@@ -79,7 +77,32 @@ deserunt sed!
 
 ## Usage
 
+### Updating state base on a previous state
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam in provident eius eaque modi,
+architecto consequuntur nihil soluta, dolore ratione, deleniti voluptatum unde. Qui veritatis,
+deleniti error vero ducimus sunt.
+
+### Updating objects and non-objects in state
+
+Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cupiditate consectetur sequi repellendus
+culpa nesciunt dolores aut. Voluptas corrupti expedita temporibus doloribus, maxime dolor iure
+suscipit adipisci hic cumque quasi officia?
+
+### Subscribing to state updates
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut quidem est neque consequuntur,
+dolorem eius, explicabo ullam voluptatibus ex corporis qui, quasi eum reprehenderit maxime! Magni
+magnam dignissimos eos dicta!
+
 ## Troubleshooting
 
-<div id="gg">
-</div>
+Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aut illo, earum beatae voluptate corporis
+saepe ipsa? Placeat animi commodi qui odit debitis eveniet enim maiores, illum tempora repellendus
+sint non?
+
+### I’ve updated the state, but the screen doesn’t update
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi facere vel minus saepe inventore hic
+tenetur aspernatur officia ipsam accusantium illum, neque consectetur placeat doloremque pariatur
+voluptatum amet odio quos!
