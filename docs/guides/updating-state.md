@@ -131,7 +131,7 @@ You can also use [Ramda](https://ramdajs.com/):
 
 ```ts
   ramdaInc: () =>
-    set(R.over(R.lensPath(["deep", "nested", "obj", "count"]), (c) => c + 1)),
+    set(R.modifyPath(["deep", "nested", "obj", "count"], (c) => c + 1)),
 ```
 
 Both ramda and optics-ts also work with types.
