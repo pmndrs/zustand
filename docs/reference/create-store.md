@@ -43,7 +43,7 @@ createStore<T>()(initializer: StateCreator<T, [], []>): StoreApi<T>
 #### Parameters
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `store` as
+  when you pass a function should take `setState` function, `getState` function and `api` as
   arguments.
 
 #### Returns
