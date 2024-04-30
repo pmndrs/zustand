@@ -30,7 +30,11 @@ devtools<T>(initializer: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOpti
 #### Parameters
 
 - `initializer`: Lorem ipsum dolor sit, amet consectetur adipisicing elit. Corporis tempore hic sit.
-  Numquam vero voluptate perspiciatis sunt ab amet recusandae, molestias eaque fugit animi debitis asperiores magnam, beatae eveniet rem?
+  Numquam vero voluptate perspiciatis sunt ab amet recusandae, molestias eaque fugit animi debitis
+  asperiores magnam, beatae eveniet rem?
+- `devtoolsOptions`: Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum, repellat?
+  Nihil neque placeat voluptatibus eveniet ipsa amet maiores cumque vero illo, ipsum eaque totam
+  repudiandae beatae, accusantium cum quae magnam!
 
 #### Returns
 

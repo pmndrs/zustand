@@ -17,7 +17,6 @@ useStore(api, selector)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
   - [`subscribe` function](#subscribe-function)
-  - [`destroy` function](#destroy-function)
   - [`storeApi`](#storeapi)
 - [Usage](#usage)
   - [Use a vanilla store in React](#use-a-vanilla-store-in-react)
@@ -86,16 +85,11 @@ previous state as arguments.
 
 `subscribe` returns a function that lets you unsubscribe.
 
-### `destroy` function
-
-The `destroy` function lets you clear all the listeners. This function is **deprecated** and would
-be removed in the future.
-
 ### `storeApi`
 
 The `storeApi` lets you access to the store api utilities like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, [`subscribe`](#subscribe-function) function,
-and [`destroy`](#destroy-function) function.
+function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
+function.
 
 ## Usage
 

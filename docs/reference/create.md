@@ -15,11 +15,10 @@ create(initializer)
 - [Reference](#reference)
   - [`Signature`](#create-signature)
   - [`selector` function](#selector-function)
-  - [`equalityFn` function](#equalityfn-function)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
   - [`subscribe` function](#subscribe-function)
-  - [`destroy` function](#destroy-function)
+  - [`storeApi`](#storeapi)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-base-on-a-previous-state)
   - [Updating objects and non-objects in state](#updating-objects-and-non-objects-in-state)
@@ -43,9 +42,9 @@ create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 
 #### Returns
 
-`create` returns a hook, that could take `selector` function, and `equalityFn` function as
-arguments. Also, expose [`setState`](#selector-function) function, [`getState`](#getstate-function)
-function, [`subscribe`](#subscribe-function) function, and [`destroy`](#destroy-function) function.
+`create` returns a hook, that should take `selector` function as its only argument. Also,
+expose [`setState`](#selector-function) function, [`getState`](#getstate-function) function, and
+[`subscribe`](#subscribe-function) function.
 
 ### `selector` function
 
@@ -77,16 +76,11 @@ previous state as arguments.
 
 `subscribe` returns a function that lets you unsubscribe.
 
-### `destroy` function
-
-The `destroy` function lets you clear all the listeners. This function is **deprecated** and would
-be removed in the future.
-
 ### `storeApi`
 
 The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, [`subscribe`](#subscribe-function) function,
-and [`destroy`](#destroy-function) function.
+function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
+function.
 
 ## Usage
 

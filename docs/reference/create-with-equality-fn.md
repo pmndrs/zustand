@@ -11,17 +11,9 @@ bound store to a custom hook. Lorem ipsum dolor sit amet consectetur, adipisicin
 repellendus pariatur suscipit quidem hic ullam blanditiis ut repudiandae ab unde dolores, tempore
 expedita ipsam minus reprehenderit voluptas soluta sed debitis!
 
-::: code-group
-
-```ts [TypeScript]
-createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
-```
-
-```js [JavaScript]
+```js
 createWithEqualityFn(initializer, equalityFn)
 ```
-
-:::
 
 - [Reference](#reference)
   - [Signature](#createwithequalityfn-signature)
@@ -30,7 +22,6 @@ createWithEqualityFn(initializer, equalityFn)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
   - [`subscribe` function](#subscribe-function)
-  - [`destroy` function](#destroy-function)
   - [`storeApi`](#storeapi)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-base-on-a-previous-state)
@@ -58,8 +49,8 @@ createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn: (a: 
 #### Returns
 
 `createWithEqualityFn` returns a custom hook, that could take `selector` function, and `equalityFn`
-function as arguments. Also, expose `setState` function, `getState` function, `subscribe` function,
-and `destroy` function.
+function as arguments. Also, expose [`setState`](#setstate-function) function,
+[`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function) function.
 
 ### `selector` function
 
@@ -116,13 +107,8 @@ previous state as arguments.
 
 `subscribe` returns a function that lets you unsubscribe.
 
-### `destroy` function
-
-The `destroy` function lets you clear all the listeners. This function is **deprecated** and would
-be removed in the future.
-
 ### `storeApi`
 
 The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, [`subscribe`](#subscribe-function) function,
-and [`destroy`](#destroy-function) function.
+function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
+function.

@@ -6,9 +6,9 @@ nav: 200
 
 # combine
 
-`combine` lets you create a new state by combining an initial state with additional state created
-by a function. This middleware is particularly useful due to infers the state so you do not need to
-type it.
+`combine` middleware lets you create a new state by combining an initial state with additional
+state created by a function. This middleware is particularly useful due to infers the state so you
+don't need to type it.
 
 ```js
 combine(initialState, additionalStateCreator)
@@ -19,7 +19,6 @@ combine(initialState, additionalStateCreator)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
   - [`subscribe` function](#subscribe-function)
-  - [`destroy` function](#destroy-function)
   - [`storeApi`](#storeapi)
 - [Usage](#usage)
   - TBD
@@ -30,7 +29,7 @@ combine(initialState, additionalStateCreator)
 
 ### `combine` Signature
 
-```ts [TypeScript]
+```ts
 combine<T, U>(initialState: T, additionalStateCreator: StateCreator<T, [], [], U>): Omit<T, keyof U> & U
 ```
 
@@ -90,16 +89,11 @@ previous state as arguments.
 
 `subscribe` returns a function that lets you unsubscribe.
 
-### `destroy` function
-
-The `destroy` function lets you clear all the listeners. This function is **deprecated** and would
-be removed in the future.
-
 ### `storeApi`
 
 The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, [`subscribe`](#subscribe-function) function,
-and [`destroy`](#destroy-function) function.
+function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
+function.
 
 ## Usage
 

@@ -15,6 +15,11 @@ aperiam quasi.
 createContext()
 ```
 
+- [Reference](#reference)
+  - [Signature](#createcontext-signature)
+- [Usage](#usage)
+- [Troubleshooting](#troubleshooting)
+
 ## Reference
 
 ### `createContext` Signature
