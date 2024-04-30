@@ -8,7 +8,7 @@ nav: 212
 
 `useStore` lets you use a vanilla store in React.
 
-```js [JavaScript]
+```js
 useStore(api, selector)
 ```
 
@@ -27,7 +27,7 @@ useStore(api, selector)
 
 ### `useStore` Signature
 
-```ts [TypeScript]
+```ts
 useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selector?: (state: T) => U) => UseBoundStore<StoreApi<T>>
 ```
 

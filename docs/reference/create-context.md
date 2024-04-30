@@ -11,14 +11,14 @@ sit amet consectetur adipisicing elit. Voluptate a ipsum in accusamus adipisci c
 aspernatur pariatur excepturi nam quod architecto id doloremque repellat nisi minus deserunt, quae
 aperiam quasi.
 
-::: code-group
-
-```ts [TypeScript]
-createContext<StoreApi<T>>(): { Provider: (props: any)=> JSX.Element, useStore: () => T, useStoreApi: () => StoreApi<T> }
-```
-
-```js [JavaScript]
+```js
 createContext()
 ```
 
-:::
+## Reference
+
+### `createContext` Signature
+
+```ts
+createContext<StoreApi<T>>(): { Provider: (props: any) => JSX.Element, useStore: () => T, useStoreApi: () => StoreApi<T> }
+```

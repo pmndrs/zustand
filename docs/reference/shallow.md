@@ -10,19 +10,12 @@ nav: 209
 Mollitia aliquid labore veritatis eius architecto ea nemo ratione alias illum molestiae excepturi
 necessitatibus hic voluptas, tenetur quibusdam ad similique deserunt tempora.
 
-::: code-group
-
-```ts [TypeScript]
-shallow<T>(a: T, b: T): boolean
-```
-
-```js [JavaScript]
+```js
 shallow(a, b)
 ```
 
-:::
-
 - [Reference](#reference)
+  - [Signature](#shallow-signature)
 - [Usage](#usage)
   - [Skipping re-rendering when props are unchanged](#skipping-re-rendering-when-props-are-unchanged)
   - [Specifying a custom comparison function ](#specifying-a-custom-comparison-function)
@@ -31,9 +24,22 @@ shallow(a, b)
 
 ## Reference
 
+### `shallow` Signature
+
 ```ts
 shallow<T>(a: T, b: T): boolean
 ```
+
+#### Parameters
+
+- a: Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda, amet at? At praesentium
+  nisi, ullam iusto odio iure fugiat totam expedita aliquam nemo debitis possimus sint minima autem
+  atque libero!
+- b: Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem culpa deserunt quia, non quis
+  hic. Consectetur fuga nemo voluptas veritatis. Aspernatur impedit facilis eius officiis. Soluta
+  maiores dolorem eos perferendis.
+
+#### Returns
 
 ## Usage
 
