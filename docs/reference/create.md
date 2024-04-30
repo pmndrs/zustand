@@ -6,24 +6,14 @@ nav: 204
 
 # create
 
-`create` lets you create a store and then bound the store to a custom hook. Lorem ipsum dolor sit,
-amet consectetur adipisicing elit. Consequuntur dolorum quaerat hic ipsum, perspiciatis enim
-laudantium minima porro tempore laboriosam praesentium obcaecati modi nesciunt voluptatibus at
-fugit libero iusto cum.
+`create` lets you create a store and expose store api utilities.
 
-::: code-group
-
-```ts [TypeScript]
-create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
-```
-
-```js [JavaScript]
+```js
 create(initializer)
 ```
 
-:::
-
 - [Reference](#reference)
+  - [`Signature`](#create-signature)
   - [`selector` function](#selector-function)
   - [`equalityFn` function](#equalityfn-function)
   - [`setState` function](#setstate-function)
@@ -39,6 +29,8 @@ create(initializer)
 
 ## Reference
 
+### `create` Signature
+
 ```ts
 create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 ```
@@ -51,9 +43,9 @@ create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 
 #### Returns
 
-`create` returns a custom hook, that could take `selector` function, and `equalityFn` function as
-arguments. Also, expose `setState` function, `getState` function, `subscribe` function, and
-`destroy` function.
+`create` returns a hook, that could take `selector` function, and `equalityFn` function as
+arguments. Also, expose [`setState`](#selector-function) function, [`getState`](#getstate-function)
+function, [`subscribe`](#subscribe-function) function, and [`destroy`](#destroy-function) function.
 
 ### `selector` function
 
@@ -67,30 +59,59 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui perspiciatis invent
 nihil quasi ipsa, iure pariatur distinctio aspernatur aliquid reprehenderit alias a. Aliquam quis
 deleniti temporibus ex vero.
 
-### `setState` function
-
-Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iure incidunt laboriosam et ut facere
-quisquam ab tempore, sed veniam? Provident esse illum eos iusto, deserunt libero vel labore nam
-nostrum?
-
 ### `getState` function
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Id laudantium alias molestias adipisci
-incidunt culpa accusamus expedita perspiciatis fugiat, consequuntur saepe assumenda maxime sint
-molestiae magni ipsam, praesentium quia temporibus?
+The `getState` function lets you access to the current state. It can be stale on async operations.
 
 ### `subscribe` function
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit facilis impedit voluptate
-inventore cum suscipit esse quidem ab sequi, maxime corrupti ipsum aliquid officiis magnam
-perspiciatis corporis quaerat optio reiciendis.
+The `subscribe` function lets you subscribe to state updates. It should take current state and
+previous state as arguments.
+
+#### Parameters
+
+- `currentState`: It's the current state.
+- `previousState`: It's the previous state.
+
+#### Returns
+
+`subscribe` returns a function that lets you unsubscribe.
 
 ### `destroy` function
 
-Lorem ipsum dolor sit amet consectetur, adipisicing elit. Est nostrum, voluptas magni consequuntur
-cum quibusdam quas iusto quae minima autem sed assumenda aut sapiente? Saepe voluptatem a cum
-deserunt sed!
+The `destroy` function lets you clear all the listeners. This function is **deprecated** and would
+be removed in the future.
+
+### `storeApi`
+
+The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
+function, [`getState`](#getstate-function) function, [`subscribe`](#subscribe-function) function,
+and [`destroy`](#destroy-function) function.
 
 ## Usage
 
+### Updating state base on previous state
+
+Lorem ipsum, dolor sit amet consectetur adipisicing elit. Incidunt placeat debitis laborum vero
+totam excepturi, ducimus, qui molestias, dolorem minus doloribus repudiandae ex delectus corporis
+libero quo et numquam quidem?
+
+### Updating objects and non-objects in state
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, quo expedita! Rem aut placeat
+excepturi accusamus deserunt velit reprehenderit corrupti amet ad nisi ipsum, veritatis
+perspiciatis eligendi possimus quasi facilis!
+
+### Subscribing to state updates
+
+Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsa minima cum consectetur magnam,
+nostrum temporibus. Exercitationem enim temporibus ipsum doloremque sequi fuga aliquid rem quasi
+harum, eos, eaque est ducimus!
+
 ## Troubleshooting
+
+### I’ve updated the state, but the screen doesn’t update
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur repudiandae consequuntur
+aliquam iste corporis inventore vel dolorum architecto qui error. Et enim voluptate voluptatem
+animi, aut quas commodi corporis fugiat.

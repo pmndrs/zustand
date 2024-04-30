@@ -6,9 +6,9 @@ nav: 200
 
 # combine
 
-The `combine` middleware is commonly used to create a new state by combining an initial state with
-additional state created by a function. This middleware is particularly useful due to infers the
-state so you do not need to type it.
+`combine` lets you create a new state by combining an initial state with additional state created
+by a function. This middleware is particularly useful due to infers the state so you do not need to
+type it.
 
 ```js
 combine(initialState, additionalStateCreator)
@@ -18,9 +18,13 @@ combine(initialState, additionalStateCreator)
   - [Signature](#combine-signature)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
-  - [`api`](#api)
+  - [`subscribe` function](#subscribe-function)
+  - [`destroy` function](#destroy-function)
+  - [`storeApi`](#storeapi)
 - [Usage](#usage)
+  - TBD
 - [Troubleshooting](#troubleshooting)
+  - TBD
 
 ## Reference
 
@@ -58,7 +62,7 @@ previous state, or replace it completely.
     updates without modifying other properties.
   - if you pass a non-object as a `nextState`, make sure you use `replace` as `true` to avoid
     unexpected behaviors.
-  - if you pass a function as a `nextState`. It must be pure, should take previous state as its
+  - if you pass a function as a `nextState`. It must be pure, should take current state as its
     only argument, and should return the next state. The next state returned by the updater
     function face the same restrictions of any next state.
 - `replace`: This optional boolean flag controls whether to replace the entire state or merge the
@@ -72,30 +76,30 @@ previous state, or replace it completely.
 
 The `getState` function lets you access to the current state. It can be stale on async operations.
 
-#### `subscribe` function
+### `subscribe` function
 
 The `subscribe` function lets you subscribe to state updates. It should take current state and
 previous state as arguments.
 
 #### Parameters
 
-- `currentState`:
-- `previousState`:
+- `currentState`: It's the current state.
+- `previousState`: It's the previous state.
 
 #### Returns
 
-`subscribe` returns an unsubscribe function that you can use later.
+`subscribe` returns a function that lets you unsubscribe.
 
-#### `destroy` function
+### `destroy` function
 
 The `destroy` function lets you clear all the listeners. This function is **deprecated** and would
 be removed in the future.
 
-### `api`
+### `storeApi`
 
-The `api` (aka store api) lets you access to the store api functions like
-[`setState`](#setstate-function) function, [`getState`](#getstate-function) function,
-[`subscribe`](#subscribe-function) function, and [`destroy`](#destroy-function) function.
+The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
+function, [`getState`](#getstate-function) function, [`subscribe`](#subscribe-function) function,
+and [`destroy`](#destroy-function) function.
 
 ## Usage
 
