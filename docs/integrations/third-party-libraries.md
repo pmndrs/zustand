@@ -36,8 +36,9 @@ This can be done using third-party libraries created by the community.
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) - Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) - 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
-- [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
+- [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
+- [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
 - [zustand-di](https://github.com/charkour/zustand-di) - use react props to init zustand stores
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
