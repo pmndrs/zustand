@@ -32,7 +32,7 @@ useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selector?: (state: T) => U) 
 
 #### Parameters
 
-- `storeApi`: The store api give you access to api utilities that can be used to listen to state
+- `storeApi`: The store API give you access to API utilities that can be used to listen to state
   updates, get current state, and more.
 - `selector`: The selector function should take current state as its only argument, and should
   return data based on current state.
@@ -44,7 +44,7 @@ selector function.
 
 ### `setState` function
 
-The `setState` function lets you update the state to a different value and trigger a re-render. You
+The `setState` function lets you update the state to a different value and trigger re-render. You
 can pass the next state directly, a next partial state, a function that calculates it from the
 previous state, or replace it completely.
 
@@ -69,7 +69,8 @@ previous state, or replace it completely.
 
 ### `getState` function
 
-The `getState` function lets you access to the current state. It can be stale on async operations.
+The `getState` function lets you access to the current state. It can be stale on asynchronous
+operations.
 
 ### `subscribe` function
 
@@ -87,9 +88,9 @@ previous state as arguments.
 
 ### `storeApi`
 
-The `storeApi` lets you access to the store api utilities like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
-function.
+The `storeApi` lets you access to the store API utilities like
+[`setState` function](#setstate-function), [`getState` function](#getstate-function),
+and [`subscribe` function](#subscribe-function).
 
 ## Usage
 

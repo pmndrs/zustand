@@ -6,7 +6,7 @@ nav: 204
 
 # create
 
-`create` lets you create a store and expose store api utilities.
+`create` lets you create a store and expose store API utilities.
 
 ```js
 create(initializer)
@@ -43,8 +43,8 @@ create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 #### Returns
 
 `create` returns a hook, that should take `selector` function as its only argument. Also,
-expose [`setState`](#selector-function) function, [`getState`](#getstate-function) function, and
-[`subscribe`](#subscribe-function) function.
+expose [`setState` function](#selector-function), [`getState` function](#getstate-function), and
+[`subscribe` function](#subscribe-function).
 
 ### `selector` function
 
@@ -60,7 +60,8 @@ deleniti temporibus ex vero.
 
 ### `getState` function
 
-The `getState` function lets you access to the current state. It can be stale on async operations.
+The `getState` function lets you access to the current state. It can be stale on asynchronous
+operations.
 
 ### `subscribe` function
 
@@ -78,9 +79,9 @@ previous state as arguments.
 
 ### `storeApi`
 
-The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
-function.
+The `storeApi` lets you access to the store API functions like
+[`setState` function](#setstate-function), [`getState` function](#getstate-function), and
+[`subscribe` function](#subscribe-function).
 
 ## Usage
 

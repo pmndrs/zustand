@@ -41,32 +41,29 @@ createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn: (a: 
 #### Parameters
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take [`setState`](#setstate-function) function,
-  [`getState`](#getstate-function) function and [`api`](#api) as arguments.
-- `equalityFn`: A function that accepts two arguments: the previous state, and its new state. It
-  should return `true` if the old and new states are equal. Otherwise it should return `false`.
+  when you pass a function should take [`setState` function](#setstate-function),
+  [`getState` function](#getstate-function) and [`api`](#api) as arguments.
+- `equalityFn`: The equality function should take the previous state, and its current state as
+  arguments. It should return `true` if the previous and current states are equal. Otherwise, it
+  should return `false`.
 
 #### Returns
 
 `createWithEqualityFn` returns a custom hook, that could take `selector` function, and `equalityFn`
-function as arguments. Also, expose [`setState`](#setstate-function) function,
-[`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function) function.
+function as arguments. Also, expose [`setState` function](#setstate-function),
+[`getState` function](#getstate-function), and [`subscribe` function](#subscribe-function).
 
 ### `selector` function
 
-Lorem ipsum dolor, sit amet consectetur adipisicing elit. Incidunt, natus reiciendis porro earum
-fugit, nihil vero adipisci assumenda, quia ab harum nostrum quasi. Dolorem, aspernatur. Nemo quae
-repellendus doloribus deserunt?
+The `selector` function lets you select a piece of data based on current state.
 
 ### `equalityFn` function
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui perspiciatis inventore minus totam
-nihil quasi ipsa, iure pariatur distinctio aspernatur aliquid reprehenderit alias a. Aliquam quis
-deleniti temporibus ex vero.
+The `equalityFn` lets you
 
 ### `setState` function
 
-The `setState` function lets you update the state to a different value and trigger a re-render. You
+The `setState` function lets you update the state to a different value and trigger re-render. You
 can pass the next state directly, a next partial state, a function that calculates it from the
 previous state, or replace it completely.
 
@@ -74,12 +71,12 @@ previous state, or replace it completely.
 
 - `nextState`: The value that you want the state to be. It can be a value of any type, but there is
   a special behavior for functions.
-  - if you pass an object as a `nextState`. It will shallow merge `nextState` with the current
+  - If you pass an object as a `nextState`. It will shallow merge `nextState` with the current
     state. You can pass only the properties you want to update, this allows for selective state
     updates without modifying other properties.
-  - if you pass a non-object as a `nextState`, make sure you use `replace` as `true` to avoid
+  - If you pass a non-object as a `nextState`, make sure you use `replace` as `true` to avoid
     unexpected behaviors.
-  - if you pass a function as a `nextState`. It must be pure, should take current state as its
+  - If you pass a function as a `nextState`. It must be pure, should take current state as its
     only argument, and should return the next state. The next state returned by the updater
     function face the same restrictions of any next state.
 - `replace`: This optional boolean flag controls whether to replace the entire state or merge the
@@ -91,7 +88,8 @@ previous state, or replace it completely.
 
 ### `getState` function
 
-The `getState` function lets you access to the current state. It can be stale on async operations.
+The `getState` function lets you access to the current state. It can be stale on asynchronous
+operations.
 
 ### `subscribe` function
 
@@ -109,6 +107,6 @@ previous state as arguments.
 
 ### `storeApi`
 
-The `storeApi` lets you access to the store api functions like [`setState`](#setstate-function)
-function, [`getState`](#getstate-function) function, and [`subscribe`](#subscribe-function)
-function.
+The `storeApi` lets you access to the store API functions like
+[`setState` function](#setstate-function), [`getState` function](#getstate-function), and
+[`subscribe` function](#subscribe-function).

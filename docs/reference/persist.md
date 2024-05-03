@@ -6,9 +6,9 @@ nav: 207
 
 # persist Middleware
 
-`persist` Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde recusandae ratione vero
-obcaecati maxime ex, nemo laudantium repellat animi error facere earum doloribus tenetur esse
-repellendus nam harum non quod!
+`persist` middleware lets you Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde
+recusandae ratione vero obcaecati maxime ex, nemo laudantium repellat animi error facere earum
+doloribus tenetur esse repellendus nam harum non quod!
 
 ```js
 persist(initializer, persistOptions)
@@ -18,6 +18,8 @@ persist(initializer, persistOptions)
   - [Signature](#persist-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
+  - [Cannot read property 'setOptions' of undefined](#cannot-read-property-setoptions-of-undefined)
+  - [Storage is not being validated or type checked](#storage-is-not-being-validated-or-type-checked)
 
 ## Reference
 
@@ -45,3 +47,15 @@ quod nihil similique quo dicta.
 ## Usage
 
 ## Troubleshooting
+
+### Cannot read property 'setOptions' of undefined
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum reprehenderit eaque excepturi,
+cumque officia incidunt repellendus, fugit soluta dolore perspiciatis laudantium voluptatem
+repudiandae illum ipsum quam, perferendis iusto a aperiam!
+
+### Storage is not being validated or type checked
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum ratione aspernatur dolores ut in
+erferendis quis reprehenderit iure numquam minima laborum vero unde, eum laudantium! Minima beatae
+natus tempore est.
