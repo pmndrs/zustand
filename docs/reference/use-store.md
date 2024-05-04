@@ -1,12 +1,12 @@
 ---
 title: useStore
 description:
-nav: 212
+nav: 213
 ---
 
-# useStore
+# useStore ⚛️
 
-`useStore` lets you use a vanilla store in React.
+`useStore` is a React Hook that lets you use a vanilla store in React.
 
 ```js
 useStore(api, selector)

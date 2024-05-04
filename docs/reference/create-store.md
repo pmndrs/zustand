@@ -6,8 +6,8 @@ nav: 202
 
 # createStore
 
-`createStore` lets you create a vanilla store with some API utilities. You can use a vanilla store
-in React with [`useStore`](./use-store) hook.
+`createStore` lets you create a vanilla store with store API utilities. In React, you can utilize a
+vanilla store using the [`useStore`](./use-store) hook.
 
 ```js
 createStore(initializer)
@@ -43,7 +43,7 @@ createStore<T>()(initializer: StateCreator<T, [], []>): StoreApi<T>
 
 #### Returns
 
-`createStore` returns a vanilla store, that expose some API utilities:
+`createStore` returns a vanilla store with some API utilities. These API utilities are:
 [`setState` function](#setstate-function), [`getState` function](#getstate-function), and
 [`subscribe` function](#subscribe-function).
 
@@ -65,8 +65,8 @@ previous state, or replace it completely.
   - If you pass a function as a `nextState`. It must be pure, should take current state as its
     only argument, and should return the next state. The next state returned by the updater
     function face the same restrictions of any next state.
-- `replace`: This optional boolean flag controls whether to replace the entire state or merge the
-  update with the current state.
+- `replace`: This optional boolean flag controls whether the state is completely replaced or only
+  shallow updated, through a shallow merge.
 
 #### Returns
 
@@ -93,7 +93,7 @@ previous state as arguments.
 
 ### `storeApi`
 
-The `storeApi` lets you access to the store API functions like
+The `storeApi` lets you access to the store API functions:
 [`setState` function](#setstate-function), [`getState` function](#getstate-function), and
 [`subscribe` function](#subscribe-function).
 

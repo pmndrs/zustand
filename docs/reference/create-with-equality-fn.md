@@ -4,7 +4,7 @@ description:
 nav: 203
 ---
 
-# createWithEqualityFn
+# createWithEqualityFn ⚛️
 
 `createWithEqualityFn` lets you create a store with an equality function from the beginning and
 bound store to a custom hook. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Labore

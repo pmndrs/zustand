@@ -6,7 +6,7 @@ nav: 209
 
 # shallow
 
-`shallow` lets you optimize re-renders. Lorem ipsum dolor sit amet consectetur adipisicing elit.
+`shallow` function lets you optimize re-renders. Lorem ipsum dolor sit amet consectetur adipisicing elit.
 Mollitia aliquid labore veritatis eius architecto ea nemo ratione alias illum molestiae excepturi
 necessitatibus hic voluptas, tenetur quibusdam ad similique deserunt tempora.
 

@@ -1,14 +1,15 @@
 ---
 title: useStoreWithEqualityFn
 description:
-nav: 211
+nav: 212
 ---
 
-# useStoreWithEqualityFn
+# useStoreWithEqualityFn ⚛️
 
-`useStoreWithEqualityFn` lets you Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempora
-voluptatum dolore non, eveniet consequuntur labore, optio saepe hic asperiores repellendus error
-alias, facilis ab assumenda possimus magnam voluptate. Blanditiis, perspiciatis?
+`useStoreWithEqualityFn` is a React Hook lets you Lorem ipsum dolor sit amet, consectetur
+adipisicing elit. Tempora voluptatum dolore non, eveniet consequuntur labore, optio saepe hic
+asperiores repellendus error alias, facilis ab assumenda possimus magnam voluptate. Blanditiis,
+perspiciatis?
 
 ```js
 useStoreWithEqualityFn(storeApi, selector, equalityFn)

@@ -4,9 +4,9 @@ description:
 nav: 204
 ---
 
-# create
+# create ⚛️
 
-`create` lets you create a store and expose store API utilities.
+`create` lets you create a React Hook with store API utilities.
 
 ```js
 create(initializer)
@@ -37,14 +37,16 @@ create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 #### Parameters
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `api` as
-  arguments.
+  when you pass a function should take [`setState` function](#setstate-function),
+  [`getState` function](#getstate-function) and [`storeApi`](#storeapi) as arguments.
 
 #### Returns
 
-`create` returns a hook, that should take `selector` function as its only argument. Also,
-expose [`setState` function](#selector-function), [`getState` function](#getstate-function), and
+`create` returns a React Hook with some store API utilities. These API utilities are:
+[`setState` function](#setstate-function), [`getState` function](#getstate-function), and
 [`subscribe` function](#subscribe-function).
+
+- The React Hook should take a [`selector` function](#selector-function) as its only argument.
 
 ### `selector` function
 
