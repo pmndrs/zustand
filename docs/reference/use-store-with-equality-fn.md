@@ -25,7 +25,7 @@ useStoreWithEqualityFn(storeApi, selector, equalityFn)
 ### `useStoreWithEqualityFn` Signature
 
 ```ts
-useStoreWithEqualityFn<T, U>(storeApi: StoreApi<T>, selector: (state: T) => U, equalityFn?: (a: T, b: T) => boolean): U
+useStoreWithEqualityFn<T, U>(storeApi: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: T, b: T) => boolean): U
 ```
 
 #### Parameters
@@ -33,7 +33,7 @@ useStoreWithEqualityFn<T, U>(storeApi: StoreApi<T>, selector: (state: T) => U, e
 - `storeApi`: Lorem, ipsum dolor sit amet consectetur adipisicing elit. Natus commodi adipisci vero
   cumque rem harum explicabo asperiores, nulla, repellendus omnis mollitia vitae eos porro
   deleniti. Ducimus fugit voluptatem provident dolores.
-- `selector`: Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eos similique reprehenderit
+- `selectorFn`: Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eos similique reprehenderit
   maiores dolorum voluptates molestiae a, aperiam totam quam et error assumenda unde, doloremque
   quo, corrupti iusto tenetur fugiat voluptatibus.
 - `equalityFn`: Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt, voluptatum incidunt

@@ -32,10 +32,9 @@ useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selector?: (state: T) => U) 
 
 #### Parameters
 
-- `storeApi`: The store API give you access to API utilities that can be used to listen to state
-  updates, get current state, and more.
-- `selector`: The selector function should take current state as its only argument, and should
-  return data based on current state.
+- `storeApi`: The [`storeApi`](#storeapi) that lets you access to store API utilities.
+- `selector`: The [`selector` function](#selector-function) that should take current state as its only argument, and
+  should return data based on current state.
 
 #### Returns
 

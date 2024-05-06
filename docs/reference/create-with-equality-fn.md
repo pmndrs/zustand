@@ -6,10 +6,8 @@ nav: 203
 
 # createWithEqualityFn ⚛️
 
-`createWithEqualityFn` lets you create a store with an equality function from the beginning and
-bound store to a custom hook. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Labore
-repellendus pariatur suscipit quidem hic ullam blanditiis ut repudiandae ab unde dolores, tempore
-expedita ipsam minus reprehenderit voluptas soluta sed debitis!
+`createWithEqualityFn` lets you create a React Hook with store API utilities, and default equality
+function.
 
 ```js
 createWithEqualityFn(initializer, equalityFn)
@@ -18,7 +16,7 @@ createWithEqualityFn(initializer, equalityFn)
 - [Reference](#reference)
   - [Signature](#createwithequalityfn-signature)
   - [`selector` function](#selector-function)
-  - [`equalityFn` function](#equalityfn-function)
+  - [`equality` function](#equality-function)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
   - [`subscribe` function](#subscribe-function)
@@ -42,24 +40,30 @@ createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn: (a: 
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
   when you pass a function should take [`setState` function](#setstate-function),
-  [`getState` function](#getstate-function) and [`api`](#api) as arguments.
-- `equalityFn`: The equality function should take the previous state, and its current state as
-  arguments. It should return `true` if the previous and current states are equal. Otherwise, it
-  should return `false`.
+  [`getState` function](#getstate-function) and [`storeApi`](#storeapi) as arguments.
+- `equalityFn`: A function that lets you skip re-renders when certain values are unchanged. It
+  should take the previous state, and its current state as arguments. It should return `true` if
+  the previous and current states are equal. Otherwise, it should return `false`.
 
 #### Returns
 
-`createWithEqualityFn` returns a custom hook, that could take `selector` function, and `equalityFn`
-function as arguments. Also, expose [`setState` function](#setstate-function),
-[`getState` function](#getstate-function), and [`subscribe` function](#subscribe-function).
+`createWithEqualityFn` returns a React Hook:
+
+1. The React Hook that lets you return data that is based on current state, using a
+   [`selector` function](#selector-function), and lets you skip re-renders using a
+   [`equality` function](#equality-function). It should take a selector function, and an equality
+   function as arguments.
 
 ### `selector` function
 
-The `selector` function lets you select a piece of data based on current state.
+The `selector` function lets you return data that is based on current state. It should take current
+state as its only argument.
 
-### `equalityFn` function
+### `equality` function
 
-The `equalityFn` lets you
+The `equality` function lets you skip re-renders when certain values are unchanged. It should
+take the previous state, and its current state as arguments. It should return `true` if the
+previous and current states are equal. Otherwise, it should return `false`.
 
 ### `setState` function
 
@@ -93,20 +97,20 @@ operations.
 
 ### `subscribe` function
 
-The `subscribe` function lets you subscribe to state updates. It should take current state and
-previous state as arguments.
+The `subscribe` function lets you subscribe to state updates. It should take current state, and
+its previous state as arguments.
 
 #### Parameters
 
-- `currentState`: It's the current state.
-- `previousState`: It's the previous state.
+- `currentState`: The current state.
+- `previousState`: The previous state.
 
 #### Returns
 
-`subscribe` returns a function that lets you unsubscribe.
+`subscribe` returns a function that lets you unsubscribe from itself.
 
 ### `storeApi`
 
-The `storeApi` lets you access to the store API functions like
+The `storeApi` lets you access to the store API utilities. These store API utilities are:
 [`setState` function](#setstate-function), [`getState` function](#getstate-function), and
 [`subscribe` function](#subscribe-function).

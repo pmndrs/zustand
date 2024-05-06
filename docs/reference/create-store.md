@@ -79,21 +79,21 @@ operations.
 
 ### `subscribe` function
 
-The `subscribe` function lets you subscribe to state updates. It should take current state and
-previous state as arguments.
+The `subscribe` function lets you subscribe to state updates. It should take current state, and
+its previous state as arguments.
 
 #### Parameters
 
-- `currentState`: It's the current state.
-- `previousState`: It's the previous state.
+- `currentState`: The current state.
+- `previousState`: The previous state.
 
 #### Returns
 
-`subscribe` returns a function that lets you unsubscribe.
+`subscribe` returns a function that lets you unsubscribe from itself.
 
 ### `storeApi`
 
-The `storeApi` lets you access to the store API functions:
+The `storeApi` lets you access to the store API utilities. These store API utilities are:
 [`setState` function](#setstate-function), [`getState` function](#getstate-function), and
 [`subscribe` function](#subscribe-function).
 
