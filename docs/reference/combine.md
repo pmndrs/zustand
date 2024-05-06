@@ -83,8 +83,8 @@ previous state as arguments.
 
 #### Parameters
 
-- `currentState`: It's the current state.
-- `previousState`: It's the previous state.
+- `currentState`: The current state.
+- `previousState`: The previous state.
 
 #### Returns
 
