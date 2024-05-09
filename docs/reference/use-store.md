@@ -13,7 +13,8 @@ useStore(api, selector)
 ```
 
 - [Reference](#reference)
-  - [`useStore` Signature](#usestore-signature)
+  - [Signature](#usestore-signature)
+  - [`selector` function](#selector-function)
   - [`setState` function](#setstate-function)
   - [`getState` function](#getstate-function)
   - [`subscribe` function](#subscribe-function)
@@ -27,19 +28,23 @@ useStore(api, selector)
 ### `useStore` Signature
 
 ```ts
-useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selector?: (state: T) => U) => UseBoundStore<StoreApi<T>>
+useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
 ```
 
 #### Parameters
 
-- `storeApi`: The [`storeApi`](#storeapi) that lets you access to store API utilities.
-- `selector`: The [`selector` function](#selector-function) that should take current state as its only argument, and
-  should return data based on current state.
+- `storeApi`: The instance that lets you access to store API utilities.
+- `selectorFn`: A function that lets you return data that is based on current state.
 
 #### Returns
 
 `useStore` returns current state or returns any data based on current state depending on the
 selector function.
+
+### `selector` function
+
+The `selector` function lets you return data that is based on current state. It should take current
+state as its only argument.
 
 ### `setState` function
 

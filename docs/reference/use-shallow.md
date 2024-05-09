@@ -16,6 +16,7 @@ useShallow(selector)
 
 - [Reference](#reference)
   - [Signature](#useshallow-signature)
+  - [`selector` function](#selector-function)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
 
@@ -24,20 +25,21 @@ useShallow(selector)
 ### `useShallow` Signature
 
 ```ts
-useShallow<T, U>(selector: (state: T) => U): (state: T) => U
+useShallow<T, U>(selectorFn: (state: T) => U): (state: T) => U
 ```
 
 #### Parameters
 
-- `selector`: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur nisi, quam
-  necessitatibus odit repellendus recusandae praesentium. Placeat delectus atque, iusto doloremque,
-  ullam tempore nesciunt repellat temporibus, ad ut voluptas ipsa?
+- `selectorFn`: A function that lets you return data that is based on current state.
 
 #### Returns
 
-`useShallow` returns Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum fuga,
-facere qui quisquam quod magnam dignissimos esse animi eius reprehenderit nihil eligendi eum
-molestias odio quaerat deleniti accusantium nam impedit.
+`useShallow` returns a memoized version of a given `selector` function.
+
+### `selector` function
+
+The `selector` function lets you return data that is based on current state. It should take current
+state as its only argument.
 
 ## Usage
 

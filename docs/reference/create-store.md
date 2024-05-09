@@ -38,14 +38,13 @@ createStore<T>()(initializer: StateCreator<T, [], []>): StoreApi<T>
 #### Parameters
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take [`setState` function](#setstate-function),
-  [`getState` function](#getstate-function) and [`storeApi`](#storeapi) as arguments.
+  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+  arguments.
 
 #### Returns
 
-`createStore` returns a vanilla store with some API utilities. These API utilities are:
-[`setState` function](#setstate-function), [`getState` function](#getstate-function), and
-[`subscribe` function](#subscribe-function).
+`createStore` returns a vanilla store with some API utilities. These API utilities are: `setState`
+function, `getState` function, and `subscribe` function.
 
 ### `setState` function
 
@@ -94,8 +93,7 @@ its previous state as arguments.
 ### `storeApi`
 
 The `storeApi` lets you access to the store API utilities. These store API utilities are:
-[`setState` function](#setstate-function), [`getState` function](#getstate-function), and
-[`subscribe` function](#subscribe-function).
+`setState` function, `getState` function, and `subscribe` function.
 
 ## Usage
 

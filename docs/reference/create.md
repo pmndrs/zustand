@@ -37,8 +37,8 @@ create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 #### Parameters
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take [`setState` function](#setstate-function),
-  [`getState` function](#getstate-function) and [`storeApi`](#storeapi) as arguments.
+  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+  arguments.
 
 #### Returns
 

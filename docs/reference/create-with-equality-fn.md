@@ -39,20 +39,17 @@ createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn: (a: 
 #### Parameters
 
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take [`setState` function](#setstate-function),
-  [`getState` function](#getstate-function) and [`storeApi`](#storeapi) as arguments.
-- `equalityFn`: A function that lets you skip re-renders when certain values are unchanged. It
-  should take the previous state, and its current state as arguments. It should return `true` if
-  the previous and current states are equal. Otherwise, it should return `false`.
+  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+  arguments.
+- `equalityFn`: A function that lets you skip re-renders.
 
 #### Returns
 
 `createWithEqualityFn` returns a React Hook:
 
-1. The React Hook that lets you return data that is based on current state, using a
-   [`selector` function](#selector-function), and lets you skip re-renders using a
-   [`equality` function](#equality-function). It should take a selector function, and an equality
-   function as arguments.
+1. The React Hook that lets you return data that is based on current state, using a `selector`
+   function, and lets you skip re-renders using a `equality` function. It should take a selector
+   function, and an equality function as arguments.
 
 ### `selector` function
 
@@ -112,5 +109,8 @@ its previous state as arguments.
 ### `storeApi`
 
 The `storeApi` lets you access to the store API utilities. These store API utilities are:
-[`setState` function](#setstate-function), [`getState` function](#getstate-function), and
-[`subscribe` function](#subscribe-function).
+`setState` function, `getState` function, and `subscribe` function.
+
+## Usage
+
+## Troubleshooting
