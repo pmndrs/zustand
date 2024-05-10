@@ -56,16 +56,7 @@ jobs:
       - name: Patch testing setup for Old TS
         if: ${{ matrix.typescript == '4.4.4' || matrix.typescript == '4.3.5' || matrix.typescript == '4.2.3' || matrix.typescript == '4.1.5' }}
         run: |
-          rm node_modules/@vitest/expect/dist/*.d.ts
-          echo "declare module '@vitest/expect'" >> ./src/types.d.ts
-          rm node_modules/@vitest/runner/dist/*.d.ts
-          echo "declare module '@vitest/runner'" >> ./src/types.d.ts
-          rm node_modules/@vitest/spy/dist/*.d.ts
-          echo "declare module '@vitest/spy'" >> ./src/types.d.ts
-          rm node_modules/@vitest/utils/dist/*.d.ts
-          echo "declare module '@vitest/utils'" >> ./src/types.d.ts
-          rm node_modules/vite-node/dist/*.d.ts
-          echo "declare module 'vite-node'" >> ./src/types.d.ts
+          pnpm add -D vitest@0.33.0 @vitest/coverage-v8@0.33.0 @vitest/ui@0.33.0
           rm node_modules/vitest/dist/*.d.ts
           echo "declare module 'vitest'" >> ./src/types.d.ts
       - name: Test ${{ matrix.typescript }}
