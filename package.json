@@ -66,7 +66,6 @@
     "build:vanilla:shallow": "rollup -c --config-vanilla_shallow",
     "build:react:shallow": "rollup -c --config-react_shallow",
     "build:traditional": "rollup -c --config-traditional",
-    "build:context": "rollup -c --config-context",
     "postbuild": "pnpm patch-d-ts && pnpm copy && pnpm patch-old-ts && pnpm patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
     "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'",
@@ -150,9 +149,9 @@
     "vitest": "^1.4.0"
   },
   "peerDependencies": {
-    "@types/react": ">=18.0",
+    "@types/react": ">=18.0.0",
     "immer": ">=9.0.6",
-    "react": ">=18.0",
+    "react": ">=18.0.0",
     "use-sync-external-store": ">=1.2.0"
   },
   "peerDependenciesMeta": {
