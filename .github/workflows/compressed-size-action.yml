@@ -1,13 +1,20 @@
 name: Compressed Size
 
-on: [pull_request]
+on: [ pull_request ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: preactjs/compressed-size-action@v2
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          version: 8.2.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - uses: preactjs/compressed-size-action@v2

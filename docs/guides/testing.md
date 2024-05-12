@@ -57,10 +57,25 @@ this means your application logic does not need to be changed or mocked when wri
 
 The mock provided below will enable the relevant test runner to reset the zustand stores after each test.
 
-> **Warning:** In the following examples we are only supporting the curried version of create `(create()(...))`,
-> since it is supported on both JavaScript and TypeScript. If you are using the uncurried version of
-> `create(...)` you will need to update your hooks to use the curried version, or update the mocks in order
-> to support the uncurried version.
+### Shared code just for testing purposes
+
+This shared code was added to avoid code duplication in our demo since we use the same counter store
+creator for both implementations, with and without `Context` API — `createStore` and `create`, respectively.
+
+```ts
+// shared/counter-store-creator.ts
+import { type StateCreator } from 'zustand'
+
+export type CounterStore = {
+  count: number
+  inc: () => void
+}
+
+export const counterStoreCreator: StateCreator<CounterStore> = (set) => ({
+  count: 1,
+  inc: () => set((state) => ({ count: state.count + 1 })),
+})
+```
 
 ### Jest
 
@@ -126,7 +141,7 @@ afterEach(() => {
 ```
 
 ```ts
-// src/setup-jest.ts
+// setup-jest.ts
 import '@testing-library/jest-dom'
 ```
 
@@ -137,7 +152,7 @@ import type { JestConfigWithTsJest } from 'ts-jest'
 const config: JestConfigWithTsJest = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['./src/setup-jest.ts'],
+  setupFilesAfterEnv: ['./setup-jest.ts'],
 }
 
 export default config
@@ -218,7 +233,7 @@ afterEach(() => {
 > to add `import { afterEach, vi } from 'vitest'` at the top.
 
 ```ts
-// __mocks__/vitest-env.d.ts
+// global.d.ts
 /// <reference types="vite/client" />
 /// <reference types="vitest/globals" />
 ```
@@ -227,10 +242,10 @@ afterEach(() => {
 > need to remove `/// <reference types="vitest/globals" />`.
 
 ```ts
-// src/setup-vitest.ts
+// setup-vitest.ts
 import '@testing-library/jest-dom'
 
-vi.mock('zustand') // to make it works like Jest (auto-mocking)
+vi.mock('zustand') // to make it work like Jest (auto-mocking)
 ```
 
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
@@ -278,39 +293,47 @@ export const counterStoreCreator: StateCreator<CounterStore> = (set) => ({
 // stores/user-counter-store.ts
 import { create } from 'zustand'
 
-import { type CounterStore, counterStoreCreator } from './counter-store-creator'
+import {
+  type CounterStore,
+  counterStoreCreator,
+} from '../shared/counter-store-creator'
 
 export const useCounterStore = create<CounterStore>()(counterStoreCreator)
 ```
 
 ```tsx
-// stores/use-counter-store-context.tsx
-import {
-  type PropsWithChildren,
-  createContext,
-  useContext,
-  useRef,
-} from 'react'
-import { type StoreApi, createStore } from 'zustand'
+// contexts/use-counter-store-context.tsx
+import { type ReactNode, createContext, useContext, useRef } from 'react'
+import { createStore } from 'zustand'
 import { useStoreWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/shallow'
 
-import { type CounterStore, counterStoreCreator } from './counter-store-creator'
+import {
+  type CounterStore,
+  counterStoreCreator,
+} from '../shared/counter-store-creator'
 
 export const createCounterStore = () => {
   return createStore<CounterStore>(counterStoreCreator)
 }
 
-export const CounterStoreContext = createContext<StoreApi<CounterStore>>(
-  null as never,
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
+
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
+  undefined,
 )
 
-export type CounterStoreProviderProps = PropsWithChildren
+export interface CounterStoreProviderProps {
+  children: ReactNode
+}
 
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const counterStoreRef = useRef(createCounterStore())
+  const counterStoreRef = useRef<CounterStoreApi>()
+  if (!counterStoreRef.current) {
+    counterStoreRef.current = createCounterStore()
+  }
 
   return (
     <CounterStoreContext.Provider value={counterStoreRef.current}>
@@ -400,7 +423,7 @@ const renderCounter = () => {
 import {
   CounterStoreProvider,
   useCounterStoreContext,
-} from '../../stores/use-counter-store-context'
+} from '../../contexts/use-counter-store-context'
 
 const Counter = () => {
   const { count, inc } = useCounterStoreContext((state) => state)
@@ -470,8 +493,8 @@ const renderCounterWithContext = () => {
 
 **CodeSandbox Demos**
 
-- Jest Demo: https://codesandbox.io/p/sandbox/zustand-jest-demo-twkypn
-- Vitest Demo: https://codesandbox.io/p/sandbox/zustand-vitest-demo-ph5gnj
+- Jest Demo: https://stackblitz.com/edit/jest-zustand
+- Vitest Demo: https://stackblitz.com/edit/vitest-zustand
 
 ## References
 

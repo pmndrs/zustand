@@ -1,11 +1,12 @@
 {
   "name": "zustand",
+  "description": "🐻 Bear necessities for state management in React",
   "private": true,
+  "type": "commonjs",
   "version": "5.0.0-alpha.6",
   "publishConfig": {
     "tag": "next"
   },
-  "description": "🐻 Bear necessities for state management in React",
   "main": "./index.js",
   "types": "./index.d.ts",
   "typesVersions": {
@@ -55,7 +56,7 @@
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
-    "build": "concurrently -m 8 'yarn:build:*'",
+    "build": "pnpm run prebuild && pnpm run '/^build:.*/' && pnpm run postbuild",
     "build:base": "rollup -c",
     "build:vanilla": "rollup -c --config-vanilla",
     "build:react": "rollup -c --config-react",
@@ -65,14 +66,15 @@
     "build:vanilla:shallow": "rollup -c --config-vanilla_shallow",
     "build:react:shallow": "rollup -c --config-react_shallow",
     "build:traditional": "rollup -c --config-traditional",
-    "postbuild": "yarn patch-d-ts && yarn copy && yarn patch-old-ts && yarn patch-esm-ts",
+    "build:context": "rollup -c --config-context",
+    "postbuild": "pnpm patch-d-ts && pnpm copy && pnpm patch-old-ts && pnpm patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
-    "prettier:ci": "prettier '*.{js,json,md}' '{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
     "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'",
-    "eslint:ci": "eslint  --no-eslintrc --c .eslintrc.json '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'",
-    "pretest": "tsc",
-    "test": "vitest --ui --coverage",
-    "test:ci": "vitest",
+    "test": "pnpm run '/^test:.*/'",
+    "test:format": "prettier '*.{js,json,md}' '{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}' --list-different",
+    "test:types": "tsc --noEmit",
+    "test:lint": "eslint  --no-eslintrc --c .eslintrc.json '*.{js,json,ts}' '{src,tests}/**/*.{ts,tsx}'",
+    "test:spec": "vitest",
     "patch-d-ts": "node -e \"var {entries}=require('./rollup.config.js');require('shelljs').find('dist/**/*.d.ts').forEach(f=>{entries.forEach(({find,replacement})=>require('shelljs').sed('-i',new RegExp(' from \\''+find.source.slice(0,-1)+'\\';$'),' from \\''+replacement+'\\';',f));require('shelljs').sed('-i',/ from '(\\.[^']+)\\.ts';$/,' from \\'\\$1\\';',f)})\"",
     "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
     "patch-old-ts": "shx touch dist/ts_version_4.5_and_above_is_required.d.ts",
@@ -107,6 +109,7 @@
     "url": "https://github.com/pmndrs/zustand/issues"
   },
   "homepage": "https://github.com/pmndrs/zustand",
+  "packageManager": "pnpm@8.15.0",
   "devDependencies": {
     "@redux-devtools/extension": "^3.3.0",
     "@rollup/plugin-alias": "^5.1.0",
@@ -122,7 +125,6 @@
     "@typescript-eslint/parser": "^7.1.0",
     "@vitest/coverage-v8": "^1.4.0",
     "@vitest/ui": "^1.4.0",
-    "concurrently": "^8.2.2",
     "esbuild": "^0.20.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -141,6 +143,7 @@
     "redux": "^5.0.1",
     "rollup": "^4.12.0",
     "rollup-plugin-esbuild": "^6.1.1",
+    "shelljs": "^0.8.5",
     "shx": "^0.3.4",
     "typescript": "^5.3.3",
     "use-sync-external-store": "^1.2.0",
@@ -165,6 +168,5 @@
     "use-sync-external-store": {
       "optional": true
     }
-  },
-  "packageManager": "yarn@1.22.21+sha256.dbed5b7e10c552ba0e1a545c948d5473bc6c5a28ce22a8fd27e493e3e5eb6370"
+  }
 }
