@@ -262,7 +262,7 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['./setup-vitest.ts'],
+      setupFiles: ['./src/setup-vitest.ts'],
     },
   }),
 )
