@@ -4,11 +4,10 @@ description:
 nav: 207
 ---
 
-# persist Middleware
+# persist
 
-`persist` middleware lets you Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde
-recusandae ratione vero obcaecati maxime ex, nemo laudantium repellat animi error facere earum
-doloribus tenetur esse repellendus nam harum non quod!
+`persist` middleware lets you persist your store's state across page reloads or application
+restarts.
 
 ```js
 persist(initializer, persistOptions)
@@ -18,8 +17,9 @@ persist(initializer, persistOptions)
   - [Signature](#persist-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
-  - [Cannot read property 'setOptions' of undefined](#cannot-read-property-setoptions-of-undefined)
+  - [Cannot read property `setOptions` of undefined](#cannot-read-property-setoptions-of-undefined)
   - [Storage is not being validated or type checked](#storage-is-not-being-validated-or-type-checked)
+  - [Cannot read property `setItem`/`getItem`/`removeItem` of null](#cannot-read-property-setitemgetitemremoveitem-of-null)
 
 ## Reference
 
@@ -31,24 +31,24 @@ persist<T, U>(initializer: StateCreator<T, [], []>, persistOptions?: PersistOpti
 
 #### Parameters
 
-- `initializer`: Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illum dicta, fugit
-  recusandae minima ad optio! Voluptate at quam optio veritatis necessitatibus laborum hic eligendi!
-  Quae sunt ratione aliquam tenetur ea.
+- `initializer`: The value you want the state to be initially. It can be a value of any type, but
+  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+  arguments.
 - `persistOptions`: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Adipisci nemo itaque
   culpa fuga accusamus laborum est voluptas nulla aspernatur quaerat neque consectetur corrupti
   nihil reiciendis officia id, vel, facilis aliquam!
 
 #### Returns
 
-`persist` Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit autem aperiam quam, beatae
-nesciunt in. Deserunt mollitia aperiam officiis veritatis. Nesciunt neque minima illum sapiente
-quod nihil similique quo dicta.
+`persist` returns an extended version of your initializer function that enhances the store API
+utilities by adding new functions: `persist` function, `rehydrate` function, `onHydrate` callback
+function, and `onFinishHydration` callback function.
 
 ## Usage
 
 ## Troubleshooting
 
-### Cannot read property 'setOptions' of undefined
+### Cannot read property `setOptions` of undefined
 
 Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum reprehenderit eaque excepturi,
 cumque officia incidunt repellendus, fugit soluta dolore perspiciatis laudantium voluptatem
@@ -59,3 +59,5 @@ repudiandae illum ipsum quam, perferendis iusto a aperiam!
 Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum ratione aspernatur dolores ut in
 erferendis quis reprehenderit iure numquam minima laborum vero unde, eum laudantium! Minima beatae
 natus tempore est.
+
+### Cannot read property `setItem`/`getItem`/`removeItem` of null

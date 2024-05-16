@@ -6,9 +6,7 @@ nav: 209
 
 # shallow
 
-`shallow` function lets you optimize re-renders. Lorem ipsum dolor sit amet consectetur adipisicing elit.
-Mollitia aliquid labore veritatis eius architecto ea nemo ratione alias illum molestiae excepturi
-necessitatibus hic voluptas, tenetur quibusdam ad similique deserunt tempora.
+`shallow` function lets you optimize re-renders.
 
 ```js
 shallow(a, b)
@@ -32,14 +30,13 @@ shallow<T>(a: T, b: T): boolean
 
 #### Parameters
 
-- a: Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda, amet at? At praesentium
-  nisi, ullam iusto odio iure fugiat totam expedita aliquam nemo debitis possimus sint minima autem
-  atque libero!
-- b: Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem culpa deserunt quia, non quis
-  hic. Consectetur fuga nemo voluptas veritatis. Aspernatur impedit facilis eius officiis. Soluta
-  maiores dolorem eos perferendis.
+- `a`: The first value.
+- `b`: The second value.
 
 #### Returns
+
+`shallow` returns `true` when `a` and `b` are equal based on a shallow comparison of their
+**top-level** properties. Otherwise, it should return `false`.
 
 ## Usage
 

@@ -6,9 +6,7 @@ nav: 211
 
 # useShallow ⚛️
 
-`useShallow` is a React Hook lets you Lorem ipsum dolor sit amet consectetur adipisicing elit.
-Molestias repellat ipsum quidem. Vel, possimus aspernatur! Eveniet ea ab, vel dolorum vero dolorem,
-nostrum, officiis cupiditate odit laudantium eius aliquam vitae?
+`useShallow` is a React Hook lets you memoized a selector function.
 
 ```js
 useShallow(selector)
@@ -34,7 +32,8 @@ useShallow<T, U>(selectorFn: (state: T) => U): (state: T) => U
 
 #### Returns
 
-`useShallow` returns a memoized version of a given `selector` function.
+`useShallow` returns a memoized version of a selector function using a shallow comparison for
+memoization.
 
 ### `selector` function
 
