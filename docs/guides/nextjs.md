@@ -68,6 +68,8 @@ request.
 
 > **Note:** do not forget to remove all comments from your `tsconfig.json` file.
 
+### Initializing the store
+
 ```ts
 // src/stores/counter-store.ts
 import { createStore } from 'zustand/vanilla'
@@ -149,13 +151,13 @@ export const useCounterStore = <T,>(
 }
 ```
 
-> **Note:** In this example, we ensure that this component is re-render-safe by checking the
+> **Note:** In this second example below, we ensure that this component is re-render-safe by checking the
 > value of the reference, so that the store is only created once. This component will only be
 > rendered once per request on the server, but might be re-rendered multiple times on the client if
 > there are stateful client components located above this component in the tree, or if this component
 > also contains other mutable state that causes a re-render.
 
-### Initializing the store
+### Initializing the store (Example 2)
 
 ```ts
 // src/stores/counter-store.ts
@@ -190,6 +192,8 @@ export const createCounterStore = (
   }))
 }
 ```
+
+### Providing the store (Example 2)
 
 ```tsx
 // src/providers/counter-store-provider.tsx
