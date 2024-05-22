@@ -34,8 +34,8 @@ jobs:
           - 18.0.0
           - 18.1.0
           - 18.2.0
-          - 18.3.0-canary-2f8f77602-20240229
-          - 0.0.0-experimental-2f8f77602-20240229
+          - 19.0.0-rc-8f3c0525f9-20240521
+          - 0.0.0-experimental-8f3c0525f9-20240521
         devtools-skip:
           - CI-MATRIX-NOSKIP
         include:
