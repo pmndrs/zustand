@@ -1,9 +1,9 @@
 ---
-title: 'How to Migrate to v5'
+title: 'How to Migrate to v5 from v4'
 nav: 30
 ---
 
-# How to Migrate to v5
+# How to Migrate to v5 from v4
 
 We highly recommend to update to the latest version of v4, before migrating to v5. It will show all deprecation warnings without breaking your app.
 
@@ -21,12 +21,12 @@ We highly recommend to update to the latest version of v4, before migrating to v
 
 ## Migration Guide
 
-### `createWithEqulityFn`
+### `createWithEqualityFn`
 
 The `create` function in v5 does not support customizing equality function.
 
 If you use custom equality function such as `shallow`,
-The easiest migration is to use `createWithEqulityFn`.
+the easiest migration is to use `createWithEqualityFn`.
 
 ```js
 // v4
@@ -51,7 +51,7 @@ const Component = () => {
 }
 ```
 
-That can be done with `createWithEqulityFn` in v5:
+That can be done with `createWithEqualityFn` in v5:
 
 ```bash
 npm install use-sync-external-store
@@ -67,6 +67,7 @@ import { createWithEqualityFn as create } from 'zustand/traditional'
 Alternatively, for the `shallow` use case, you can use `useShallow` hook:
 
 ```js
+// v5
 import { create } from 'zustand'
 import { useShallow } from 'zustand/shallow'
 
