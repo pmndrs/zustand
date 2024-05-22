@@ -1,0 +1,92 @@
+---
+title: 'How to Migrate to v5'
+nav: 30
+---
+
+# How to Migrate to v5
+
+We highly recommend to update to the latest version of v4, before migrating to v5. It will show all deprecation warnings without breaking your app.
+
+## Changes in v5
+
+- Drop default exports
+- Drop deprecated features
+- Make React 18 the minimum required version
+- Make use-sync-external-store a peer dependency (required for `createWithEqualityFn` and `useStoreWithEqualityFn` in `zustand/traditional`)
+- Make TypeScript 4.5 the minimum required version
+- Drop UMD/SystemJS support
+- Organize entry points in the package.json
+- Drop ES5 support
+- Other small improvements (technically breaking changes)
+
+## Migration Guide
+
+### `createWithEqulityFn`
+
+The `create` function in v5 does not support customizing equality function.
+
+If you use custom equality function such as `shallow`,
+The easiest migration is to use `createWithEqulityFn`.
+
+```js
+// v4
+import { create } from 'zustand'
+import { shallow } from 'zustand/shallow'
+
+const useCountStore = create((set) => ({
+  count: 0,
+  text: 'hello',
+  // ...
+}))
+
+const Component = () => {
+  const { count, text } = useCountStore(
+    (state) => ({
+      count: state.count,
+      text: state.text,
+    }),
+    shallow,
+  )
+  // ...
+}
+```
+
+That can be done with `createWithEqulityFn` in v5:
+
+```bash
+npm install use-sync-external-store
+```
+
+```js
+// v5
+import { createWithEqualityFn as create } from 'zustand/traditional'
+
+// The rest is the same as v4
+```
+
+Alternatively, for the `shallow` use case, you can use `useShallow` hook:
+
+```js
+import { create } from 'zustand'
+import { useShallow } from 'zustand/shallow'
+
+const useCountStore = create((set) => ({
+  count: 0,
+  text: 'hello',
+  // ...
+}))
+
+const Component = () => {
+  const { count, text } = useCountStore(
+    useShallow((state) => ({
+      count: state.count,
+      text: state.text,
+    })),
+  )
+  // ...
+}
+```
+
+## Links
+
+- https://github.com/pmndrs/zustand/pull/2138
