@@ -19,6 +19,7 @@ This can be done using third-party libraries created by the community.
 
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
+- [@prncss-xyz/zustand-optics](https://github.com/prncss-xyz/zustand-optics) — An adapter for [optics-ts](https://github.com/akheron/optics-ts).
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook) — Automatic generation of Zustand hooks with Typescript support.
 - [derive-zustand](https://github.com/zustandjs/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
 - [geschichte](https://github.com/BowlingX/geschichte) — Zustand and Immer-based hook to manage query parameters.
