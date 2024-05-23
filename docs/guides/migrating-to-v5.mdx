@@ -21,7 +21,7 @@ We highly recommend to update to the latest version of v4, before migrating to v
 
 ## Migration Guide
 
-### `createWithEqualityFn`
+### Using custom equality functions such as `shallow`
 
 The `create` function in v5 does not support customizing equality function.
 
@@ -86,6 +86,45 @@ const Component = () => {
   )
   // ...
 }
+```
+
+### Requiring stable selector outputs
+
+There is a behavioral change in v5 to match React default behavior.
+If a selector returns a new reference, it may cause infinite loops.
+
+For example, this may cause infinite loops.
+
+```js
+// v4
+const action = useMainStore((state) => {
+  return state.action ?? () => {}
+})
+```
+
+The error message will be something like this:
+
+```
+Uncaught Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.
+```
+
+To fix it, make sure the selector function returns a stable reference.
+
+```js
+// v5
+
+const FALLBACK_ACTION = () => {}
+
+const action = useMainStore((state) => {
+  return state.action ?? FALLBACK_ACTION
+})
+```
+
+Alternatively, if you need v4 behavior, `createWithEqualityFn` will do.
+
+```js
+// v5
+import { createWithEqualityFn as create } from 'zustand/traditional'
 ```
 
 ## Links
