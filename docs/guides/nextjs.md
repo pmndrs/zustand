@@ -70,7 +70,7 @@ request.
 
 ```ts
 // src/stores/counter-store.ts
-import { createStore } from 'zustand/vanilla'
+import { createStore } from 'zustand'
 
 export type CounterState = {
   count: number
