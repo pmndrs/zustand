@@ -34,9 +34,20 @@ persist<T, U>(initializer: StateCreator<T, [], []>, persistOptions?: PersistOpti
 - `initializer`: The value you want the state to be initially. It can be a value of any type, but
   when you pass a function should take `setState` function, `getState` function and `storeApi` as
   arguments.
-- `persistOptions`: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Adipisci nemo itaque
-  culpa fuga accusamus laborum est voluptas nulla aspernatur quaerat neque consectetur corrupti
-  nihil reiciendis officia id, vel, facilis aliquam!
+- `persistOptions`: An object to.
+  - `name`: A unique name of the item for your store in the storage.
+  - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`. -
+  - **optional** `partialize`: A function to filter state fields before persisting it.
+  - **optional** `onRehydrateStorage`: A function or function returning a function that allows
+    custom logic before and after state rehydration.
+  - **optional** `version`: A version number for the persisted state. If the stored state version
+    doesn't match, it won't be used.
+  - **optional** `migrate`: A function to migrate persisted state if the version mismatch occurs.
+  - **optional** `merge`: A function for custom logic when merging persisted state with the current
+    state during rehydration. Defaults to a shallow merge.
+  - **optional** `skipHydration`: Defaults to `false`. If `true`, the middleware won't
+    automatically rehydrate the state on initialization. Use `rehydrate` function manually in this
+    case. This is useful for server-side rendering (SSR) applications.
 
 #### Returns
 

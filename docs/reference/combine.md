@@ -21,9 +21,7 @@ combine(initialState, additionalStateCreator)
   - [`subscribe` function](#subscribe-function)
   - [`storeApi`](#storeapi)
 - [Usage](#usage)
-  - TBD
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ## Reference
 
