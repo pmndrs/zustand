@@ -16,7 +16,7 @@ shallow(a, b)
   - [Signature](#shallow-signature)
 - [Usage](#usage)
   - [Skipping re-rendering when props are unchanged](#skipping-re-rendering-when-props-are-unchanged)
-  - [Specifying a custom comparison function ](#specifying-a-custom-comparison-function)
+  - [Specifying a custom comparison function for 'memo'](#specifying-a-custom-comparison-function-for-memo)
 - [Troubleshooting](#troubleshooting)
   - [My component re-renders](#my-component-re-renders)
 
@@ -46,7 +46,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed saepe nam reiciendi
 recusandae rem perspiciatis distinctio, dolor minus obcaecati expedita quis sunt nulla aliquam eius
 quos iusto! Facere, molestiae!
 
-### Specifying a custom comparison function
+### Specifying a custom comparison function for 'memo'
 
 Lorem ipsum, dolor sit amet consectetur adipisicing elit. Culpa ullam, excepturi ipsam corporis
 soluta placeat eum nam veritatis, quisquam quam necessitatibus similique porro sint possimus cum

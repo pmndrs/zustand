@@ -6,9 +6,8 @@ nav: 205
 
 # devtools
 
-`devtools` middleware lets you Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi
-saepe, non et deserunt eos accusantium, at laborum quae doloremque commodi error inventore odio eum
-ex nesciunt maiores, praesentium fugit harum!
+`devtools` middleware lets you use [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)
+without Redux. Read more about the benefits of using [Redux DevTools for debugging](https://redux.js.org/style-guide/#use-the-redux-devtools-extension-for-debugging).
 
 ```js
 devtools(initilizer, devtoolsOptions)
@@ -18,6 +17,8 @@ devtools(initilizer, devtoolsOptions)
   - [Signature](#devtools-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
+  - [Only one store is displayed](#only-one-store-is-displayed)
+  - [Action names are labeled as 'anonymous'](#all-action-names-are-labeled-as-anonymous)
 
 ## Reference
 
@@ -29,19 +30,34 @@ devtools<T>(initializer: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOpti
 
 #### Parameters
 
-- `initializer`: Lorem ipsum dolor sit, amet consectetur adipisicing elit. Corporis tempore hic sit.
-  Numquam vero voluptate perspiciatis sunt ab amet recusandae, molestias eaque fugit animi debitis
-  asperiores magnam, beatae eveniet rem?
-- `devtoolsOptions`: Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum, repellat?
-  Nihil neque placeat voluptatibus eveniet ipsa amet maiores cumque vero illo, ipsum eaque totam
-  repudiandae beatae, accusantium cum quae magnam!
+- `initializer`: The value you want the state to be initially. It can be a value of any type, but
+  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+  arguments.
+- **optional** `devtoolsOptions`: An object to define Redux DevTools options.
+  - **optional** `name`: A custom identifier for the connection in the Redux DevTools.
+  - **optional** `enabled`: Defaults to `true`. Enables or disables the Redux DevTools integration
+    for this store.
+  - **optional** `anonymousActionType`: Defaults to `anonymous`. A string to use as the action type
+    for anonymous mutations in the Redux DevTools.
+  - **optional** `store`: A custom identifier for the store in the Redux DevTools.
 
 #### Returns
 
-`devtools` returns Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae doloremque sequi,
-debitis voluptate mollitia quia atque harum temporibus ducimus? Porro necessitatibus eum dolore
-voluptatibus modi minus laborum expedita quam nemo?
+`devtools` returns an extended version of your initializer function that enhances the `setState`
+function, allowing you to pass a `action`, so Redux DevTools can use it for debugging.
 
 ## Usage
 
 ## Troubleshooting
+
+### Only one store is displayed
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo voluptatum, eos suscipit explicabo
+animi ad porro vitae vel ullam saepe magnam in facilis earum, nulla officia sit. Unde, nostrum
+delectus!
+
+### All action names are labeled as 'anonymous'
+
+Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat et illo hic architecto deleniti
+soluta, veritatis reiciendis nesciunt laborum laudantium, dolorum asperiores fuga at accusamus aut
+facere ex perspiciatis qui!
