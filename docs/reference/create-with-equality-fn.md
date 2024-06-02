@@ -33,7 +33,7 @@ createWithEqualityFn(initializer, equalityFn)
 ### `createWithEqualityFn` Signature
 
 ```ts
-createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
+createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
 ```
 
 #### Parameters
