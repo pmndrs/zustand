@@ -32,12 +32,12 @@ createStore(initializer)
 ### `createStore` Signature
 
 ```ts
-createStore<T>()(initializer: StateCreator<T, [], []>): StoreApi<T>
+createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
+- `stateCreatorFn`: The value you want the state to be initially. It can be a value of any type, but
   when you pass a function should take `setState` function, `getState` function and `storeApi` as
   arguments.
 

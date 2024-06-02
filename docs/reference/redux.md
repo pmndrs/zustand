@@ -38,8 +38,7 @@ redux<T, A>(reducer: (state: T, action: A) => T, initialState: T): StateCreator<
 
 #### Returns
 
-`redux` returns an extended version of your initializer function that enhances your `setState`
-function allowing you to use redux-like updates by dispatching.
+`redux` returns a state creator function.
 
 ### `setState` function
 

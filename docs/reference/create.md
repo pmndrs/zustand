@@ -9,7 +9,7 @@ nav: 204
 `create` lets you create a React Hook with store API utilities.
 
 ```js
-create(initializer)
+create(stateCreatorFn)
 ```
 
 - [Reference](#reference)
@@ -31,18 +31,18 @@ create(initializer)
 ### `create` Signature
 
 ```ts
-create<T>()(initializer: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
+create<T>()(stateCreatorFn: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `storeApi` as
-  arguments.
+- `stateCreatorFn`: The value you want the state to be initially. It can be a value of any type,
+  but when you pass a function should take `setState` function, `getState` function and `storeApi`
+  as arguments.
 
 #### Returns
 
-`create` returns a React Hook:
+`create` returns a React Hook with Store API attached:
 
 1. The React Hook that lets you return data that is based on current state, using a
    [`selector` function](#selector-function). It should take a selector function as its only

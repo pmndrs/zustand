@@ -9,7 +9,7 @@ nav: 206
 `immer` middleware lets you perform immutable updates.
 
 ```js
-immer(initializer)
+immer(stateCreatorFn)
 ```
 
 - [Reference](#reference)
@@ -26,20 +26,18 @@ immer(initializer)
 ### `immer` Signature
 
 ```ts
-immer<T>(initializer: StateCreator<T, [], []>): StateCreator<T, [], []>
+immer<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [], []>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+- `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
+  updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
   arguments.
 
 #### Returns
 
-`immer` returns an extended version of your initializer function that enhances the `setState`
-function, allowing you to perform immutable updates using "mutating" syntax rather than copying
-every level of nesting that needs to be updated.
+`immer` returns a state creator function.
 
 ### `setState` function
 

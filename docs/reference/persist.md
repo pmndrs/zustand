@@ -10,7 +10,7 @@ nav: 207
 restarts.
 
 ```js
-persist(initializer, persistOptions)
+persist(stateCreatorFn, persistOptions)
 ```
 
 - [Reference](#reference)
@@ -26,13 +26,13 @@ persist(initializer, persistOptions)
 ### `persist` Signature
 
 ```ts
-persist<T, U>(initializer: StateCreator<T, [], []>, persistOptions?: PersistOptions<T, U>): StateCreator<T, [], []>
+persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistOptions<T, U>): StateCreator<T, [], []>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+- `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
+  updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
   arguments.
 - `persistOptions`: An object to.
   - `name`: A unique name of the item for your store in the storage.
@@ -51,9 +51,7 @@ persist<T, U>(initializer: StateCreator<T, [], []>, persistOptions?: PersistOpti
 
 #### Returns
 
-`persist` returns an extended version of your initializer function that enhances the store API
-utilities by adding new functions: `persist` function, `rehydrate` function, `onHydrate` callback
-function, and `onFinishHydration` callback function.
+`persist` returns a state creator function.
 
 ## Usage
 

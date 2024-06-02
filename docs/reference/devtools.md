@@ -10,7 +10,7 @@ nav: 205
 without Redux. Read more about the benefits of using [Redux DevTools for debugging](https://redux.js.org/style-guide/#use-the-redux-devtools-extension-for-debugging).
 
 ```js
-devtools(initilizer, devtoolsOptions)
+devtools(stateCreatorFn, devtoolsOptions)
 ```
 
 - [Reference](#reference)
@@ -25,13 +25,13 @@ devtools(initilizer, devtoolsOptions)
 ### `devtools` Signature
 
 ```ts
-devtools<T>(initializer: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOptions): StateCreator<T, [], []>
+devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOptions): StateCreator<T, [], []>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+- `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
+  updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
   arguments.
 - **optional** `devtoolsOptions`: An object to define Redux DevTools options.
   - **optional** `name`: A custom identifier for the connection in the Redux DevTools.

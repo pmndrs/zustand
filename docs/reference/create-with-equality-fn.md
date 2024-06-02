@@ -10,7 +10,7 @@ nav: 203
 function.
 
 ```js
-createWithEqualityFn(initializer, equalityFn)
+createWithEqualityFn(stateCreatorFn, equalityFn)
 ```
 
 - [Reference](#reference)
@@ -33,15 +33,15 @@ createWithEqualityFn(initializer, equalityFn)
 ### `createWithEqualityFn` Signature
 
 ```ts
-createWithEqualityFn<T>()(initializer: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
+createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+- `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
+  updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
   arguments.
-- `equalityFn`: A function that lets you skip re-renders.
+- **optional** `equalityFn`: Defaults to `Object.is`. A function that lets you skip re-renders.
 
 #### Returns
 

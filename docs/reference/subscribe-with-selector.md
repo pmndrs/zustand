@@ -9,7 +9,7 @@ nav: 210
 `subscribeWithSelector` middleware lets you subscribe to specific data based on current state.
 
 ```js
-subscribeWithSelector(initializer)
+subscribeWithSelector(stateCreatorFn)
 ```
 
 - [Reference](#reference)
@@ -26,21 +26,18 @@ subscribeWithSelector(initializer)
 ### `subscribeWithSelector` Signature
 
 ```ts
-subscribeWithSelector<T>(initializer: StateCreator<T, [], []>): StateCreator<T, [], []>
+subscribeWithSelector<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [], []>
 ```
 
 #### Parameters
 
-- `initializer`: The value you want the state to be initially. It can be a value of any type, but
-  when you pass a function should take `setState` function, `getState` function and `storeApi` as
+- `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
+  updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
   arguments.
 
 #### Returns
 
-`subscribeWithSelector` returns an extended version of your initializer function that enhances the
-`subscribe` function, allowing you to subscribe to specific data within your store based on a
-`selector` function rather than subscribing to the entire state, and receiving updates for every
-change.
+`subscribeWithSelector` returns a state creator function.
 
 ### `setState` function
 

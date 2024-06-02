@@ -28,16 +28,16 @@ combine(initialState, additionalStateCreator)
 ### `combine` Signature
 
 ```ts
-combine<T, U>(initialState: T, additionalStateCreator: StateCreator<T, [], [], U>): Omit<T, keyof U> & U
+combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [], U>): Omit<T, keyof U> & U
 ```
 
 #### Parameters
 
 - `initialState`: The value you want the state to be initially. It can be a value of any type,
   except a function.
-- `additionalStateCreator`: A function that should take [`setState` function](#setstate-function),
-  [`getState` function](#getstate-function) and [`storeApi`](#storeapi) as arguments. It should
-  return an additional state based on the initial state.
+- `additionalStateCreatorFn`: The state creator function that specifies how the state gets
+  initialized and updated. It must be pure, should take `setState` function, `getState` function
+  and `storeApi` as arguments.
 
 #### Returns
 

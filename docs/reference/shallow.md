@@ -6,7 +6,8 @@ nav: 209
 
 # shallow
 
-`shallow` function lets you optimize re-renders.
+`shallow` is a comparison function that lets you optimize re-renders when it's used as a custom
+equality function.
 
 ```js
 shallow(a, b)
