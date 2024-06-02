@@ -256,7 +256,7 @@
   "peerDependencies": {
     "@types/react": ">=16.8",
     "immer": ">=9.0.6",
-    "react": ">=16.8"
+    "react": ">=16.8, <19"
   },
   "peerDependenciesMeta": {
     "@types/react": {
