@@ -6,7 +6,7 @@ nav: 211
 
 # useShallow ⚛️
 
-`useShallow` is a React Hook lets you memoized a selector function.
+`useShallow` is a React Hook that lets you optimize re-renders.
 
 ```js
 useShallow(selector)
