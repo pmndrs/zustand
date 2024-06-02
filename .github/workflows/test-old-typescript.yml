@@ -28,14 +28,17 @@ jobs:
           - 4.2.3
           - 4.1.5
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
-          node-version: '18'
-          cache: yarn
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-      - run: yarn install --frozen-lockfile --check-files
-      - run: yarn build
+          version: 8.2.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - name: Patch for Old TS
         run: |
           sed -i~ 's/\/\/ @ts-expect-error.*\[LATEST-TS-ONLY\]//' tests/*.tsx
@@ -46,24 +49,13 @@ jobs:
           sed -i~ 's/"zustand": \["\.\/src\/index\.ts"\],/"zustand": [".\/dist\/index.d.ts"],/' tsconfig.json
           sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/*.d.ts"]/' tsconfig.json
           sed -i~ 's/"include": .*/"include": ["src\/types.d.ts", "dist\/**\/*", "tests\/**\/*"],/' tsconfig.json
-          yarn json -I -f package.json -e "this.resolutions={}; this.resolutions['@types/node']='18.13.0';"
-          yarn add -D @types/node@18.13.0
+          pnpm json -I -f package.json -e "this.resolutions={}; this.resolutions['@types/node']='18.13.0';"
+          pnpm add -D @types/node@18.13.0
       - name: Install old TypeScript
-        run: yarn add -D typescript@${{ matrix.typescript }}
+        run: pnpm add -D typescript@${{ matrix.typescript }}
       - name: Patch testing setup for Old TS
         if: ${{ matrix.typescript == '4.4.4' || matrix.typescript == '4.3.5' || matrix.typescript == '4.2.3' || matrix.typescript == '4.1.5' }}
         run: |
-          rm node_modules/@vitest/expect/dist/*.d.ts
-          echo "declare module '@vitest/expect'" >> ./src/types.d.ts
-          rm node_modules/@vitest/runner/dist/*.d.ts
-          echo "declare module '@vitest/runner'" >> ./src/types.d.ts
-          rm node_modules/@vitest/spy/dist/*.d.ts
-          echo "declare module '@vitest/spy'" >> ./src/types.d.ts
-          rm node_modules/@vitest/utils/dist/*.d.ts
-          echo "declare module '@vitest/utils'" >> ./src/types.d.ts
-          rm node_modules/vite-node/dist/*.d.ts
-          echo "declare module 'vite-node'" >> ./src/types.d.ts
-          rm node_modules/vitest/dist/*.d.ts
-          echo "declare module 'vitest'" >> ./src/types.d.ts
+          pnpm add -D vitest@0.33.0 @vitest/coverage-v8@0.33.0 @vitest/ui@0.33.0
       - name: Test ${{ matrix.typescript }}
-        run: yarn tsc --noEmit
+        run: pnpm test:types

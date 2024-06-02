@@ -65,14 +65,13 @@ you can use this suggested workflow:
 
 - Fork this repository;
 - Create a new feature branch based on the `main` branch;
-- Install dependencies by running `yarn`
-  ([version 1](https://classic.yarnpkg.com/lang/en/docs/install));
+- Install dependencies by running `pnpm`;
 - Create failing tests for your fix or new feature;
 - Implement your changes and confirm that all test are passing.
   You can run the tests continuously during development
-  with the `yarn test` command.
+  with the `pnpm test` command.
 - If you want to test it in a React project:
-  - Either use `yarn link`, or
+  - Either use `pnpm link`, or
   - Use the `yalc` package.
 - Commit your changes (see the [committing guidelines]).
 - Submit a PR for review.
