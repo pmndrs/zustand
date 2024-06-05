@@ -50,12 +50,16 @@ type TakeTwo<T> = T extends { length: 0 }
 type WithDevtools<S> = Write<S, StoreDevtools<S>>
 
 type StoreDevtools<S> = S extends {
-  setState: (...a: infer Sa) => infer Sr
+  setState: {
+    // capture both overloads of setState
+    (...a: infer Sa1): infer Sr1
+    (...a: infer Sa2): infer Sr2
+  }
 }
   ? {
       setState<A extends string | { type: string }>(
-        ...a: [...a: TakeTwo<Sa>, action?: A]
-      ): Sr
+        ...a: [...a: TakeTwo<Sa1 | Sa2>, action?: A]
+      ): Sr1 | Sr2
     }
   : never
 
@@ -165,8 +169,8 @@ const devtoolsImpl: DevtoolsImpl =
       extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
-    ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
-      const r = set(state, replace)
+    ;(api.setState as any) = ((state, replace, nameOrAction) => {
+      const r = set(state, replace as any)
       if (!isRecording) return r
       const action: { type: string } =
         nameOrAction === undefined
@@ -189,12 +193,12 @@ const devtoolsImpl: DevtoolsImpl =
         },
       )
       return r
-    }
+    }) as NamedSet<S>
 
     const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
       isRecording = false
-      set(...a)
+      set(...(a as Parameters<typeof set>))
       isRecording = originalIsRecording
     }
 
