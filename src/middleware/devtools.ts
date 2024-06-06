@@ -49,6 +49,12 @@ type TakeTwo<T> = T extends { length: 0 }
 
 type WithDevtools<S> = Write<S, StoreDevtools<S>>
 
+type Action =
+  | string
+  | {
+      type: string
+      [x: string | number | symbol]: unknown
+    }
 type StoreDevtools<S> = S extends {
   setState: {
     // capture both overloads of setState
@@ -57,12 +63,8 @@ type StoreDevtools<S> = S extends {
   }
 }
   ? {
-      setState<A extends string | { type: string }>(
-        ...a: [...a: TakeTwo<Sa1>, action?: A]
-      ): Sr1
-      setState<A extends string | { type: string }>(
-        ...a: [...a: TakeTwo<Sa2>, action?: A]
-      ): Sr2
+      setState(...a: [...a: TakeTwo<Sa1>, action?: Action]): Sr1
+      setState(...a: [...a: TakeTwo<Sa2>, action?: Action]): Sr2
     }
   : never
 
@@ -172,11 +174,7 @@ const devtoolsImpl: DevtoolsImpl =
       extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
-    ;(api.setState as any) = ((
-      state,
-      replace,
-      nameOrAction: string | { type: string },
-    ) => {
+    ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
       if (!isRecording) return r
       const action: { type: string } =
