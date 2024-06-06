@@ -58,8 +58,11 @@ type StoreDevtools<S> = S extends {
 }
   ? {
       setState<A extends string | { type: string }>(
-        ...a: [...a: TakeTwo<Sa1 | Sa2>, action?: A]
-      ): Sr1 | Sr2
+        ...a: [...a: TakeTwo<Sa1>, action?: A]
+      ): Sr1
+      setState<A extends string | { type: string }>(
+        ...a: [...a: TakeTwo<Sa2>, action?: A]
+      ): Sr2
     }
   : never
 
@@ -169,7 +172,11 @@ const devtoolsImpl: DevtoolsImpl =
       extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
-    ;(api.setState as any) = ((state, replace, nameOrAction) => {
+    ;(api.setState as any) = ((
+      state,
+      replace,
+      nameOrAction: string | { type: string },
+    ) => {
       const r = set(state, replace as any)
       if (!isRecording) return r
       const action: { type: string } =
