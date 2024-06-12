@@ -43,8 +43,7 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
 
 #### Returns
 
-`devtools` returns an extended version of your initializer function that enhances the `setState`
-function, allowing you to pass a `action`, so Redux DevTools can use it for debugging.
+`devtools` returns a state creator function.
 
 ## Usage
 

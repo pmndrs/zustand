@@ -28,7 +28,7 @@ combine(initialState, additionalStateCreator)
 ### `combine` Signature
 
 ```ts
-combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [], U>): Omit<T, keyof U> & U
+combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [], U>): StateCreator<Omit<T, keyof U> & U, [], []>
 ```
 
 #### Parameters
@@ -41,8 +41,7 @@ combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [],
 
 #### Returns
 
-`combine` returns a new state that is the result of merging the initial state and the additional
-state.
+`combine` returns a state creator function.
 
 ### `setState` function
 
