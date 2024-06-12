@@ -1,5 +1,5 @@
 import { Vector3, CatmullRomCurve3 } from 'three'
-import React, { useRef, useMemo } from 'react'
+import { useRef, useMemo } from 'react'
 import { extend, useFrame } from '@react-three/fiber'
 import * as meshline from 'meshline'
 
@@ -7,7 +7,7 @@ extend(meshline)
 
 const r = () => Math.max(0.2, Math.random())
 
-function Fatline({ curve, width, color }) {
+function Fatline({ curve, color }) {
   const material = useRef()
   useFrame((state, delta) => (material.current.uniforms.dashOffset.value -= delta / 100))
   return (
@@ -21,7 +21,7 @@ function Fatline({ curve, width, color }) {
 export default function Fireflies({ count, colors, radius = 10 }) {
   const lines = useMemo(
     () =>
-      new Array(count).fill().map((_, index) => {
+      new Array(count).fill().map(() => {
         const pos = new Vector3(Math.sin(0) * radius * r(), Math.cos(0) * radius * r(), 0)
         const points = new Array(30).fill().map((_, index) => {
           const angle = (index / 20) * Math.PI * 2
