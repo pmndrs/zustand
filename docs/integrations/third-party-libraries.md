@@ -39,6 +39,7 @@ This can be done using third-party libraries created by the community.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) - Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) - 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
+- [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
 - [zustand-di](https://github.com/charkour/zustand-di) - use react props to init zustand stores
