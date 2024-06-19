@@ -1,0 +1,14 @@
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Bug Description
+      description: Describe the bug you encountered
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Check List
+      options:
+        - label: I've added a link to a [TypeScript Playground](https://www.typescriptlang.org/play), a [StackBlitz Project](https://stackblitz.com/) or something else with a minimal reproduction.
+          required: true
