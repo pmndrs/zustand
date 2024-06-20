@@ -22,9 +22,9 @@ export default function CodePreview() {
         // position is set to relative so the copy button can align to bottom right
         <pre className={className} style={{ ...style, position: 'relative' }}>
           {tokens.map((line, i) => (
-            <div {...getLineProps({ line, key: i })}>
+            <div {...getLineProps({ line })} key={i}>
               {line.map((token, key) => (
-                <span {...getTokenProps({ token, key })} />
+                <span {...getTokenProps({ token })} key={key} />
               ))}
             </div>
           ))}

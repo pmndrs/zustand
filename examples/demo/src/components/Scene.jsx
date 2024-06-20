@@ -1,5 +1,5 @@
 import { Mesh, PlaneGeometry, Group, Vector3, MathUtils } from 'three'
-import React, { useRef, useState, useLayoutEffect } from 'react'
+import { memo, useRef, useState, useLayoutEffect } from 'react'
 import { createRoot, events, extend, useFrame } from '@react-three/fiber'
 import { Plane, useAspect, useTexture } from '@react-three/drei'
 import { EffectComposer, DepthOfField, Vignette } from '@react-three/postprocessing'
@@ -106,7 +106,7 @@ function Canvas({ children }) {
     window.addEventListener('resize', resize)
     root.current.render(children)
     return () => window.removeEventListener('resize', resize)
-  }, [])
+  }, [children])
 
   return <canvas ref={canvas} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'block' }} />
 }
