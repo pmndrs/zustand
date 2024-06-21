@@ -20,7 +20,8 @@
     "prettier",
     "react-hooks",
     "import",
-    "vitest"
+    "vitest",
+    "eslint-plugin-react-compiler"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -31,6 +32,7 @@
     }
   },
   "rules": {
+    "react-compiler/react-compiler": "warn",
     "eqeqeq": "error",
     "no-var": "error",
     "prefer-const": "error",
