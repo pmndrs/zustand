@@ -231,7 +231,7 @@
     "@vitest/ui": "^1.6.0",
     "downlevel-dts": "^0.11.0",
     "esbuild": "^0.21.5",
-    "eslint": "9.5.0",
+    "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.29.1",
