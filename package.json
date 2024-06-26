@@ -2,7 +2,6 @@
   "name": "zustand",
   "description": "🐻 Bear necessities for state management in React",
   "private": true,
-  "type": "commonjs",
   "version": "4.5.3",
   "main": "./index.js",
   "types": "./index.d.ts",
