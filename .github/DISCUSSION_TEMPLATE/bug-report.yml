@@ -1,0 +1,17 @@
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: If you don't have a reproduction link, please choose a different category.
+  - type: textarea
+    attributes:
+      label: Bug Description
+      description: Describe the bug you encountered
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Reproduction Link
+      description: A link to a [TypeScript Playground](https://www.typescriptlang.org/play), a [StackBlitz Project](https://stackblitz.com/) or something else with a minimal reproduction.
+    validations:
+      required: true
