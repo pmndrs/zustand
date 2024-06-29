@@ -128,7 +128,6 @@ Alternatively, if you need v4 behavior, `createWithEqualityFn` will do.
 import { createWithEqualityFn as create } from 'zustand/traditional'
 ```
 
-
 ### Stricter types when setState's replace flag is set (Typescript only)
 
 ```diff
@@ -148,13 +147,13 @@ This change ensures that `store.setState({}, true)` (which results in an invalid
 
 ```ts
 // Partial state update (valid)
-store.setState({ key: 'value' });
+store.setState({ key: 'value' })
 
 // Complete state replacement (valid)
-store.setState({ key: 'value' }, true);
+store.setState({ key: 'value' }, true)
 
 // Incomplete state replacement (invalid)
-store.setState({}, true); // Error
+store.setState({}, true) // Error
 ```
 
 #### Handling Dynamic `replace` Flag
@@ -162,10 +161,9 @@ store.setState({}, true); // Error
 If the value of the `replace` flag is dynamic and determined at runtime, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with `as any`:
 
 ```ts
-const replaceFlag = Math.random() > 0.5;
-store.setState(partialOrFull, replaceFlag as any);
+const replaceFlag = Math.random() > 0.5
+store.setState(partialOrFull, replaceFlag as any)
 ```
-
 
 ## Links
 

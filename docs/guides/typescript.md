@@ -237,8 +237,8 @@ If you are eager to know what the answer is to this particular problem then you 
 If the value of the `replace` flag is not known at compile time and is determined dynamically, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with `as any`:
 
 ```ts
-const replaceFlag = Math.random() > 0.5;
-store.setState(partialOrFull, replaceFlag as any);
+const replaceFlag = Math.random() > 0.5
+store.setState(partialOrFull, replaceFlag as any)
 ```
 
 #### Example with `as any` Workaround
@@ -256,8 +256,8 @@ const useBearStore = create<BearState>()((set) => ({
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
 
-const replaceFlag = Math.random() > 0.5;
-useBearStore.setState({ bears: 5 }, replaceFlag as any); // Using the workaround
+const replaceFlag = Math.random() > 0.5
+useBearStore.setState({ bears: 5 }, replaceFlag as any) // Using the workaround
 ```
 
 By following this approach, you can ensure that your code handles dynamic `replace` flags without encountering type issues.
