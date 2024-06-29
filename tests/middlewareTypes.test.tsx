@@ -112,7 +112,7 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<{ count: number }> = createStore(
+    const _testSubtyping: StoreApi<object> = createStore(
       devtools(() => ({ count: 0 })),
     )
   })
