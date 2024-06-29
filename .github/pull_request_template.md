@@ -1,4 +1,4 @@
-## Related Issues or Discussions
+## Related Bug Reports or Discussions
 
 Fixes #
 

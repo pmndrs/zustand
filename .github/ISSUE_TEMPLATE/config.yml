@@ -1,4 +1,10 @@
 contact_links:
-  - name: Questions, unconfirmed bugs and ideas
-    url: https://github.com/pmndrs/zustand/discussions/new
-    about: Please post questions, unconfirmed bugs and ideas in discussions.
+  - name: Bug Reports
+    url: https://github.com/pmndrs/zustand/discussions/new?category=bug-report
+    about: Please post bug reports here.
+  - name: Questions
+    url: https://github.com/pmndrs/zustand/discussions/new?category=q-a
+    about: Please post questions here.
+  - name: Other Discussions
+    url: https://github.com/pmndrs/zustand/discussions/new/choose
+    about: Please post ideas and general discussions here.

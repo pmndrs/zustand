@@ -16,18 +16,23 @@ const { useDebugValue, useSyncExternalStore } = ReactExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
-type ReadonlyStoreApi<T> = Pick<StoreApi<T>, 'getState' | 'subscribe'>
+type ReadonlyStoreApi<T> = Pick<
+  StoreApi<T>,
+  'getState' | 'getInitialState' | 'subscribe'
+>
 
 const identity = <T>(arg: T): T => arg
-export function useStore<S extends StoreApi<unknown>>(api: S): ExtractState<S>
+export function useStore<S extends ReadonlyStoreApi<unknown>>(
+  api: S,
+): ExtractState<S>
 
-export function useStore<S extends StoreApi<unknown>, U>(
+export function useStore<S extends ReadonlyStoreApi<unknown>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
 ): U
 
 export function useStore<TState, StateSlice>(
-  api: StoreApi<TState>,
+  api: ReadonlyStoreApi<TState>,
   selector: (state: TState) => StateSlice = identity as any,
 ) {
   const slice = useSyncExternalStore(
