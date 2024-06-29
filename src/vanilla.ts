@@ -1,8 +1,9 @@
 type SetStateInternal<T> = {
   _(
     partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
-    replace?: boolean | undefined,
+    replace?: false,
   ): void
+  _(state: T | { _(state: T): T }['_'], replace: true): void
 }['_']
 
 export interface StoreApi<T> {
@@ -10,10 +11,6 @@ export interface StoreApi<T> {
   getState: () => T
   getInitialState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
-  /**
-   * @deprecated Use `unsubscribe` returned by `subscribe`
-   */
-  destroy: () => void
 }
 
 type Get<T, K, F> = K extends keyof T ? T[K] : F
@@ -92,94 +89,10 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     return () => listeners.delete(listener)
   }
 
-  const destroy: StoreApi<TState>['destroy'] = () => {
-    if (import.meta.env?.MODE !== 'production') {
-      console.warn(
-        '[DEPRECATED] The `destroy` method will be unsupported in a future version. Instead use unsubscribe function returned by subscribe. Everything will be garbage-collected if store is garbage-collected.',
-      )
-    }
-    listeners.clear()
-  }
-
-  const api = { setState, getState, getInitialState, subscribe, destroy }
+  const api = { setState, getState, getInitialState, subscribe }
   const initialState = (state = createState(setState, getState, api))
   return api as any
 }
 
 export const createStore = ((createState) =>
   createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
-
-/**
- * @deprecated Use `import { createStore } from 'zustand/vanilla'`
- */
-export default ((createState) => {
-  if (import.meta.env?.MODE !== 'production') {
-    console.warn(
-      "[DEPRECATED] Default export is deprecated. Instead use import { createStore } from 'zustand/vanilla'.",
-    )
-  }
-  return createStore(createState)
-}) as CreateStore
-
-// ---------------------------------------------------------
-
-/**
- * @deprecated Use `unknown` instead of `State`
- */
-export type State = unknown
-
-/**
- * @deprecated Use `Partial<T> | ((s: T) => Partial<T>)` instead of `PartialState<T>`
- */
-export type PartialState<T extends State> =
-  | Partial<T>
-  | ((state: T) => Partial<T>)
-
-/**
- * @deprecated Use `(s: T) => U` instead of `StateSelector<T, U>`
- */
-export type StateSelector<T extends State, U> = (state: T) => U
-
-/**
- * @deprecated Use `(a: T, b: T) => boolean` instead of `EqualityChecker<T>`
- */
-export type EqualityChecker<T> = (state: T, newState: T) => boolean
-
-/**
- * @deprecated Use `(state: T, previousState: T) => void` instead of `StateListener<T>`
- */
-export type StateListener<T> = (state: T, previousState: T) => void
-
-/**
- * @deprecated Use `(slice: T, previousSlice: T) => void` instead of `StateSliceListener<T>`.
- */
-export type StateSliceListener<T> = (slice: T, previousSlice: T) => void
-
-/**
- * @deprecated Use `(listener: (state: T) => void) => void` instead of `Subscribe<T>`.
- */
-export type Subscribe<T extends State> = {
-  (listener: (state: T, previousState: T) => void): () => void
-}
-
-/**
- * @deprecated You might be looking for `StateCreator`, if not then
- * use `StoreApi<T>['setState']` instead of `SetState<T>`.
- */
-export type SetState<T extends State> = {
-  _(
-    partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
-    replace?: boolean | undefined,
-  ): void
-}['_']
-
-/**
- * @deprecated You might be looking for `StateCreator`, if not then
- * use `StoreApi<T>['getState']` instead of `GetState<T>`.
- */
-export type GetState<T extends State> = () => T
-
-/**
- * @deprecated Use `StoreApi<T>['destroy']` instead of `Destroy`.
- */
-export type Destroy = () => void
