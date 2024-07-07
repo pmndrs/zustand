@@ -308,12 +308,9 @@ const Component = () => {
 
 ### State Model (vs Jotai)
 
-There are two major differences between Zustand and Jotai.
-Firstly, Zustand is a single store,
-while Jotai consists of primitive atoms
-that can be composed together.
-Secondly, a Zustand store is an external store,
-making it more suitable when access outside of React is required.
+There is one major difference between Zustand and Jotai.
+Zustand is a single store,
+while Jotai consists of primitive atoms that can be composed together.
 
 **Zustand**
 
