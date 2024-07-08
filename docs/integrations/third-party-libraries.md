@@ -16,8 +16,6 @@ This can be done using third-party libraries created by the community.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@davstack/store](https://www.npmjs.com/package/@davstack/store) — A zustand store factory that auto generates selectors with get/set/use methods, supports inferred types, and makes global / local state management easy.
-- [zustand-interval-persist](https://www.npmjs.com/package/zustand-interval-persist) — An enhancement for zustand that enables automatic saving of the store's state to the specified storage at regular interval.
-
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
 - [@prncss-xyz/zustand-optics](https://github.com/prncss-xyz/zustand-optics) — An adapter for [optics-ts](https://github.com/akheron/optics-ts).
@@ -37,6 +35,7 @@ This can be done using third-party libraries created by the community.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
+- [zustand-interval-persist](https://www.npmjs.com/package/zustand-interval-persist) — An enhancement for zustand that enables automatic saving of the store's state to the specified storage at regular interval.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) - Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) - 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
