@@ -6,10 +6,9 @@ nav: 212
 
 # useStoreWithEqualityFn ⚛️
 
-`useStoreWithEqualityFn` is a React Hook lets you Lorem ipsum dolor sit amet, consectetur
-adipisicing elit. Tempora voluptatum dolore non, eveniet consequuntur labore, optio saepe hic
-asperiores repellendus error alias, facilis ab assumenda possimus magnam voluptate. Blanditiis,
-perspiciatis?
+`useStoreWithEqualityFn` is a React Hook that lets you use a vanilla store in React, just like
+`useStore`. However, it offers a way to define a custom equality check. This allows for more
+granular control over when components re-render, improving performance and responsiveness.
 
 ```js
 useStoreWithEqualityFn(storeApi, selector, equalityFn)

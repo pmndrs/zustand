@@ -6,8 +6,11 @@ nav: 209
 
 # shallow
 
-`shallow` is a comparison function that lets you optimize re-renders when it's used as a custom
-equality function.
+`shallow` lets you run fast checks on simple data structures. It effectively identifies changes in
+**top-level** properties when you're working with data structures that don't have nested objects or
+arrays within them.
+
+> **Note:** shallow lets you perform quick comparisons, but keep its limitations in mind.
 
 ```js
 shallow(a, b)
@@ -17,9 +20,8 @@ shallow(a, b)
   - [Signature](#shallow-signature)
 - [Usage](#usage)
   - [Skipping re-rendering when props are unchanged](#skipping-re-rendering-when-props-are-unchanged)
-  - [Specifying a custom comparison function for 'memo'](#specifying-a-custom-comparison-function-for-memo)
 - [Troubleshooting](#troubleshooting)
-  - [My component re-renders](#my-component-re-renders)
+  - TBD
 
 ## Reference
 
@@ -43,24 +45,59 @@ shallow<T>(a: T, b: T): boolean
 
 ### Skipping re-rendering when props are unchanged
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed saepe nam reiciendis dignissimos
-recusandae rem perspiciatis distinctio, dolor minus obcaecati expedita quis sunt nulla aliquam eius
-quos iusto! Facere, molestiae!
+When you use `memo`, your component re-renders whenever any prop is not shallowly equal to what it
+was previously. This means that React compares every prop in your component with its previous value
+using the `Object.is(...)` comparison. Note that `Object.is(3, 3)` is `true`, but
+`Object.is({}, {})` is `false`.
 
-### Specifying a custom comparison function for 'memo'
+In that case, you can provide a custom comparison function, which React will use to compare the
+previous and next props instead of using shallow equality. This function is passed as a second
+argument to `memo`. It should return `true` only if the new props would result in the same output as
+the old props; otherwise it should return `false`.
 
-Lorem ipsum, dolor sit amet consectetur adipisicing elit. Culpa ullam, excepturi ipsam corporis
-soluta placeat eum nam veritatis, quisquam quam necessitatibus similique porro sint possimus cum
-obcaecati laboriosam sapiente provident.
+```tsx
+import { memo, useState } from 'react'
+import { shallow } from 'zustand/vanilla/shallow'
 
-## Troubleshooting
+const Chart = memo(
+  function Chart({ dataPoints }: { dataPoints: { x: number; y: number }[] }) {
+    console.log('Data points', dataPoints)
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas explicabo delectus necessitatibus
-molestias ex distinctio corporis, ad, expedita qui quia corrupti quos fuga eaque! Adipisci dolore
-minus omnis neque provident.
+    return <>Cool Chart</>
+  },
+  (previousProps, nextProps) => {
+    return (
+      previousProps.dataPoints.length === nextProps.dataPoints.length &&
+      previousProps.dataPoints.every((previousPoint, index) => {
+        const nextPoint = nextProps.dataPoints[index]
+        return shallow(previousPoint, nextPoint)
+      })
+    )
+  },
+)
 
-### My component re-renders
+export default function App() {
+  const [count, setCount] = useState(0)
+  const dataPoints = [
+    { x: 1, y: 10 },
+    { x: 2, y: 15 },
+    { x: 3, y: 8 },
+    { x: 4, y: 12 },
+  ]
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus nobis nisi dolore necessitatibus
-perspiciatis, iure consequatur mollitia cupiditate iste possimus suscipit a, harum fugiat officiis
-aliquid explicabo. Expedita, architecto suscipit?
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setCount((currentCount) => currentCount + 1)}
+      >
+        Count: {count}
+      </button>
+      <Chart dataPoints={dataPoints} />
+    </>
+  )
+}
+```
+
+> **Note:** moving `dataPoints` outside of component eliminates the need for a custom comparison
+> function

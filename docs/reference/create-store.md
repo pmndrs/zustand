@@ -6,24 +6,21 @@ nav: 202
 
 # createStore
 
-`createStore` lets you create a vanilla store with store API utilities. In React, you can utilize a
-vanilla store using the [`useStore`](./use-store) hook.
+`createStore` lets you create a vanilla store with API utilities attached.
 
 ```js
-createStore(initializer)
+createStore(stateCreatorFn)
 ```
 
 - [Reference](#reference)
   - [Signature](#createstore-signature)
-  - [`setState` function](#setstate-function)
-  - [`getState` function](#getstate-function)
-  - [`subscribe` function](#subscribe-function)
-  - [`storeApi`](#storeapi)
 - [Usage](#usage)
-  - [Updating state based on previous state](#updating-state-base-on-a-previous-state)
-  - [Updating objects and non-objects in state](#updating-objects-and-non-objects-in-state)
+  - [Updating state based on previous state](#updating-state-based-on-previous-state)
+  - [Updating Primitives in State](#updating-primitives-in-state)
+  - [Updating Objects in State](#updating-objects-in-state)
+  - [Updating Arrays in State](#updating-arrays-in-state)
+  - [Updating state with no store actions](#updating-state-with-no-store-actions)
   - [Subscribing to state updates](#subscribing-to-state-updates)
-  - [Split state in multiple slices](#split-state-in-multiple-slices)
 - [Troubleshooting](#troubleshooting)
   - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
@@ -46,89 +43,501 @@ createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 `createStore` returns a vanilla store with some API utilities. These API utilities are: `setState`
 function, `getState` function, and `subscribe` function.
 
-### `setState` function
-
-The `setState` function lets you update the state to a different value and trigger re-render. You
-can pass the next state directly, a next partial state, a function that calculates it from the
-previous state, or replace it completely.
-
-#### Parameters
-
-- `nextState`: The value that you want the state to be. It can be a value of any type, but there is
-  a special behavior for functions.
-  - If you pass an object as a `nextState`. It will shallow merge `nextState` with the current
-    state. You can pass only the properties you want to update, this allows for selective state
-    updates without modifying other properties.
-  - If you pass a non-object as a `nextState`, make sure you use `replace` as `true` to avoid
-    unexpected behaviors.
-  - If you pass a function as a `nextState`. It must be pure, should take current state as its
-    only argument, and should return the next state. The next state returned by the updater
-    function face the same restrictions of any next state.
-- `replace`: This optional boolean flag controls whether the state is completely replaced or only
-  shallow updated, through a shallow merge.
-
-#### Returns
-
-`setState` function do not have a return value.
-
-### `getState` function
-
-The `getState` function lets you access to the current state. It can be stale on asynchronous
-operations.
-
-### `subscribe` function
-
-The `subscribe` function lets you subscribe to state updates. It should take current state, and
-its previous state as arguments.
-
-#### Parameters
-
-- `currentState`: The current state.
-- `previousState`: The previous state.
-
-#### Returns
-
-`subscribe` returns a function that lets you unsubscribe from itself.
-
-### `storeApi`
-
-The `storeApi` lets you access to the store API utilities. These store API utilities are:
-`setState` function, `getState` function, and `subscribe` function.
-
 ## Usage
 
-### Updating state base on a previous state
+### Updating state based on previous state
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam in provident eius eaque modi,
-architecto consequuntur nihil soluta, dolore ratione, deleniti voluptatum unde. Qui veritatis,
-deleniti error vero ducimus sunt.
+This example show you how you can support **updater functions** for your
+**actions**.
 
-### Updating objects and non-objects in state
+```tsx
+import { createStore } from 'zustand'
 
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cupiditate consectetur sequi repellendus
-culpa nesciunt dolores aut. Voluptas corrupti expedita temporibus doloribus, maxime dolor iure
-suscipit adipisci hic cumque quasi officia?
+type AgeStoreState = { age: number }
+
+type AgeStoreActions = {
+  setAge: (
+    nextAge:
+      | AgeStoreState['age']
+      | ((currentAge: AgeStoreState['age']) => AgeStoreState['age']),
+  ) => void
+}
+
+type AgeStore = AgeStoreState & AgeStoreActions
+
+const ageStore = createStore<AgeStore>()((set) => ({
+  age: 42,
+  setAge: (nextAge) => {
+    set((state) => ({
+      age: typeof nextAge === 'function' ? nextAge(state.age) : nextAge,
+    }))
+  },
+}))
+
+function increment() {
+  ageStore.getState().setAge((currentAge) => currentAge + 1)
+}
+
+const $yourAgeHeading = document.getElementById(
+  'your-age',
+) as HMTLHeadingElement
+const $incrementBy3Button = document.getElementById(
+  'increment-by-3',
+) as HTMLButtonElement
+const $incrementBy1Button = document.getElementById(
+  'increment-by-1',
+) as HTMLButtonElement
+
+$incrementBy3Button.addEventListener('click', () => {
+  increment()
+  increment()
+  increment()
+})
+
+$incrementBy1Button.addEventListener('click', () => {
+  increment()
+})
+
+const render: Parameters<typeof ageStore.subscribe>[0] = (state) => {
+  $yourAgeHeading.innerHTML = `Your age: ${state.age}`
+}
+
+render(ageStore.getInitialState(), ageStore.getInitialState())
+
+ageStore.subscribe(render)
+```
+
+Here's the `html` code
+
+```html
+<h1 id="your-age"></h1>
+<button id="increment-by-3">+3</button>
+<button id="increment-by-1">+1</button>
+```
+
+### Updating Primitives in State
+
+State can hold any kind of JavaScript value. When you want to update built-in primitive values like
+number, strings, booleans, etc. we should directly assign new values to ensure updates are applied
+correctly, and avoid unexpected behaviors.
+
+> **Note:** by default, `set` function performs a shallow merge. If you need to completely replace
+> the state with a new one, use the `replace` parameter set to `true`
+
+```ts
+import { create } from 'zustand'
+
+type XStore = number
+
+const xStore = create<XStore>()(() => 0)
+
+const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dotContainer.addEventListener('pointermove', (event) => {
+  xStore.setState(event.clientX, true)
+})
+
+const render: Parameters<typeof xStore.subscribe>[0] = (state) => {
+  const position = { y: 0, x: state }
+
+  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+}
+
+render(xStore.getInitialState(), xStore.getInitialState())
+
+xStore.subscribe(render)
+```
+
+Here's the `html` code
+
+```html
+<div
+  id="dot-container"
+  style="position: relative; width: 100vw; height: 100vh;"
+>
+  <div
+    id="dot"
+    style="position: absolute; background-color: red; border-radius: 50%; left: -10px; top: -10px; width: 20px; height: 20px;"
+  ></div>
+</div>
+```
+
+### Updating Objects in State
+
+Objects are **mutable** in JavaScript, but you should treat them as **immutable** when you store
+them in state. Instead, when you want to update an object, you need to create a new one (or make a
+copy of an existing one), and then set the state to use the new object.
+
+By default, `set` function performs a shallow merge. For most updates where you only need to modify
+specific properties, the default shallow merge is preferred as it's more efficient. To completely
+replace the state with a new one, use the `replace` parameter set to `true` with caution, as it
+discards any existing nested data within the state.
+
+```ts
+import { create } from 'zustand'
+
+type PositionStoreState = { x: number; y: number }
+
+type PositionStoreActions = {
+  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const positionStore = create<PositionStore>()((set) => ({
+  x: 0,
+  y: 0,
+  setPosition: (nextPosition) => {
+    set(nextPosition)
+  },
+}))
+
+const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dotContainer.addEventListener('pointermove', (event) => {
+  positionStore.getState().setPosition({
+    x: event.clientX,
+    y: event.clientY,
+  })
+})
+
+const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  const position = { x: state.x, y: state.y }
+
+  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+}
+
+render(positionStore.getInitialState(), positionStore.getInitialState())
+
+positionStore.subscribe(render)
+```
+
+Here's the `html` code
+
+```html
+<div
+  id="dot-container"
+  style="position: relative; width: 100vw; height: 100vh;"
+>
+  <div
+    id="dot"
+    style="position: absolute; background-color: red; border-radius: 50%; left: -10px; top: -10px; width: 20px; height: 20px;"
+  ></div>
+</div>
+```
+
+### Updating Arrays in State
+
+Arrays are mutable in JavaScript, but you should treat them as immutable when you store them in
+state. Just like with objects, when you want to update an array stored in state, you need to create
+a new one (or make a copy of an existing one), and then set state to use the new array.
+
+By default, `set` function performs a shallow merge. To update array values we should assign new
+values to ensure updates are applied correctly, and avoid unexpected behaviors. To completely
+replace the state with a new one, use the `replace` parameter set to `true`.
+
+> **Note:** we should prefer immutable operations like: `concat(...)`, `[...array]`, `filter(...)`,
+> `slice(...)`, `map(...)`, `[...array].sort(...)`, and `[...array].reverse(...)`, and avoid
+> mutable operations like `push(...)`, `unshift(...)`, `pop(...)`, `shift(...)`, `splice(...)`,
+> `array[arrayIndex] = ...`, `reverse(...)`, and `sort(...)`.
+
+```ts
+import { create } from 'zustand'
+
+type PositionStore = [number, number]
+
+const positionStore = create<PositionStore>()(() => [0, 0])
+
+const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dotContainer.addEventListener('pointermove', (event) => {
+  positionStore.setState([event.clientX, event.clientY], true)
+})
+
+const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  const position = { x: state[0], y: state[1] }
+
+  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+}
+
+render(positionStore.getInitialState(), positionStore.getInitialState())
+
+positionStore.subscribe(render)
+```
+
+Here's the `html` code
+
+```html
+<div
+  id="dot-container"
+  style="position: relative; width: 100vw; height: 100vh;"
+>
+  <div
+    id="dot"
+    style="position: absolute; background-color: red; border-radius: 50%; left: -10px; top: -10px; width: 20px; height: 20px;"
+  ></div>
+</div>
+```
 
 ### Subscribing to state updates
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut quidem est neque consequuntur,
-dolorem eius, explicabo ullam voluptatibus ex corporis qui, quasi eum reprehenderit maxime! Magni
-magnam dignissimos eos dicta!
+By subscribing to state updates, you register a callback that fires whenever the store's state
+updates. We can use `subscribe` for external state management.
 
-### Split state in multiple slices
+```ts
+import { useEffect } from 'react'
+import { createStore } from 'zustand'
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat, sint doloremque incidunt beatae
-asperiores tempore amet quam ipsa commodi adipisci nobis quis fugiat aliquam? Facere repellendus
-asperiores incidunt maxime facilis?
+type PositionStoreState = { x: number; y: number }
+
+type PositionStoreActions = {
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const positionStore = createStore<PositionStore>()((set) => ({
+  x: 0,
+  y: 0,
+  setPosition: (nextPosition) => {
+    set(nextPosition)
+  },
+}))
+
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dot.addEventListener('mouseenter', (event) => {
+  const parent = event.currentTarget.parentElement
+  const parentWidth = parent.clientWidth
+  const parentHeight = parent.clientHeight
+
+  positionStore.getState().setPosition({
+    x: Math.ceil(Math.random() * parentWidth),
+    y: Math.ceil(Math.random() * parentHeight),
+  })
+})
+
+const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  const position = { x: state.x, y: state.y }
+
+  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+}
+
+render(positionStore.getInitialState(), positionStore.getInitialState())
+
+positionStore.subscribe(render)
+
+const logger: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  console.log('new position', { position: { x: state.x, y: state.x } })
+}
+
+positionStore.subscribe(logger)
+```
+
+Here's the `html` code
+
+```html
+<div
+  id="dot-container"
+  style="position: relative; width: 100vw; height: 100vh;"
+>
+  <div
+    id="dot"
+    style="position: absolute; background-color: red; border-radius: 50%; left: -10px; top: -10px; width: 20px; height: 20px;"
+  ></div>
+</div>
+```
 
 ## Troubleshooting
 
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aut illo, earum beatae voluptate corporis
-saepe ipsa? Placeat animi commodi qui odit debitis eveniet enim maiores, illum tempora repellendus
-sint non?
-
 ### I’ve updated the state, but the screen doesn’t update
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi facere vel minus saepe inventore hic
-tenetur aspernatur officia ipsam accusantium illum, neque consectetur placeat doloremque pariatur
-voluptatum amet odio quos!
+In the previous example, the `position` object is always created fresh from the current cursor
+position. But often, you will want to include existing data as a part of the new object you’re
+creating. For example, you may want to update only one field in a form, but keep the previous
+values for all other fields.
+
+These input fields don’t work because the `oninput` handlers mutate the state:
+
+```ts
+import { createStore } from 'zustand'
+
+type PersonStoreState = {
+  firstName: string
+  lastName: string
+  email: string
+}
+
+type PersonStoreActions = {
+  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+}
+
+type PersonStore = PersonStoreState & PersonStoreActions
+
+const personStore = createStore<PersonStore>()((set) => ({
+  firstName: 'Barbara',
+  lastName: 'Hepworth',
+  email: 'bhepworth@sculpture.com',
+  setPerson: (nextPerson) => {
+    set(nextPerson)
+  },
+}))
+
+const $firstNameInput = document.getElementById(
+  'first-name',
+) as HTMLInputElement
+const $lastNameInput = document.getElementById('last-name') as HTMLInputElement
+const $emailInput = document.getElementById('email') as HTMLInputElement
+const $result = document.getElementById('result') as HTMLDivElement
+
+function handleFirstNameChange(event: Event) {
+  personStore.getState().firstName = (event.target as any).value
+}
+
+function handleLastNameChange(event: Event) {
+  personStore.getState().lastName = (event.target as any).value
+}
+
+function handleEmailChange(event: Event) {
+  personStore.getState().email = (event.target as any).value
+}
+
+$firstNameInput.addEventListener('input', handleFirstNameChange)
+$lastNameInput.addEventListener('input', handleLastNameChange)
+$emailInput.addEventListener('input', handleEmailChange)
+
+const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
+  const person = {
+    firstName: state.firstName,
+    lastName: state.lastName,
+    email: state.email,
+  }
+
+  $firstNameInput.value = person.firstName
+  $lastNameInput.value = person.lastName
+  $emailInput.value = person.email
+
+  $result.innerHTML = `${person.firstName} ${person.lastName} (${person.email})`
+}
+
+render(personStore.getInitialState(), personStore.getInitialState())
+
+personStore.subscribe(render)
+```
+
+Here's the `html` code
+
+```html
+<label style="display: block">
+  First name:
+  <input id="first-name" />
+</label>
+<label style="display: block">
+  Last name:
+  <input id="last-name" />
+</label>
+<label style="display: block">
+  Email:
+  <input id="email" />
+</label>
+<p id="result"></p>
+```
+
+For example, this line mutates the state from a past render:
+
+```ts
+personStore.getState().firstName = (e.target as any).value
+```
+
+The reliable way to get the behavior you’re looking for is to create a new object and pass it to
+`setPerson`. But here, you want to also copy the existing data into it because only one of the
+fields has changed:
+
+```ts
+personStore.getState().setPerson({
+  firstName: e.target.value, // New first name from the input
+})
+```
+
+> **Note:** we don’t need to copy every property separately due to `set` function performs shallow
+> merge by default.
+
+Now the form works!
+
+Notice how you didn’t declare a separate state variable for each input field. For large forms,
+keeping all data grouped in an object is very convenient—as long as you update it correctly!
+
+```ts
+import { createStore } from 'zustand'
+
+type PersonStoreState = {
+  firstName: string
+  lastName: string
+  email: string
+}
+
+type PersonStoreActions = {
+  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+}
+
+type PersonStore = PersonStoreState & PersonStoreActions
+
+const personStore = createStore<PersonStore>()((set) => ({
+  firstName: 'Barbara',
+  lastName: 'Hepworth',
+  email: 'bhepworth@sculpture.com',
+  setPerson: (nextPerson) => {
+    set(nextPerson)
+  },
+}))
+
+const $firstNameInput = document.getElementById(
+  'first-name',
+) as HTMLInputElement
+const $lastNameInput = document.getElementById('last-name') as HTMLInputElement
+const $emailInput = document.getElementById('email') as HTMLInputElement
+const $result = document.getElementById('result') as HTMLDivElement
+
+function handleFirstNameChange(event: Event) {
+  personStore.getState().setPerson({
+    firstName: (event.target as any).value,
+  })
+}
+
+function handleLastNameChange(event: Event) {
+  personStore.getState().setPerson({
+    lastName: (event.target as any).value,
+  })
+}
+
+function handleEmailChange(event: Event) {
+  personStore.getState().setPerson({
+    email: (event.target as any).value,
+  })
+}
+
+$firstNameInput.addEventListener('input', handleFirstNameChange)
+$lastNameInput.addEventListener('input', handleLastNameChange)
+$emailInput.addEventListener('input', handleEmailChange)
+
+const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
+  const person = {
+    firstName: state.firstName,
+    lastName: state.lastName,
+    email: state.email,
+  }
+
+  $firstNameInput.value = person.firstName
+  $lastNameInput.value = person.lastName
+  $emailInput.value = person.email
+
+  $result.innerHTML = `${person.firstName} ${person.lastName} (${person.email})`
+}
+
+render(personStore.getInitialState(), personStore.getInitialState())
+
+personStore.subscribe(render)
+```

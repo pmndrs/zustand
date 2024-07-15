@@ -8,11 +8,12 @@ nav: 200
 
 ## Store
 
-The Store lets you access to the store API utilities.
+The Store lets you access to the current state and API utilities.
 
-## API Utilities
+## Store API Utilities
 
-These store API utilities are: `setState` function, `getState` function, and `subscribe` function.
+These store API utilities lets you get current state, update current state and subscribe current
+state. These utilities are: `setState` function, `getState` function, and `subscribe` function.
 
 ### `setState` function
 
@@ -58,14 +59,20 @@ its previous state as arguments.
 
 `subscribe` returns a function that lets you unsubscribe from itself.
 
-### Selector
+## Selector
 
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vel veritatis alias saepe vitae placeat
-blanditiis laborum, asperiores architecto explicabo unde. Cum sint vero veritatis. Hic ipsum quis
-saepe voluptates temporibus!
+The selector function lets you return data that is based on current state. It should take current
+state as its only argument.
 
-### Bound Hook
+## Bound Hook
 
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minus quas sequi, similique corrupti iure
-incidunt autem. Voluptas eum atque harum! Assumenda natus, animi doloribus facilis maiores dicta
-iusto ipsa earum.
+You can create custom hooks in React that utilize closures to "bind" functionality to specific data
+or contexts. Within the custom hook, you might define a function that relies on values captured in
+the closure during its creation. When you use the custom hook in your component, you're essentially
+getting a function that's "bound" to that specific closure's captured data (in Zustand to store API
+utilities).
+
+## State Creator Function
+
+The state creator function lets you create a store, when you pass to the `create` function from
+Zustand. This function essentially acts as a _**blueprint**_ for your state management needs.
