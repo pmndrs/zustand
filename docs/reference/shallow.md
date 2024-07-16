@@ -63,7 +63,7 @@ const Chart = memo(
   function Chart({ dataPoints }: { dataPoints: { x: number; y: number }[] }) {
     console.log('Data points', dataPoints)
 
-    return <>Cool Chart</>
+    return <div>Cool Chart</div>
   },
   (previousProps, nextProps) => {
     return (
@@ -101,3 +101,7 @@ export default function App() {
 
 > **Note:** moving `dataPoints` outside of component eliminates the need for a custom comparison
 > function
+
+## Troubleshooting
+
+TBD

@@ -9,19 +9,16 @@ nav: 213
 `useStore` is a React Hook that lets you use a vanilla store in React.
 
 ```js
-useStore(api, selector)
+useStore(storeApi, selectorFn)
 ```
 
 - [Reference](#reference)
   - [Signature](#usestore-signature)
-  - [`selector` function](#selector-function)
-  - [`setState` function](#setstate-function)
-  - [`getState` function](#getstate-function)
-  - [`subscribe` function](#subscribe-function)
-  - [`storeApi`](#storeapi)
 - [Usage](#usage)
   - [Use a vanilla store in React](#use-a-vanilla-store-in-react)
+  - [Using scoped (non-global) vanilla store in React](#using-scoped-non-global-vanilla-store-in-react)
 - [Troubleshooting](#troubleshooting)
+  - TBD
 
 ## Reference
 
@@ -41,63 +38,178 @@ useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selectorFn?: (state: T) => U
 `useStore` returns current state or returns any data based on current state depending on the
 selector function.
 
-### `selector` function
-
-The `selector` function lets you return data that is based on current state. It should take current
-state as its only argument.
-
-### `setState` function
-
-The `setState` function lets you update the state to a different value and trigger re-render. You
-can pass the next state directly, a next partial state, a function that calculates it from the
-previous state, or replace it completely.
-
-#### Parameters
-
-- `nextState`: The value that you want the state to be. It can be a value of any type, but there is
-  a special behavior for functions.
-  - if you pass an object as a `nextState`. It will shallow merge `nextState` with the current
-    state. You can pass only the properties you want to update, this allows for selective state
-    updates without modifying other properties.
-  - if you pass a non-object as a `nextState`, make sure you use `replace` as `true` to avoid
-    unexpected behaviors.
-  - if you pass a function as a `nextState`. It must be pure, should take current state as its
-    only argument, and should return the next state. The next state returned by the updater
-    function face the same restrictions of any next state.
-- `replace`: This optional boolean flag controls whether to replace the entire state or merge the
-  update with the current state.
-
-#### Returns
-
-`setState` function do not have a return value.
-
-### `getState` function
-
-The `getState` function lets you access to the current state. It can be stale on asynchronous
-operations.
-
-### `subscribe` function
-
-The `subscribe` function lets you subscribe to state updates. It should take current state and
-previous state as arguments.
-
-#### Parameters
-
-- `currentState`: The current state.
-- `previousState`: The previous state.
-
-#### Returns
-
-`subscribe` returns a function that lets you unsubscribe.
-
-### `storeApi`
-
-The `storeApi` lets you access to the store API utilities like
-[`setState` function](#setstate-function), [`getState` function](#getstate-function),
-and [`subscribe` function](#subscribe-function).
-
 ## Usage
 
-### Use a vanilla store in React
+### Using a global vanilla store in React
+
+TBD - Lorem, ipsum dolor sit amet consectetur adipisicing elit. Adipisci fugiat nobis, repellendus,
+officiis rem qui facere maxime asperiores distinctio est maiores nam nisi ipsum quisquam sunt non,
+dicta soluta quasi.
+
+```tsx
+import { createStore, useStore } from 'zustand'
+
+type PositionStoreState = { x: number; y: number }
+
+type PositionStoreActions = {
+  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const positionStore = createStore<PositionStore>()((set) => ({
+  x: 0,
+  y: 0,
+  setPosition: (nextPosition) => {
+    set(nextPosition)
+  },
+}))
+
+export default function MovingDot() {
+  const [position, setPosition] = useStore(positionStore, (state) => [
+    { x: state.x, y: state.y },
+    state.setPosition,
+  ])
+
+  return (
+    <div
+      onPointerMove={(e) => {
+        setPosition({
+          x: e.clientX,
+          y: e.clientY,
+        })
+      }}
+      style={{
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          backgroundColor: 'red',
+          borderRadius: '50%',
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          left: -10,
+          top: -10,
+          width: 20,
+          height: 20,
+        }}
+      />
+    </div>
+  )
+}
+```
+
+### Using scoped (non-global) vanilla store in React
+
+TBD - Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sed ex animi nemo sequi aperiam
+debitis porro laudantium fugit amet, asperiores corporis fuga, nam nesciunt magni voluptatem
+repudiandae, quam doloremque et?
+
+```tsx
+import { type ReactNode, useState, createContext, useContext } from 'react'
+import { createStore, useStore } from 'zustand'
+
+type PositionStoreState = { x: number; y: number }
+
+type PositionStoreActions = {
+  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const createPositionStore = () => {
+  return createStore<PositionStore>()((set) => ({
+    x: 0,
+    y: 0,
+    setPosition: (nextPosition) => {
+      set(nextPosition)
+    },
+  }))
+}
+
+const PositionStoreContext = createContext<ReturnType<
+  typeof createPositionStore
+> | null>(null)
+
+function PositionStoreProvider({ children }: { children: ReactNode }) {
+  const [positionStore] = useState(createPositionStore)
+
+  return (
+    <PositionStoreContext.Provider value={positionStore}>
+      {children}
+    </PositionStoreContext.Provider>
+  )
+}
+
+function usePositionStore<U = PositionStore>(
+  selector: (state: PositionStore) => U,
+) {
+  const store = useContext(PositionStoreContext)
+
+  if (store === null) {
+    throw new Error(
+      'usePositionStore must be used within PositionStoreProvider',
+    )
+  }
+
+  return useStore(store, selector)
+}
+
+function MovingDot({ color }: { color: string }) {
+  const [position, setPosition] = usePositionStore(
+    (state) => [{ x: state.x, y: state.y }, state.setPosition] as const,
+  )
+
+  return (
+    <div
+      onPointerMove={(e) => {
+        setPosition({
+          x:
+            e.clientX > e.currentTarget.clientWidth
+              ? e.clientX - e.currentTarget.clientWidth
+              : e.clientX,
+          y: e.clientY,
+        })
+      }}
+      style={{
+        position: 'relative',
+        width: '50vw',
+        height: '100vh',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          backgroundColor: color,
+          borderRadius: '50%',
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          left: -10,
+          top: -10,
+          width: 20,
+          height: 20,
+        }}
+      />
+    </div>
+  )
+}
+
+export default function App() {
+  return (
+    <div style={{ display: 'flex' }}>
+      <PositionStoreProvider>
+        <MovingDot color="red" />
+      </PositionStoreProvider>
+      <PositionStoreProvider>
+        <MovingDot color="blue" />
+      </PositionStoreProvider>
+    </div>
+  )
+}
+```
 
 ## Troubleshooting
+
+TBD
