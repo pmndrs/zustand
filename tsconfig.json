@@ -10,6 +10,7 @@
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
