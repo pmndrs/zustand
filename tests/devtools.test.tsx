@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { devtools, redux } from 'zustand/middleware'
-import { StoreApi, createStore } from 'zustand/vanilla'
+import { createStore } from 'zustand/vanilla'
+import type { StoreApi } from 'zustand/vanilla'
 
 type TupleOfEqualLengthH<
   Arr extends unknown[],

@@ -1,11 +1,11 @@
 import {
   Component as ClassComponent,
-  ReactNode,
   StrictMode,
   useEffect,
   useLayoutEffect,
   useState,
 } from 'react'
+import type { ReactNode } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import { afterEach, expect, it, vi } from 'vitest'
