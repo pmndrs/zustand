@@ -16,10 +16,6 @@ combine(initialState, additionalStateCreator)
 
 - [Reference](#reference)
   - [Signature](#combine-signature)
-  - [`setState` function](#setstate-function)
-  - [`getState` function](#getstate-function)
-  - [`subscribe` function](#subscribe-function)
-  - [`storeApi`](#storeapi)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
 

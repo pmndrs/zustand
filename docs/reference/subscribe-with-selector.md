@@ -14,10 +14,6 @@ subscribeWithSelector(stateCreatorFn)
 
 - [Reference](#reference)
   - [Signature](#subscribewithselector-signature)
-  - [`setState` function](#setstate-function)
-  - [`getState` function](#getstate-function)
-  - [`subscribe` function](#subscribe-function)
-  - [`storeApi`](#storeapi)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
 

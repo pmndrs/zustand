@@ -15,10 +15,6 @@ redux(reducer, initialState)
 
 - [Reference](#reference)
   - [Signature](#redux-signature)
-  - [`setState` function](#setstate-function)
-  - [`getState` function](#getstate-function)
-  - [`subscribe` function](#subscribe-function)
-  - [`storeApi`](#storeapi)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
 
