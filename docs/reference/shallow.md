@@ -10,7 +10,8 @@ nav: 209
 **top-level** properties when you're working with data structures that don't have nested objects or
 arrays within them.
 
-> **Note:** shallow lets you perform quick comparisons, but keep its limitations in mind.
+> [!NOTE]
+> Shallow lets you perform quick comparisons, but keep its limitations in mind.
 
 ```js
 shallow(a, b)
@@ -204,8 +205,8 @@ export default function App() {
 }
 ```
 
-> **Note:** moving `dataPoints` outside of component eliminates the need for a custom comparison
-> function
+> [!IMPORTANT]
+> Moving `dataPoints` outside of component eliminates the need for a custom comparison function
 
 ## Troubleshooting
 

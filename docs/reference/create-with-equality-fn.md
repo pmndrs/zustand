@@ -121,7 +121,8 @@ State can hold any kind of JavaScript value. When you want to update built-in pr
 number, strings, booleans, etc. we should directly assign new values to ensure updates are applied
 correctly, and avoid unexpected behaviors.
 
-> **Note:** by default, `set` function performs a shallow merge. If you need to completely replace
+> [!NOTE]
+> By default, `set` function performs a shallow merge. If you need to completely replace
 > the state with a new one, use the `replace` parameter set to `true`
 
 ```tsx
@@ -248,7 +249,8 @@ By default, `set` function performs a shallow merge. To update array values we s
 values to ensure updates are applied correctly, and avoid unexpected behaviors. To completely
 replace the state with a new one, use the `replace` parameter set to `true`.
 
-> **Note:** we should prefer immutable operations like: `concat(...)`, `[...array]`, `filter(...)`,
+> [!IMPORTANT ]
+> We should prefer immutable operations like: `concat(...)`, `[...array]`, `filter(...)`,
 > `slice(...)`, `map(...)`, `[...array].sort(...)`, and `[...array].reverse(...)`, and avoid
 > mutable operations like `push(...)`, `unshift(...)`, `pop(...)`, `shift(...)`, `splice(...)`,
 > `array[arrayIndex] = ...`, `reverse(...)`, and `sort(...)`.
@@ -304,8 +306,9 @@ export default function MovingDot() {
 Defining actions at module level, external to the store have a few advantages like: it doesn't
 require a hook to call an action, and it facilitates code splitting.
 
-> **Note:** the recommended way is to colocate actions and states within the store (let your
-> actions be located together with your state).
+> [!NOTE]
+> The recommended way is to colocate actions and states within the store (let your actions be
+> located together with your state).
 
 ```tsx
 import { createWithEqualityFn } from 'zustand/traditional'
@@ -537,7 +540,8 @@ setPerson({
 })
 ```
 
-> **Note:** we don’t need to copy every property separately due to `set` function performs shallow
+> [!NOTE]
+> We don’t need to copy every property separately due to `set` function performs shallow
 > merge by default.
 
 Now the form works!
