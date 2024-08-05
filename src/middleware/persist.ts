@@ -108,7 +108,7 @@ export interface PersistOptions<S, PersistedState = S> {
    *
    * @params state The state's value
    */
-  partialize?: (state: S) => PersistedState
+  partialize?: (state: S) => Partial<PersistedState>
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
