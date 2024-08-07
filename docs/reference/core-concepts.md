@@ -74,5 +74,6 @@ utilities).
 
 ## State Creator Function
 
-The state creator function lets you create a store, when you pass to the `create` function from
-Zustand. This function essentially acts as a _**blueprint**_ for your state management needs.
+The state creator function lets you create a store, when you pass to the `create` function or
+`createStore` function from Zustand. This function essentially acts as a _**blueprint**_ for your
+state management needs.
