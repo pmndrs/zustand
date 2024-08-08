@@ -14,6 +14,7 @@ import type {
   StoreApi,
   StoreMutatorIdentifier,
 } from './vanilla.ts'
+import { devtools } from './middleware.ts'
 
 const { useDebugValue } = ReactExports
 const { useSyncExternalStoreWithSelector } = useSyncExternalStoreExports
@@ -138,3 +139,18 @@ export default ((createState: any) => {
   }
   return create(createState)
 }) as Create
+
+
+export type WithDevtools<S> = StateCreator<
+S,
+[["zustand/devtools", never]],
+[],
+S
+>;
+
+export const createWrappedStore = <T>(fn: WithDevtools<T>, name: string, productionMode?: boolean): UseBoundStore<StoreApi<T>> => {
+  if (!productionMode) {
+    return create(devtools(fn, {name}))
+  }
+  return create(fn)
+}
