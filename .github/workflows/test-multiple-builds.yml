@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [cjs, esm, umd]
-        env: [development, production]
+        build: [cjs, esm]
+        env: [development] # [development, production]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -24,10 +24,6 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - name: Use React 17 for production test
-        if: ${{ matrix.env == 'production' }}
-        run: |
-          pnpm add -D react@17.0.2 react-dom@17.0.2 @testing-library/react@12.1.4
       - name: Patch for DEV-ONLY
         if: ${{ matrix.env == 'development' }}
         run: |
@@ -42,24 +38,11 @@ jobs:
         if: ${{ matrix.build == 'cjs' }}
         run: |
           sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\1.js')/" vitest.config.ts
-          sed -i~ "s/module.exports.createStore = vanilla.createStore;//" dist/index.js
       - name: Patch for ESM
         if: ${{ matrix.build == 'esm' }}
         run: |
           sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/esm\1.mjs')/" vitest.config.ts
           sed -i~ "1s/^/import.meta.env=import.meta.env||{};import.meta.env.MODE='${NODE_ENV}';/" tests/*.tsx
-        env:
-          NODE_ENV: ${{ matrix.env }}
-      - name: Patch for UMD
-        if: ${{ matrix.build == 'umd' }}
-        run: |
-          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/umd\1.${NODE_ENV}.js')/" vitest.config.ts
-        env:
-          NODE_ENV: ${{ matrix.env }}
-      - name: Patch for SystemJS
-        if: ${{ matrix.build == 'system' }}
-        run: |
-          sed -i~ "s/resolve('\.\/src\(.*\)\.ts')/resolve('\.\/dist\/system\1.${NODE_ENV}.js')/" vitest.config.ts
         env:
           NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}

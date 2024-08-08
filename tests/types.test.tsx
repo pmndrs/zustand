@@ -79,7 +79,6 @@ it('can use exposed types', () => {
     _stateSelector: (state: ExampleState) => number,
     _storeApi: StoreApi<ExampleState>,
     _subscribe: StoreApi<ExampleState>['subscribe'],
-    _destroy: StoreApi<ExampleState>['destroy'],
     _equalityFn: (a: ExampleState, b: ExampleState) => boolean,
     _stateCreator: StateCreator<ExampleState>,
     _useBoundStore: UseBoundStore<StoreApi<ExampleState>>,
@@ -96,7 +95,6 @@ it('can use exposed types', () => {
     selector,
     storeApi,
     storeApi.subscribe,
-    storeApi.destroy,
     equalityFn,
     stateCreator,
     useBoundStore,
@@ -114,9 +112,9 @@ it('should have correct (partial) types for setState', () => {
 
   const store = create<Count>((set) => ({
     count: 0,
-    // @ts-expect-error we shouldn't be able to set count to undefined [LATEST-TS-ONLY]
+    // @ts-expect-error we shouldn't be able to set count to undefined
     a: () => set(() => ({ count: undefined })),
-    // @ts-expect-error we shouldn't be able to set count to undefined [LATEST-TS-ONLY]
+    // @ts-expect-error we shouldn't be able to set count to undefined
     b: () => set({ count: undefined }),
     c: () => set({ count: 1 }),
   }))
@@ -132,9 +130,9 @@ it('should have correct (partial) types for setState', () => {
   store.setState({})
   store.setState((previous) => previous)
 
-  // @ts-expect-error type undefined is not assignable to type number [LATEST-TS-ONLY]
+  // @ts-expect-error type undefined is not assignable to type number
   store.setState({ count: undefined })
-  // @ts-expect-error type undefined is not assignable to type number [LATEST-TS-ONLY]
+  // @ts-expect-error type undefined is not assignable to type number
   store.setState((state) => ({ ...state, count: undefined }))
 })
 

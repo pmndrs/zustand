@@ -1,4 +1,4 @@
-// import { useDebugValue } from 'react'
+// import { useRef } from 'react'
 // That doesnt work in ESM, because React libs are CJS only.
 // The following is a workaround until ESM is supported.
 // eslint-disable-next-line import/extensions
