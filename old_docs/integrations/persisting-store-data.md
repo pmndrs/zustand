@@ -575,7 +575,7 @@ const useBoundStore = create(
     {
       // ...
       onRehydrateStorage: (state) => {
-        state.setHasHydrated(true)
+        return () => state.setHasHydrated(true)
       }
     }
   )
