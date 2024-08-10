@@ -60,3 +60,4 @@ This can be done using third-party libraries created by the community.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) - Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
+- [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) - A tool that automatically generates getters, setters and more for your zustand store.
