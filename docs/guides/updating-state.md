@@ -109,7 +109,7 @@ take a look at an example:
 
 ```ts
   immerInc: () =>
-    set(produce((state: State) => { ++state.deep.nested.obj.count })),
+    set(immer((state: State) => { ++state.deep.nested.obj.count })),
 ```
 
 What a reduction! Please take note of the [gotchas listed here](../integrations/immer-middleware.md).
