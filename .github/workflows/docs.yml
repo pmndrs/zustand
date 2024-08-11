@@ -15,6 +15,7 @@ jobs:
     with:
       mdx: './docs'
       libname: 'Zustand'
+      home_redirect: '/getting-started/introduction'
 
   deploy:
     needs: build
