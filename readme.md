@@ -403,7 +403,7 @@ const useBearStore = create(devtools((set) => ({
   ...
   eatFish: () => set(
     (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
-    false,
+    undefined,
     'bear/eatFish'
   ),
   ...
@@ -415,7 +415,7 @@ You can also log the action's type along with its payload:
   ...
   addFishes: (count) => set(
     (prev) => ({ fishes: prev.fishes + count }),
-    false,
+    undefined,
     { type: 'bear/addFishes', count, }
   ),
   ...
