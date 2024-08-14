@@ -1,10 +1,12 @@
 ---
 title: 'Tutorial: Tic-Tac-Toe'
-description:
+description: Building a game
 nav: 100
 ---
 
 # Tutorial: Tic-Tac-Toe
+
+## Building a game
 
 You will build a small tic-tac-toe game during this tutorial. This tutorial does assume existing
 React knowledge. The techniques you'll learn in the tutorial are fundamental to building any React
