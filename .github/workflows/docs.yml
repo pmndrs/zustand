@@ -16,8 +16,8 @@ jobs:
       mdx: './docs'
       libname: 'Zustand'
       home_redirect: '/getting-started/introduction'
-      emoji: '🐻'
-      logo: '/bear.jpg'
+      icon: '/favicon.ico'
+      logo: '/logo.jpg'
 
   deploy:
     needs: build
