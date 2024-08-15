@@ -738,4 +738,26 @@ describe('persist middleware with sync configuration', () => {
       undefined,
     )
   })
+
+  it('does not call setItem when hydrating from its own storage', async () => {
+    const setItem = vi.fn()
+    const storage = {
+      getItem: (name: string) => ({
+        state: { count: 42, name },
+        version: 0,
+      }),
+      setItem,
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({}), {
+        name: 'test-storage',
+        storage: storage,
+      }),
+    )
+
+    expect(useBoundStore.persist.hasHydrated()).toBe(true)
+    expect(setItem).toBeCalledTimes(0)
+  })
 })
