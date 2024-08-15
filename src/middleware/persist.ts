@@ -35,7 +35,7 @@ export function createJSONStorage<S>(
   let storage: StateStorage | undefined
   try {
     storage = getStorage()
-  } catch (_e) {
+  } catch {
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
     return
   }
