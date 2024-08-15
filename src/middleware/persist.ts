@@ -35,7 +35,7 @@ export function createJSONStorage<S>(
   let storage: StateStorage | undefined
   try {
     storage = getStorage()
-  } catch (e) {
+  } catch (_e) {
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
     return
   }
@@ -258,27 +258,34 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
             deserializedStorageValue.version !== options.version
           ) {
             if (options.migrate) {
-              return options.migrate(
-                deserializedStorageValue.state,
-                deserializedStorageValue.version,
-              )
+              return [
+                true,
+                options.migrate(
+                  deserializedStorageValue.state,
+                  deserializedStorageValue.version,
+                ),
+              ] as const
             }
             console.error(
               `State loaded from storage couldn't be migrated since no migrate function was provided`,
             )
           } else {
-            return deserializedStorageValue.state
+            return [false, deserializedStorageValue.state] as const
           }
         }
+        return [false, undefined] as const
       })
-      .then((migratedState) => {
+      .then((migrationResult) => {
+        const [migrated, migratedState] = migrationResult
         stateFromStorage = options.merge(
           migratedState as S,
           get() ?? configResult,
         )
 
         set(stateFromStorage as S, true)
-        return setItem()
+        if (migrated) {
+          return setItem()
+        }
       })
       .then(() => {
         // TODO: In the asynchronous case, it's possible that the state has changed

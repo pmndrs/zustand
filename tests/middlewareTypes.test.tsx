@@ -1,4 +1,7 @@
-import { describe, it } from 'vitest'
+/* eslint @typescript-eslint/no-unused-expressions: off */ // FIXME
+/* eslint react-compiler/react-compiler: off */
+
+import { describe, expect, it } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
 import {
@@ -57,9 +60,10 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createStore(
+    const testSubtyping: StoreApi<object> = createStore(
       immer(() => ({ count: 0 })),
     )
+    expect(testSubtyping).toBeDefined()
   })
 
   it('redux', () => {
@@ -85,9 +89,10 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createStore(
+    const testSubtyping: StoreApi<object> = createStore(
       redux((x) => x, { count: 0 }),
     )
+    expect(testSubtyping).toBeDefined()
   })
 
   it('devtools', () => {
@@ -112,9 +117,10 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createStore(
+    const testSubtyping: StoreApi<object> = createStore(
       devtools(() => ({ count: 0 })),
     )
+    expect(testSubtyping).toBeDefined()
   })
 
   it('subscribeWithSelector', () => {
@@ -139,9 +145,10 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createStore(
+    const testSubtyping: StoreApi<object> = createStore(
       subscribeWithSelector(() => ({ count: 0 })),
     )
+    expect(testSubtyping).toBeDefined()
   })
 
   it('combine', () => {
@@ -161,9 +168,10 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createStore(
+    const testSubtyping: StoreApi<object> = createStore(
       combine({ count: 0 }, () => ({})),
     )
+    expect(testSubtyping).toBeDefined()
   })
 
   it('persist', () => {
@@ -188,9 +196,10 @@ describe('counter state spec (single middleware)', () => {
     }
     TestComponent
 
-    const _testSubtyping: StoreApi<object> = createStore(
+    const testSubtyping: StoreApi<object> = createStore(
       persist(() => ({ count: 0 }), { name: 'prefix' }),
     )
+    expect(testSubtyping).toBeDefined()
   })
 
   it('persist with partialize', () => {
