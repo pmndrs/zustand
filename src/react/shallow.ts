@@ -13,6 +13,8 @@ export function useShallow<S, U>(selector: (state: S) => U): (state: S) => U {
     const next = selector(state)
     return shallow(prev.current, next)
       ? (prev.current as U)
-      : (prev.current = next)
+      : // It might not work with React Compiler
+        // eslint-disable-next-line react-compiler/react-compiler
+        (prev.current = next)
   }
 }
