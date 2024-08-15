@@ -17,6 +17,7 @@ jobs:
       libname: 'Zustand'
       home_redirect: '/getting-started/introduction'
       emoji: '🐻'
+      logo: '/bear.jpg'
 
   deploy:
     needs: build
