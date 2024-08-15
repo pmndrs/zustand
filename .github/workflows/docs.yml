@@ -1,7 +1,7 @@
 name: Build documentation and deploy to GitHub Pages
 on:
   push:
-    branches: ['docs']
+    branches: ['main']
   workflow_dispatch:
 
 # Cancel previous run (see: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency)
@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@app-router
+    uses: pmndrs/docs/.github/workflows/build.yml@main
     with:
       mdx: './docs'
       libname: 'Zustand'
