@@ -37,7 +37,7 @@ export type StateCreator<
   store: Mutate<StoreApi<T>, Mis>,
 ) => U) & { $$storeMutators?: Mos }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
 export interface StoreMutators<S, A> {}
 export type StoreMutatorIdentifier = keyof StoreMutators<unknown, unknown>
 
@@ -74,7 +74,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     if (!Object.is(nextState, state)) {
       const previousState = state
       state =
-        replace ?? (typeof nextState !== 'object' || nextState === null)
+        (replace ?? (typeof nextState !== 'object' || nextState === null))
           ? (nextState as TState)
           : Object.assign({}, state, nextState)
       listeners.forEach((listener) => listener(state, previousState))

@@ -35,7 +35,7 @@ export function createJSONStorage<S>(
   let storage: StateStorage | undefined
   try {
     storage = getStorage()
-  } catch (e) {
+  } catch (_e) {
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
     return
   }
@@ -222,7 +222,7 @@ const oldImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   try {
     storage = options.getStorage()
-  } catch (e) {
+  } catch (_e) {
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
   }
 
