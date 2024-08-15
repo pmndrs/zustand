@@ -18,7 +18,7 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: Mock<[f: (m: unknown) => void], () => void>
+    subscribe: Mock<any>
     unsubscribe: Mock<any>
     send: Mock<any>
     init: Mock<any>

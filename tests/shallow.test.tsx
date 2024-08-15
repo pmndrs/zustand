@@ -34,8 +34,7 @@ describe('types', () => {
 })
 
 describe('useShallow', () => {
-  const testUseShallowSimpleCallback =
-    vi.fn<[{ selectorOutput: string[]; useShallowOutput: string[] }]>()
+  const testUseShallowSimpleCallback = vi.fn()
   const TestUseShallowSimple = ({
     selector,
     state,
