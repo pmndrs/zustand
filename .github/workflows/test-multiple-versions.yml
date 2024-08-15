@@ -34,8 +34,8 @@ jobs:
           - 18.2.0
           - 18.3.1
           - 19.0.0-rc.0
-          - 19.0.0-rc-8971381549-20240625
-          - 0.0.0-experimental-8971381549-20240625
+          - 19.0.0-rc-49496d49-20240814
+          - 0.0.0-experimental-49496d49-20240814
         devtools-skip:
           - CI-MATRIX-NOSKIP
         include:
