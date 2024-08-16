@@ -2,22 +2,31 @@
   "name": "zustand",
   "description": "🐻 Bear necessities for state management in React",
   "private": true,
-  "version": "4.5.5",
+  "type": "commonjs",
+  "version": "5.0.0-beta.2",
+  "publishConfig": {
+    "tag": "next"
+  },
   "main": "./index.js",
   "types": "./index.d.ts",
   "typesVersions": {
-    "<4.0": {
+    ">=4.5": {
       "esm/*": [
-        "ts3.4/*"
+        "esm/*"
       ],
       "*": [
-        "ts3.4/*"
+        "*"
+      ]
+    },
+    "*": {
+      "esm/*": [
+        "ts_version_4.5_and_above_is_required.d.ts"
+      ],
+      "*": [
+        "ts_version_4.5_and_above_is_required.d.ts"
       ]
     }
   },
-  "files": [
-    "**"
-  ],
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -25,142 +34,39 @@
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
       },
-      "module": {
-        "types": "./esm/index.d.ts",
-        "default": "./esm/index.js"
-      },
       "default": {
         "types": "./index.d.ts",
         "default": "./index.js"
       }
     },
-    "./vanilla": {
+    "./*": {
       "import": {
-        "types": "./esm/vanilla.d.mts",
-        "default": "./esm/vanilla.mjs"
-      },
-      "module": {
-        "types": "./esm/vanilla.d.ts",
-        "default": "./esm/vanilla.js"
+        "types": "./esm/*.d.mts",
+        "default": "./esm/*.mjs"
       },
       "default": {
-        "types": "./vanilla.d.ts",
-        "default": "./vanilla.js"
-      }
-    },
-    "./middleware": {
-      "import": {
-        "types": "./esm/middleware.d.mts",
-        "default": "./esm/middleware.mjs"
-      },
-      "module": {
-        "types": "./esm/middleware.d.ts",
-        "default": "./esm/middleware.js"
-      },
-      "default": {
-        "types": "./middleware.d.ts",
-        "default": "./middleware.js"
-      }
-    },
-    "./middleware/immer": {
-      "import": {
-        "types": "./esm/middleware/immer.d.mts",
-        "default": "./esm/middleware/immer.mjs"
-      },
-      "module": {
-        "types": "./esm/middleware/immer.d.ts",
-        "default": "./esm/middleware/immer.js"
-      },
-      "default": {
-        "types": "./middleware/immer.d.ts",
-        "default": "./middleware/immer.js"
-      }
-    },
-    "./shallow": {
-      "import": {
-        "types": "./esm/shallow.d.mts",
-        "default": "./esm/shallow.mjs"
-      },
-      "module": {
-        "types": "./esm/shallow.d.ts",
-        "default": "./esm/shallow.js"
-      },
-      "default": {
-        "types": "./shallow.d.ts",
-        "default": "./shallow.js"
-      }
-    },
-    "./vanilla/shallow": {
-      "import": {
-        "types": "./esm/vanilla/shallow.d.mts",
-        "default": "./esm/vanilla/shallow.mjs"
-      },
-      "module": {
-        "types": "./esm/vanilla/shallow.d.ts",
-        "default": "./esm/vanilla/shallow.js"
-      },
-      "default": {
-        "types": "./vanilla/shallow.d.ts",
-        "default": "./vanilla/shallow.js"
-      }
-    },
-    "./react/shallow": {
-      "import": {
-        "types": "./esm/react/shallow.d.mts",
-        "default": "./esm/react/shallow.mjs"
-      },
-      "module": {
-        "types": "./esm/react/shallow.d.ts",
-        "default": "./esm/react/shallow.js"
-      },
-      "default": {
-        "types": "./react/shallow.d.ts",
-        "default": "./react/shallow.js"
-      }
-    },
-    "./traditional": {
-      "import": {
-        "types": "./esm/traditional.d.mts",
-        "default": "./esm/traditional.mjs"
-      },
-      "module": {
-        "types": "./esm/traditional.d.ts",
-        "default": "./esm/traditional.js"
-      },
-      "default": {
-        "types": "./traditional.d.ts",
-        "default": "./traditional.js"
-      }
-    },
-    "./context": {
-      "import": {
-        "types": "./esm/context.d.mts",
-        "default": "./esm/context.mjs"
-      },
-      "module": {
-        "types": "./esm/context.d.ts",
-        "default": "./esm/context.js"
-      },
-      "default": {
-        "types": "./context.d.ts",
-        "default": "./context.js"
+        "types": "./*.d.ts",
+        "default": "./*.js"
       }
     }
   },
+  "files": [
+    "**"
+  ],
   "sideEffects": false,
   "scripts": {
     "prebuild": "shx rm -rf dist",
     "build": "pnpm run prebuild && pnpm run '/^build:.*/' && pnpm run postbuild",
     "build:base": "rollup -c",
     "build:vanilla": "rollup -c --config-vanilla",
+    "build:react": "rollup -c --config-react",
     "build:middleware": "rollup -c --config-middleware",
     "build:middleware:immer": "rollup -c --config-middleware_immer",
     "build:shallow": "rollup -c --config-shallow",
     "build:vanilla:shallow": "rollup -c --config-vanilla_shallow",
     "build:react:shallow": "rollup -c --config-react_shallow",
     "build:traditional": "rollup -c --config-traditional",
-    "build:context": "rollup -c --config-context",
-    "postbuild": "pnpm patch-d-ts && pnpm copy && pnpm patch-esm-ts",
+    "postbuild": "pnpm patch-d-ts && pnpm copy && pnpm patch-old-ts && pnpm patch-esm-ts",
     "prettier": "prettier \"*.{js,json,md}\" \"{examples,src,tests,docs}/**/*.{js,jsx,ts,tsx,md,mdx}\" --write",
     "eslint": "eslint --no-eslintrc --c .eslintrc.json --fix '*.{js,ts}' '{src,tests}/**/*.{ts,tsx}'",
     "test": "pnpm run '/^test:.*/'",
@@ -169,11 +75,12 @@
     "test:lint": "eslint  --no-eslintrc --c .eslintrc.json '*.{js,ts}' '{src,tests}/**/*.{ts,tsx}'",
     "test:spec": "vitest run",
     "patch-d-ts": "node -e \"var {entries}=require('./rollup.config.js');require('shelljs').find('dist/**/*.d.ts').forEach(f=>{entries.forEach(({find,replacement})=>require('shelljs').sed('-i',new RegExp(' from \\''+find.source.slice(0,-1)+'\\';$'),' from \\''+replacement+'\\';',f));require('shelljs').sed('-i',/ from '(\\.[^']+)\\.ts';$/,' from \\'\\$1\\';',f)})\"",
-    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && downlevel-dts dist dist/ts3.4 && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
-    "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').copyFileSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
+    "copy": "shx cp -r dist/src/* dist/esm && shx cp -r dist/src/* dist && shx rm -rf dist/src && shx rm -rf dist/{src,tests} && shx cp package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.prettier=undefined;\"",
+    "patch-old-ts": "shx touch dist/ts_version_4.5_and_above_is_required.d.ts",
+    "patch-esm-ts": "node -e \"require('shelljs').find('dist/esm/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.mts');require('fs').renameSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.mjs\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.mjs\\'',f2)})\""
   },
   "engines": {
-    "node": ">=12.7.0"
+    "node": ">=12.20.0"
   },
   "prettier": {
     "semi": false,
@@ -202,22 +109,11 @@
   },
   "homepage": "https://github.com/pmndrs/zustand",
   "packageManager": "pnpm@8.15.0",
-  "dependencies": {
-    "use-sync-external-store": "1.2.2"
-  },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/plugin-external-helpers": "^7.24.7",
-    "@babel/plugin-transform-react-jsx": "^7.25.2",
-    "@babel/plugin-transform-runtime": "^7.24.7",
-    "@babel/plugin-transform-typescript": "^7.25.2",
-    "@babel/preset-env": "^7.25.3",
     "@redux-devtools/extension": "^3.3.0",
     "@rollup/plugin-alias": "^5.1.0",
-    "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",
-    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@testing-library/react": "^16.0.0",
     "@types/node": "^22.3.0",
@@ -228,7 +124,6 @@
     "@typescript-eslint/parser": "^8.1.0",
     "@vitest/coverage-v8": "^2.0.5",
     "@vitest/ui": "^2.0.5",
-    "downlevel-dts": "^0.11.0",
     "esbuild": "^0.23.0",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -251,12 +146,14 @@
     "shelljs": "^0.8.5",
     "shx": "^0.3.4",
     "typescript": "^5.5.4",
+    "use-sync-external-store": "^1.2.2",
     "vitest": "^2.0.5"
   },
   "peerDependencies": {
-    "@types/react": ">=16.8",
+    "@types/react": ">=18.0.0",
     "immer": ">=9.0.6",
-    "react": ">=16.8"
+    "react": ">=18.0.0",
+    "use-sync-external-store": ">=1.2.0"
   },
   "peerDependenciesMeta": {
     "@types/react": {
@@ -266,6 +163,9 @@
       "optional": true
     },
     "react": {
+      "optional": true
+    },
+    "use-sync-external-store": {
       "optional": true
     }
   }

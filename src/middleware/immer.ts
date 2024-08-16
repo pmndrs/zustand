@@ -38,13 +38,21 @@ type StoreImmer<S> = S extends {
   getState: () => infer T
   setState: infer SetState
 }
-  ? SetState extends (...a: infer A) => infer Sr
+  ? SetState extends {
+      (...a: infer A1): infer Sr1
+      (...a: infer A2): infer Sr2
+    }
     ? {
         setState(
           nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
-          shouldReplace?: boolean | undefined,
-          ...a: SkipTwo<A>
-        ): Sr
+          shouldReplace?: false,
+          ...a: SkipTwo<A1>
+        ): Sr1
+        setState(
+          nextStateOrUpdater: T | ((state: Draft<T>) => void),
+          shouldReplace: true,
+          ...a: SkipTwo<A2>
+        ): Sr2
       }
     : never
   : never
@@ -61,7 +69,7 @@ const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
       typeof updater === 'function' ? produce(updater as any) : updater
     ) as ((s: T) => T) | T | Partial<T>
 
-    return set(nextState as any, replace, ...a)
+    return set(nextState, replace as any, ...a)
   }
 
   return initializer(store.setState, get, store)

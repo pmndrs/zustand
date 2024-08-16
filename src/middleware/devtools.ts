@@ -49,13 +49,22 @@ type TakeTwo<T> = T extends { length: 0 }
 
 type WithDevtools<S> = Write<S, StoreDevtools<S>>
 
+type Action =
+  | string
+  | {
+      type: string
+      [x: string | number | symbol]: unknown
+    }
 type StoreDevtools<S> = S extends {
-  setState: (...a: infer Sa) => infer Sr
+  setState: {
+    // capture both overloads of setState
+    (...a: infer Sa1): infer Sr1
+    (...a: infer Sa2): infer Sr2
+  }
 }
   ? {
-      setState<A extends string | { type: string }>(
-        ...a: [...a: TakeTwo<Sa>, action?: A]
-      ): Sr
+      setState(...a: [...a: TakeTwo<Sa1>, action?: Action]): Sr1
+      setState(...a: [...a: TakeTwo<Sa2>, action?: Action]): Sr2
     }
   : never
 
@@ -153,16 +162,11 @@ const devtoolsImpl: DevtoolsImpl =
       extensionConnector =
         (enabled ?? import.meta.env?.MODE !== 'production') &&
         window.__REDUX_DEVTOOLS_EXTENSION__
-    } catch (_e) {
+    } catch {
       // ignored
     }
 
     if (!extensionConnector) {
-      if (import.meta.env?.MODE !== 'production' && enabled) {
-        console.warn(
-          '[zustand devtools middleware] Please install/enable Redux devtools extension',
-        )
-      }
       return fn(set, get, api)
     }
 
@@ -170,8 +174,8 @@ const devtoolsImpl: DevtoolsImpl =
       extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
-    ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
-      const r = set(state, replace)
+    ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
+      const r = set(state, replace as any)
       if (!isRecording) return r
       const action: { type: string } =
         nameOrAction === undefined
@@ -194,12 +198,12 @@ const devtoolsImpl: DevtoolsImpl =
         },
       )
       return r
-    }
+    }) as NamedSet<S>
 
     const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
       isRecording = false
-      set(...a)
+      set(...(a as Parameters<typeof set>))
       isRecording = originalIsRecording
     }
 
@@ -269,7 +273,7 @@ const devtoolsImpl: DevtoolsImpl =
                 if (Object.keys(action.state as S).length !== 1) {
                   console.error(
                     `
-                    [zustand devtools middleware] Unsupported __setState action format. 
+                    [zustand devtools middleware] Unsupported __setState action format.
                     When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
                     and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
                     `,

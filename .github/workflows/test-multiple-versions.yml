@@ -27,8 +27,6 @@ jobs:
       fail-fast: false
       matrix:
         react:
-          - 16.8.0
-          - 17.0.0
           - 18.0.0
           - 18.1.0
           - 18.2.0
@@ -36,22 +34,6 @@ jobs:
           - 19.0.0-rc.0
           - 19.0.0-rc-49496d49-20240814
           - 0.0.0-experimental-49496d49-20240814
-        devtools-skip:
-          - CI-MATRIX-NOSKIP
-        include:
-          - devtools-skip: CI-MATRIX-[2345]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1345]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1245]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1235]
-            react: 16.8.0
-          - devtools-skip: CI-MATRIX-[1234]
-            react: 16.8.0
-        exclude:
-          - devtools-skip: CI-MATRIX-NOSKIP
-            react: 16.8.0
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -61,18 +43,6 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: '**/pnpm-lock.yaml'
       - run: pnpm install --frozen-lockfile
-      - name: Install legacy testing-library
-        if: ${{ startsWith(matrix.react, '16.') || startsWith(matrix.react, '17.') }}
-        run: pnpm add -D @testing-library/react@12.1.4
-      - name: Patch for React 16
-        if: ${{ startsWith(matrix.react, '16.') }}
-        run: |
-          sed -i~ '1s/^/import React from "react";/' tests/*.tsx
-          sed -i~ 's/"jsx": "react-jsx"/"jsx": "react"/' tsconfig.json
-          sed -i~ 's/import\.meta\.env[?]\.MODE/"DEVELOPMENT".toLowerCase()/' src/*.ts src/*/*.ts
-          sed -i~ "s/it('\[${DEVTOOLS_SKIP}\]/it.skip('/" tests/devtools.test.tsx
-        env:
-          DEVTOOLS_SKIP: ${{ matrix.devtools-skip }}
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
           pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
