@@ -1,4 +1,4 @@
-## Related Issues or Discussions
+## Related Bug Reports or Discussions
 
 Fixes #
 
@@ -8,4 +8,4 @@ Fixes #
 
 ## Check List
 
-- [ ] `yarn run prettier` for formatting code and docs
+- [ ] `pnpm run prettier` for formatting code and docs

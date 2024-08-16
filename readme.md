@@ -15,7 +15,7 @@ Don't disregard it because it's cute. It has quite the claws, lots of time was s
 You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/examples/demo).
 
 ```bash
-npm install zustand # or yarn add zustand or pnpm add zustand
+npm i zustand
 ```
 
 :warning: This readme is written for JavaScript users. If you are a TypeScript user, be sure to check out our [TypeScript Usage section](#typescript-usage).
@@ -401,7 +401,7 @@ const useBearStore = create(devtools((set) => ({
   ...
   eatFish: () => set(
     (prev) => ({ fishes: prev.fishes > 1 ? prev.fishes - 1 : 0 }),
-    false,
+    undefined,
     'bear/eatFish'
   ),
   ...
@@ -413,7 +413,7 @@ You can also log the action's type along with its payload:
   ...
   addFishes: (count) => set(
     (prev) => ({ fishes: prev.fishes + count }),
-    false,
+    undefined,
     { type: 'bear/addFishes', count, }
   ),
   ...

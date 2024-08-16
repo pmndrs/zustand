@@ -22,7 +22,7 @@ const LayerMaterial = shaderMaterial(
         mat3 m = mat3(c, 0, s, 0, 1, 0, -s, 0, c);
         transformed = transformed * m;
         vNormal = vNormal * m;
-      }      
+      }
       gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.);
     }`,
   ` uniform float time;
@@ -38,7 +38,7 @@ const LayerMaterial = shaderMaterial(
       if (color.a < 0.1) discard;
       gl_FragColor = vec4(color.rgb, .1);
       #include <tonemapping_fragment>
-      #include <encodings_fragment>
+      #include <colorspace_fragment>
     }`,
 )
 

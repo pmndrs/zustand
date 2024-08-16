@@ -20,7 +20,8 @@
     "prettier",
     "react-hooks",
     "import",
-    "vitest"
+    "vitest",
+    "eslint-plugin-react-compiler"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -31,6 +32,7 @@
     }
   },
   "rules": {
+    "react-compiler/react-compiler": "warn",
     "eqeqeq": "error",
     "no-var": "error",
     "prefer-const": "error",
@@ -43,7 +45,11 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
-      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
     ],
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-empty-function": "off",
@@ -109,13 +115,14 @@
     {
       "files": ["tests/**/*.ts", "tests/**/*.tsx"],
       "rules": {
-        "import/extensions": ["error", "never"]
+        "import/extensions": ["error", "never"],
+        "@typescript-eslint/no-unused-vars": "off"
       }
     },
     {
       "files": ["./*.js"],
       "rules": {
-        "@typescript-eslint/no-var-requires": "off"
+        "@typescript-eslint/no-require-imports": "off"
       }
     }
   ]

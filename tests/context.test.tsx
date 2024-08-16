@@ -1,11 +1,11 @@
 import {
   Component as ClassComponent,
-  ReactNode,
   StrictMode,
   useCallback,
   useEffect,
   useState,
 } from 'react'
+import type { ReactNode } from 'react'
 import { render } from '@testing-library/react'
 import { afterEach, it, vi } from 'vitest'
 import { create } from 'zustand'

@@ -1,13 +1,11 @@
-name: Lint and Type
+name: Publish
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    types: [opened, synchronize]
+  release:
+    types: [published]
 
 jobs:
-  lint:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,9 +13,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+          registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
           cache-dependency-path: '**/pnpm-lock.yaml'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test:format
-      - run: pnpm test:types
-      - run: pnpm test:lint
+      - run: pnpm test
+      - run: pnpm build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: dist

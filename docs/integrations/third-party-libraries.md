@@ -16,9 +16,9 @@ This can be done using third-party libraries created by the community.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@davstack/store](https://www.npmjs.com/package/@davstack/store) — A zustand store factory that auto generates selectors with get/set/use methods, supports inferred types, and makes global / local state management easy.
-
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
+- [@prncss-xyz/zustand-optics](https://github.com/prncss-xyz/zustand-optics) — An adapter for [optics-ts](https://github.com/akheron/optics-ts).
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook) — Automatic generation of Zustand hooks with Typescript support.
 - [derive-zustand](https://github.com/zustandjs/derive-zustand) — A function to create a derived Zustand store from other Zustand stores.
 - [geschichte](https://github.com/BowlingX/geschichte) — Zustand and Immer-based hook to manage query parameters.
@@ -29,17 +29,21 @@ This can be done using third-party libraries created by the community.
 - [shared-zustand](https://github.com/Tom-Julux/shared-zustand) — Cross-tab state sharing for Zustand.
 - [simple-zustand-devtools](https://github.com/beerose/simple-zustand-devtools) — 🐻⚛️ Inspect your Zustand store in React DevTools.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
+- [treeshakable](https://github.com/react18-tools/treeshakable) — A wrapper for library creators to avoid redundant store creation.
 - [use-broadcast-ts](https://github.com/Romainlg29/use-broadcast) — Zustand middleware to share state between tabs.
 - [use-zustand](https://github.com/zustandjs/use-zustand) — Another custom hook to use Zustand vanilla store.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
-- [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) - Native devtools with state and action tracking, diffing, tree display, and time travel
+- [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) - 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
-- [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
+- [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
+- [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
+- [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
 - [zustand-di](https://github.com/charkour/zustand-di) - use react props to init zustand stores
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
+- [zustand-interval-persist](https://www.npmjs.com/package/zustand-interval-persist) — An enhancement for zustand that enables automatic saving of the store's state to the specified storage at regular interval.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
 - [zustand-middleware-yjs](https://github.com/joebobmiles/zustand-middleware-yjs) — A middleware for synchronizing Zustand stores with Yjs.
