@@ -19,11 +19,9 @@ const useBearStore = create<BearStoreState & BearStoreAction>((set) => ({
 }))
 
 function Counter() {
-  const { bears, increasePopulation } = useBearStore(
-    ({ bears, increasePopulation }) => ({
-      bears,
-      increasePopulation,
-    }),
+  const bears = useBearStore(({ bears }) => bears)
+  const increasePopulation = useBearStore(
+    ({ increasePopulation }) => increasePopulation,
   )
 
   useEffect(() => {
@@ -37,7 +35,10 @@ describe.skipIf(!React.version.startsWith('18'))(
   'ssr behavior with react 18',
   () => {
     it('should handle different states between server and client correctly', async () => {
-      const { hydrateRoot }: any = await vi.importActual('react-dom/client')
+      const { hydrateRoot } =
+        await vi.importActual<typeof import('react-dom/client')>(
+          'react-dom/client',
+        )
 
       const markup = renderToString(
         <React.Suspense fallback={<div>Loading...</div>}>
@@ -69,7 +70,10 @@ describe.skipIf(!React.version.startsWith('18'))(
         bears: 0,
       }))
 
-      const { hydrateRoot }: any = await vi.importActual('react-dom/client')
+      const { hydrateRoot } =
+        await vi.importActual<typeof import('react-dom/client')>(
+          'react-dom/client',
+        )
 
       const Component = () => {
         const bears = useStore((state) => state.bears)

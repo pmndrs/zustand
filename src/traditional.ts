@@ -3,7 +3,6 @@
 // Those don't work in ESM, because React libs are CJS only.
 // See: https://github.com/pmndrs/valtio/issues/452
 // The following is a workaround until ESM is supported.
-// eslint-disable-next-line import/extensions
 import ReactExports from 'react'
 // eslint-disable-next-line import/extensions
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
@@ -25,35 +24,27 @@ type ReadonlyStoreApi<T> = Pick<
   'getState' | 'getInitialState' | 'subscribe'
 >
 
-type WithReact<S extends ReadonlyStoreApi<unknown>> = S & {
-  /** @deprecated please use api.getInitialState() */
-  getServerState?: () => ExtractState<S>
-}
-
 const identity = <T>(arg: T): T => arg
 
-export function useStoreWithEqualityFn<
-  S extends WithReact<ReadonlyStoreApi<unknown>>,
->(api: S): ExtractState<S>
+export function useStoreWithEqualityFn<S extends ReadonlyStoreApi<unknown>>(
+  api: S,
+): ExtractState<S>
 
-export function useStoreWithEqualityFn<
-  S extends WithReact<ReadonlyStoreApi<unknown>>,
-  U,
->(
+export function useStoreWithEqualityFn<S extends ReadonlyStoreApi<unknown>, U>(
   api: S,
   selector: (state: ExtractState<S>) => U,
   equalityFn?: (a: U, b: U) => boolean,
 ): U
 
 export function useStoreWithEqualityFn<TState, StateSlice>(
-  api: WithReact<ReadonlyStoreApi<TState>>,
+  api: ReadonlyStoreApi<TState>,
   selector: (state: TState) => StateSlice = identity as any,
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean,
 ) {
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
-    api.getServerState || api.getInitialState,
+    api.getInitialState,
     selector,
     equalityFn,
   )
@@ -61,9 +52,7 @@ export function useStoreWithEqualityFn<TState, StateSlice>(
   return slice
 }
 
-export type UseBoundStoreWithEqualityFn<
-  S extends WithReact<ReadonlyStoreApi<unknown>>,
-> = {
+export type UseBoundStoreWithEqualityFn<S extends ReadonlyStoreApi<unknown>> = {
   (): ExtractState<S>
   <U>(
     selector: (state: ExtractState<S>) => U,

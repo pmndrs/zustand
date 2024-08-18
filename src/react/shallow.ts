@@ -1,7 +1,6 @@
-// import { useDebugValue } from 'react'
+// import { useRef } from 'react'
 // That doesnt work in ESM, because React libs are CJS only.
 // The following is a workaround until ESM is supported.
-// eslint-disable-next-line import/extensions
 import ReactExports from 'react'
 import { shallow } from '../vanilla/shallow.ts'
 
@@ -14,6 +13,8 @@ export function useShallow<S, U>(selector: (state: S) => U): (state: S) => U {
     const next = selector(state)
     return shallow(prev.current, next)
       ? (prev.current as U)
-      : (prev.current = next)
+      : // It might not work with React Compiler
+        // eslint-disable-next-line react-compiler/react-compiler
+        (prev.current = next)
   }
 }
