@@ -37,6 +37,7 @@ This can be done using third-party libraries created by the community.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) - Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) - 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
+- [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) - A tool that automatically generates getters, setters and more for your zustand store.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
 - [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
@@ -60,4 +61,3 @@ This can be done using third-party libraries created by the community.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) - Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
-- [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) - A tool that automatically generates getters, setters and more for your zustand store.
