@@ -783,13 +783,13 @@ interface BearState {
     getItem: (name) => {
       const str = localStorage.getItem(name);
       if (!str) return null;
-      const { state, version } = JSON.parse(str);
+      const existingValue = JSON.parse(str);
       return {
+        ...existingValue,
         state: {
-          ...state,
-          transactions: new Map(state.transactions),
-        },
-        version
+          ...existingValue.state,
+          transactions: new Map(existingValue.state.transactions),
+        }
       }
     },
     setItem: (name, newValue: StorageValue<BearState>) => {
