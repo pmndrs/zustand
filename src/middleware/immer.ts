@@ -1,6 +1,10 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
-import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
+import type {
+  StateCreator,
+  StoreApi,
+  StoreMutatorIdentifier,
+} from '../vanilla.ts'
 
 type Immer = <
   T,
@@ -18,7 +22,6 @@ declare module '../vanilla' {
 }
 
 type Write<T, U> = Omit<T, keyof U> & U
-type First<T> = T extends [infer A] ? A : never
 type SkipTwo<T> = T extends { length: 0 }
   ? []
   : T extends { length: 1 }
@@ -38,25 +41,24 @@ type WithImmer<S> = Write<S, StoreImmer<S>>
 type StoreImmer<S> = S extends {
   setState: infer SetState
 }
-  ? SetState extends {
-      (...a: infer A1): infer Sr1
-      (...a: infer A2): infer Sr2
-    }
-    ? {
-        setState(
-          nextStateOrUpdater:
-            | First<A1>
-            | Partial<First<A1>>
-            | ((state: Draft<First<A1>>) => void),
-          shouldReplace?: false,
-          ...a: SkipTwo<A1>
-        ): Sr1
-        setState(
-          nextStateOrUpdater: First<A2> | ((state: Draft<First<A2>>) => void),
-          shouldReplace: true,
-          ...a: SkipTwo<A2>
-        ): Sr2
+  ? SetState extends StoreApi<infer T>['setState']
+    ? SetState extends {
+        (...a: infer A1): infer Sr1
+        (...a: infer A2): infer Sr2
       }
+      ? {
+          setState(
+            nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
+            shouldReplace?: false,
+            ...a: SkipTwo<A1>
+          ): Sr1
+          setState(
+            nextStateOrUpdater: T | ((state: Draft<T>) => void),
+            shouldReplace: true,
+            ...a: SkipTwo<A2>
+          ): Sr2
+        }
+      : never
     : never
   : never
 
