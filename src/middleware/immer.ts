@@ -18,6 +18,7 @@ declare module '../vanilla' {
 }
 
 type Write<T, U> = Omit<T, keyof U> & U
+type First<T> = T extends [infer A] ? A : never
 type SkipTwo<T> = T extends { length: 0 }
   ? []
   : T extends { length: 1 }
@@ -35,7 +36,6 @@ type SkipTwo<T> = T extends { length: 0 }
 type WithImmer<S> = Write<S, StoreImmer<S>>
 
 type StoreImmer<S> = S extends {
-  getState: () => infer T
   setState: infer SetState
 }
   ? SetState extends {
@@ -44,12 +44,15 @@ type StoreImmer<S> = S extends {
     }
     ? {
         setState(
-          nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
+          nextStateOrUpdater:
+            | First<A1>
+            | Partial<First<A1>>
+            | ((state: Draft<First<A1>>) => void),
           shouldReplace?: false,
           ...a: SkipTwo<A1>
         ): Sr1
         setState(
-          nextStateOrUpdater: T | ((state: Draft<T>) => void),
+          nextStateOrUpdater: First<A2> | ((state: Draft<First<A2>>) => void),
           shouldReplace: true,
           ...a: SkipTwo<A2>
         ): Sr2
