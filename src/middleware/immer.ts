@@ -44,6 +44,9 @@ type StoreImmer<S> = S extends {
       (...a: infer A2): infer Sr2
     }
     ? {
+        // Ideally, we would want to infer the `nextStateOrUpdater` `T` type from the
+        // `A1` type, but this is infeasible since it is an intersection with
+        // a partial type.
         setState(
           nextStateOrUpdater:
             | SetStateType<A2>
