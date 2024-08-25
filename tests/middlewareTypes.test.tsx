@@ -96,6 +96,13 @@ describe('counter state spec (single middleware)', () => {
           inc: () =>
             set((state) => {
               state.count = get().count + 1
+              type OmitFn<T> = Exclude<T, (...args: any[]) => any>
+              expectTypeOf<
+                OmitFn<Parameters<typeof set>[0]>
+              >().not.toMatchTypeOf<{ additional: number }>()
+              expectTypeOf<ReturnType<typeof get>>().toMatchTypeOf<{
+                additional: number
+              }>()
             }),
         })),
       ),
