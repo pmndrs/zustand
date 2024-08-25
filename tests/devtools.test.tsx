@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 import { devtools, redux } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 import type { StoreApi } from 'zustand/vanilla'
@@ -17,12 +18,12 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: any
-    unsubscribe: any
-    send: any
-    init: any
-    error: any
-    dispatch?: any
+    subscribe: Mock<any>
+    unsubscribe: Mock<any>
+    send: Mock<any>
+    init: Mock<any>
+    error: Mock<any>
+    dispatch?: Mock<any>
   }
 }
 const namedConnections = new Map<string | undefined, Connection>()
@@ -150,23 +151,8 @@ describe('If there is no extension installed...', () => {
     }).not.toThrow()
   })
 
-  it('does not warn if not enabled', async () => {
+  it('does not warn', async () => {
     createStore(devtools(() => ({ count: 0 })))
-    expect(console.warn).not.toBeCalled()
-  })
-
-  it('[DEV-ONLY] warns if enabled in dev mode', async () => {
-    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
-    expect(console.warn).toBeCalled()
-  })
-
-  it.skip('[PRD-ONLY] does not warn if not in dev env', async () => {
-    createStore(devtools(() => ({ count: 0 })))
-    expect(console.warn).not.toBeCalled()
-  })
-
-  it.skip('[PRD-ONLY] does not warn if not in dev env even if enabled', async () => {
-    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     expect(console.warn).not.toBeCalled()
   })
 })
@@ -690,7 +676,7 @@ it('preserves isRecording after setting from devtools', async () => {
 /* features:
  * [] if name is undefined - use multiple devtools connections.
  * [] if name and store is defined - use connection for specific 'name'.
- * [] if two stores are coonected to one 'name' group and.
+ * [] if two stores are connected to one 'name' group and.
  *      another connected to another 'name' group, then feature should work
  * [] check actions with this feature, for multiple stores that store prefixes are added -
  * [] - reset
@@ -732,9 +718,7 @@ describe('when redux connection was called on multiple stores with `name` undefi
   })
 
   describe('when `store` property was provided in `devtools` call in options', () => {
-    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
-    // Relevant issues https://github.com/nodejs/node/issues/35889
-    it('[CI-MATRIX-1] should create single connection for all indernal calls of .connect and `store` is not passed to .connect', async () => {
+    it('should create single connection for all internal calls of .connect and `store` is not passed to .connect', async () => {
       const { devtools: newDevtools } = await import('zustand/middleware')
 
       const options1 = { store: 'store1123', foo: 'bar1' }
@@ -755,9 +739,7 @@ describe('when redux connection was called on multiple stores with `name` undefi
       })
     })
 
-    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
-    // Relevant issues https://github.com/nodejs/node/issues/35889
-    it('[CI-MATRIX-2] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+    it('should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
       const { devtools: newDevtools } = await import('zustand/middleware')
 
       const options1 = { store: 'store12' }
@@ -851,9 +833,7 @@ describe('when redux connection was called on multiple stores with `name` provid
       })
     })
 
-    // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
-    // Relevant issues https://github.com/nodejs/node/issues/35889
-    it('[CI-MATRIX-3] should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
+    it('should call `.init` on single connection with combined states after each `create(devtools` call', async () => {
       const { devtools: newDevtools } = await import('zustand/middleware')
       const connectionNameGroup1 = 'test1'
       const connectionNameGroup2 = 'test2'
@@ -2364,9 +2344,7 @@ describe('when create devtools was called multiple times with `name` and `store`
           console.error = originalConsoleError
         })
 
-        // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
-        // Relevant issues https://github.com/nodejs/node/issues/35889
-        it('[CI-MATRIX-4] does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
+        it('does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
           const { devtools: newDevtools } = await import('zustand/middleware')
 
           const name1 = 'name1'
@@ -2414,9 +2392,7 @@ describe('when create devtools was called multiple times with `name` and `store`
           expect((api2 as any).dispatch).not.toBeCalled()
         })
 
-        // FIXME: Run this test separately in CI, until we're able to test modules in isolation i.e. use jest.resetModule and re-import modules in each test
-        // Relevant issues https://github.com/nodejs/node/issues/35889
-        it('[CI-MATRIX-5] dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
+        it('dispatches with `api.dispatch` when `api.dispatchFromDevtools` is set to true, connections are isolated from each other', async () => {
           const { devtools: newDevtools } = await import('zustand/middleware')
           const name1 = 'name1'
           const name2 = 'name2'

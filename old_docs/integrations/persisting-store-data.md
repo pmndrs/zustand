@@ -783,17 +783,19 @@ interface BearState {
     getItem: (name) => {
       const str = localStorage.getItem(name);
       if (!str) return null;
-      const { state } = JSON.parse(str);
+      const existingValue = JSON.parse(str);
       return {
+        ...existingValue,
         state: {
-          ...state,
-          transactions: new Map(state.transactions),
-        },
+          ...existingValue.state,
+          transactions: new Map(existingValue.state.transactions),
+        }
       }
     },
     setItem: (name, newValue: StorageValue<BearState>) => {
       // functions cannot be JSON encoded
       const str = JSON.stringify({
+        ...newValue,
         state: {
           ...newValue.state,
           transactions: Array.from(newValue.state.transactions.entries()),

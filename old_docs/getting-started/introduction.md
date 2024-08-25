@@ -5,7 +5,7 @@ nav: 0
 ---
 
 <div class="flex justify-center mb-4">
-  <img src="https://github.com/pmndrs/zustand/raw/main/bear.jpg" />
+  <img src="https://github.com/pmndrs/zustand/raw/main/docs/bear.jpg" />
 </div>
 
 A small, fast, and scalable bearbones state management solution.
