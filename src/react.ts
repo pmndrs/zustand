@@ -1,8 +1,4 @@
-// import { useDebugValue, useSyncExternalStore } from 'react'
-// That doesn't work in ESM, because React libs are CJS only.
-// See: https://github.com/pmndrs/valtio/issues/452
-// The following is a workaround until ESM is supported.
-import ReactExports from 'react'
+import React from 'react'
 import { createStore } from './vanilla.ts'
 import type {
   Mutate,
@@ -10,8 +6,6 @@ import type {
   StoreApi,
   StoreMutatorIdentifier,
 } from './vanilla.ts'
-
-const { useDebugValue, useSyncExternalStore } = ReactExports
 
 type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
@@ -34,12 +28,12 @@ export function useStore<TState, StateSlice>(
   api: ReadonlyStoreApi<TState>,
   selector: (state: TState) => StateSlice = identity as any,
 ) {
-  const slice = useSyncExternalStore(
+  const slice = React.useSyncExternalStore(
     api.subscribe,
     () => selector(api.getState()),
     () => selector(api.getInitialState()),
   )
-  useDebugValue(slice)
+  React.useDebugValue(slice)
   return slice
 }
 
