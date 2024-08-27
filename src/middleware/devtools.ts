@@ -228,9 +228,9 @@ const devtoolsImpl: DevtoolsImpl =
       (api as any).dispatchFromDevtools &&
       typeof (api as any).dispatch === 'function'
     ) {
-      let didWarnAboutReservedActionType = false
-      const originalDispatch = (api as any).dispatch
-      ;(api as any).dispatch = (...a: any[]) => {
+      let didWarnAboutReservedActionType = false;
+      const originalDispatch = (api as any).dispatch;
+      (api as any).dispatch = (...a: any[]) => {
         if (
           import.meta.env?.MODE !== 'production' &&
           a[0].type === '__setState' &&
@@ -238,15 +238,15 @@ const devtoolsImpl: DevtoolsImpl =
         ) {
           console.warn(
             '[zustand devtools middleware] "__setState" action type is reserved ' +
-              'to set state from the devtools. Avoid using it.',
-          )
-          didWarnAboutReservedActionType = true
+              'to set state from the devtools. Avoid using it.'
+          );
+          didWarnAboutReservedActionType = true;
         }
-        ;(originalDispatch as any)(...a)
-      }
+        originalDispatch(...a);
+      };
     }
-
-    ;(
+    
+    (
       connection as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
         subscribe: (
