@@ -24,8 +24,8 @@ This can be done using third-party libraries created by the community.
 - [geschichte](https://github.com/BowlingX/geschichte) — Zustand and Immer-based hook to manage query parameters.
 - [leiten-zustand](https://github.com/hecmatyar/leiten-zustand) — Cleans your store from boilerplate for requests and data transformation.
 - [mobz](https://github.com/2A5F/Mobz) — Zustand-style MobX API.
-- [ngx-zustand](https://github.com/JoaoPauloLousada/ngx-zustand) - A Zustand adapter for Angular.
-- [persist-and-sync](https://github.com/mayank1513/persist-and-sync) - Zustand middleware to easily persist and sync Zustand state between tabs/windows/iframes with same origin.
+- [ngx-zustand](https://github.com/JoaoPauloLousada/ngx-zustand) — A Zustand adapter for Angular.
+- [persist-and-sync](https://github.com/mayank1513/persist-and-sync) — Zustand middleware to easily persist and sync Zustand state between tabs/windows/iframes with same origin.
 - [shared-zustand](https://github.com/Tom-Julux/shared-zustand) — Cross-tab state sharing for Zustand.
 - [simple-zustand-devtools](https://github.com/beerose/simple-zustand-devtools) — 🐻⚛️ Inspect your Zustand store in React DevTools.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
@@ -34,30 +34,33 @@ This can be done using third-party libraries created by the community.
 - [use-zustand](https://github.com/zustandjs/use-zustand) — Another custom hook to use Zustand vanilla store.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
-- [zukeeper](https://github.com/oslabs-beta/Zukeeper) - Native devtools with state and action tracking, diffing, tree display, and time travel
+- [zukeeper](https://github.com/oslabs-beta/Zukeeper) — Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
-- [zustand-ards](https://github.com/ivoilic/zustand-ards) - 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
-- [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) - A tool that automatically generates getters, setters and more for your zustand store.
+- [zustand-ards](https://github.com/ivoilic/zustand-ards) — 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
+- [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) — A tool that automatically generates getters, setters and more for your zustand store.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
 - [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
-- [zustand-di](https://github.com/charkour/zustand-di) - use react props to init zustand stores
+- [zustand-di](https://github.com/charkour/zustand-di) — use react props to init zustand stores
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
+- [zustand-injectors](https://github.com/zustandjs/zustand-injectors) — A sweet way to lazy load slices
 - [zustand-interval-persist](https://www.npmjs.com/package/zustand-interval-persist) — An enhancement for zustand that enables automatic saving of the store's state to the specified storage at regular interval.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
 - [zustand-middleware-yjs](https://github.com/joebobmiles/zustand-middleware-yjs) — A middleware for synchronizing Zustand stores with Yjs.
 - [zustand-persist](https://github.com/roadmanfong/zustand-persist) — A middleware for persisting and rehydrating state.
-- [zustand-pub](https://github.com/AwesomeDevin/zustand-pub) - Cross-Application/Cross-Framework State Management And Sharing based on zustand and zustand-vue for React/Vue.
+- [zustand-pub](https://github.com/AwesomeDevin/zustand-pub) — Cross-Application/Cross-Framework State Management And Sharing based on zustand and zustand-vue for React/Vue.
 - [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
 - [zustand-rx](https://github.com/patdx/zustand-rx) — A Zustand middleware enabling you to subscribe to a store as an RxJS Observable.
 - [zustand-saga](https://github.com/Nowsta/zustand-saga) — A Zustand middleware for redux-saga (minus redux).
 - [zustand-slices](https://github.com/zustandjs/zustand-slices) — A slice utility for Zustand.
 - [zustand-store-addons](https://github.com/Diablow/zustand-store-addons) — React state management addons for Zustand.
 - [zustand-sync-tabs](https://github.com/mayank1513/zustand-sync-tabs) — Zustand middleware to easily sync Zustand state between tabs/windows/iframes with same origin.
-- [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) - State management for vue (Vue3 / Vue2) based on zustand.
+- [zustand-valtio](https://github.com/zustandjs/zustand-valtio) — A sweet combination of Zustand and Valtio
+- [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) — State management for vue (Vue3 / Vue2) based on zustand.
+- [zustand-xs](https://github.com/zustandjs/zustand-xs) — XState/store compabile middleware for Zustand
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
-- [zusty](https://github.com/oslabs-beta/Zusty) - Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
+- [zusty](https://github.com/oslabs-beta/Zusty) — Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
