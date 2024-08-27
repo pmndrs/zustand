@@ -1,9 +1,9 @@
 /* eslint @typescript-eslint/no-unused-expressions: off */ // FIXME
 /* eslint react-compiler/react-compiler: off */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import { create } from 'zustand'
-import type { StoreApi } from 'zustand'
+import type { StateCreator, StoreApi, StoreMutatorIdentifier } from 'zustand'
 import {
   combine,
   devtools,
@@ -17,6 +17,27 @@ import { createStore } from 'zustand/vanilla'
 type CounterState = {
   count: number
   inc: () => void
+}
+
+type ExampleStateCreator<T, A> = <
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+  U = T,
+>(
+  f: StateCreator<T, [...Mps, ['org/example', A]], Mcs>,
+) => StateCreator<T, Mps, [['org/example', A], ...Mcs], U & A>
+
+type Write<T, U> = Omit<T, keyof U> & U
+type StoreModifyAllButSetState<S, A> = S extends {
+  getState: () => infer T
+}
+  ? Omit<StoreApi<T & A>, 'setState'>
+  : never
+
+declare module 'zustand/vanilla' {
+  interface StoreMutators<S, A> {
+    'org/example': Write<S, StoreModifyAllButSetState<S, A>>
+  }
 }
 
 describe('counter state spec (no middleware)', () => {
@@ -64,6 +85,39 @@ describe('counter state spec (single middleware)', () => {
       immer(() => ({ count: 0 })),
     )
     expect(testSubtyping).toBeDefined()
+
+    const exampleMiddleware = ((initializer) =>
+      initializer) as ExampleStateCreator<CounterState, { additional: number }>
+
+    const testDerivedSetStateType = create<CounterState>()(
+      exampleMiddleware(
+        immer((set, get) => ({
+          count: 0,
+          inc: () =>
+            set((state) => {
+              state.count = get().count + 1
+              type OmitFn<T> = Exclude<T, (...args: any[]) => any>
+              expectTypeOf<
+                OmitFn<Parameters<typeof set>[0]>
+              >().not.toMatchTypeOf<{ additional: number }>()
+              expectTypeOf<ReturnType<typeof get>>().toMatchTypeOf<{
+                additional: number
+              }>()
+            }),
+        })),
+      ),
+    )
+    expect(testDerivedSetStateType).toBeDefined()
+    // the type of the `getState` should include our new property
+    expectTypeOf(testDerivedSetStateType.getState()).toMatchTypeOf<{
+      additional: number
+    }>()
+    // the type of the `setState` should not include our new property
+    expectTypeOf<
+      Parameters<typeof testDerivedSetStateType.setState>[0]
+    >().not.toMatchTypeOf<{
+      additional: number
+    }>()
   })
 
   it('redux', () => {

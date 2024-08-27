@@ -32,10 +32,11 @@ type SkipTwo<T> = T extends { length: 0 }
             ? A
             : never
 
+type SetStateType<T extends unknown[]> = Exclude<T[0], (...args: any[]) => any>
+
 type WithImmer<S> = Write<S, StoreImmer<S>>
 
 type StoreImmer<S> = S extends {
-  getState: () => infer T
   setState: infer SetState
 }
   ? SetState extends {
@@ -43,13 +44,21 @@ type StoreImmer<S> = S extends {
       (...a: infer A2): infer Sr2
     }
     ? {
+        // Ideally, we would want to infer the `nextStateOrUpdater` `T` type from the
+        // `A1` type, but this is infeasible since it is an intersection with
+        // a partial type.
         setState(
-          nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void),
+          nextStateOrUpdater:
+            | SetStateType<A2>
+            | Partial<SetStateType<A2>>
+            | ((state: Draft<SetStateType<A2>>) => void),
           shouldReplace?: false,
           ...a: SkipTwo<A1>
         ): Sr1
         setState(
-          nextStateOrUpdater: T | ((state: Draft<T>) => void),
+          nextStateOrUpdater:
+            | SetStateType<A2>
+            | ((state: Draft<SetStateType<A2>>) => void),
           shouldReplace: true,
           ...a: SkipTwo<A2>
         ): Sr2
