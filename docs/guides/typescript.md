@@ -499,9 +499,8 @@ const bearStore = createStore<BearState>()((set) => ({
   increase: (by) => set((state) => ({ bears: state.bears + by })),
 }))
 
-const createBoundedUseStore = ((store) => (selector) => useStore(store)) as <
-  S extends StoreApi<unknown>,
->(
+const createBoundedUseStore = ((store) => (selector) =>
+  useStore(store, selector)) as <S extends StoreApi<unknown>>(
   store: S,
 ) => {
   (): ExtractState<S>
