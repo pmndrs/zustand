@@ -94,7 +94,7 @@ const useBearStore = create(set => ({
   nuts: 0,
   honey: 0,
   treats: {},
-  ...
+  // ...
 }))
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
