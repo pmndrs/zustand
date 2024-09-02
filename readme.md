@@ -90,7 +90,7 @@ If you want to construct a single object with multiple state-picks inside, simil
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-const useBearStore = create(set => ({
+const useBearStore = create((set) => ({
   nuts: 0,
   honey: 0,
   treats: {},
