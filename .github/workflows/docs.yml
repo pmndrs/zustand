@@ -11,9 +11,9 @@ concurrency:
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@v1
+    uses: pmndrs/docs/.github/workflows/build.yml@v2
     with:
-      mdx: './docs'
+      mdx: 'docs'
       libname: 'Zustand'
       home_redirect: '/getting-started/introduction'
       icon: '/favicon.ico'
