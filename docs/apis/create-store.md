@@ -461,7 +461,7 @@ personStore.getState().setPerson({
 ```
 
 > [!NOTE]
-> We don’t need to copy every property separately due to `set` function performing shallow merge by 
+> We don’t need to copy every property separately due to `set` function performing shallow merge by
 > default.
 
 Now the form works!
