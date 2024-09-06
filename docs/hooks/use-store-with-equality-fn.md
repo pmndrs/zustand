@@ -55,7 +55,7 @@ import { createStore, useStore } from 'zustand'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
@@ -129,7 +129,7 @@ import { shallow } from 'zustand/shallow'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
@@ -550,7 +550,7 @@ import { shallow } from 'zustand/shallow'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions

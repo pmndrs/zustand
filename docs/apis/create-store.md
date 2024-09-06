@@ -4,7 +4,7 @@ description: How to create vanilla stores
 nav: 202
 ---
 
-`createStore` lets you create a vanilla store that expose some API utilities.
+`createStore` lets you create a vanilla store that exposes API utilities.
 
 ```js
 createStore(stateCreatorFn)
@@ -37,15 +37,14 @@ createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 
 #### Returns
 
-`createStore` returns a vanilla store that expose some API utilities, `setState`, `getState` and
+`createStore` returns a vanilla store that exposes API utilities, `setState`, `getState` and
 `subscribe`.
 
 ## Usage
 
 ### Updating state based on previous state
 
-This example show you how you can support **updater functions** for your
-**actions**.
+This example shows how you can support **updater functions** for your **actions**.
 
 ```tsx
 import { createStore } from 'zustand'
@@ -77,7 +76,7 @@ function increment() {
 
 const $yourAgeHeading = document.getElementById(
   'your-age',
-) as HMTLHeadingElement
+) as HTMLHeadingElement
 const $incrementBy3Button = document.getElementById(
   'increment-by-3',
 ) as HTMLButtonElement
@@ -108,14 +107,14 @@ Here's the `html` code
 
 ```html
 <h1 id="your-age"></h1>
-<button id="increment-by-3">+3</button>
-<button id="increment-by-1">+1</button>
+<button id="increment-by-3" type="button">+3</button>
+<button id="increment-by-1" type="button">+1</button>
 ```
 
 ### Updating Primitives in State
 
 State can hold any kind of JavaScript value. When you want to update built-in primitive values like
-number, strings, booleans, etc. we should directly assign new values to ensure updates are applied
+numbers, strings, booleans, etc. you should directly assign new values to ensure updates are applied
 correctly, and avoid unexpected behaviors.
 
 > [!NOTE]
@@ -178,7 +177,7 @@ import { create } from 'zustand'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
@@ -452,7 +451,7 @@ personStore.getState().firstName = (e.target as any).value
 ```
 
 The reliable way to get the behavior you’re looking for is to create a new object and pass it to
-`setPerson`. But here, you want to also copy the existing data into it because only one of the
+`setPerson`. But here you want to also copy the existing data into it because only one of the
 fields has changed:
 
 ```ts
@@ -462,8 +461,8 @@ personStore.getState().setPerson({
 ```
 
 > [!NOTE]
-> We don’t need to copy every property separately due to `set` function performs shallow
-> merge by default.
+> We don’t need to copy every property separately due to `set` function performing shallow merge by 
+> default.
 
 Now the form works!
 

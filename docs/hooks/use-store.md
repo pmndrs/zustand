@@ -49,7 +49,7 @@ store to manage `x` and `y` coordinates and provide an action to update these co
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
@@ -120,7 +120,7 @@ import { createStore, useStore } from 'zustand'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
@@ -530,7 +530,7 @@ import { createStore, useStore } from 'zustand'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions

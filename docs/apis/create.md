@@ -48,7 +48,7 @@ should take a selector function as its only argument.
 To update a state based on previous state we should use **updater functions**. Read more
 about that [here](https://react.dev/learn/queueing-a-series-of-state-updates).
 
-This example show you how you can support **updater functions** for your **actions**.
+This example shows how you can support **updater functions** for your **actions**.
 
 ```tsx
 import { create } from 'zustand'
@@ -108,7 +108,7 @@ export default function App() {
 ### Updating Primitives in State
 
 State can hold any kind of JavaScript value. When you want to update built-in primitive values like
-number, strings, booleans, etc. we should directly assign new values to ensure updates are applied
+numbers, strings, booleans, etc. you should directly assign new values to ensure updates are applied
 correctly, and avoid unexpected behaviors.
 
 > [!NOTE]
@@ -174,7 +174,7 @@ import { create } from 'zustand'
 type PositionStoreState = { x: number; y: number }
 
 type PositionStoreActions = {
-  setPosition: (nexPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: Partial<PositionStoreState>) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
@@ -503,7 +503,7 @@ person.firstName = e.target.value
 ```
 
 The reliable way to get the behavior you’re looking for is to create a new object and pass it to
-`setPerson`. But here, you want to also copy the existing data into it because only one of the
+`setPerson`. But here you want to also copy the existing data into it because only one of the
 fields has changed:
 
 ```ts
@@ -513,7 +513,7 @@ setPerson({
 ```
 
 > [!NOTE]
-> We don’t need to copy every property separately due to `set` function performs shallow merge by
+> We don’t need to copy every property separately due to `set` function performing shallow merge by
 > default.
 
 Now the form works!
