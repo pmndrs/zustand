@@ -43,9 +43,26 @@ You can put anything in it: primitives, objects, functions.
 The `set` function _merges_ state.
 
 ```js
+//js
 import { create } from 'zustand'
 
 const useStore = create((set) => ({
+  bears: 0,
+  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+  removeAllBears: () => set({ bears: 0 }),
+  updateBears: (newBears) => set({ bears: newBears }),
+}))
+```
+```ts
+//ts
+interface BearState {
+  bears: number
+  increasePopulation: () => void
+  removeAllBears: () => void
+  updateBears: (newBears: number) => void
+}
+
+const useStore = create<BearState>((set) => ({
   bears: 0,
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   removeAllBears: () => set({ bears: 0 }),
@@ -59,7 +76,8 @@ You can use the hook anywhere, without the need of providers.
 Select your state and the consuming component
 will re-render when that state changes.
 
-```jsx
+```jsx, tsx
+//jsx
 function BearCounter() {
   const bears = useStore((state) => state.bears)
   return <h1>{bears} around here...</h1>
