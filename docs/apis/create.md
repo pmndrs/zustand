@@ -37,9 +37,9 @@ create<T>()(stateCreatorFn: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 
 #### Returns
 
-`create` returns a React Hook with some API utilities, `setState`, `getState`, and `subscribe`,
-attached. It lets you return data that is based on current state, using a selector function. It
-should take a selector function as its only argument.
+`create` returns a React Hook with API utilities, `setState`, `getState`, `getInitialState` and
+`subscribe`, attached. It lets you return data that is based on current state, using a selector
+function. It should take a selector function as its only argument.
 
 ## Usage
 

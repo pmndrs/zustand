@@ -40,10 +40,10 @@ createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: 
 
 #### Returns
 
-`createWithEqualityFn` returns a React Hook with some API utilities, `setState`, `getState`, and
-`subscribe`, attached like `create`. It lets you return data that is based on current state,
-using a selector function, and lets you skip re-renders using an equality function. It should take
-a selector function, and an equality function as arguments.
+`createWithEqualityFn` returns a React Hook with API utilities attached, just like `create`. It
+lets you return data that is based on current state, using a selector function, and lets you skip
+re-renders using an equality function. It should take a selector function, and an equality function
+as arguments.
 
 ### Updating state based on previous state
 

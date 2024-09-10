@@ -37,8 +37,8 @@ createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 
 #### Returns
 
-`createStore` returns a vanilla store that exposes API utilities, `setState`, `getState` and
-`subscribe`.
+`createStore` returns a vanilla store that exposes API utilities, `setState`, `getState`,
+`getInitialState` and `subscribe`.
 
 ## Usage
 
