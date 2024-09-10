@@ -98,7 +98,7 @@ const render: Parameters<typeof ageStore.subscribe>[0] = (state) => {
   $yourAgeHeading.innerHTML = `Your age: ${state.age}`
 }
 
-render(ageStore.getInitialState(), ageStore.getInitialState())
+render(ageStore.getState(), ageStore.getState())
 
 ageStore.subscribe(render)
 ```
@@ -141,7 +141,7 @@ const render: Parameters<typeof xStore.subscribe>[0] = (state) => {
   $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
 }
 
-render(xStore.getInitialState(), xStore.getInitialState())
+render(xStore.getState(), xStore.getState())
 
 xStore.subscribe(render)
 ```
@@ -206,7 +206,7 @@ const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
   $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
 }
 
-render(positionStore.getInitialState(), positionStore.getInitialState())
+render(positionStore.getState(), positionStore.getState())
 
 positionStore.subscribe(render)
 ```
@@ -261,7 +261,7 @@ const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
   $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
 }
 
-render(positionStore.getInitialState(), positionStore.getInitialState())
+render(positionStore.getState(), positionStore.getState())
 
 positionStore.subscribe(render)
 ```
@@ -324,7 +324,7 @@ const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
   $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
 }
 
-render(positionStore.getInitialState(), positionStore.getInitialState())
+render(positionStore.getState(), positionStore.getState())
 
 positionStore.subscribe(render)
 
@@ -421,7 +421,7 @@ const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
   $result.innerHTML = `${person.firstName} ${person.lastName} (${person.email})`
 }
 
-render(personStore.getInitialState(), personStore.getInitialState())
+render(personStore.getState(), personStore.getState())
 
 personStore.subscribe(render)
 ```
@@ -536,7 +536,7 @@ const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
   $result.innerHTML = `${person.firstName} ${person.lastName} (${person.email})`
 }
 
-render(personStore.getInitialState(), personStore.getInitialState())
+render(personStore.getState(), personStore.getState())
 
 personStore.subscribe(render)
 ```
