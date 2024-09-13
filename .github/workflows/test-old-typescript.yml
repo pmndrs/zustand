@@ -34,6 +34,9 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - name: Patch for all TS
+        run: |
+          sed -i~ 's/"isolatedDeclarations": true,//' tsconfig.json
       - name: Patch for v4/v3 TS
         if: ${{ startsWith(matrix.typescript, '4.') || startsWith(matrix.typescript, '3.') }}
         run: |

@@ -11,6 +11,8 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
+    "declaration": true,
+    "isolatedDeclarations": true,
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
