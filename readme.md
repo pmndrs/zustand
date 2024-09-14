@@ -247,7 +247,7 @@ const useBoundStore = (selector) => useStore(vanillaStore, selector)
 
 ## Transient updates (for often occurring state-changes)
 
-The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
+The subscribe function allows components to bind to a state-portion without forcing re-render on changes. Best to combine it with useEffect for automatic unsubscribe on unmount. This can make a [drastic](https://codesandbox.io/s/peaceful-johnson-txtws) performance impact when you are allowed to mutate the view directly.
 
 ```jsx
 const useScratchStore = create((set) => ({ scratches: 0, ... }))
