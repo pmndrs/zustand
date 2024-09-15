@@ -9,11 +9,21 @@ const r = () => Math.max(0.2, Math.random())
 
 function Fatline({ curve, color }) {
   const material = useRef()
-  useFrame((state, delta) => (material.current.uniforms.dashOffset.value -= delta / 100))
+  useFrame(
+    (state, delta) =>
+      (material.current.uniforms.dashOffset.value -= delta / 100),
+  )
   return (
     <mesh>
       <meshLineGeometry points={curve} />
-      <meshLineMaterial ref={material} transparent lineWidth={0.01} color={color} dashArray={0.1} dashRatio={0.99} />
+      <meshLineMaterial
+        ref={material}
+        transparent
+        lineWidth={0.01}
+        color={color}
+        dashArray={0.1}
+        dashRatio={0.99}
+      />
     </mesh>
   )
 }
@@ -22,10 +32,22 @@ export default function Fireflies({ count, colors, radius = 10 }) {
   const lines = useMemo(
     () =>
       new Array(count).fill().map(() => {
-        const pos = new Vector3(Math.sin(0) * radius * r(), Math.cos(0) * radius * r(), 0)
+        const pos = new Vector3(
+          Math.sin(0) * radius * r(),
+          Math.cos(0) * radius * r(),
+          0,
+        )
         const points = new Array(30).fill().map((_, index) => {
           const angle = (index / 20) * Math.PI * 2
-          return pos.add(new Vector3(Math.sin(angle) * radius * r(), Math.cos(angle) * radius * r(), 0)).clone()
+          return pos
+            .add(
+              new Vector3(
+                Math.sin(angle) * radius * r(),
+                Math.cos(angle) * radius * r(),
+                0,
+              ),
+            )
+            .clone()
         })
         const curve = new CatmullRomCurve3(points).getPoints(100)
         return {

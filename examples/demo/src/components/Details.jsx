@@ -6,10 +6,16 @@ export default function Details() {
         <a href="https://github.com/pmndrs/zustand">Github</a>
       </nav>
       <div className="bottom">
-        <a href="https://github.com/pmndrs/zustand/tree/main/examples/demo" className="bottom-right">
+        <a
+          href="https://github.com/pmndrs/zustand/tree/main/examples/demo"
+          className="bottom-right"
+        >
           {'<Source />'}
         </a>
-        <a href="https://www.instagram.com/tina.henschel/" className="bottom-left">
+        <a
+          href="https://www.instagram.com/tina.henschel/"
+          className="bottom-left"
+        >
           Illustrations @ Tina Henschel
         </a>
       </div>

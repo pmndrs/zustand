@@ -8,7 +8,8 @@ import typescriptCode from '../resources/typescript-code'
 const useStore = create((set, get) => ({
   lang: 'javascript',
   setLang: (lang) => set(() => ({ lang })),
-  getCode: () => (get().lang === 'javascript' ? javascriptCode : typescriptCode),
+  getCode: () =>
+    get().lang === 'javascript' ? javascriptCode : typescriptCode,
 }))
 
 export default function CodePreview() {

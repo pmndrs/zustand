@@ -9,6 +9,10 @@
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
   "packageManager": "pnpm@8.15.0",
   "dependencies": {
     "@react-three/drei": "^9.78.2",
