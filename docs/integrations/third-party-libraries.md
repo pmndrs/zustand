@@ -37,6 +37,7 @@ This can be done using third-party libraries created by the community.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) — Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) — 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
+- [zustand-async-slice](https://github.com/mym0404/zustand-async-slice) - Simple Zustand utility to create Async Slice. TypeScript Fully Supported 🖖
 - [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) — A tool that automatically generates getters, setters and more for your zustand store.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
 - [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
