@@ -17,7 +17,7 @@ export const replacer = (
   }
 }
 
-export const reviver = (key: string, value: ReplacedMap | unknown) => {
+export const reviver = (key: string, value: ReplacedMap | unknown): unknown => {
   if (isReplacedMap(value)) {
     return new Map(value.value)
   }
