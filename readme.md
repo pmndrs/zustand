@@ -91,9 +91,10 @@ import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 const useBearStore = create((set) => ({
-  bears: 0,
-  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
+  nuts: 0,
+  honey: 0,
+  treats: {},
+  // ...
 }))
 
 // Object pick, re-renders the component when either state.nuts or state.honey change
@@ -110,7 +111,7 @@ const [nuts, honey] = useBearStore(
 const treats = useBearStore(useShallow((state) => Object.keys(state.treats)))
 ```
 
-For more control over re-rendering, you may provide any custom equality function.
+For more control over re-rendering, you may provide any custom equality function (this example requires the use of [`createWithEqualityFn`](./docs/migrations/migrating-to-v5.md#using-custom-equality-functions-such-as-shallow)).
 
 ```jsx
 const treats = useBearStore(
