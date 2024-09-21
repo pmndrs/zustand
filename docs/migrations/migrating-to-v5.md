@@ -98,15 +98,36 @@ For example, this may cause infinite loops.
 
 ```js
 // v4
-const action = useMainStore((state) => {
-  return state.action ?? () => {}
-})
+const [searchValue, setSearchValue] = useStore((state) => [
+  state.searchValue,
+  state.setSearchValue,
+])
 ```
 
 The error message will be something like this:
 
 ```plaintext
 Uncaught Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.
+```
+
+To fix it, use the `useShallow` hook, which will return a stable reference.
+
+```js
+// v5
+import { useShallow } from 'zustand/shallow'
+
+const [searchValue, setSearchValue] = useStore(
+  useShallow((state) => [state.searchValue, state.setSearchValue]),
+)
+```
+
+Here's another example that may cause infinite loops.
+
+```js
+// v4
+const action = useMainStore((state) => {
+  return state.action ?? () => {}
+})
 ```
 
 To fix it, make sure the selector function returns a stable reference.
