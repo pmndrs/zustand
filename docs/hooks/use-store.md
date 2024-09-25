@@ -46,19 +46,18 @@ First, let's set up a store that will hold the position of the dot on the screen
 store to manage `x` and `y` coordinates and provide an action to update these coordinates.
 
 ```tsx
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
-  x: 0,
-  y: 0,
-  setPosition: (nextPosition) => {
-    set(nextPosition)
+  position: { x: 0, y: 0 },
+  setPosition: (position) => {
+    set({ position })
   },
 }))
 ```
@@ -68,10 +67,8 @@ will use the store to track and update the dot's position.
 
 ```tsx
 function MovingDot() {
-  const [position, setPosition] = useStore(positionStore, (state) => [
-    { x: state.x, y: state.y },
-    state.setPosition,
-  ])
+  const position = useStore(positionStore, (state) => state.position)
+  const setPosition = useStore(positionStore, (state) => state.setPositionStore)
 
   return (
     <div
@@ -117,27 +114,24 @@ Here is what the code should look like:
 ```tsx
 import { createStore, useStore } from 'zustand'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
-  x: 0,
-  y: 0,
-  setPosition: (nextPosition) => {
-    set(nextPosition)
+  position: { x: 0, y: 0 },
+  setPosition: (position) => {
+    set({ position })
   },
 }))
 
 function MovingDot() {
-  const [position, setPosition] = useStore(positionStore, (state) => [
-    { x: state.x, y: state.y },
-    state.setPosition,
-  ])
+  const position = useStore(positionStore, (state) => state.position)
+  const setPosition = useStore(positionStore, (state) => state.setPositionStore)
 
   return (
     <div
@@ -405,20 +399,19 @@ First, let's set up a store that will hold the position of the dot on the screen
 store to manage `x` and `y` coordinates and provide an action to update these coordinates.
 
 ```tsx
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const createPositionStore = () => {
   return createStore<PositionStore>()((set) => ({
-    x: 0,
-    y: 0,
-    setPosition: (nextPosition) => {
-      set(nextPosition)
+    position: { x: 0, y: 0 },
+    setPosition: (position) => {
+      set({ position })
     },
   }))
 }
@@ -465,9 +458,8 @@ within its container.
 
 ```tsx
 function MovingDot({ color }: { color: string }) {
-  const [position, setPosition] = usePositionStore(
-    (state) => [{ x: state.x, y: state.y }, state.setPosition] as const,
-  )
+  const position = usePositionStore((state) => state.position)
+  const setPosition = usePositionStore((state) => state.setPosition)
 
   return (
     <div
@@ -527,20 +519,19 @@ Here is what the code should look like:
 import { type ReactNode, useState, createContext, useContext } from 'react'
 import { createStore, useStore } from 'zustand'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const createPositionStore = () => {
   return createStore<PositionStore>()((set) => ({
-    x: 0,
-    y: 0,
-    setPosition: (nextPosition) => {
-      set(nextPosition)
+    position: { x: 0, y: 0 },
+    setPosition: (position) => {
+      set({ position })
     },
   }))
 }
@@ -572,9 +563,8 @@ function usePositionStore<U>(selector: (state: PositionStore) => U) {
 }
 
 function MovingDot({ color }: { color: string }) {
-  const [position, setPosition] = usePositionStore(
-    (state) => [{ x: state.x, y: state.y }, state.setPosition] as const,
-  )
+  const position = usePositionStore((state) => state.position)
+  const setPosition = usePositionStore((state) => state.setPosition)
 
   return (
     <div
