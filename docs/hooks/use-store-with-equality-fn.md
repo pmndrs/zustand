@@ -62,9 +62,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
   position: { x: 0, y: 0 },
-  setPosition: (position) => {
-    set({ position })
-  },
+  setPosition: (position) => set({ position }),
 }))
 ```
 
@@ -140,9 +138,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
   position: { x: 0, y: 0 },
-  setPosition: (position) => {
-    set({ position })
-  },
+  setPosition: (position) => set({ position }),
 }))
 
 function MovingDot() {
@@ -442,9 +438,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 const createPositionStore = () => {
   return createStore<PositionStore>()((set) => ({
     position: { x: 0, y: 0 },
-    setPosition: (position) => {
-      set({ position })
-    },
+    setPosition: (position) => set({ position }),
   }))
 }
 ```
@@ -564,9 +558,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 const createPositionStore = () => {
   return createStore<PositionStore>()((set) => ({
     position: { x: 0, y: 0 },
-    setPosition: (position) => {
-      set({ position })
-    },
+    setPosition: (position) => set({ position }),
   }))
 }
 

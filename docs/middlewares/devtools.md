@@ -1,0 +1,136 @@
+---
+title: devtools
+description: How to time-travel debug your store
+nav: 205
+---
+
+# devtools
+
+`devtools` middleware lets you use [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)
+without Redux. Read more about the benefits of using [Redux DevTools for debugging](https://redux.js.org/style-guide/#use-the-redux-devtools-extension-for-debugging).
+
+```js
+devtools(stateCreatorFn, devtoolsOptions)
+```
+
+- [Reference](#reference)
+  - [Signature](#devtools-signature)
+- [Usage](#usage)
+  - [Debugging a store](#debugging-a-store)
+  - [Debugging a Slices pattern based store](#debugging-a-slices-pattern-based-store)
+- [Troubleshooting](#troubleshooting)
+  - [Only one store is displayed](#only-one-store-is-displayed)
+  - [Action names are labeled as 'anonymous'](#all-action-names-are-labeled-as-anonymous)
+
+## Reference
+
+### `devtools` Signature
+
+```ts
+devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOptions): StateCreator<T, [], []>
+```
+
+#### Parameters
+
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+  Usually, you will return an object with the methods you want to expose.
+- **optional** `devtoolsOptions`: An object to define Redux DevTools options.
+  - **optional** `name`: A custom identifier for the connection in the Redux DevTools.
+  - **optional** `enabled`: Defaults to `true` when is on development mode, and defaults to `false`
+    when is on production mode. Enables or disables the Redux DevTools integration
+    for this store.
+  - **optional** `anonymousActionType`: Defaults to `anonymous`. A string to use as the action type
+    for anonymous mutations in the Redux DevTools.
+  - **optional** `store`: A custom identifier for the store in the Redux DevTools.
+
+#### Returns
+
+`devtools` returns a state creator function.
+
+## Usage
+
+### Debugging a store
+
+This example shows you how you can use `Redux Devtools` to debug a store
+
+```ts
+import { create, StateCreator } from 'zustand'
+
+type JungleStore = {
+  bears: number
+  addBear: () => void
+  fishes: number
+  addFish: () => void
+}
+
+const useJungleStore = create<JungleStore>()(
+  devtools((...args) => ({
+    bears: 0,
+    addBear: () => set((state) => ({ bears: state.bears + 1 })),
+    fishes: 0,
+    addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+  })),
+)
+```
+
+### Debugging a Slices pattern based store
+
+This example shows you how you can use `Redux Devtools` to debug a Slices pattern based store
+
+```ts
+import { create, StateCreator } from 'zustand'
+
+type BearSlice = {
+  bears: number
+  addBear: () => void
+}
+
+type FishSlice = {
+  fishes: number
+  addFish: () => void
+}
+
+type JungleStore = BearSlice & FishSlice
+
+const createBearSlice: StateCreator<
+  JungleStore,
+  [['zustand/devtools', never]],
+  [],
+  BearSlice
+> = (set) => ({
+  bears: 0,
+  addBear: () => set((state) => ({ bears: state.bears + 1 })),
+  eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
+})
+
+const createFishSlice: StateCreator<
+  JungleStore,
+  [['zustand/devtools', never]],
+  [],
+  FishSlice
+> = (set) => ({
+  fishes: 0,
+  addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+})
+
+const useJungleStore = create<JungleStore>()(
+  devtools((...args) => ({
+    ...createBearSlice(...args),
+    ...createFishSlice(...args),
+  })),
+)
+```
+
+## Troubleshooting
+
+### Only one store is displayed
+
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo voluptatum, eos suscipit explicabo
+animi ad porro vitae vel ullam saepe magnam in facilis earum, nulla officia sit. Unde, nostrum
+delectus!
+
+### All action names are labeled as 'anonymous'
+
+Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat et illo hic architecto deleniti
+soluta, veritatis reiciendis nesciunt laborum laudantium, dolorum asperiores fuga at accusamus aut
+facere ex perspiciatis qui!

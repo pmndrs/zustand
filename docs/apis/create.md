@@ -48,7 +48,7 @@ function. It should take a selector function as its only argument.
 To update a state based on previous state we should use **updater functions**. Read more
 about that [here](https://react.dev/learn/queueing-a-series-of-state-updates).
 
-This example shows how you can support **updater functions** for your **actions**.
+This example shows how you can support **updater functions** within **actions**.
 
 ```tsx
 import { create } from 'zustand'
@@ -172,27 +172,22 @@ discards any existing nested data within the state.
 ```tsx
 import { create } from 'zustand'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const usePositionStore = create<PositionStore>()((set) => ({
-  x: 0,
-  y: 0,
-  setPosition: (nextPosition) => {
-    set(nextPosition)
-  },
+  position: { x: 0, y: 0 },
+  setPosition: (nextPosition) => set(nextPosition),
 }))
 
 export default function MovingDot() {
-  const [position, setPosition] = usePositionStore((state) => [
-    { x: state.x, y: state.y },
-    state.setPosition,
-  ])
+  const position = usePositionStore((state) => state.position)
+  const setPosition = usePositionStore((state) => state.setPosition)
 
   return (
     <div
@@ -351,27 +346,22 @@ updates. We can use `subscribe` for external state management.
 import { useEffect } from 'react'
 import { create } from 'zustand'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const usePositionStore = create<PositionStore>()((set) => ({
-  x: 0,
-  y: 0,
-  setPosition: (nextPosition) => {
-    set(nextPosition)
-  },
+  position: { x: 0, y: 0 },
+  setPosition: (nextPosition) => set(nextPosition),
 }))
 
 export default function MovingDot() {
-  const [position, setPosition] = usePositionStore((state) => [
-    { x: state.x, y: state.y },
-    state.setPosition,
-  ])
+  const position = usePositionStore((state) => state.position)
+  const setPosition = usePositionStore((state) => state.setPosition)
 
   useEffect(() => {
     const unsubscribePositionStore = usePositionStore.subscribe(({ x, y }) => {
@@ -448,30 +438,22 @@ const usePersonStore = create<PersonStore>()((set) => ({
   firstName: 'Barbara',
   lastName: 'Hepworth',
   email: 'bhepworth@sculpture.com',
-  setPerson: (nextPerson) => {
-    set(nextPerson)
-  },
+  setPerson: (nextPerson) => set(nextPerson),
 }))
 
 export default function Form() {
-  const [person] = usePersonStore((state) => [
-    {
-      firstName: state.firstName,
-      lastName: state.lastName,
-      email: state.email,
-    },
-    state.setPerson,
-  ])
+  const person = usePersonStore((state) => person)
+  const setPerson = usePersonStore((state) => setPerson)
 
-  function handleFirstNameChange(e) {
+  function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
     person.firstName = e.target.value
   }
 
-  function handleLastNameChange(e) {
+  function handleLastNameChange(e: ChangeEvent<HTMLInputElement>) {
     person.lastName = e.target.value
   }
 
-  function handleEmailChange(e) {
+  function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
     person.email = e.target.value
   }
 
@@ -508,9 +490,7 @@ The reliable way to get the behavior you’re looking for is to create a new obj
 fields has changed:
 
 ```ts
-setPerson({
-  firstName: e.target.value, // New first name from the input
-})
+setPerson({ ...person, firstName: e.target.value }) // New first name from the input
 ```
 
 > [!NOTE]
@@ -522,50 +502,42 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```tsx {35,39,43}
+```tsx {27,31,35}
 import { create } from 'zustand'
 
 type PersonStoreState = {
-  firstName: string
-  lastName: string
-  email: string
+  person: { firstName: string; lastName: string; email: string }
 }
 
 type PersonStoreActions = {
-  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+  setPerson: (nextPerson: PersonStoreState['person']) => void
 }
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
 const usePersonStore = create<PersonStore>()((set) => ({
-  firstName: 'Barbara',
-  lastName: 'Hepworth',
-  email: 'bhepworth@sculpture.com',
-  setPerson: (nextPerson) => {
-    set(nextPerson)
+  person: {
+    firstName: 'Barbara',
+    lastName: 'Hepworth',
+    email: 'bhepworth@sculpture.com',
   },
+  setPerson: (nextPerson) => set(nextPerson),
 }))
 
 export default function Form() {
-  const [person, setPerson] = usePersonStore((state) => [
-    {
-      firstName: state.firstName,
-      lastName: state.lastName,
-      email: state.email,
-    },
-    state.setPerson,
-  ])
+  const person = usePersonStore((state) => state.person)
+  const setPerson = usePersonStore((state) => state.setPerson)
 
-  function handleFirstNameChange(e) {
-    setPerson({ firstName: e.target.value })
+  function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
+    setPerson({ ...person, firstName: e.target.value })
   }
 
-  function handleLastNameChange(e) {
-    setPerson({ lastName: e.target.value })
+  function handleLastNameChange(e: ChangeEvent<HTMLInputElement>) {
+    setPerson({ ...person, lastName: e.target.value })
   }
 
-  function handleEmailChange(e) {
-    setPerson({ email: e.target.value })
+  function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
+    setPerson({ ...person, email: e.target.value })
   }
 
   return (
