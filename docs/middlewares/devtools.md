@@ -99,6 +99,65 @@ const createBearSlice: StateCreator<
   BearSlice
 > = (set) => ({
   bears: 0,
+  addBear: () =>
+    set((state) => ({ bears: state.bears + 1 }), undefined, 'bear/addBear'),
+})
+
+const createFishSlice: StateCreator<
+  JungleStore,
+  [['zustand/devtools', never]],
+  [],
+  FishSlice
+> = (set) => ({
+  fishes: 0,
+  addFish: () =>
+    set((state) => ({ fishes: state.fishes + 1 }), undefined, 'bear/addFish'),
+})
+
+const useJungleStore = create<JungleStore>()(
+  devtools((...args) => ({
+    ...createBearSlice(...args),
+    ...createFishSlice(...args),
+  })),
+)
+```
+
+## Troubleshooting
+
+### Only one store is displayed
+
+By default, `Redux Devtools` only show one store at a time, so in order to see other stores you
+need to use store selector and choose a different store.
+
+### All action names are labeled as 'anonymous'
+
+If an action type name is not provided, it is defaulted to "anonymous". You can customize this
+default value by providing a `anonymousActionType` parameter:
+
+For instance the next example doesn't have action type name:
+
+```ts
+import { create, StateCreator } from 'zustand'
+
+type BearSlice = {
+  bears: number
+  addBear: () => void
+}
+
+type FishSlice = {
+  fishes: number
+  addFish: () => void
+}
+
+type JungleStore = BearSlice & FishSlice
+
+const createBearSlice: StateCreator<
+  JungleStore,
+  [['zustand/devtools', never]],
+  [],
+  BearSlice
+> = (set) => ({
+  bears: 0,
   addBear: () => set((state) => ({ bears: state.bears + 1 })),
   eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
 })
@@ -121,16 +180,57 @@ const useJungleStore = create<JungleStore>()(
 )
 ```
 
-## Troubleshooting
+In order to fix the previous example, we need to provide an action type name as the third parameter.
+Additionally, to preserve the default behavior of the replacement logic, the second parameter
+should be set to `undefined`.
 
-### Only one store is displayed
+Here's the fixed previous example
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo voluptatum, eos suscipit explicabo
-animi ad porro vitae vel ullam saepe magnam in facilis earum, nulla officia sit. Unde, nostrum
-delectus!
+```ts
+import { create, StateCreator } from 'zustand'
 
-### All action names are labeled as 'anonymous'
+type BearSlice = {
+  bears: number
+  addBear: () => void
+}
 
-Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat et illo hic architecto deleniti
-soluta, veritatis reiciendis nesciunt laborum laudantium, dolorum asperiores fuga at accusamus aut
-facere ex perspiciatis qui!
+type FishSlice = {
+  fishes: number
+  addFish: () => void
+}
+
+type JungleStore = BearSlice & FishSlice
+
+const createBearSlice: StateCreator<
+  JungleStore,
+  [['zustand/devtools', never]],
+  [],
+  BearSlice
+> = (set) => ({
+  bears: 0,
+  addBear: () =>
+    set((state) => ({ bears: state.bears + 1 }), undefined, 'bear/addBear'),
+})
+
+const createFishSlice: StateCreator<
+  JungleStore,
+  [['zustand/devtools', never]],
+  [],
+  FishSlice
+> = (set) => ({
+  fishes: 0,
+  addFish: () =>
+    set((state) => ({ fishes: state.fishes + 1 }), undefined, 'fish/addFish'),
+})
+
+const useJungleStore = create<JungleStore>()(
+  devtools((...args) => ({
+    ...createBearSlice(...args),
+    ...createFishSlice(...args),
+  })),
+)
+```
+
+> [!IMPORTANT]
+> Do not set the second parameter to `true` or `false` unless you want to replace the default
+> replacement logic
