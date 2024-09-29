@@ -6,7 +6,7 @@ nav: 207
 
 # persist
 
-`persist` middleware lets you persist your store's state across page reloads or application
+`persist` middleware lets you persist a store's state across page reloads or application
 restarts.
 
 ```js
@@ -48,7 +48,7 @@ persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistO
 - `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
   updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
   arguments.
-- `persistOptions`: An object to.
+- `persistOptions`: An object to define storage options.
   - `name`: A unique name of the item for your store in the storage.
   - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`. -
   - **optional** `partialize`: A function to filter state fields before persisting it.

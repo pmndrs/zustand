@@ -48,7 +48,7 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
 
 - `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
-- **optional** `devtoolsOptions`: An object to define Redux DevTools options.
+- **optional** `devtoolsOptions`: An object to define `Redux Devtools` options.
   - **optional** `name`: A custom identifier for the connection in the Redux DevTools.
   - **optional** `enabled`: Defaults to `true` when is on development mode, and defaults to `false`
     when is on production mode. Enables or disables the Redux DevTools integration
@@ -80,9 +80,15 @@ type JungleStore = {
 const useJungleStore = create<JungleStore>()(
   devtools((...args) => ({
     bears: 0,
-    addBear: () => set((state) => ({ bears: state.bears + 1 })),
+    addBear: () =>
+      set((state) => ({ bears: state.bears + 1 }), undefined, 'jungle/addBear'),
     fishes: 0,
-    addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+    addFish: () =>
+      set(
+        (state) => ({ fishes: state.fishes + 1 }),
+        undefined,
+        'jungle/addFish',
+      ),
   })),
 )
 ```
@@ -114,7 +120,11 @@ const createBearSlice: StateCreator<
 > = (set) => ({
   bears: 0,
   addBear: () =>
-    set((state) => ({ bears: state.bears + 1 }), undefined, 'bear/addBear'),
+    set(
+      (state) => ({ bears: state.bears + 1 }),
+      undefined,
+      'jungle:bear/addBear',
+    ),
 })
 
 const createFishSlice: StateCreator<
@@ -125,7 +135,11 @@ const createFishSlice: StateCreator<
 > = (set) => ({
   fishes: 0,
   addFish: () =>
-    set((state) => ({ fishes: state.fishes + 1 }), undefined, 'bear/addFish'),
+    set(
+      (state) => ({ fishes: state.fishes + 1 }),
+      undefined,
+      'jungle:fish/addFish',
+    ),
 })
 
 const useJungleStore = create<JungleStore>()(
