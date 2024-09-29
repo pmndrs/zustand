@@ -7,11 +7,12 @@ nav: 204
 `create` lets you create a React Hook with API utilities attached.
 
 ```js
-create(stateCreatorFn)
+const useStore = create(stateCreatorFn)
 ```
 
-- [Reference](#reference)
+- [Types](#types)
   - [Signature](#create-signature)
+- [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
   - [Updating Primitives in State](#updating-primitives-in-state)
@@ -22,17 +23,21 @@ create(stateCreatorFn)
 - [Troubleshooting](#troubleshooting)
   - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
-## Reference
+## Types
 
-### `create` Signature
+### Signature
 
 ```ts
 create<T>()(stateCreatorFn: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 ```
 
+## Reference
+
+### `create(stateCreatorFn)`
+
 #### Parameters
 
-- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
 
 #### Returns

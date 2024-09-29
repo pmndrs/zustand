@@ -10,11 +10,13 @@ nav: 205
 without Redux. Read more about the benefits of using [Redux DevTools for debugging](https://redux.js.org/style-guide/#use-the-redux-devtools-extension-for-debugging).
 
 ```js
-devtools(stateCreatorFn, devtoolsOptions)
+const nextStateCreatorFn = devtools(stateCreatorFn, devtoolsOptions)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
+  - [Mutator](#mutator)
 - [Reference](#reference)
-  - [Signature](#devtools-signature)
 - [Usage](#usage)
   - [Debugging a store](#debugging-a-store)
   - [Debugging a Slices pattern based store](#debugging-a-slices-pattern-based-store)
@@ -22,17 +24,29 @@ devtools(stateCreatorFn, devtoolsOptions)
   - [Only one store is displayed](#only-one-store-is-displayed)
   - [Action names are labeled as 'anonymous'](#all-action-names-are-labeled-as-anonymous)
 
-## Reference
+## Types
 
-### `devtools` Signature
+### Signature
 
 ```ts
-devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOptions): StateCreator<T, [], []>
+devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsOptions): StateCreator<T, [['zustand/devtools', never]], []>
 ```
+
+### Mutator
+
+<!-- prettier-ignore-start -->
+```ts
+['zustand/devtools', never]
+```
+<!-- prettier-ignore-end -->
+
+## Reference
+
+### `devtools(stateCreatorFn, devtoolsOptions)`
 
 #### Parameters
 
-- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
 - **optional** `devtoolsOptions`: An object to define Redux DevTools options.
   - **optional** `name`: A custom identifier for the connection in the Redux DevTools.
@@ -232,5 +246,5 @@ const useJungleStore = create<JungleStore>()(
 ```
 
 > [!IMPORTANT]
-> Do not set the second parameter to `true` or `false` unless you want to replace the default
+> Do not set the second parameter to `true` or `false` unless you want to override the default
 > replacement logic

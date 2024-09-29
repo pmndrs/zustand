@@ -12,11 +12,12 @@ arrays within them.
 > Shallow lets you perform quick comparisons, but keep its limitations in mind.
 
 ```js
-shallow(a, b)
+const equal = shallow(a, b)
 ```
 
-- [Reference](#reference)
+- [Types](#types)
   - [Signature](#shallow-signature)
+- [Reference](#reference)
 - [Usage](#usage)
   - [Comparing Primitives](#comparing-primitives)
   - [Comparing Objects](#comparing-objects)
@@ -25,13 +26,17 @@ shallow(a, b)
 - [Troubleshooting](#troubleshooting)
   - [Comparing objects returns `false` even if they are identical.](#comparing-objects-returns-false-even-if-they-are-identical)
 
-## Reference
+## Types
 
-### `shallow` Signature
+### Signature
 
 ```ts
 shallow<T>(a: T, b: T): boolean
 ```
+
+## Reference
+
+### `shallow(a, b)`
 
 #### Parameters
 

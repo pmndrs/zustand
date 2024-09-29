@@ -6,25 +6,37 @@ nav: 208
 
 # redux
 
-`redux`
-
 ```js
-redux(reducerFn, initialState)
+const nextStateCreatorFn = redux(reducerFn, initialState)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
+  - [Mutator](#mutator)
 - [Reference](#reference)
-  - [Signature](#redux-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
-## Reference
+## Types
 
-### `redux` Signature
+### Signature
 
 ```ts
-redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreator<T & { dispatch: (action: A) => A }, [], []>
+redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreator<T & { dispatch: (action: A) => A }, [['zustand/redux', A]], []>
 ```
+
+### Mutator
+
+<!-- prettier-ignore-start -->
+```ts
+['zustand/redux', A]
+```
+<!-- prettier-ignore-end -->
+
+## Reference
+
+### `redux(reducerFn, initialState)`
 
 #### Parameters
 

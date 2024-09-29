@@ -10,24 +10,38 @@ nav: 207
 restarts.
 
 ```js
-persist(stateCreatorFn, persistOptions)
+const nextStateCreatorFn = persist(stateCreatorFn, persistOptions)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
+  - [Mutator](#mutator)
 - [Reference](#reference)
-  - [Signature](#persist-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
   - [Cannot read property `setOptions` of undefined](#cannot-read-property-setoptions-of-undefined)
   - [Storage is not being validated or type checked](#storage-is-not-being-validated-or-type-checked)
   - [Cannot read property `setItem`/`getItem`/`removeItem` of null](#cannot-read-property-setitemgetitemremoveitem-of-null)
 
-## Reference
+## Types
 
-### `persist` Signature
+### Signature
 
 ```ts
-persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistOptions<T, U>): StateCreator<T, [], []>
+persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistOptions<T, U>): StateCreator<T, [['zustand/persist', unknown]], []>
 ```
+
+### Mutator
+
+<!-- prettier-ignore-start -->
+```ts
+['zustand/persist', unknown]
+```
+<!-- prettier-ignore-end -->
+
+## Reference
+
+### `persist(stateCreatorFn)`
 
 #### Parameters
 

@@ -7,11 +7,12 @@ nav: 213
 `useStore` is a React Hook that lets you use a vanilla store in React.
 
 ```js
-useStore(storeApi, selectorFn)
+const state = useStore(store, selectorFn)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
 - [Reference](#reference)
-  - [Signature](#usestore-signature)
 - [Usage](#usage)
   - [Use a vanilla store in React](#use-a-vanilla-store-in-react)
   - [Using dynamic vanilla stores in React](#using-dynamic-global-vanilla-stores-in-react)
@@ -20,13 +21,17 @@ useStore(storeApi, selectorFn)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
-## Reference
+## Types
 
-### `useStore` Signature
+### Signature
 
 ```ts
-useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
+useStore<StoreApi<T>, U = T>(store: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
 ```
+
+## Reference
+
+### `useStore(store, selectorFn)`
 
 #### Parameters
 

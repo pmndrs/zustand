@@ -9,26 +9,40 @@ nav: 210
 `subscribeWithSelector` middleware lets you subscribe to specific data based on current state.
 
 ```js
-subscribeWithSelector(stateCreatorFn)
+const nextStateCreatorFn = subscribeWithSelector(stateCreatorFn)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
+  - [Mutator](#mutator)
 - [Reference](#reference)
-  - [Signature](#subscribewithselector-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
-## Reference
+## Types
 
-### `subscribeWithSelector` Signature
+### Signature
 
 ```ts
-subscribeWithSelector<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [], []>
+subscribeWithSelector<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [['zustand/subscribeWithSelector', never]], []>
 ```
+
+### Mutator
+
+<!-- prettier-ignore-start -->
+```ts
+['zustand/subscribeWithSelector', never]
+```
+<!-- prettier-ignore-end -->
+
+## Reference
+
+### `subscribeWithSelector(stateCreatorFn)`
 
 #### Parameters
 
-- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
 
 #### Returns

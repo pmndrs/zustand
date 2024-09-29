@@ -9,11 +9,12 @@ However, it offers a way to define a custom equality check. This allows for more
 over when components re-render, improving performance and responsiveness.
 
 ```js
-createWithEqualityFn(stateCreatorFn, equalityFn)
+const useStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ```
 
-- [Reference](#reference)
+- [Types](#types)
   - [Signature](#createwithequalityfn-signature)
+- [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
   - [Updating Primitives in State](#updating-primitives-in-state)
@@ -24,17 +25,21 @@ createWithEqualityFn(stateCreatorFn, equalityFn)
 - [Troubleshooting](#troubleshooting)
   - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
-## Reference
+## Types
 
-### `createWithEqualityFn` Signature
+### Signature
 
 ```ts
 createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
 ```
 
+## Reference
+
+### `createWithEqualityFn(stateCreatorFn)`
+
 #### Parameters
 
-- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
 - **optional** `equalityFn`: Defaults to `Object.is`. A function that lets you skip re-renders.
 
@@ -44,6 +49,8 @@ createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: 
 lets you return data that is based on current state, using a selector function, and lets you skip
 re-renders using an equality function. It should take a selector function, and an equality function
 as arguments.
+
+## Usage
 
 ### Updating state based on previous state
 

@@ -9,11 +9,12 @@ nav: 212
 granular control over when components re-render, improving performance and responsiveness.
 
 ```js
-useStoreWithEqualityFn(storeApi, selectorFn, equalityFn)
+const state = useStoreWithEqualityFn(store, selectorFn, equalityFn)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
 - [Reference](#reference)
-  - [Signature](#usestorewithequalityfn-signature)
 - [Usage](#usage)
   - [Use a vanilla store in React](#use-a-vanilla-store-in-react)
   - [Using dynamic vanilla stores in React](#using-dynamic-global-vanilla-stores-in-react)
@@ -22,13 +23,15 @@ useStoreWithEqualityFn(storeApi, selectorFn, equalityFn)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
-## Reference
-
-### `useStoreWithEqualityFn` Signature
+### Signature
 
 ```ts
-useStoreWithEqualityFn<T, U = T>(storeApi: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: T, b: T) => boolean): U
+useStoreWithEqualityFn<T, U = T>(store: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: T, b: T) => boolean): U
 ```
+
+## Reference
+
+### `useStoreWithEqualityFn(store, selectorFn, equalityFn)`
 
 #### Parameters
 

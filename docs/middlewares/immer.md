@@ -9,83 +9,110 @@ nav: 206
 `immer` middleware lets you perform immutable updates.
 
 ```js
-immer(stateCreatorFn)
+const nextStateCreatorFn = immer(stateCreatorFn)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
+  - [Mutator](#mutator)
 - [Reference](#reference)
-  - [Signature](#immer-signature)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
-## Reference
+## Types
 
-### `immer` Signature
+### Signature
 
 ```ts
-immer<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [], []>
+immer<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [['zustand/immer', never]], []>
 ```
+
+### Mutator
+
+<!-- prettier-ignore-start -->
+```ts
+['zustand/immer', never]
+```
+<!-- prettier-ignore-end -->
+
+## Reference
+
+### `immer(stateCreatorFn)`
 
 #### Parameters
 
-- `stateCreatorFn`: The state creator function that specifies how the state gets initialized and
-  updated. It must be pure, should take `setState` function, `getState` function and `storeApi` as
-  arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
+  Usually, you will return an object with the methods you want to expose.
 
 #### Returns
 
 `immer` returns a state creator function.
 
-### `setState` function
-
-The `setState` function lets you update the state to a different value and trigger re-render. You
-can pass the next state directly, a next partial state, a function that calculates it from the
-previous state, or replace it completely.
-
-#### Parameters
-
-- `nextState`: The value that you want the state to be. It can be a value of any type, but there is
-  a special behavior for functions.
-  - If you pass an object as a `nextState`. It will shallow merge `nextState` with the current
-    state. You can pass only the properties you want to update, this allows for selective state
-    updates without modifying other properties.
-  - If you pass a non-object as a `nextState`, make sure you use `replace` as `true` to avoid
-    unexpected behaviors.
-  - If you pass a function as a `nextState`. It must be pure, should take current state as its
-    only argument, and should return the next state. The next state returned by the updater
-    function face the same restrictions of any next state.
-- `replace`: This optional boolean flag controls whether the state is completely replaced or only
-  shallow updated, through a shallow merge.
-
-#### Returns
-
-`setState` function do not have a return value.
-
-### `getState` function
-
-The `getState` function lets you access to the current state. It can be stale on asynchronous
-operations.
-
-### `subscribe` function
-
-The `subscribe` function lets you subscribe to state updates. It should take current state, and
-its previous state as arguments.
-
-#### Parameters
-
-- `currentState`: The current state.
-- `previousState`: The previous state.
-
-#### Returns
-
-`subscribe` returns a function that lets you unsubscribe from itself.
-
-### `storeApi`
-
-The `storeApi` lets you access to the store API utilities. These store API utilities are:
-`setState` function, `getState` function, and `subscribe` function.
-
 ## Usage
+
+### Updating state without boilerplate code
+
+```ts
+import { createStore } from 'zustand/vanilla'
+import { immer } from 'zustand/middleware/immer'
+
+type PersonStoreState = {
+  person: { firstName: string; lastName: string; email: string }
+}
+
+type PersonStoreActions = {
+  setPerson: (nextPerson: PersonStoreState['person']) => void
+}
+
+type PersonStore = PersonStoreState & PersonStoreActions
+
+const personStore = createStore<PersonStore>()(
+  immer((set) => ({
+    person: {
+      firstName: 'Barbara',
+      lastName: 'Hepworth',
+      email: 'bhepworth@sculpture.com',
+    },
+    setPerson: (person) => set({ person }),
+  })),
+)
+
+const $firstNameInput = document.getElementById(
+  'first-name',
+) as HTMLInputElement
+const $lastNameInput = document.getElementById('last-name') as HTMLInputElement
+const $emailInput = document.getElementById('email') as HTMLInputElement
+const $result = document.getElementById('result') as HTMLDivElement
+
+function handleFirstNameChange(event: Event) {
+  personStore.getState().person.firstName = (event.target as any).value
+}
+
+function handleLastNameChange(event: Event) {
+  personStore.getState().person.lastName = (event.target as any).value
+}
+
+function handleEmailChange(event: Event) {
+  personStore.getState().person.email = (event.target as any).value
+}
+
+$firstNameInput.addEventListener('input', handleFirstNameChange)
+$lastNameInput.addEventListener('input', handleLastNameChange)
+$emailInput.addEventListener('input', handleEmailChange)
+
+const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
+  $firstNameInput.value = state.person.firstName
+  $lastNameInput.value = state.person.lastName
+  $emailInput.value = state.person.email
+
+  $result.innerHTML = `${state.person.firstName} ${state.person.lastName} (${state.person.email})`
+}
+
+render(personStore.getInitialState(), personStore.getInitialState())
+
+personStore.subscribe(render)
+```
 
 ## Troubleshooting
 

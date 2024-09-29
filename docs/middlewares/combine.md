@@ -8,33 +8,41 @@ nav: 201
 
 `combine` middleware lets you create a cohesive state by merging an initial state with a state
 creator function that adds new state slices and actions. This is really helpful as it automatically
-infers types, so there’s no need for explicit type definitions. This makes state management more
-straightforward and efficient.
+infers types, so there’s no need for explicit type definitions.
+
+> [!TIP]
+> This makes state management more straightforward and efficient by making curried version of
+> `create` and `createStore` not necessary for middleware usage.
 
 ```js
-combine(initialState, additionalStateCreatorFn)
+const nextStateCreatorFn = combine(initialState, additionalStateCreatorFn)
 ```
 
-- [Reference](#reference)
+- [Types](#types)
   - [Signature](#combine-signature)
+- [Reference](#reference)
 - [Usage](#usage)
   - [Creating a state with inferred types](#creating-a-state-wit-inferred-types)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
-## Reference
+## Types
 
-### `combine` Signature
+### Signature
 
 ```ts
 combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [], U>): StateCreator<Omit<T, keyof U> & U, [], []>
 ```
 
+## Reference
+
+### `combine(initialState, additionalStateCreatorFn)`
+
 #### Parameters
 
 - `initialState`: The value you want the state to be initially. It can be a value of any type,
   except a function.
-- `additionalStateCreatorFn`: A function that takes `set` function, `get` function and `api` as
+- `additionalStateCreatorFn`: A function that takes `set` function, `get` function and `store` as
   arguments. Usually, you will return an object with the methods you want to expose.
 
 #### Returns
