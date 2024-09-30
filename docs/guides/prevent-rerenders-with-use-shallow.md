@@ -6,7 +6,7 @@ nav: 16
 When you need to subscribe to a computed state from a store, the recommended way is to
 use a selector.
 
-The computed selector will cause a rererender if the output has changed according to [Object.is](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is?retiredLocale=it).
+The computed selector will cause a rerender if the output has changed according to [Object.is](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is?retiredLocale=it).
 
 In this case you might want to use `useShallow` to avoid a rerender if the computed value is always shallow
 equal the previous one.
