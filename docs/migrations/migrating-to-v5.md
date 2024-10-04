@@ -187,11 +187,11 @@ const replaceFlag = Math.random() > 0.5
 store.setState(partialOrFull, replaceFlag as any)
 ```
 
-#### Persist middlware no longer store item at the store creation
+#### Persist middlware no longer stores item at store creation
 
-Previously, the `persist` middleware stored the initial state at the store creation. This behavior has been removed in v5 (and v4.5.5).
+Previously, the `persist` middleware stored the initial state during store creation. This behavior has been removed in v5 (and v4.5.5).
 
-For example, the following example stores the initial state to the storage.
+For example, in the following code, the initial state is stored in the storage.
 
 ```js
 // v4
@@ -210,7 +210,7 @@ const useCountStore = create(
 )
 ```
 
-It will not be the case in v5, and you need to explicitly set the state after the creation.
+In v5, this is no longer the case, and you need to explicitly set the state after store creation.
 
 ```js
 // v5
