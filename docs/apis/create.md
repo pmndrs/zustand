@@ -75,7 +75,8 @@ const useAgeStore = create<AgeStore>()((set) => ({
 }))
 
 export default function App() {
-  const [age, setAge] = useAgeStore((state) => [state.age, state.setAge])
+  const age = useAgeStore((state) => state.age)
+  const setAge = useAgeStore((state) => state.setAge)
 
   function increment() {
     setAge((currentAge) => currentAge + 1)

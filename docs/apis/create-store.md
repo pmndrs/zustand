@@ -47,7 +47,7 @@ createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 This example shows how you can support **updater functions** for your **actions**.
 
 ```tsx
-import { createStore } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type AgeStoreState = { age: number }
 
@@ -122,11 +122,11 @@ correctly, and avoid unexpected behaviors.
 > the state with a new one, use the `replace` parameter set to `true`
 
 ```ts
-import { create } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type XStore = number
 
-const xStore = create<XStore>()(() => 0)
+const xStore = createStore<XStore>()(() => 0)
 
 const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
 const $dot = document.getElementById('dot') as HTMLDivElement
@@ -172,7 +172,7 @@ replace the state with a new one, use the `replace` parameter set to `true` with
 discards any existing nested data within the state.
 
 ```ts
-import { create } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type PositionStoreState = { x: number; y: number }
 
@@ -182,7 +182,7 @@ type PositionStoreActions = {
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
-const positionStore = create<PositionStore>()((set) => ({
+const positionStore = createStore<PositionStore>()((set) => ({
   x: 0,
   y: 0,
   setPosition: (nextPosition) => {
@@ -242,7 +242,7 @@ replace the state with a new one, use the `replace` parameter set to `true`.
 > `shift(...)`, `splice(...)`, `reverse(...)`, and `sort(...)`.
 
 ```ts
-import { create } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type PositionStore = [number, number]
 
@@ -286,8 +286,7 @@ By subscribing to state updates, you register a callback that fires whenever the
 updates. We can use `subscribe` for external state management.
 
 ```ts
-import { useEffect } from 'react'
-import { createStore } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type PositionStoreState = { x: number; y: number }
 
@@ -361,7 +360,7 @@ values for all other fields.
 These input fields don’t work because the `oninput` handlers mutate the state:
 
 ```ts
-import { createStore } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type PersonStoreState = {
   firstName: string
@@ -470,7 +469,7 @@ Notice how you didn’t declare a separate state variable for each input field. 
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
 ```ts {32-34,38-40,44-46}
-import { createStore } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
 type PersonStoreState = {
   firstName: string
