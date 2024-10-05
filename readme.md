@@ -30,7 +30,7 @@ npm i zustand
 ```
 And the best part? It’s a no-fuss solution with almost no learning curve. In just a few lines of code, you can start managing your state like a pro, without the usual bloated setup.
 
-⚠️ Note: This guide focuses on JavaScript usage. If you’re working with TypeScript, be sure to check out our dedicated TypeScript Usage section for detailed instructions.
+⚠️ Note: This guide focuses on JavaScript usage. If you’re working with TypeScript, be sure to check out our dedicated [**TypeScript Usage Section**](#typescript-usage) for detailed instructions.
 
 Ready To Give It a Try? [Check It Out Here](https://githubbox.com/pmndrs/zustand/tree/main/examples/demo).
 
