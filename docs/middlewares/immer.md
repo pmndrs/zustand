@@ -156,6 +156,7 @@ middleware.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
+import { immer } from 'zustand/middleware/immer'
 
 type PersonStoreState = {
   person: { firstName: string; lastName: string; email: string }
@@ -171,17 +172,19 @@ type PersonStoreActions = {
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
-const personStore = createStore<PersonStore>()((set) => ({
-  person: {
-    firstName: 'Barbara',
-    lastName: 'Hepworth',
-    email: 'bhepworth@sculpture.com',
-  },
-  setPerson: (nextPerson) =>
-    set((state) => {
-      state.person = typeof nextPerson ? nextPerson(state.person) : nextPerson
-    }),
-}))
+const personStore = createStore<PersonStore>()(
+  immer((set) => ({
+    person: {
+      firstName: 'Barbara',
+      lastName: 'Hepworth',
+      email: 'bhepworth@sculpture.com',
+    },
+    setPerson: (nextPerson) =>
+      set((state) => {
+        state.person = typeof nextPerson ? nextPerson(state.person) : nextPerson
+      }),
+  })),
+)
 
 const $firstNameInput = document.getElementById(
   'first-name',
@@ -191,20 +194,20 @@ const $emailInput = document.getElementById('email') as HTMLInputElement
 const $result = document.getElementById('result') as HTMLDivElement
 
 function handleFirstNameChange(event: Event) {
-  personStore.getState().setPerson(person => {
-    person.firstName = (event.target as any).value,
+  personStore.getState().setPerson((person) => {
+    person.firstName = (event.target as any).value
   })
 }
 
 function handleLastNameChange(event: Event) {
-   personStore.getState().setPerson(person => {
-    person.lastName = (event.target as any).value,
+  personStore.getState().setPerson((person) => {
+    person.lastName = (event.target as any).value
   })
 }
 
 function handleEmailChange(event: Event) {
-   personStore.getState().setPerson(person => {
-    person.email = (event.target as any).value,
+  personStore.getState().setPerson((person) => {
+    person.email = (event.target as any).value
   })
 }
 

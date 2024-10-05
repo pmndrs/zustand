@@ -18,6 +18,9 @@ const nextStateCreatorFn = persist(stateCreatorFn, persistOptions)
   - [Mutator](#mutator)
 - [Reference](#reference)
 - [Usage](#usage)
+  - [Persisting a state](#persisting-a-state)
+  - [Persisting a partial state](#persisting-a-partial-state)
+  - [Persisting a state with custom storage](#persisting-a-state-with-custom-storage)
 - [Troubleshooting](#troubleshooting)
   - [Cannot read property `setOptions` of undefined](#cannot-read-property-setoptions-of-undefined)
   - [Storage is not being validated or type checked](#storage-is-not-being-validated-or-type-checked)
@@ -69,18 +72,142 @@ persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistO
 
 ## Usage
 
+### Persisting a state
+
+```ts
+import { createStore } from 'zustand/vanilla'
+import { persist } from 'zustand/middleware/persist'
+
+type PositionStoreState = { position: { x: number; y: number } }
+
+type PositionStoreActions = {
+  setPosition: (nextPosition: PositionStoreState['position']) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const positionStore = createStore<PositionStore>()(
+  persist(
+    (set) => ({
+      position: { x: 0, y: 0 },
+      setPosition: (position) => set({ position }),
+    }),
+    { name: 'position-storage' },
+  ),
+)
+
+const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dotContainer.addEventListener('pointermove', (event) => {
+  positionStore.getState().setPosition({
+    x: event.clientX,
+    y: event.clientY,
+  })
+})
+
+const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  $dot.style.transform = `translate(${state.position.x}px, ${state.position.y}px)`
+}
+
+render(positionStore.getInitialState(), positionStore.getInitialState())
+
+positionStore.subscribe(render)
+```
+
+### Persisting a partial state
+
+```ts
+import { createStore } from 'zustand/vanilla'
+import { persist } from 'zustand/middleware/persist'
+
+type PositionStoreState = { position: { x: number; y: number } }
+
+type PositionStoreActions = {
+  setPosition: (nextPosition: PositionStoreState['position']) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const positionStore = createStore<PositionStore>()(
+  persist(
+    (set) => ({
+      position: { x: 0, y: 0 },
+      setPosition: (position) => set({ position }),
+    }),
+    { name: 'position-storage' },
+  ),
+)
+
+const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dotContainer.addEventListener('pointermove', (event) => {
+  positionStore.getState().setPosition({
+    x: event.clientX,
+    y: event.clientY,
+  })
+})
+
+const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  $dot.style.transform = `translate(${state.position.x}px, ${state.position.y}px)`
+}
+
+render(positionStore.getInitialState(), positionStore.getInitialState())
+
+positionStore.subscribe(render)
+```
+
+### Persisting a state with custom storage
+
+```ts
+import { createStore } from 'zustand/vanilla'
+import { persist, createJSONStorage } from 'zustand/middleware/persist'
+
+type PositionStoreState = { position: { x: number; y: number } }
+
+type PositionStoreActions = {
+  setPosition: (nextPosition: PositionStoreState['position']) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const positionStore = createStore<PositionStore>()(
+  persist(
+    (set) => ({
+      position: { x: 0, y: 0 },
+      setPosition: (position) => set({ position }),
+    }),
+    {
+      name: 'position-storage',
+      storage: createJSONStorage(() => sessionStorage),
+    },
+  ),
+)
+
+const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
+const $dot = document.getElementById('dot') as HTMLDivElement
+
+$dotContainer.addEventListener('pointermove', (event) => {
+  positionStore.getState().setPosition({
+    x: event.clientX,
+    y: event.clientY,
+  })
+})
+
+const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
+  $dot.style.transform = `translate(${state.position.x}px, ${state.position.y}px)`
+}
+
+render(positionStore.getInitialState(), positionStore.getInitialState())
+
+positionStore.subscribe(render)
+```
+
 ## Troubleshooting
 
 ### Cannot read property `setOptions` of undefined
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum reprehenderit eaque excepturi,
-cumque officia incidunt repellendus, fugit soluta dolore perspiciatis laudantium voluptatem
-repudiandae illum ipsum quam, perferendis iusto a aperiam!
-
 ### Storage is not being validated or type checked
-
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum ratione aspernatur dolores ut in
-erferendis quis reprehenderit iure numquam minima laborum vero unde, eum laudantium! Minima beatae
-natus tempore est.
 
 ### Cannot read property `setItem`/`getItem`/`removeItem` of null

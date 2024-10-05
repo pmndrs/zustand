@@ -17,6 +17,7 @@ const nextStateCreatorFn = redux(reducerFn, initialState)
   - [Mutator](#mutator)
 - [Reference](#reference)
 - [Usage](#usage)
+  - [Updating state through actions and reducers](#updating-state-through-actions-and-reducers)
 - [Troubleshooting](#troubleshooting)
   - TBD
 
@@ -57,6 +58,7 @@ redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreato
 
 ```ts
 import { createStore } from 'zustand/vanilla'
+import { redux } from 'zustand/middleware/redux'
 
 type PersonStoreState = {
   firstName: string

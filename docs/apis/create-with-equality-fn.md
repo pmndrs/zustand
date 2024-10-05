@@ -392,9 +392,11 @@ export default function MovingDot() {
   const setPosition = usePositionStore((state) => state.setPosition)
 
   useEffect(() => {
-    const unsubscribePositionStore = usePositionStore.subscribe(({ x, y }) => {
-      console.log('new position', { position: { x, y } })
-    })
+    const unsubscribePositionStore = usePositionStore.subscribe(
+      ({ position }) => {
+        console.log('new position', { position })
+      },
+    )
 
     return () => {
       unsubscribePositionStore()
