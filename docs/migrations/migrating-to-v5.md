@@ -18,6 +18,7 @@ We highly recommend to update to the latest version of v4, before migrating to v
 - Organize entry points in the package.json
 - Drop ES5 support
 - Stricter types when setState's replace flag is set
+- Persist middleware behavioral change
 - Other small improvements (technically breaking changes)
 
 ## Migration Guide
@@ -184,6 +185,51 @@ If the value of the `replace` flag is dynamic and determined at runtime, you mig
 ```ts
 const replaceFlag = Math.random() > 0.5
 store.setState(partialOrFull, replaceFlag as any)
+```
+
+#### Persist middlware no longer stores item at store creation
+
+Previously, the `persist` middleware stored the initial state during store creation. This behavior has been removed in v5 (and v4.5.5).
+
+For example, in the following code, the initial state is stored in the storage.
+
+```js
+// v4
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useCountStore = create(
+  persist(
+    () => ({
+      count: Math.floor(Math.random() * 1000),
+    }),
+    {
+      name: 'count',
+    },
+  ),
+)
+```
+
+In v5, this is no longer the case, and you need to explicitly set the state after store creation.
+
+```js
+// v5
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useCountStore = create(
+  persist(
+    () => ({
+      count: 0,
+    }),
+    {
+      name: 'count',
+    },
+  ),
+)
+useCountStore.setState({
+  count: Math.floor(Math.random() * 1000),
+})
 ```
 
 ## Links
