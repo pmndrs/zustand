@@ -234,14 +234,17 @@ If you are eager to know what the answer is to this particular problem then you 
 
 ### Handling Dynamic `replace` Flag
 
-If the value of the `replace` flag is not known at compile time and is determined dynamically, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with `as any`:
+If the value of the `replace` flag is not known at compile time and is determined dynamically, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with the parameters of the `setState` function:
 
 ```ts
 const replaceFlag = Math.random() > 0.5
-store.setState(partialOrFull, replaceFlag as any)
+const args = [{ bears: 5 }, replaceFlag] as Parameters<
+  typeof useBearStore.setState
+>
+store.setState(...args)
 ```
 
-#### Example with `as any` Workaround
+#### Example with `as Parameters` Workaround
 
 ```ts
 import { create } from 'zustand'
@@ -257,7 +260,10 @@ const useBearStore = create<BearState>()((set) => ({
 }))
 
 const replaceFlag = Math.random() > 0.5
-useBearStore.setState({ bears: 5 }, replaceFlag as any) // Using the workaround
+const args = [{ bears: 5 }, replaceFlag] as Parameters<
+  typeof useBearStore.setState
+>
+useBearStore.setState(...args) // Using the workaround
 ```
 
 By following this approach, you can ensure that your code handles dynamic `replace` flags without encountering type issues.
@@ -267,10 +273,10 @@ By following this approach, you can ensure that your code handles dynamic `repla
 ### Middleware that doesn't change the store type
 
 ```ts
-import { create, State, StateCreator, StoreMutatorIdentifier } from 'zustand'
+import { create, StateCreator, StoreMutatorIdentifier } from 'zustand'
 
 type Logger = <
-  T extends State,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
 >(
@@ -278,20 +284,19 @@ type Logger = <
   name?: string,
 ) => StateCreator<T, Mps, Mcs>
 
-type LoggerImpl = <T extends State>(
+type LoggerImpl = <T>(
   f: StateCreator<T, [], []>,
   name?: string,
 ) => StateCreator<T, [], []>
 
 const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
-  type T = ReturnType<typeof f>
   const loggedSet: typeof set = (...a) => {
-    set(...a)
+    set(...(a as Parameters<typeof set>))
     console.log(...(name ? [`${name}:`] : []), get())
   }
   const setState = store.setState
   store.setState = (...a) => {
-    setState(...a)
+    setState(...(a as Parameters<typeof setState>))
     console.log(...(name ? [`${name}:`] : []), store.getState())
   }
 
@@ -318,7 +323,6 @@ const useBearStore = create<BearState>()(
 ```ts
 import {
   create,
-  State,
   StateCreator,
   StoreMutatorIdentifier,
   Mutate,
@@ -326,7 +330,7 @@ import {
 } from 'zustand'
 
 type Foo = <
-  T extends State,
+  T,
   A,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
@@ -341,7 +345,7 @@ declare module 'zustand' {
   }
 }
 
-type FooImpl = <T extends State, A>(
+type FooImpl = <T, A>(
   f: StateCreator<T, [], []>,
   bar: A,
 ) => StateCreator<T, [], []>
