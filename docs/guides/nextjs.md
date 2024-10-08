@@ -1,6 +1,6 @@
 ---
 title: Setup with Next.js
-nav: 21
+nav: 17
 ---
 
 [Next.js](https://nextjs.org) is a popular server-side rendering framework for React that presents

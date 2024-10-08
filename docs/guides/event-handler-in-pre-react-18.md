@@ -1,6 +1,6 @@
 ---
 title: Calling actions outside a React event handler in pre React 18
-nav: 10
+nav: 9
 ---
 
 Because React handles `setState` synchronously if it's called outside an event handler, updating the state outside an event handler will force react to update the components synchronously. Therefore, there is a risk of encountering the zombie-child effect.

@@ -1,6 +1,6 @@
 ---
 title: Map and Set Usage
-nav: 11
+nav: 10
 ---
 
 You need to wrap Maps and Sets inside an object. When you want its update to be reflected (e.g. in React),
