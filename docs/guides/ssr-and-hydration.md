@@ -1,6 +1,6 @@
 ---
 title: SSR and Hydration
-nav: 20
+nav: 16
 ---
 
 ## Server-side Rendering (SSR)

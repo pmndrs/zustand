@@ -1,6 +1,6 @@
 ---
 title: 'How to Migrate to v5 from v4'
-nav: 30
+nav: 23
 ---
 
 # How to Migrate to v5 from v4

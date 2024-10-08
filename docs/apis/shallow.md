@@ -1,7 +1,7 @@
 ---
 title: shallow
 description: How compare simple data effectively
-nav: 209
+nav: 27
 ---
 
 `shallow` lets you run fast checks on simple data structures. It effectively identifies changes in

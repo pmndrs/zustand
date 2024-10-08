@@ -1,7 +1,7 @@
 ---
 title: create ⚛️
 description: How to create stores
-nav: 204
+nav: 26
 ---
 
 `create` lets you create a React Hook with API utilities attached.
