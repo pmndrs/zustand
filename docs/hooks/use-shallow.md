@@ -67,7 +67,7 @@ function BearNames() {
 }
 ```
 
-Next, we will create a `UpdateBabyBearMeal` component that periodically updates babe bear's meal
+Next, we will create a `UpdateBabyBearMeal` component that periodically updates baby bear's meal
 choice.
 
 ```tsx
