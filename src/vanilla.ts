@@ -15,13 +15,9 @@ export interface StoreApi<T> {
 
 type Get<T, K, F> = K extends keyof T ? T[K] : F
 
-export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]
-  ? S
-  : Ms extends []
-    ? S
-    : Ms extends [[infer Mi, infer Ma], ...infer Mrs]
-      ? Mutate<StoreMutators<S, Ma>[Mi & StoreMutatorIdentifier], Mrs>
-      : never
+export type Mutate<S, Ms extends [StoreMutatorIdentifier, unknown][]> = S & {
+  [K in Ms[number][0]]: StoreMutators<S, Ms[number][1]>[K]
+}
 
 export type StateCreator<
   T,
