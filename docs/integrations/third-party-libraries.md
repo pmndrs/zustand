@@ -45,6 +45,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
 - [zustand-di](https://github.com/charkour/zustand-di) — use react props to init zustand stores
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
+- [zustand-hash-storage](https://github.com/MartinGamesCZ/zustand-hash-storage) — Zustand middleware for saving state into URL hash, b64 encoded (can be configured) and debounce timer.
 - [zustand-injectors](https://github.com/zustandjs/zustand-injectors) — A sweet way to lazy load slices
 - [zustand-interval-persist](https://www.npmjs.com/package/zustand-interval-persist) — An enhancement for zustand that enables automatic saving of the store's state to the specified storage at regular interval.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
