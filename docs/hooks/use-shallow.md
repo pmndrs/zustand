@@ -1,7 +1,7 @@
 ---
 title: useShallow ⚛️
 description: How to memoize selector functions
-nav: 211
+nav: 28
 ---
 
 `useShallow` is a React Hook that lets you optimize re-renders.
@@ -69,7 +69,7 @@ function BearNames() {
 }
 ```
 
-Next, we will create a `UpdateBabyBearMeal` component that periodically updates babe bear's meal
+Next, we will create a `UpdateBabyBearMeal` component that periodically updates baby bear's meal
 choice.
 
 ```tsx

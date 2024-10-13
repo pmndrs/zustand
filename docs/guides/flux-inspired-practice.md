@@ -1,6 +1,6 @@
 ---
 title: Flux inspired practice
-nav: 5
+nav: 4
 ---
 
 Although Zustand is an unopinionated library, we do recommend a few patterns.

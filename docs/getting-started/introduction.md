@@ -5,7 +5,7 @@ nav: 0
 ---
 
 <div class="flex justify-center mb-4">
-  <img src="../bear.jpg" />
+  <img src="../bear.jpg" alt="Logo Zustand" />
 </div>
 
 A small, fast, and scalable bearbones state management solution.
