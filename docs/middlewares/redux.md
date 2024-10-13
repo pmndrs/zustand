@@ -19,7 +19,6 @@ const nextStateCreatorFn = redux(reducerFn, initialState)
 - [Usage](#usage)
   - [Updating state through actions and reducers](#updating-state-through-actions-and-reducers)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ## Types
 

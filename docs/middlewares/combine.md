@@ -24,7 +24,6 @@ const nextStateCreatorFn = combine(initialState, additionalStateCreatorFn)
 - [Usage](#usage)
   - [Creating a state with inferred types](#creating-a-state-wit-inferred-types)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ## Types
 

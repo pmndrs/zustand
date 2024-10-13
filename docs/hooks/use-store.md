@@ -19,7 +19,6 @@ const state = useStore(store, selectorFn)
   - [Using scoped (non-global) vanilla store in React](#using-scoped-non-global-vanilla-store-in-react)
   - [Using dynamic scoped (non-global) vanilla stores in React](#using-dynamic-scoped-non-global-vanilla-stores-in-react)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ## Types
 

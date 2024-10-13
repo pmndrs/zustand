@@ -16,7 +16,6 @@ const memoizedSelector = useShallow(selector)
 - [Usage](#usage)
   - [Writing a memoized selector](#writing-a-memoized-selector)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ### Signature
 

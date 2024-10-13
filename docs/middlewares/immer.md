@@ -18,7 +18,6 @@ const nextStateCreatorFn = immer(stateCreatorFn)
 - [Reference](#reference)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ## Types
 

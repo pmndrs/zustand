@@ -18,7 +18,6 @@ const nextStateCreatorFn = subscribeWithSelector(stateCreatorFn)
 - [Reference](#reference)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
 ## Types
 
