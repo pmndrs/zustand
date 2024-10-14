@@ -9,7 +9,7 @@ However, it offers a way to define a custom equality check. This allows for more
 over when components re-render, improving performance and responsiveness.
 
 ```js
-const useStore = createWithEqualityFn(stateCreatorFn, equalityFn)
+const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ```
 
 - [Types](#types)
