@@ -4,9 +4,6 @@
   "private": true,
   "type": "commonjs",
   "version": "5.0.0",
-  "publishConfig": {
-    "tag": "next"
-  },
   "main": "./index.js",
   "types": "./index.d.ts",
   "typesVersions": {
