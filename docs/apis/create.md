@@ -7,7 +7,7 @@ nav: 26
 `create` lets you create a React Hook with API utilities attached.
 
 ```js
-const useStore = create(stateCreatorFn)
+const useSomeStore = create(stateCreatorFn)
 ```
 
 - [Types](#types)
