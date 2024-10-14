@@ -9,7 +9,7 @@ nav: 29
 granular control over when components re-render, improving performance and responsiveness.
 
 ```js
-const state = useStoreWithEqualityFn(store, selectorFn, equalityFn)
+const someState = useStoreWithEqualityFn(store, selectorFn, equalityFn)
 ```
 
 - [Types](#types)
