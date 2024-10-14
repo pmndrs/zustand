@@ -7,7 +7,7 @@ nav: 30
 `useStore` is a React Hook that lets you use a vanilla store in React.
 
 ```js
-const state = useStore(store, selectorFn)
+const someState = useStore(store, selectorFn)
 ```
 
 - [Types](#types)
