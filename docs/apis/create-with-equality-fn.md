@@ -9,11 +9,12 @@ However, it offers a way to define a custom equality check. This allows for more
 over when components re-render, improving performance and responsiveness.
 
 ```js
-createWithEqualityFn(stateCreatorFn, equalityFn)
+const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ```
 
-- [Reference](#reference)
+- [Types](#types)
   - [Signature](#createwithequalityfn-signature)
+- [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
   - [Updating Primitives in State](#updating-primitives-in-state)
@@ -24,17 +25,21 @@ createWithEqualityFn(stateCreatorFn, equalityFn)
 - [Troubleshooting](#troubleshooting)
   - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
-## Reference
+## Types
 
-### `createWithEqualityFn` Signature
+### Signature
 
 ```ts
 createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
 ```
 
+## Reference
+
+### `createWithEqualityFn(stateCreatorFn)`
+
 #### Parameters
 
-- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
 - **optional** `equalityFn`: Defaults to `Object.is`. A function that lets you skip re-renders.
 
@@ -45,12 +50,14 @@ lets you return data that is based on current state, using a selector function, 
 re-renders using an equality function. It should take a selector function, and an equality function
 as arguments.
 
+## Usage
+
 ### Updating state based on previous state
 
 To update a state based on previous state we should use **updater functions**. Read more
 about that [here](https://react.dev/learn/queueing-a-series-of-state-updates).
 
-This example shows how you can support **updater functions** for your **actions**.
+This example shows how you can support **updater functions** within **actions**.
 
 ```tsx
 import { createWithEqualityFn } from 'zustand/traditional'
@@ -71,11 +78,10 @@ type AgeStore = AgeStoreState & AgeStoreActions
 const useAgeStore = createWithEqualityFn<AgeStore>()(
   (set) => ({
     age: 42,
-    setAge: (nextAge) => {
+    setAge: (nextAge) =>
       set((state) => ({
         age: typeof nextAge === 'function' ? nextAge(state.age) : nextAge,
-      }))
-    },
+      })),
   }),
   shallow,
 )
@@ -182,30 +188,25 @@ discards any existing nested data within the state.
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const usePositionStore = createWithEqualityFn<PositionStore>()(
   (set) => ({
-    x: 0,
-    y: 0,
-    setPosition: (nextPosition) => {
-      set(nextPosition)
-    },
+    position: { x: 0, y: 0 },
+    setPosition: (position) => set({ position }),
   }),
   shallow,
 )
 
 export default function MovingDot() {
-  const [position, setPosition] = usePositionStore((state) => [
-    { x: state.x, y: state.y },
-    state.setPosition,
-  ])
+  const position = usePositionStore((state) => state.position)
+  const setPosition = usePositionStore((state) => state.setPosition)
 
   return (
     <div
@@ -267,10 +268,10 @@ const usePositionStore = createWithEqualityFn<PositionStore>()(
 
 export default function MovingDot() {
   const [x, y] = usePositionStore()
+  const position = { x, y }
   const setPosition: typeof usePositionStore.setState = (nextPosition) => {
     usePositionStore.setState(nextPosition, true)
   }
-  const position = { x, y }
 
   return (
     <div
@@ -370,35 +371,32 @@ import { useEffect } from 'react'
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const usePositionStore = createWithEqualityFn<PositionStore>()(
   (set) => ({
-    x: 0,
-    y: 0,
-    setPosition: (nextPosition) => {
-      set(nextPosition)
-    },
+    position: { x: 0, y: 0 },
+    setPosition: (nextPosition) => set(nextPosition),
   }),
   shallow,
 )
 
 export default function MovingDot() {
-  const [position, setPosition] = usePositionStore((state) => [
-    { x: state.x, y: state.y },
-    state.setPosition,
-  ])
+  const position = usePositionStore((state) => state.position)
+  const setPosition = usePositionStore((state) => state.setPosition)
 
   useEffect(() => {
-    const unsubscribePositionStore = usePositionStore.subscribe(({ x, y }) => {
-      console.log('new position', { position: { x, y } })
-    })
+    const unsubscribePositionStore = usePositionStore.subscribe(
+      ({ position }) => {
+        console.log('new position', { position })
+      },
+    )
 
     return () => {
       unsubscribePositionStore()
@@ -456,48 +454,40 @@ import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
 
 type PersonStoreState = {
-  firstName: string
-  lastName: string
-  email: string
+  person: { firstName: string; lastName: string; email: string }
 }
 
 type PersonStoreActions = {
-  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+  setPerson: (nextPerson: PersonStoreState['person']) => void
 }
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
 const usePersonStore = createWithEqualityFn<PersonStore>()(
   (set) => ({
-    firstName: 'Barbara',
-    lastName: 'Hepworth',
-    email: 'bhepworth@sculpture.com',
-    setPerson: (nextPerson) => {
-      set(nextPerson)
+    person: {
+      firstName: 'Barbara',
+      lastName: 'Hepworth',
+      email: 'bhepworth@sculpture.com',
     },
+    setPerson: (person) => set({ person }),
   }),
   shallow,
 )
 
 export default function Form() {
-  const [person] = usePersonStore((state) => [
-    {
-      firstName: state.firstName,
-      lastName: state.lastName,
-      email: state.email,
-    },
-    state.setPerson,
-  ])
+  const person = usePersonStore((state) => state.person)
+  const setPerson = usePersonStore((state) => state.setPerson)
 
-  function handleFirstNameChange(e) {
+  function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
     person.firstName = e.target.value
   }
 
-  function handleLastNameChange(e) {
+  function handleLastNameChange(e: ChangeEvent<HTMLInputElement>) {
     person.lastName = e.target.value
   }
 
-  function handleEmailChange(e) {
+  function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
     person.email = e.target.value
   }
 
@@ -534,9 +524,7 @@ The reliable way to get the behavior you’re looking for is to create a new obj
 fields has changed:
 
 ```ts
-setPerson({
-  firstName: e.target.value, // New first name from the input
-})
+setPerson({ ...person, firstName: e.target.value }) // New first name from the input
 ```
 
 > [!NOTE]
@@ -548,54 +536,47 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```tsx {39,43,47}
+```tsx {32,36,40}
+import { type ChangeEvent } from 'react'
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
 
 type PersonStoreState = {
-  firstName: string
-  lastName: string
-  email: string
+  person: { firstName: string; lastName: string; email: string }
 }
 
 type PersonStoreActions = {
-  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+  setPerson: (nextPerson: PersonStoreState['person']) => void
 }
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
 const usePersonStore = createWithEqualityFn<PersonStore>()(
   (set) => ({
-    firstName: 'Barbara',
-    lastName: 'Hepworth',
-    email: 'bhepworth@sculpture.com',
-    setPerson: (nextPerson) => {
-      set(nextPerson)
+    person: {
+      firstName: 'Barbara',
+      lastName: 'Hepworth',
+      email: 'bhepworth@sculpture.com',
     },
+    setPerson: (person) => set({ person }),
   }),
   shallow,
 )
 
 export default function Form() {
-  const [person, setPerson] = usePersonStore((state) => [
-    {
-      firstName: state.firstName,
-      lastName: state.lastName,
-      email: state.email,
-    },
-    state.setPerson,
-  ])
+  const person = usePersonStore((state) => state.person)
+  const setPerson = usePersonStore((state) => state.setPerson)
 
-  function handleFirstNameChange(e) {
-    setPerson({ firstName: e.target.value })
+  function handleFirstNameChange(e: ChangeEvent<HTLMInputElement>) {
+    setPerson({ ...person, firstName: e.target.value })
   }
 
-  function handleLastNameChange(e) {
-    setPerson({ lastName: e.target.value })
+  function handleLastNameChange(e: ChangeEvent<HTLMInputElement>) {
+    setPerson({ ...person, lastName: e.target.value })
   }
 
-  function handleEmailChange(e) {
-    setPerson({ email: e.target.value })
+  function handleEmailChange(e: ChangeEvent<HTLMInputElement>) {
+    setPerson({ ...person, email: e.target.value })
   }
 
   return (

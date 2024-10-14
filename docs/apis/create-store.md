@@ -7,32 +7,36 @@ nav: 24
 `createStore` lets you create a vanilla store that exposes API utilities.
 
 ```js
-createStore(stateCreatorFn)
+const someStore = createStore(stateCreatorFn)
 ```
 
-- [Reference](#reference)
+- [Types](#types)
   - [Signature](#createstore-signature)
+- [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
   - [Updating Primitives in State](#updating-primitives-in-state)
   - [Updating Objects in State](#updating-objects-in-state)
   - [Updating Arrays in State](#updating-arrays-in-state)
-  - [Updating state with no store actions](#updating-state-with-no-store-actions)
   - [Subscribing to state updates](#subscribing-to-state-updates)
 - [Troubleshooting](#troubleshooting)
   - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
-## Reference
+## Types
 
-### `createStore` Signature
+### Signature
 
 ```ts
 createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 ```
 
+## Reference
+
+### `createStore(stateCreatorFn)`
+
 #### Parameters
 
-- `stateCreatorFn`: A function that takes `set` function, `get` function and `api` as arguments.
+- `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
 
 #### Returns
@@ -44,7 +48,7 @@ createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 
 ### Updating state based on previous state
 
-This example shows how you can support **updater functions** for your **actions**.
+This example shows how you can support **updater functions** within **actions**.
 
 ```tsx
 import { createStore } from 'zustand/vanilla'
@@ -63,11 +67,10 @@ type AgeStore = AgeStoreState & AgeStoreActions
 
 const ageStore = createStore<AgeStore>()((set) => ({
   age: 42,
-  setAge: (nextAge) => {
+  setAge: (nextAge) =>
     set((state) => ({
       age: typeof nextAge === 'function' ? nextAge(state.age) : nextAge,
-    }))
-  },
+    })),
 }))
 
 function increment() {
@@ -135,10 +138,8 @@ $dotContainer.addEventListener('pointermove', (event) => {
   xStore.setState(event.clientX, true)
 })
 
-const render: Parameters<typeof xStore.subscribe>[0] = (state) => {
-  const position = { y: 0, x: state }
-
-  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+const render: Parameters<typeof xStore.subscribe>[0] = (x) => {
+  $dot.style.transform = `translate(${x}px, 0)`
 }
 
 render(xStore.getInitialState(), xStore.getInitialState())
@@ -174,20 +175,17 @@ discards any existing nested data within the state.
 ```ts
 import { createStore } from 'zustand/vanilla'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
-  x: 0,
-  y: 0,
-  setPosition: (nextPosition) => {
-    set(nextPosition)
-  },
+  position: { x: 0, y: 0 },
+  setPosition: (position) => set({ position }),
 }))
 
 const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
@@ -201,9 +199,7 @@ $dotContainer.addEventListener('pointermove', (event) => {
 })
 
 const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
-  const position = { x: state.x, y: state.y }
-
-  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+  $dot.style.transform = `translate(${state.position.x}px, ${state.position.y}px)`
 }
 
 render(positionStore.getInitialState(), positionStore.getInitialState())
@@ -255,10 +251,8 @@ $dotContainer.addEventListener('pointermove', (event) => {
   positionStore.setState([event.clientX, event.clientY], true)
 })
 
-const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
-  const position = { x: state[0], y: state[1] }
-
-  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+const render: Parameters<typeof positionStore.subscribe>[0] = ([x, y]) => {
+  $dot.style.transform = `translate(${x}px, ${y}px)`
 }
 
 render(positionStore.getInitialState(), positionStore.getInitialState())
@@ -288,20 +282,17 @@ updates. We can use `subscribe` for external state management.
 ```ts
 import { createStore } from 'zustand/vanilla'
 
-type PositionStoreState = { x: number; y: number }
+type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
-  setPosition: (nextPosition: Partial<PositionStoreState>) => void
+  setPosition: (nextPosition: PositionStoreState['position']) => void
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
-  x: 0,
-  y: 0,
-  setPosition: (nextPosition) => {
-    set(nextPosition)
-  },
+  position: { x: 0, y: 0 },
+  setPosition: (position) => set({ position }),
 }))
 
 const $dot = document.getElementById('dot') as HTMLDivElement
@@ -318,9 +309,7 @@ $dot.addEventListener('mouseenter', (event) => {
 })
 
 const render: Parameters<typeof positionStore.subscribe>[0] = (state) => {
-  const position = { x: state.x, y: state.y }
-
-  $dot.style.transform = `translate(${position.x}px, ${position.y}px)`
+  $dot.style.transform = `translate(${state.position.x}px, ${state.position.y}px)`
 }
 
 render(positionStore.getInitialState(), positionStore.getInitialState())
@@ -328,7 +317,7 @@ render(positionStore.getInitialState(), positionStore.getInitialState())
 positionStore.subscribe(render)
 
 const logger: Parameters<typeof positionStore.subscribe>[0] = (state) => {
-  console.log('new position', { position: { x: state.x, y: state.x } })
+  console.log('new position', { position: state.position })
 }
 
 positionStore.subscribe(logger)
@@ -363,24 +352,22 @@ These input fields don’t work because the `oninput` handlers mutate the state:
 import { createStore } from 'zustand/vanilla'
 
 type PersonStoreState = {
-  firstName: string
-  lastName: string
-  email: string
+  person: { firstName: string; lastName: string; email: string }
 }
 
 type PersonStoreActions = {
-  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+  setPerson: (nextPerson: PersonStoreState['person']) => void
 }
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
 const personStore = createStore<PersonStore>()((set) => ({
-  firstName: 'Barbara',
-  lastName: 'Hepworth',
-  email: 'bhepworth@sculpture.com',
-  setPerson: (nextPerson) => {
-    set(nextPerson)
+  person: {
+    firstName: 'Barbara',
+    lastName: 'Hepworth',
+    email: 'bhepworth@sculpture.com',
   },
+  setPerson: (person) => set({ person }),
 }))
 
 const $firstNameInput = document.getElementById(
@@ -391,15 +378,15 @@ const $emailInput = document.getElementById('email') as HTMLInputElement
 const $result = document.getElementById('result') as HTMLDivElement
 
 function handleFirstNameChange(event: Event) {
-  personStore.getState().firstName = (event.target as any).value
+  personStore.getState().person.firstName = (event.target as any).value
 }
 
 function handleLastNameChange(event: Event) {
-  personStore.getState().lastName = (event.target as any).value
+  personStore.getState().person.lastName = (event.target as any).value
 }
 
 function handleEmailChange(event: Event) {
-  personStore.getState().email = (event.target as any).value
+  personStore.getState().person.email = (event.target as any).value
 }
 
 $firstNameInput.addEventListener('input', handleFirstNameChange)
@@ -407,17 +394,11 @@ $lastNameInput.addEventListener('input', handleLastNameChange)
 $emailInput.addEventListener('input', handleEmailChange)
 
 const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
-  const person = {
-    firstName: state.firstName,
-    lastName: state.lastName,
-    email: state.email,
-  }
+  $firstNameInput.value = state.person.firstName
+  $lastNameInput.value = state.person.lastName
+  $emailInput.value = state.person.email
 
-  $firstNameInput.value = person.firstName
-  $lastNameInput.value = person.lastName
-  $emailInput.value = person.email
-
-  $result.innerHTML = `${person.firstName} ${person.lastName} (${person.email})`
+  $result.innerHTML = `${state.person.firstName} ${state.person.lastName} (${state.person.email})`
 }
 
 render(personStore.getInitialState(), personStore.getInitialState())
@@ -472,24 +453,22 @@ keeping all data grouped in an object is very convenient—as long as you update
 import { createStore } from 'zustand/vanilla'
 
 type PersonStoreState = {
-  firstName: string
-  lastName: string
-  email: string
+  person: { firstName: string; lastName: string; email: string }
 }
 
 type PersonStoreActions = {
-  setPerson: (nextPerson: Partial<PersonStoreState>) => void
+  setPerson: (nextPerson: PersonStoreState['person']) => void
 }
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
 const personStore = createStore<PersonStore>()((set) => ({
-  firstName: 'Barbara',
-  lastName: 'Hepworth',
-  email: 'bhepworth@sculpture.com',
-  setPerson: (nextPerson) => {
-    set(nextPerson)
+  person: {
+    firstName: 'Barbara',
+    lastName: 'Hepworth',
+    email: 'bhepworth@sculpture.com',
   },
+  setPerson: (person) => set({ person }),
 }))
 
 const $firstNameInput = document.getElementById(
@@ -501,18 +480,21 @@ const $result = document.getElementById('result') as HTMLDivElement
 
 function handleFirstNameChange(event: Event) {
   personStore.getState().setPerson({
+    ...personStore.getState().person,
     firstName: (event.target as any).value,
   })
 }
 
 function handleLastNameChange(event: Event) {
   personStore.getState().setPerson({
+    ...personStore.getState().person,
     lastName: (event.target as any).value,
   })
 }
 
 function handleEmailChange(event: Event) {
   personStore.getState().setPerson({
+    ...personStore.getState().person,
     email: (event.target as any).value,
   })
 }
@@ -522,17 +504,11 @@ $lastNameInput.addEventListener('input', handleLastNameChange)
 $emailInput.addEventListener('input', handleEmailChange)
 
 const render: Parameters<typeof personStore.subscribe>[0] = (state) => {
-  const person = {
-    firstName: state.firstName,
-    lastName: state.lastName,
-    email: state.email,
-  }
+  $firstNameInput.value = state.person.firstName
+  $lastNameInput.value = state.person.lastName
+  $emailInput.value = state.person.email
 
-  $firstNameInput.value = person.firstName
-  $lastNameInput.value = person.lastName
-  $emailInput.value = person.email
-
-  $result.innerHTML = `${person.firstName} ${person.lastName} (${person.email})`
+  $result.innerHTML = `${state.person.firstName} ${state.person.lastName} (${state.person.email})`
 }
 
 render(personStore.getInitialState(), personStore.getInitialState())

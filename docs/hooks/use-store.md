@@ -7,26 +7,30 @@ nav: 30
 `useStore` is a React Hook that lets you use a vanilla store in React.
 
 ```js
-useStore(storeApi, selectorFn)
+const someState = useStore(store, selectorFn)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
 - [Reference](#reference)
-  - [Signature](#usestore-signature)
 - [Usage](#usage)
   - [Use a vanilla store in React](#use-a-vanilla-store-in-react)
   - [Using dynamic vanilla stores in React](#using-dynamic-global-vanilla-stores-in-react)
   - [Using scoped (non-global) vanilla store in React](#using-scoped-non-global-vanilla-store-in-react)
   - [Using dynamic scoped (non-global) vanilla stores in React](#using-dynamic-scoped-non-global-vanilla-stores-in-react)
 - [Troubleshooting](#troubleshooting)
-  - TBD
+
+## Types
+
+### Signature
+
+```ts
+useStore<StoreApi<T>, U = T>(store: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
+```
 
 ## Reference
 
-### `useStore` Signature
-
-```ts
-useStore<StoreApi<T>, U = T>(storeApi: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
-```
+### `useStore(store, selectorFn)`
 
 #### Parameters
 
@@ -56,9 +60,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
   position: { x: 0, y: 0 },
-  setPosition: (position) => {
-    set({ position })
-  },
+  setPosition: (position) => set({ position }),
 }))
 ```
 
@@ -124,9 +126,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 
 const positionStore = createStore<PositionStore>()((set) => ({
   position: { x: 0, y: 0 },
-  setPosition: (position) => {
-    set({ position })
-  },
+  setPosition: (position) => set({ position }),
 }))
 
 function MovingDot() {
@@ -410,9 +410,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 const createPositionStore = () => {
   return createStore<PositionStore>()((set) => ({
     position: { x: 0, y: 0 },
-    setPosition: (position) => {
-      set({ position })
-    },
+    setPosition: (position) => set({ position }),
   }))
 }
 ```
@@ -530,9 +528,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 const createPositionStore = () => {
   return createStore<PositionStore>()((set) => ({
     position: { x: 0, y: 0 },
-    setPosition: (position) => {
-      set({ position })
-    },
+    setPosition: (position) => set({ position }),
   }))
 }
 

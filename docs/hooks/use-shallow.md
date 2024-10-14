@@ -7,23 +7,25 @@ nav: 28
 `useShallow` is a React Hook that lets you optimize re-renders.
 
 ```js
-useShallow(selector)
+const memoizedSelector = useShallow(selector)
 ```
 
+- [Types](#types)
+  - [Signature](#signature)
 - [Reference](#reference)
-  - [Signature](#useshallow-signature)
 - [Usage](#usage)
   - [Writing a memoized selector](#writing-a-memoized-selector)
 - [Troubleshooting](#troubleshooting)
-  - TBD
 
-## Reference
-
-### `useShallow` Signature
+### Signature
 
 ```ts
 useShallow<T, U = T>(selectorFn: (state: T) => U): (state: T) => U
 ```
+
+## Reference
+
+### `useShallow(selectorFn)`
 
 #### Parameters
 
