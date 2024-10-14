@@ -7,7 +7,7 @@ nav: 24
 `createStore` lets you create a vanilla store that exposes API utilities.
 
 ```js
-const store = createStore(stateCreatorFn)
+const someStore = createStore(stateCreatorFn)
 ```
 
 - [Types](#types)
