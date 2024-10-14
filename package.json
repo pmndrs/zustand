@@ -3,7 +3,7 @@
   "description": "🐻 Bear necessities for state management in React",
   "private": true,
   "type": "commonjs",
-  "version": "5.0.0-rc.2",
+  "version": "5.0.0",
   "publishConfig": {
     "tag": "next"
   },
