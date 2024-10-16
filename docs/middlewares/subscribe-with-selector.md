@@ -57,7 +57,7 @@ partial state updates. We can use `subscribe` for external state management.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
-import { subscribeWithSelector } from 'zustand/middleware/subscribeWithSelector'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 type PositionStoreState = { position: { x: number; y: number } }
 

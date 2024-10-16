@@ -99,7 +99,7 @@ This example shows you how you can use `Redux Devtools` to debug a Slices patter
 
 ```ts
 import { create, StateCreator } from 'zustand'
-import { devtools } from 'zustand/middleware/devtools'
+import { devtools } from 'zustand/middleware'
 
 type BearSlice = {
   bears: number
@@ -167,7 +167,7 @@ For instance the next example doesn't have action type name:
 
 ```ts
 import { create, StateCreator } from 'zustand'
-import { devtools } from 'zustand/middleware/devtools'
+import { devtools } from 'zustand/middleware'
 
 type BearSlice = {
   bears: number
