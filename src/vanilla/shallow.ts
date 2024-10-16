@@ -40,10 +40,14 @@ export function shallow<T>(objA: T, objB: T): boolean {
       nextA.value.length === 2 &&
       nextB.value.length === 2
     ) {
-      return compareMapLike(
-        objA as Iterable<[unknown, unknown]>,
-        objB as Iterable<[unknown, unknown]>,
-      )
+      try {
+        return compareMapLike(
+          objA as Iterable<[unknown, unknown]>,
+          objB as Iterable<[unknown, unknown]>,
+        )
+      } catch {
+        // fallback
+      }
     }
     while (!nextA.done && !nextB.done) {
       if (!Object.is(nextA.value, nextB.value)) {
