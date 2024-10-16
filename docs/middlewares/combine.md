@@ -57,7 +57,7 @@ don’t need to define them explicitly.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
-import { combine } from 'zustand/middleware/combine'
+import { combine } from 'zustand/middleware'
 
 const positionStore = createStore(
   combine({ position: { x: 0, y: 0 } }, (set) => ({
