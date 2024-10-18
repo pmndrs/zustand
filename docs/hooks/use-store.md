@@ -70,7 +70,7 @@ will use the store to track and update the dot's position.
 ```tsx
 function MovingDot() {
   const position = useStore(positionStore, (state) => state.position)
-  const setPosition = useStore(positionStore, (state) => state.setPositionStore)
+  const setPosition = useStore(positionStore, (state) => state.setPosition)
 
   return (
     <div
@@ -131,7 +131,7 @@ const positionStore = createStore<PositionStore>()((set) => ({
 
 function MovingDot() {
   const position = useStore(positionStore, (state) => state.position)
-  const setPosition = useStore(positionStore, (state) => state.setPositionStore)
+  const setPosition = useStore(positionStore, (state) => state.setPosition)
 
   return (
     <div
