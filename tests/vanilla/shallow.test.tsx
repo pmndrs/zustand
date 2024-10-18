@@ -97,6 +97,11 @@ describe('shallow', () => {
     const b = new URLSearchParams({ zustand: 'shallow' })
     expect(shallow(a, b)).toBe(false)
   })
+
+  it('should work with nested arrays (#2794)', () => {
+    const arr = [1, 2]
+    expect(shallow([arr, 1], [arr, 1])).toBe(true)
+  })
 })
 
 describe('unsupported cases', () => {
