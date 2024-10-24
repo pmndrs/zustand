@@ -40,34 +40,64 @@ describe('shallow', () => {
   })
 
   it('compares Maps', () => {
-    function createMap<T extends object>(obj: T) {
-      return new Map(Object.entries(obj))
-    }
-
     expect(
       shallow(
-        createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', asd: 123 }),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
       ),
     ).toBe(true)
 
     expect(
       shallow(
-        createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', foobar: true }),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['asd', 123],
+          ['foo', 'bar'],
+        ]),
+      ),
+    ).toBe(true)
+
+    expect(
+      shallow(
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['foobar', true],
+        ]),
       ),
     ).toBe(false)
 
     expect(
       shallow(
-        createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', asd: 123, foobar: true }),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+          ['foobar', true],
+        ]),
       ),
     ).toBe(false)
   })
 
   it('compares Sets', () => {
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 123]))).toBe(true)
+
+    expect(shallow(new Set(['bar', 123]), new Set([123, 'bar']))).toBe(true)
 
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 2]))).toBe(false)
 

@@ -1,15 +1,21 @@
-const isIterable = (obj: object): obj is Iterable<unknown> =>
+type IterableLike<T> = Iterable<T> & {
+  entries: () => IterableIterator<[number, T]>
+}
+
+const isIterable = (obj: object): obj is IterableLike<unknown> =>
   Symbol.iterator in obj
 
-const compareMapLike = (
-  iterableA: Iterable<[unknown, unknown]>,
-  iterableB: Iterable<[unknown, unknown]>,
-) => {
-  const mapA = iterableA instanceof Map ? iterableA : new Map(iterableA)
-  const mapB = iterableB instanceof Map ? iterableB : new Map(iterableB)
-  if (mapA.size !== mapB.size) return false
-  for (const [key, value] of mapA) {
-    if (!Object.is(value, mapB.get(key))) {
+const toObject = (value: IterableLike<unknown>) =>
+  Object.fromEntries(value.entries())
+
+const compareObjects = <T extends object>(objA: T, objB: T) => {
+  const keysA = Object.keys(objA)
+  if (keysA.length !== Object.keys(objB).length) return false
+  for (const keyA of keysA) {
+    if (
+      !Object.hasOwn(objB, keyA as string) ||
+      !Object.is(objA[keyA as keyof T], objB[keyA as keyof T])
+    ) {
       return false
     }
   }
@@ -17,9 +23,8 @@ const compareMapLike = (
 }
 
 export function shallow<T>(objA: T, objB: T): boolean {
-  if (Object.is(objA, objB)) {
-    return true
-  }
+  if (Object.is(objA, objB)) return true
+
   if (
     typeof objA !== 'object' ||
     objA === null ||
@@ -30,42 +35,8 @@ export function shallow<T>(objA: T, objB: T): boolean {
   }
 
   if (isIterable(objA) && isIterable(objB)) {
-    const iteratorA = objA[Symbol.iterator]()
-    const iteratorB = objB[Symbol.iterator]()
-    let nextA = iteratorA.next()
-    let nextB = iteratorB.next()
-    if (
-      Array.isArray(nextA.value) &&
-      Array.isArray(nextB.value) &&
-      nextA.value.length === 2 &&
-      nextB.value.length === 2
-    ) {
-      return compareMapLike(
-        objA as Iterable<[unknown, unknown]>,
-        objB as Iterable<[unknown, unknown]>,
-      )
-    }
-    while (!nextA.done && !nextB.done) {
-      if (!Object.is(nextA.value, nextB.value)) {
-        return false
-      }
-      nextA = iteratorA.next()
-      nextB = iteratorB.next()
-    }
-    return !!nextA.done && !!nextB.done
+    return compareObjects(toObject(objA), toObject(objB))
   }
 
-  const keysA = Object.keys(objA)
-  if (keysA.length !== Object.keys(objB).length) {
-    return false
-  }
-  for (const keyA of keysA) {
-    if (
-      !Object.hasOwn(objB, keyA as string) ||
-      !Object.is(objA[keyA as keyof T], objB[keyA as keyof T])
-    ) {
-      return false
-    }
-  }
-  return true
+  return compareObjects(objA, objB)
 }
