@@ -1,5 +1,5 @@
 type IterableLike<T> = Iterable<T> & {
-  entries: () => IterableIterator<[number, T]>
+  entries: Map<string, T>['entries'] | Set<T>['entries'] | Array<T>['entries']
 }
 
 const isIterable = (obj: object): obj is IterableLike<unknown> =>
