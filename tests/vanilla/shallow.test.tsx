@@ -40,6 +40,8 @@ describe('shallow', () => {
 
     const arr = [1, 2]
     expect(shallow([arr, 1], [arr, 1])).toBe(true)
+
+    expect(shallow([1, 2, 3], [2, 3, 1])).toBe(false)
   })
 
   it('compares Maps', () => {
