@@ -1,11 +1,10 @@
-type IterableLike<T> = Iterable<T> & {
-  entries: Map<string, T>['entries'] | Set<T>['entries'] | Array<T>['entries']
-}
+const hasIterableEntries = (
+  obj: object,
+): obj is {
+  entries(): Iterable<[unknown, unknown]>
+} => Symbol.iterator in obj && 'entries' in obj
 
-const isIterable = (obj: object): obj is IterableLike<unknown> =>
-  Symbol.iterator in obj
-
-const toObject = (value: IterableLike<unknown>) =>
+const toObject = (value: { entries(): Iterable<[unknown, unknown]> }) =>
   Object.fromEntries(value.entries())
 
 const compareObjects = <T extends object>(objA: T, objB: T) => {
@@ -34,7 +33,7 @@ export function shallow<T>(objA: T, objB: T): boolean {
     return false
   }
 
-  if (isIterable(objA) && isIterable(objB)) {
+  if (hasIterableEntries(objA) && hasIterableEntries(objB)) {
     return compareObjects(toObject(objA), toObject(objB))
   }
 
