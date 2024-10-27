@@ -1,12 +1,20 @@
 const isIterable = (obj: object): obj is Iterable<unknown> =>
   Symbol.iterator in obj
 
-const compareMapLike = (
-  iterableA: Iterable<[unknown, unknown]>,
-  iterableB: Iterable<[unknown, unknown]>,
+const hasIterableEntries = (
+  obj: object,
+): obj is {
+  entries(): Iterable<[unknown, unknown]>
+} =>
+  // HACK: avoid checking entries type with just checking Symbol.iterator
+  isIterable(obj) && 'entries' in obj
+
+const compareEntries = (
+  valueA: { entries(): Iterable<[unknown, unknown]> },
+  valueB: { entries(): Iterable<[unknown, unknown]> },
 ) => {
-  const mapA = iterableA instanceof Map ? iterableA : new Map(iterableA)
-  const mapB = iterableB instanceof Map ? iterableB : new Map(iterableB)
+  const mapA = valueA instanceof Map ? valueA : new Map(valueA.entries())
+  const mapB = valueB instanceof Map ? valueB : new Map(valueB.entries())
   if (mapA.size !== mapB.size) return false
   for (const [key, value] of mapA) {
     if (!Object.is(value, mapB.get(key))) {
@@ -17,9 +25,7 @@ const compareMapLike = (
 }
 
 export function shallow<T>(objA: T, objB: T): boolean {
-  if (Object.is(objA, objB)) {
-    return true
-  }
+  if (Object.is(objA, objB)) return true
   if (
     typeof objA !== 'object' ||
     objA === null ||
@@ -29,26 +35,15 @@ export function shallow<T>(objA: T, objB: T): boolean {
     return false
   }
 
+  if (hasIterableEntries(objA) && hasIterableEntries(objB)) {
+    return compareEntries(objA, objB)
+  }
+
   if (isIterable(objA) && isIterable(objB)) {
     const iteratorA = objA[Symbol.iterator]()
     const iteratorB = objB[Symbol.iterator]()
     let nextA = iteratorA.next()
     let nextB = iteratorB.next()
-    if (
-      Array.isArray(nextA.value) &&
-      Array.isArray(nextB.value) &&
-      nextA.value.length === 2 &&
-      nextB.value.length === 2
-    ) {
-      try {
-        return compareMapLike(
-          objA as Iterable<[unknown, unknown]>,
-          objB as Iterable<[unknown, unknown]>,
-        )
-      } catch {
-        // fallback
-      }
-    }
     while (!nextA.done && !nextB.done) {
       if (!Object.is(nextA.value, nextB.value)) {
         return false
@@ -59,17 +54,8 @@ export function shallow<T>(objA: T, objB: T): boolean {
     return !!nextA.done && !!nextB.done
   }
 
-  const keysA = Object.keys(objA)
-  if (keysA.length !== Object.keys(objB).length) {
-    return false
-  }
-  for (const keyA of keysA) {
-    if (
-      !Object.hasOwn(objB, keyA as string) ||
-      !Object.is(objA[keyA as keyof T], objB[keyA as keyof T])
-    ) {
-      return false
-    }
-  }
-  return true
+  return compareEntries(
+    { entries: () => Object.entries(objA) },
+    { entries: () => Object.entries(objB) },
+  )
 }
