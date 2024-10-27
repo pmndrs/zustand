@@ -57,7 +57,7 @@ redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreato
 
 ```ts
 import { createStore } from 'zustand/vanilla'
-import { redux } from 'zustand/middleware/redux'
+import { redux } from 'zustand/middleware'
 
 type PersonStoreState = {
   firstName: string
