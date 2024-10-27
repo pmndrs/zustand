@@ -94,6 +94,15 @@ describe('shallow', () => {
         ]),
       ),
     ).toBe(false)
+
+    const obj = {}
+    const obj2 = {}
+    expect(
+      shallow(
+        new Map<object, unknown>([[obj, 'foo']]),
+        new Map<object, unknown>([[obj2, 'foo']]),
+      ),
+    ).toBe(false)
   })
 
   it('compares Sets', () => {
@@ -106,6 +115,15 @@ describe('shallow', () => {
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 123, true]))).toBe(
       false,
     )
+
+    const obj = {}
+    const obj2 = {}
+    expect(shallow(new Set([obj]), new Set([obj]))).toBe(true)
+    expect(shallow(new Set([obj]), new Set([obj2]))).toBe(false)
+    expect(shallow(new Set([obj]), new Set([obj, obj2]))).toBe(false)
+    expect(shallow(new Set([obj]), new Set([obj2, obj]))).toBe(false)
+
+    expect(shallow(['bar', 123] as never, new Set(['bar', 123]))).toBe(false)
   })
 
   it('compares functions', () => {
@@ -125,9 +143,27 @@ describe('shallow', () => {
   })
 
   it('compares URLSearchParams', () => {
-    const a = new URLSearchParams({ hello: 'world' })
-    const b = new URLSearchParams({ zustand: 'shallow' })
-    expect(shallow(a, b)).toBe(false)
+    expect(
+      shallow(new URLSearchParams({ a: 'a' }), new URLSearchParams({ a: 'a' })),
+    ).toBe(true)
+    expect(
+      shallow(new URLSearchParams({ a: 'a' }), new URLSearchParams({ a: 'b' })),
+    ).toBe(false)
+    expect(
+      shallow(new URLSearchParams({ a: 'a' }), new URLSearchParams({ b: 'b' })),
+    ).toBe(false)
+    expect(
+      shallow(
+        new URLSearchParams({ a: 'a' }),
+        new URLSearchParams({ a: 'a', b: 'b' }),
+      ),
+    ).toBe(false)
+    expect(
+      shallow(
+        new URLSearchParams({ b: 'b', a: 'a' }),
+        new URLSearchParams({ a: 'a', b: 'b' }),
+      ),
+    ).toBe(true)
   })
 
   it('should work with nested arrays (#2794)', () => {
