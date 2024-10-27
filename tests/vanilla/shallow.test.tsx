@@ -38,9 +38,6 @@ describe('shallow', () => {
 
     expect(shallow([{ foo: 'bar' }], [{ foo: 'bar', asd: 123 }])).toBe(false)
 
-    const arr = [1, 2]
-    expect(shallow([arr, 1], [arr, 1])).toBe(true)
-
     expect(shallow([1, 2, 3], [2, 3, 1])).toBe(false)
   })
 
@@ -131,6 +128,11 @@ describe('shallow', () => {
     const a = new URLSearchParams({ hello: 'world' })
     const b = new URLSearchParams({ zustand: 'shallow' })
     expect(shallow(a, b)).toBe(false)
+  })
+
+  it('should work with nested arrays (#2794)', () => {
+    const arr = [1, 2]
+    expect(shallow([arr, 1], [arr, 1])).toBe(true)
   })
 })
 
