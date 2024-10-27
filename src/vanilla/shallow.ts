@@ -6,21 +6,15 @@ const hasIterableEntries = (obj: object): obj is IterableLike<unknown> =>
 const toObject = (value: IterableLike<unknown>) =>
   Object.fromEntries(value.entries())
 
-const compareKeys = (
-  objA: IterableLike<unknown>,
-  objB: IterableLike<unknown>,
-) => {
-  const keysA = Array.from(objA.keys()).toSorted()
-  const keysB = Array.from(objB.keys()).toSorted()
+const compKeys = (objA: IterableLike<unknown>, objB: IterableLike<unknown>) => {
+  const keysA = Array.from(objA.keys()).sort()
+  const keysB = Array.from(objB.keys()).sort()
 
   if (keysA.length !== keysB.length) return false
-  return keysA.reduce(
-    (output, keyA, keyAIndex) => output && Object.is(keyA, keysB[keyAIndex]),
-    true,
-  )
+  return keysA.reduce((o, keyA, idx) => o && Object.is(keyA, keysB[idx]), true)
 }
 
-const compareObjects = <T extends object>(objA: T, objB: T) => {
+const compObjects = <T extends object>(objA: T, objB: T) => {
   const keysA = Object.keys(objA)
   if (keysA.length !== Object.keys(objB).length) return false
   for (const keyA of keysA) {
@@ -47,9 +41,9 @@ export function shallow<T>(objA: T, objB: T): boolean {
   }
 
   if (hasIterableEntries(objA) && hasIterableEntries(objB)) {
-    if (!compareKeys(objA, objB)) return false
-    return compareObjects(toObject(objA), toObject(objB))
+    if (!compKeys(objA, objB)) return false
+    return compObjects(toObject(objA), toObject(objB))
   }
 
-  return compareObjects(objA, objB)
+  return compObjects(objA, objB)
 }
