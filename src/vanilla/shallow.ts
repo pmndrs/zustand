@@ -1,13 +1,24 @@
-const hasIterableEntries = (
-  obj: object,
-): obj is {
-  entries(): Iterable<[unknown, unknown]>
-} =>
-  // HACK: avoid checking entries type with just checking Symbol.iterator
-  Symbol.iterator in obj && 'entries' in obj
+type IterableLike<T> = Map<unknown, T> | Set<T> | Array<T>
 
-const toObject = (value: { entries(): Iterable<[unknown, unknown]> }) =>
+const hasIterableEntries = (obj: object): obj is IterableLike<unknown> =>
+  Symbol.iterator in obj
+
+const toObject = (value: IterableLike<unknown>) =>
   Object.fromEntries(value.entries())
+
+const compareKeys = (
+  objA: IterableLike<unknown>,
+  objB: IterableLike<unknown>,
+) => {
+  const keysA = Array.from(objA.keys()).toSorted()
+  const keysB = Array.from(objB.keys()).toSorted()
+
+  if (keysA.length !== keysB.length) return false
+  return keysA.reduce(
+    (output, keyA, keyAIndex) => output && Object.is(keyA, keysB[keyAIndex]),
+    true,
+  )
+}
 
 const compareObjects = <T extends object>(objA: T, objB: T) => {
   const keysA = Object.keys(objA)
@@ -36,6 +47,7 @@ export function shallow<T>(objA: T, objB: T): boolean {
   }
 
   if (hasIterableEntries(objA) && hasIterableEntries(objB)) {
+    if (!compareKeys(objA, objB)) return false
     return compareObjects(toObject(objA), toObject(objB))
   }
 

@@ -97,6 +97,14 @@ describe('shallow', () => {
 
     const obj = {}
     const obj2 = {}
+
+    expect(
+      shallow(
+        new Map<object, unknown>([[obj, 'foo']]),
+        new Map<object, unknown>([[obj, 'foo']]),
+      ),
+    ).toBe(true)
+
     expect(
       shallow(
         new Map<object, unknown>([[obj, 'foo']]),
