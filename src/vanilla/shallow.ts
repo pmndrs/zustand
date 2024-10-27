@@ -2,7 +2,9 @@ const hasIterableEntries = (
   obj: object,
 ): obj is {
   entries(): Iterable<[unknown, unknown]>
-} => Symbol.iterator in obj && 'entries' in obj
+} =>
+  // HACK: avoid checking entries type with just checking Symbol.iterator
+  Symbol.iterator in obj && 'entries' in obj
 
 const toObject = (value: { entries(): Iterable<[unknown, unknown]> }) =>
   Object.fromEntries(value.entries())
