@@ -2,12 +2,12 @@ const isIterable = (obj: object): obj is Iterable<unknown> =>
   Symbol.iterator in obj
 
 const hasIterableEntries = (
-  obj: object,
-): obj is {
+  value: Iterable<unknown>,
+): value is Iterable<unknown> & {
   entries(): Iterable<[unknown, unknown]>
 } =>
-  // HACK: avoid checking entries type with just checking Symbol.iterator
-  isIterable(obj) && 'entries' in obj
+  // HACK: avoid checking entries type
+  'entries' in value
 
 const compareEntries = (
   valueA: { entries(): Iterable<[unknown, unknown]> },
@@ -24,6 +24,25 @@ const compareEntries = (
   return true
 }
 
+// Ordered iterables
+const compareIterables = (
+  valueA: Iterable<unknown>,
+  valueB: Iterable<unknown>,
+) => {
+  const iteratorA = valueA[Symbol.iterator]()
+  const iteratorB = valueB[Symbol.iterator]()
+  let nextA = iteratorA.next()
+  let nextB = iteratorB.next()
+  while (!nextA.done && !nextB.done) {
+    if (!Object.is(nextA.value, nextB.value)) {
+      return false
+    }
+    nextA = iteratorA.next()
+    nextB = iteratorB.next()
+  }
+  return !!nextA.done && !!nextB.done
+}
+
 export function shallow<T>(objA: T, objB: T): boolean {
   if (Object.is(objA, objB)) return true
   if (
@@ -35,27 +54,15 @@ export function shallow<T>(objA: T, objB: T): boolean {
     return false
   }
 
+  if (!isIterable(objA) || !isIterable(objB)) {
+    return compareEntries(
+      { entries: () => Object.entries(objA) },
+      { entries: () => Object.entries(objB) },
+    )
+  }
+
   if (hasIterableEntries(objA) && hasIterableEntries(objB)) {
     return compareEntries(objA, objB)
   }
-
-  if (isIterable(objA) && isIterable(objB)) {
-    const iteratorA = objA[Symbol.iterator]()
-    const iteratorB = objB[Symbol.iterator]()
-    let nextA = iteratorA.next()
-    let nextB = iteratorB.next()
-    while (!nextA.done && !nextB.done) {
-      if (!Object.is(nextA.value, nextB.value)) {
-        return false
-      }
-      nextA = iteratorA.next()
-      nextB = iteratorB.next()
-    }
-    return !!nextA.done && !!nextB.done
-  }
-
-  return compareEntries(
-    { entries: () => Object.entries(objA) },
-    { entries: () => Object.entries(objB) },
-  )
+  return compareIterables(objA, objB)
 }
