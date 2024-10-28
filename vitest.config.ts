@@ -18,6 +18,7 @@ export default defineConfig({
     dir: 'tests',
     reporters: 'basic',
     coverage: {
+      include: ['src/**/'],
       reporter: ['text', 'json', 'html', 'text-summary'],
       reportsDirectory: './coverage/',
     },
