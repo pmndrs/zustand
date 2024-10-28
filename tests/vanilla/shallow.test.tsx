@@ -180,6 +180,17 @@ describe('shallow', () => {
   })
 })
 
+describe('generators', () => {
+  it('pure iterable', () => {
+    function* gen() {
+      yield 1
+      yield 2
+    }
+    expect(Symbol.iterator in gen()).toBe(true)
+    expect(shallow(gen(), gen())).toBe(true)
+  })
+})
+
 describe('unsupported cases', () => {
   it('date', () => {
     expect(
