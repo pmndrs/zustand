@@ -37,31 +37,70 @@ describe('shallow', () => {
     ).toBe(false)
 
     expect(shallow([{ foo: 'bar' }], [{ foo: 'bar', asd: 123 }])).toBe(false)
+
+    expect(shallow([1, 2, 3], [2, 3, 1])).toBe(false)
   })
 
   it('compares Maps', () => {
-    function createMap<T extends object>(obj: T) {
-      return new Map(Object.entries(obj))
-    }
-
     expect(
       shallow(
-        createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', asd: 123 }),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
       ),
     ).toBe(true)
 
     expect(
       shallow(
-        createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', foobar: true }),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['asd', 123],
+          ['foo', 'bar'],
+        ]),
+      ),
+    ).toBe(true)
+
+    expect(
+      shallow(
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['foobar', true],
+        ]),
       ),
     ).toBe(false)
 
     expect(
       shallow(
-        createMap({ foo: 'bar', asd: 123 }),
-        createMap({ foo: 'bar', asd: 123, foobar: true }),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+        ]),
+        new Map<string, unknown>([
+          ['foo', 'bar'],
+          ['asd', 123],
+          ['foobar', true],
+        ]),
+      ),
+    ).toBe(false)
+
+    const obj = {}
+    const obj2 = {}
+    expect(
+      shallow(
+        new Map<object, unknown>([[obj, 'foo']]),
+        new Map<object, unknown>([[obj2, 'foo']]),
       ),
     ).toBe(false)
   })
@@ -69,11 +108,22 @@ describe('shallow', () => {
   it('compares Sets', () => {
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 123]))).toBe(true)
 
+    expect(shallow(new Set(['bar', 123]), new Set([123, 'bar']))).toBe(true)
+
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 2]))).toBe(false)
 
     expect(shallow(new Set(['bar', 123]), new Set(['bar', 123, true]))).toBe(
       false,
     )
+
+    const obj = {}
+    const obj2 = {}
+    expect(shallow(new Set([obj]), new Set([obj]))).toBe(true)
+    expect(shallow(new Set([obj]), new Set([obj2]))).toBe(false)
+    expect(shallow(new Set([obj]), new Set([obj, obj2]))).toBe(false)
+    expect(shallow(new Set([obj]), new Set([obj2, obj]))).toBe(false)
+
+    expect(shallow(['bar', 123] as never, new Set(['bar', 123]))).toBe(false)
   })
 
   it('compares functions', () => {
@@ -93,14 +143,43 @@ describe('shallow', () => {
   })
 
   it('compares URLSearchParams', () => {
-    const a = new URLSearchParams({ hello: 'world' })
-    const b = new URLSearchParams({ zustand: 'shallow' })
-    expect(shallow(a, b)).toBe(false)
+    expect(
+      shallow(new URLSearchParams({ a: 'a' }), new URLSearchParams({ a: 'a' })),
+    ).toBe(true)
+    expect(
+      shallow(new URLSearchParams({ a: 'a' }), new URLSearchParams({ a: 'b' })),
+    ).toBe(false)
+    expect(
+      shallow(new URLSearchParams({ a: 'a' }), new URLSearchParams({ b: 'b' })),
+    ).toBe(false)
+    expect(
+      shallow(
+        new URLSearchParams({ a: 'a' }),
+        new URLSearchParams({ a: 'a', b: 'b' }),
+      ),
+    ).toBe(false)
+    expect(
+      shallow(
+        new URLSearchParams({ b: 'b', a: 'a' }),
+        new URLSearchParams({ a: 'a', b: 'b' }),
+      ),
+    ).toBe(true)
   })
 
   it('should work with nested arrays (#2794)', () => {
     const arr = [1, 2]
     expect(shallow([arr, 1], [arr, 1])).toBe(true)
+  })
+})
+
+describe('generators', () => {
+  it('pure iterable', () => {
+    function* gen() {
+      yield 1
+      yield 2
+    }
+    expect(Symbol.iterator in gen()).toBe(true)
+    expect(shallow(gen(), gen())).toBe(true)
   })
 })
 
