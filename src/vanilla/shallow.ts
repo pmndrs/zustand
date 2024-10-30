@@ -15,7 +15,9 @@ const compareEntries = (
 ) => {
   const mapA = valueA instanceof Map ? valueA : new Map(valueA.entries())
   const mapB = valueB instanceof Map ? valueB : new Map(valueB.entries())
-  if (mapA.size !== mapB.size) return false
+  if (mapA.size !== mapB.size) {
+    return false
+  }
   for (const [key, value] of mapA) {
     if (!Object.is(value, mapB.get(key))) {
       return false
@@ -43,26 +45,26 @@ const compareIterables = (
   return !!nextA.done && !!nextB.done
 }
 
-export function shallow<T>(objA: T, objB: T): boolean {
-  if (Object.is(objA, objB)) return true
+export function shallow<T>(valueA: T, valueB: T): boolean {
+  if (Object.is(valueA, valueB)) {
+    return true
+  }
   if (
-    typeof objA !== 'object' ||
-    objA === null ||
-    typeof objB !== 'object' ||
-    objB === null
+    typeof valueA !== 'object' ||
+    valueA === null ||
+    typeof valueB !== 'object' ||
+    valueB === null
   ) {
     return false
   }
-
-  if (!isIterable(objA) || !isIterable(objB)) {
+  if (!isIterable(valueA) || !isIterable(valueB)) {
     return compareEntries(
-      { entries: () => Object.entries(objA) },
-      { entries: () => Object.entries(objB) },
+      { entries: () => Object.entries(valueA) },
+      { entries: () => Object.entries(valueB) },
     )
   }
-
-  if (hasIterableEntries(objA) && hasIterableEntries(objB)) {
-    return compareEntries(objA, objB)
+  if (hasIterableEntries(valueA) && hasIterableEntries(valueB)) {
+    return compareEntries(valueA, valueB)
   }
-  return compareIterables(objA, objB)
+  return compareIterables(valueA, valueB)
 }
