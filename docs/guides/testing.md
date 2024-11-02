@@ -83,8 +83,9 @@ In the next steps we are going to setup our Jest environment in order to mock Zu
 
 ```ts
 // __mocks__/zustand.ts
-import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
+import type * as zustand from 'zustand'
+export * from 'zustand'
 
 const { create: actualCreate, createStore: actualCreateStore } =
   jest.requireActual<typeof zustand>('zustand')
@@ -172,8 +173,9 @@ In the next steps we are going to setup our Vitest environment in order to mock 
 
 ```ts
 // __mocks__/zustand.ts
-import * as zustand from 'zustand'
 import { act } from '@testing-library/react'
+import type * as zustand from 'zustand'
+export * from 'zustand'
 
 const { create: actualCreate, createStore: actualCreateStore } =
   await vi.importActual<typeof zustand>('zustand')
