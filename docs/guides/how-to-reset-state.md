@@ -44,7 +44,7 @@ const useSlice = create<State & Actions>()((set, get) => ({
 Resetting multiple stores at once
 
 ```ts
-import type * as zustand from 'zustand'
+import type { StateCreator } from 'zustand'
 import { create: actualCreate } from 'zustand'
 
 const storeResetFns = new Set<() => void>()
@@ -56,7 +56,7 @@ const resetAllStores = () => {
 }
 
 export const create = (<T>() => {
-  return (stateCreator: zustand.StateCreator<T>) => {
+  return (stateCreator: StateCreator<T>) => {
     const store = actualCreate(stateCreator)
     const initialState = store.getInitialState()
     storeResetFns.add(() => {
@@ -64,7 +64,7 @@ export const create = (<T>() => {
     })
     return store
   }
-}) as typeof zustand.create
+}) as typeof actualCreate
 ```
 
 ## CodeSandbox Demo
