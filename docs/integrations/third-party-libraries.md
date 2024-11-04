@@ -49,6 +49,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-hash-storage](https://github.com/MartinGamesCZ/zustand-hash-storage) — Zustand middleware for saving state into URL hash, b64 encoded (can be configured) and debounce timer.
 - [zustand-injectors](https://github.com/zustandjs/zustand-injectors) — A sweet way to lazy load slices
 - [zustand-interval-persist](https://www.npmjs.com/package/zustand-interval-persist) — An enhancement for zustand that enables automatic saving of the store's state to the specified storage at regular interval.
+- [zustand-lit](https://github.com/ennjin/zustand-lit) — A zustand adapter for lit.js (LitElement)
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
 - [zustand-middleware-yjs](https://github.com/joebobmiles/zustand-middleware-yjs) — A middleware for synchronizing Zustand stores with Yjs.
