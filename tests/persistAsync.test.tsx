@@ -193,10 +193,59 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
-  it('can migrate persisted state', async () => {
+  it('can non-async migrate persisted state', async () => {
     const setItemSpy = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
     const migrateSpy = vi.fn(() => ({ count: 99 }))
+
+    const storage = {
+      getItem: async () =>
+        JSON.stringify({
+          state: { count: 42 },
+          version: 12,
+        }),
+      setItem: setItemSpy,
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        version: 13,
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+        migrate: migrateSpy,
+      }),
+    )
+
+    function Counter() {
+      const { count } = useBoundStore()
+      return <div>count: {count}</div>
+    }
+
+    render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>,
+    )
+
+    await screen.findByText('count: 0')
+    await screen.findByText('count: 99')
+    expect(migrateSpy).toBeCalledWith({ count: 42 }, 12)
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: { count: 99 },
+        version: 13,
+      }),
+    )
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
+  })
+
+  it('can async migrate persisted state', async () => {
+    const setItemSpy = vi.fn()
+    const onRehydrateStorageSpy = vi.fn()
+    const migrateSpy = vi.fn(() => Promise.resolve({ count: 99 }))
 
     const storage = {
       getItem: async () =>

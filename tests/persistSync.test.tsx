@@ -131,10 +131,47 @@ describe('persist middleware with sync configuration', () => {
     expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
   })
 
-  it('can migrate persisted state', () => {
+  it('can non-async migrate persisted state', () => {
     const setItemSpy = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
     const migrateSpy = vi.fn(() => ({ count: 99 }))
+
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: { count: 42 },
+          version: 12,
+        }),
+      setItem: setItemSpy,
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        version: 13,
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+        migrate: migrateSpy,
+      }),
+    )
+
+    expect(useBoundStore.getState()).toEqual({ count: 99 })
+    expect(migrateSpy).toBeCalledWith({ count: 42 }, 12)
+    expect(setItemSpy).toBeCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: { count: 99 },
+        version: 13,
+      }),
+    )
+    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
+  })
+
+  it('can async migrate persisted state', () => {
+    const setItemSpy = vi.fn()
+    const onRehydrateStorageSpy = vi.fn()
+    const migrateSpy = vi.fn(() => Promise.resolve({ count: 99 }))
 
     const storage = {
       getItem: () =>
