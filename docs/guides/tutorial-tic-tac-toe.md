@@ -352,7 +352,7 @@ export default function Board() {
 ```
 
 `Array(9).fill(null)` creates an array with nine elements and sets each of them to `null`. The
-`useSquaresStore` declares a `squares` state that's initially set to that array. Each entry in the
+`useGameStore` declares a `squares` state that's initially set to that array. Each entry in the
 array corresponds to the value of a square. When you fill the board in later, the squares array
 will look like this:
 
