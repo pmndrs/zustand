@@ -557,7 +557,7 @@ function to check if a player has won. You can perform this check at the same ti
 user has clicked a square that already has a `'X'` or and `'O'`. We'd like to return early in
 both cases:
 
-```ts{2}
+```ts {2}
 function handleClick(i) {
   if (squares[i] || winner) return
   const nextSquares = squares.slice()
@@ -865,7 +865,7 @@ export default function Game() {
 
 Add some state to the `useGameStore` hook to track the history of moves:
 
-```ts{2,4-11}
+```ts {2,4-11}
 const useGameStore = create(
   combine({ history: [Array(9).fill(null)], xIsNext: true }, (set) => {
     return {
@@ -1010,7 +1010,7 @@ squares array as a new `history` entry. You also need to toggle `xIsNext`, just 
 component used
 to do.
 
-```ts{2-3}
+```ts {2-3}
 function handlePlay(nextSquares) {
   setHistory(history.concat([nextSquares]))
   setXIsNext(!xIsNext)
@@ -1232,7 +1232,7 @@ Before you can implement the `jumpTo` function, you need the `Game` component to
 step the user is currently viewing. To do this, define a new state variable called `currentMove`,
 which will start at `0`:
 
-```ts{3,14-21}
+```ts {3,14-21}
 const useGameStore = create(
   combine(
     { history: [Array(9).fill(null)], currentMove: 0, xIsNext: true },
@@ -1271,7 +1271,7 @@ const useGameStore = create(
 Next, update the `jumpTo` function inside `Game` component to update that `currentMove`. You’ll
 also set `xIsNext` to `true` if the number that you’re changing `currentMove` to is even.
 
-```ts{2-3}
+```ts {2-3}
 function jumpTo(nextMove) {
   setCurrentMove(nextMove)
   setXIsNext(currentMove % 2 === 0)
@@ -1287,7 +1287,7 @@ when you click on a square.
   `history.slice(0, currentMove + 1)` to keep only that portion of the old history.
 - Each time a move is made, you need to update `currentMove` to point to the latest history entry.
 
-```ts{2-4}
+```ts {2-4}
 function handlePlay(nextSquares) {
   const nextHistory = history.slice(0, currentMove + 1).concat([nextSquares])
   setHistory(nextHistory)
