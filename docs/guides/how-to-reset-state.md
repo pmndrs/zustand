@@ -44,8 +44,8 @@ const useSlice = create<State & Actions>()((set, get) => ({
 Resetting multiple stores at once
 
 ```ts
-import { create as _create } from 'zustand'
 import type { StateCreator } from 'zustand'
+import { create: actualCreate } from 'zustand'
 
 const storeResetFns = new Set<() => void>()
 
@@ -55,80 +55,16 @@ const resetAllStores = () => {
   })
 }
 
-export const create = (<T extends unknown>() => {
+export const create = (<T>() => {
   return (stateCreator: StateCreator<T>) => {
-    const store = _create(stateCreator)
-    const initialState = store.getState()
+    const store = actualCreate(stateCreator)
+    const initialState = store.getInitialState()
     storeResetFns.add(() => {
       store.setState(initialState, true)
     })
     return store
   }
-}) as typeof _create
-```
-
-Resetting bound store using Slices pattern
-
-```ts
-import create from 'zustand'
-import type { StateCreator } from 'zustand'
-
-const sliceResetFns = new Set<() => void>()
-
-export const resetAllSlices = () => {
-  sliceResetFns.forEach((resetFn) => {
-    resetFn()
-  })
-}
-
-const initialBearState = { bears: 0 }
-
-interface BearSlice {
-  bears: number
-  addBear: () => void
-  eatFish: () => void
-}
-
-const createBearSlice: StateCreator<
-  BearSlice & FishSlice,
-  [],
-  [],
-  BearSlice
-> = (set) => {
-  sliceResetFns.add(() => set(initialBearState))
-  return {
-    ...initialBearState,
-    addBear: () => set((state) => ({ bears: state.bears + 1 })),
-    eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
-  }
-}
-
-const initialStateFish = { fishes: 0 }
-
-interface FishSlice {
-  fishes: number
-  addFish: () => void
-}
-
-const createFishSlice: StateCreator<
-  BearSlice & FishSlice,
-  [],
-  [],
-  FishSlice
-> = (set) => {
-  sliceResetFns.add(() => set(initialStateFish))
-  return {
-    ...initialStateFish,
-    addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
-  }
-}
-
-const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
-  ...createBearSlice(...a),
-  ...createFishSlice(...a),
-}))
-
-export default useBoundStore
+}) as typeof actualCreate
 ```
 
 ## CodeSandbox Demo
