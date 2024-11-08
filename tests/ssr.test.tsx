@@ -40,7 +40,7 @@ describe.skipIf(!React.version.startsWith('18'))(
           'react-dom/client',
         )
 
-      const markup = renderToString(
+      const view = renderToString(
         <React.Suspense fallback={<div>Loading...</div>}>
           <Counter />
         </React.Suspense>,
@@ -48,7 +48,7 @@ describe.skipIf(!React.version.startsWith('18'))(
 
       const container = document.createElement('div')
       document.body.appendChild(container)
-      container.innerHTML = markup
+      container.innerHTML = view
 
       expect(container.textContent).toContain('bears: 0')
 
@@ -80,7 +80,7 @@ describe.skipIf(!React.version.startsWith('18'))(
         return <div>bears: {bears}</div>
       }
 
-      const markup = renderToString(
+      const view = renderToString(
         <React.Suspense fallback={<div>Loading...</div>}>
           <Component />
         </React.Suspense>,
@@ -88,7 +88,7 @@ describe.skipIf(!React.version.startsWith('18'))(
 
       const container = document.createElement('div')
       document.body.appendChild(container)
-      container.innerHTML = markup
+      container.innerHTML = view
 
       expect(container.textContent).toContain('bears: 0')
 

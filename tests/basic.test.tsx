@@ -729,7 +729,7 @@ it('works with "undefined" state', async () => {
     return <div>str: {str}</div>
   }
 
-  const { findByText } = render(
+  render(
     <StrictMode>
       <Component />
     </StrictMode>,
