@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { act, fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
@@ -60,12 +60,12 @@ describe('useShallow', () => {
   })
 
   it('input and output selectors always return shallow equal values', () => {
-    const res = render(
+    const { rerender } = render(
       <TestUseShallowSimple state={{ a: 1, b: 2 }} selector={Object.keys} />,
     )
 
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(0)
-    fireEvent.click(res.getByTestId('test-shallow'))
+    fireEvent.click(screen.getByTestId('test-shallow'))
 
     const firstRender = testUseShallowSimpleCallback.mock.lastCall?.[0]
 
@@ -73,14 +73,14 @@ describe('useShallow', () => {
     expect(firstRender).toBeTruthy()
     expect(firstRender?.selectorOutput).toEqual(firstRender?.useShallowOutput)
 
-    res.rerender(
+    rerender(
       <TestUseShallowSimple
         state={{ a: 1, b: 2, c: 3 }}
         selector={Object.keys}
       />,
     )
 
-    fireEvent.click(res.getByTestId('test-shallow'))
+    fireEvent.click(screen.getByTestId('test-shallow'))
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(2)
 
     const secondRender = testUseShallowSimpleCallback.mock.lastCall?.[0]
@@ -91,25 +91,25 @@ describe('useShallow', () => {
 
   it('returns the previously computed instance when possible', () => {
     const state = { a: 1, b: 2 }
-    const res = render(
+    const { rerender } = render(
       <TestUseShallowSimple state={state} selector={Object.keys} />,
     )
 
-    fireEvent.click(res.getByTestId('test-shallow'))
+    fireEvent.click(screen.getByTestId('test-shallow'))
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(1)
     const output1 =
       testUseShallowSimpleCallback.mock.lastCall?.[0]?.useShallowOutput
     expect(output1).toBeTruthy()
 
     // Change selector, same output
-    res.rerender(
+    rerender(
       <TestUseShallowSimple
         state={state}
         selector={(state) => Object.keys(state)}
       />,
     )
 
-    fireEvent.click(res.getByTestId('test-shallow'))
+    fireEvent.click(screen.getByTestId('test-shallow'))
     expect(testUseShallowSimpleCallback).toHaveBeenCalledTimes(2)
 
     const output2 =
@@ -137,10 +137,10 @@ describe('useShallow', () => {
     }
 
     expect(countRenders).toBe(0)
-    const res = render(<TestShallow />)
+    render(<TestShallow />)
 
     expect(countRenders).toBe(1)
-    expect(res.getByTestId('test-shallow').textContent).toBe('a,b,c')
+    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c')
 
     act(() => {
       useMyStore.setState({ a: 4 }) // This will not cause a re-render.
@@ -153,7 +153,7 @@ describe('useShallow', () => {
     })
 
     expect(countRenders).toBe(2)
-    expect(res.getByTestId('test-shallow').textContent).toBe('a,b,c,d')
+    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c,d')
   })
 
   it('does not cause stale closure issues', () => {
@@ -176,12 +176,12 @@ describe('useShallow', () => {
       )
     }
 
-    const res = render(<TestShallowWithState />)
+    render(<TestShallowWithState />)
 
-    expect(res.getByTestId('test-shallow').textContent).toBe('a,b,c,0')
+    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c,0')
 
-    fireEvent.click(res.getByTestId('test-shallow'))
+    fireEvent.click(screen.getByTestId('test-shallow'))
 
-    expect(res.getByTestId('test-shallow').textContent).toBe('a,b,c,1')
+    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c,1')
   })
 })

@@ -130,6 +130,7 @@
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-compiler": "19.0.0-beta-6fc168f-20241025",
     "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-testing-library": "^6.4.0",
     "eslint-plugin-vitest": "^0.5.4",
     "immer": "^10.1.1",
     "jsdom": "^25.0.1",
