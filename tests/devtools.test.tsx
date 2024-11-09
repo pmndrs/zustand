@@ -341,7 +341,7 @@ describe('when it receives a message of type...', () => {
     })
 
     describe('ROLLBACK...', () => {
-      it('it updates state without recording and inits with `message.state`', async () => {
+      it('updates state without recording and inits with `message.state`', async () => {
         const initialState = { count: 0, increment: () => {} }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
@@ -400,7 +400,7 @@ describe('when it receives a message of type...', () => {
 
     describe('JUMP_TO_STATE...', () => {
       const increment = () => {}
-      it('it updates state without recording with `message.state`', async () => {
+      it('updates state without recording with `message.state`', async () => {
         const initialState = { count: 0, increment }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
@@ -450,7 +450,7 @@ describe('when it receives a message of type...', () => {
     })
 
     describe('JUMP_TO_ACTION...', () => {
-      it('it updates state without recording with `message.state`', async () => {
+      it('updates state without recording with `message.state`', async () => {
         const initialState = { count: 0, increment: () => {} }
         const api = createStore(devtools(() => initialState, { enabled: true }))
         const newState = { foo: 'bar' }
@@ -1496,7 +1496,7 @@ describe('when create devtools was called multiple times with `name` option unde
     })
 
     describe('ROLLBACK...', () => {
-      it('it updates state without recording and inits with `message.state, connections are isolated from each other`', async () => {
+      it('updates state without recording and inits with `message.state, connections are isolated from each other`', async () => {
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1676,7 +1676,7 @@ describe('when create devtools was called multiple times with `name` option unde
       const increment2 = () => {}
       const increment3 = () => {}
 
-      it('it updates state without recording with `message.state`, connections are isolated from each other', async () => {
+      it('updates state without recording with `message.state`, connections are isolated from each other', async () => {
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
@@ -1837,7 +1837,7 @@ describe('when create devtools was called multiple times with `name` option unde
       const increment2 = () => {}
       const increment3 = () => {}
 
-      it('it updates state without recording with `message.state`, connections are isolated from each other', async () => {
+      it('updates state without recording with `message.state`, connections are isolated from each other', async () => {
         const options1 = { testConnectionId: 'asdf' }
         const options2 = { testConnectionId: '2f' }
         const options3 = { testConnectionId: 'd2e' }
