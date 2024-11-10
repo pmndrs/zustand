@@ -308,7 +308,7 @@ export const counterStoreCreator: StateCreator<CounterStore> = (set) => ({
 ```
 
 ```ts
-// stores/user-counter-store.ts
+// stores/use-counter-store.ts
 import { create } from 'zustand'
 
 import {
