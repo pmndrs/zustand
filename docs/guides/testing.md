@@ -293,7 +293,7 @@ In the next examples we are going to use `useCounterStore`
 > **Note**: all of these examples are written using TypeScript.
 
 ```ts
-// stores/counter-store-creator.ts
+// shared/counter-store-creator.ts
 import { type StateCreator } from 'zustand'
 
 export type CounterStore = {
@@ -308,7 +308,7 @@ export const counterStoreCreator: StateCreator<CounterStore> = (set) => ({
 ```
 
 ```ts
-// stores/user-counter-store.ts
+// stores/use-counter-store.ts
 import { create } from 'zustand'
 
 import {
