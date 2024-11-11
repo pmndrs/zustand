@@ -140,7 +140,7 @@ describe('useShallow', () => {
     render(<TestShallow />)
 
     expect(countRenders).toBe(1)
-    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c')
+    expect(screen.getByTestId('test-shallow')).toHaveTextContent('a,b,c')
 
     act(() => {
       useMyStore.setState({ a: 4 }) // This will not cause a re-render.
@@ -153,7 +153,7 @@ describe('useShallow', () => {
     })
 
     expect(countRenders).toBe(2)
-    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c,d')
+    expect(screen.getByTestId('test-shallow')).toHaveTextContent('a,b,c,d')
   })
 
   it('does not cause stale closure issues', () => {
@@ -178,10 +178,10 @@ describe('useShallow', () => {
 
     render(<TestShallowWithState />)
 
-    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c,0')
+    expect(screen.getByTestId('test-shallow')).toHaveTextContent('a,b,c,0')
 
     fireEvent.click(screen.getByTestId('test-shallow'))
 
-    expect(screen.getByTestId('test-shallow').textContent).toBe('a,b,c,1')
+    expect(screen.getByTestId('test-shallow')).toHaveTextContent('a,b,c,1')
   })
 })

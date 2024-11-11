@@ -21,6 +21,7 @@
     "react-hooks",
     "import",
     "@vitest",
+    "jest-dom",
     "testing-library",
     "eslint-plugin-react-compiler"
   ],
@@ -107,6 +108,7 @@
   "overrides": [
     {
       "extends": [
+        "plugin:jest-dom/recommended",
         "plugin:testing-library/react",
         "plugin:@vitest/legacy-recommended"
       ],

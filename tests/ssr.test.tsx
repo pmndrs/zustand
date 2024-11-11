@@ -50,7 +50,7 @@ describe.skipIf(!React.version.startsWith('18'))(
       document.body.appendChild(container)
       container.innerHTML = view
 
-      expect(container.textContent).toContain('bears: 0')
+      expect(container).toHaveTextContent(/bears: 0/)
 
       await act(async () => {
         hydrateRoot(
@@ -62,7 +62,7 @@ describe.skipIf(!React.version.startsWith('18'))(
       })
 
       const bearCountText = await screen.findByText('bears: 1')
-      expect(bearCountText).not.toBeNull()
+      expect(bearCountText).toBeInTheDocument()
       document.body.removeChild(container)
     })
     it('should not have hydration errors', async () => {
@@ -90,7 +90,7 @@ describe.skipIf(!React.version.startsWith('18'))(
       document.body.appendChild(container)
       container.innerHTML = view
 
-      expect(container.textContent).toContain('bears: 0')
+      expect(container).toHaveTextContent(/bears: 0/)
 
       const consoleMock = vi.spyOn(console, 'error')
 
@@ -111,7 +111,7 @@ describe.skipIf(!React.version.startsWith('18'))(
       expect(consoleMock).toHaveBeenCalledTimes(0)
 
       const bearCountText = await screen.findByText('bears: 1')
-      expect(bearCountText).not.toBeNull()
+      expect(bearCountText).toBeInTheDocument()
       document.body.removeChild(container)
     })
   },
