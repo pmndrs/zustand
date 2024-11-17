@@ -180,11 +180,14 @@ store.setState({}, true) // Error
 
 #### Handling Dynamic `replace` Flag
 
-If the value of the `replace` flag is dynamic and determined at runtime, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with `as any`:
+If the value of the `replace` flag is dynamic and determined at runtime, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with the parameters of the `setState` function:
 
 ```ts
 const replaceFlag = Math.random() > 0.5
-store.setState(partialOrFull, replaceFlag as any)
+const args = [{ bears: 5 }, replaceFlag] as Parameters<
+  typeof useBearStore.setState
+>
+store.setState(...args)
 ```
 
 #### Persist middlware no longer stores item at store creation
