@@ -6,7 +6,7 @@ nav: 205
 
 # devtools
 
-`devtools` middleware lets you use [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)
+`devtools` middleware lets you use [Redux DevTools Extension](https://github.com/reduxjs/redux-devtools)
 without Redux. Read more about the benefits of using [Redux DevTools for debugging](https://redux.js.org/style-guide/#use-the-redux-devtools-extension-for-debugging).
 
 ```js
