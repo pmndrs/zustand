@@ -148,7 +148,7 @@ import ReactDOMClient from 'react-dom/client'
 
 import { App } from './app.tsx'
 
-ReactDOMClient.hydrateRoot(<App />, document)
+ReactDOMClient.hydrateRoot(document, <App />)
 ```
 
 ```tsx
