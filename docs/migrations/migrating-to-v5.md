@@ -190,7 +190,7 @@ const args = [{ bears: 5 }, replaceFlag] as Parameters<
 store.setState(...args)
 ```
 
-#### Persist middlware no longer stores item at store creation
+#### Persist middleware no longer stores item at store creation
 
 Previously, the `persist` middleware stored the initial state during store creation. This behavior has been removed in v5 (and v4.5.5).
 
