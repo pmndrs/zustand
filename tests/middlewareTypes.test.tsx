@@ -177,6 +177,32 @@ describe('counter state spec (single middleware)', () => {
     expect(testSubtyping).toBeDefined()
   })
 
+  it('devtools #2700', () => {
+    type TableStore = {
+      table: string
+    }
+
+    const useStoreA = create<TableStore | null>()(
+      devtools((set) => null, { name: 'table-storage' }),
+    )
+
+    expect(useStoreA).toBeDefined()
+
+    const useStoreB = create<TableStore | null>()(
+      devtools(() => null, { name: 'table-storage' }),
+    )
+
+    expect(useStoreB).toBeDefined()
+
+    const useStoreC = create<TableStore | null>()((set) => null)
+
+    expect(useStoreC).toBeDefined()
+
+    const useStoreD = create<TableStore | null>()(() => null)
+
+    expect(useStoreD).toBeDefined()
+  })
+
   it('subscribeWithSelector', () => {
     const useBoundStore = create<CounterState>()(
       subscribeWithSelector((set, get) => ({
