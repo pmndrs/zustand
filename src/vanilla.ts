@@ -51,8 +51,9 @@ type CreateStore = {
 type CreateStoreImpl = <
   T,
   Mos extends [StoreMutatorIdentifier, unknown][] = [],
+  U extends T = T,
 >(
-  initializer: StateCreator<T, [], Mos>,
+  initializer: StateCreator<T, [], Mos, U>,
 ) => Mutate<StoreApi<T>, Mos>
 
 const createStoreImpl: CreateStoreImpl = (createState) => {
