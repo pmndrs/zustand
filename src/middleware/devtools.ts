@@ -79,8 +79,9 @@ type Devtools = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+  U = T,
 >(
-  initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs>,
+  initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs, U>,
   devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs]>
 
@@ -91,10 +92,10 @@ declare module '../vanilla' {
   }
 }
 
-type DevtoolsImpl = <T>(
-  storeInitializer: StateCreator<T, [], []>,
+type DevtoolsImpl = <T, U extends T = T>(
+  storeInitializer: StateCreator<T, [], [], U>,
   devtoolsOptions?: DevtoolsOptions,
-) => StateCreator<T, [], []>
+) => StateCreator<T, [], [], U>
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
