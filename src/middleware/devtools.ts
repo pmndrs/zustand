@@ -92,10 +92,10 @@ declare module '../vanilla' {
   }
 }
 
-type DevtoolsImpl = <T, U extends T = T>(
-  storeInitializer: StateCreator<T, [], [], U>,
+type DevtoolsImpl = <T>(
+  storeInitializer: StateCreator<T, [], []>,
   devtoolsOptions?: DevtoolsOptions,
-) => StateCreator<T, [], [], U>
+) => StateCreator<T, [], []>
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 

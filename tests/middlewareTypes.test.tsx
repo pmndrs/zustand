@@ -183,7 +183,7 @@ describe('counter state spec (single middleware)', () => {
     }
 
     const useStoreA = create<TableStore | null>()(
-      devtools((set) => null, { name: 'table-storage' }),
+      devtools((_set) => null, { name: 'table-storage' }),
     )
 
     expect(useStoreA).toBeDefined()
@@ -194,7 +194,7 @@ describe('counter state spec (single middleware)', () => {
 
     expect(useStoreB).toBeDefined()
 
-    const useStoreC = create<TableStore | null>()((set) => null)
+    const useStoreC = create<TableStore | null>()((_set) => null)
 
     expect(useStoreC).toBeDefined()
 
