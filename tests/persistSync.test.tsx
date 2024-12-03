@@ -131,7 +131,7 @@ describe('persist middleware with sync configuration', () => {
     expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
   })
 
-  it('can migrate persisted state', () => {
+  it('can non-async migrate persisted state', () => {
     const setItemSpy = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
     const migrateSpy = vi.fn(() => ({ count: 99 }))
