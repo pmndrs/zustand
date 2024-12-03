@@ -338,6 +338,8 @@ describe('persist middleware with async configuration', () => {
     await screen.findByText('count: 0')
     await waitFor(() => {
       expect(console.error).toHaveBeenCalled()
+    })
+    await waitFor(() => {
       expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
     })
   })
