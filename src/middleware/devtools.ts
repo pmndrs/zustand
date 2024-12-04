@@ -79,8 +79,9 @@ type Devtools = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+  U = T,
 >(
-  initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs>,
+  initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs, U>,
   devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs]>
 
