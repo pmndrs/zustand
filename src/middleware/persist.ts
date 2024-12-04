@@ -258,13 +258,14 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
             deserializedStorageValue.version !== options.version
           ) {
             if (options.migrate) {
-              return [
-                true,
-                options.migrate(
-                  deserializedStorageValue.state,
-                  deserializedStorageValue.version,
-                ),
-              ] as const
+              const migration = options.migrate(
+                deserializedStorageValue.state,
+                deserializedStorageValue.version,
+              )
+              if (migration instanceof Promise) {
+                return migration.then((result) => [true, result] as const)
+              }
+              return [true, migration] as const
             }
             console.error(
               `State loaded from storage couldn't be migrated since no migrate function was provided`,

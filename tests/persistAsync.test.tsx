@@ -193,10 +193,10 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
-  it('can migrate persisted state', async () => {
+  it('can async migrate persisted state', async () => {
     const setItemSpy = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
-    const migrateSpy = vi.fn(() => ({ count: 99 }))
+    const migrateSpy = vi.fn(() => Promise.resolve({ count: 99 }))
 
     const storage = {
       getItem: async () =>
