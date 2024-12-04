@@ -1,4 +1,4 @@
-import { resolve } from 'node:path'
+import { resolve } from 'path'
 // eslint-disable-next-line import/extensions
 import { defineConfig } from 'vitest/config'
 
