@@ -69,6 +69,7 @@ This example shows you how you can use `Redux Devtools` to debug a store
 
 ```ts
 import { create, StateCreator } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 type JungleStore = {
   bears: number
