@@ -65,7 +65,7 @@ you can use this suggested workflow:
 
 - Fork this repository;
 - Create a new feature branch based on the `main` branch;
-- Install dependencies by running `pnpm`;
+- Install dependencies by running `pnpm install`;
 - Create failing tests for your fix or new feature;
 - Implement your changes and confirm that all test are passing.
   You can run the tests continuously during development
