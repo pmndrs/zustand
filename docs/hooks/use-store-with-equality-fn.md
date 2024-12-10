@@ -693,7 +693,9 @@ const CounterStoresProvider = ({ children }) => {
   )
 
   return (
-    <CounterStoresContext.Provider>{children}</CounterStoresContext.Provider>
+    <CounterStoresContext.Provider value={stores}>
+      {children}
+    </CounterStoresContext.Provider>
   )
 }
 ```
