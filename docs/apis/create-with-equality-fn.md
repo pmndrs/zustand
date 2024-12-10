@@ -87,7 +87,7 @@ const useAgeStore = createWithEqualityFn<AgeStore>()(
 )
 
 export default function App() {
-  const age = useAgeStore((state) => stage.age)
+  const age = useAgeStore((state) => state.age)
   const setAge = useAgeStore((state) => state.setAge)
 
   function increment() {
