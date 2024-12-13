@@ -1,12 +1,10 @@
 name: Compressed Size
 
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -17,4 +15,4 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
       - uses: preactjs/compressed-size-action@v2
         with:
-          pattern: "./dist/**/*.{js,mjs}"
+          pattern: './dist/**/*.{js,mjs}'
