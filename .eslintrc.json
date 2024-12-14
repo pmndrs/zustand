@@ -22,7 +22,7 @@
     "@vitest",
     "jest-dom",
     "testing-library",
-    "eslint-plugin-react-compiler"
+    "react-compiler"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
