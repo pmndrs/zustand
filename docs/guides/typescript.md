@@ -36,10 +36,7 @@ const x = create(() => ({
   foo: 0,
   bar: '',
 }))
-// const x: {
-//     foo: number;
-//     bar: string;
-// }
+// const x: { foo: number; bar: string; }
 ```
 
 Here, if we do not provide a `get` param for `f` function, `x` can be inferred properly. However, if we provide the `get` function
@@ -48,16 +45,16 @@ Here, if we do not provide a `get` param for `f` function, `x` can be inferred p
 declare const create: <T>(f: (get: () => T) => T) => T
 const x = create((get) => ({
   foo: 0,
-  bar: '',
+  bar: () => get(),
 }))
 // const x: unknown
 ```
 
 `x` is inferred as `unknown`, why the difference? Let us walk through how TS Engine binds the type.
 
-In the first case, the engine try to match `() => ({foo: 0, bar: ''})` and `(get: () => T) => T`, based on the return type, the engine binds `T` with `{foo: 0, bar: ''}`, after doing that, all the constraint are met, it will not bother to match the parameter type because there is no parameter and will always match. Remember that `()=>number` is perfectly assignable to `(x:number)=>number`
+In the first case, the engine try to match `() => ({foo: 0, bar: ''})` and `(get: () => T) => T`. Based on the return type, the engine binds `T` with `{foo: 0, bar: ''}`, after doing that, all the constraint are met, it will not bother to match the parameter type because there is no parameter and will always match. Remember that `()=>number` is perfectly assignable to `(x:number)=>number`
 
-In the second case, the engine tries to match `(get) => ({foo: 0, bar: ''})` and `(get: () => T) => T`, This time, the engine sees the `get` parameter is provided, so it **must** match it. However, `get` has an implicit `any` type without other hint to match `()=>T`, so `T` is inferred as `unknown`. Now, `T` is inferred as `unknown` in the parameter type and `{foo: 0, bar: ''}` in the return type. Finally, `T` is inferred as `unknown | {foo: 0, bar: ''}` which is `unknown`.
+In the second case, the engine tries to match `(get) => ({foo: 0, bar: ''})` and `(get: () => T) => T`, This time, the engine sees that the `get` parameter **DOES** exist, so the strategy is different from the previous one, it **must** match it. However, `get` has an implicit `any` type without other hint to match `()=>T`, so `T` is inferred as `unknown`. Now, `T` is inferred as `unknown` in the parameter type and `{foo: 0, bar: ''}` in the return type. Finally, `T` is inferred as `unknown | {foo: 0, bar: ''}` which is `unknown`.
 
 If we provide some hints for the parameter type, it works again
 
@@ -66,14 +63,13 @@ const x = create((get: () => { foo: number }) => ({
   foo: 0,
   bar: '',
 }))
-// {
-// foo: number;
-//  bar: string;
-// }
+// { foo: number; bar: string; }
 ```
 
 Note that x is inferred as `{foo:number;bar:string}` rather then `{foo:number;bar:string}`.
 Note that `{foo:number;bar:string} |{ foo:number } = {foo:number;bar:string}`
+
+In the real-world scenario, we know that the creator is useful only when we have a `get` function as a parameter of it. So we have to match the second version of the signature where `T` is inferred as `unknown` for sure. To fix the problem, we have to choose to annotate the type explicitly, inferring type automatically simply will not work for the reason above.
 
 </details>
 
