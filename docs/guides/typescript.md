@@ -30,27 +30,29 @@ const useBearStore = create<BearState>()((set) => ({
 
 Consider this minimal version `create`:
 
-``` ts
+```ts
 declare const create: <T>(f: (get: () => T) => T) => T
 const x = create(() => ({
   foo: 0,
-  bar: ''
+  bar: '',
 }))
 // const x: {
 //     foo: number;
 //     bar: string;
 // }
 ```
+
 Here, if we do not provide a `get` param for `f` function, `x` can be inferred properly. However, if we provide the `get` function
 
 ```ts
 declare const create: <T>(f: (get: () => T) => T) => T
 const x = create((get) => ({
   foo: 0,
-  bar: ''
+  bar: '',
 }))
 // const x: unknown
 ```
+
 `x` is inferred as `unknown`, why the difference? Let us walk through how TS Engine binds the type.
 
 In the first case, the engine try to match `() => ({foo: 0, bar: ''})` and `(get: () => T) => T`, based on the return type, the engine binds `T` with `{foo: 0, bar: ''}`, after doing that, all the constraint are met, it will not bother to match the parameter type because there is no parameter and will always match. Remember that `()=>number` is perfectly assignable to `(x:number)=>number`
@@ -59,16 +61,17 @@ In the second case, the engine tries to match `(get) => ({foo: 0, bar: ''})` and
 
 If we provide some hints for the parameter type, it works again
 
-``` ts
-const x = create((get:()=>{ foo:number }) => ({
+```ts
+const x = create((get: () => { foo: number }) => ({
   foo: 0,
-  bar: ''
+  bar: '',
 }))
 // {
 // foo: number;
 //  bar: string;
 // }
 ```
+
 Note that x is inferred as `{foo:number;bar:string}` rather then `{foo:number;bar:string}`.
 Note that `{foo:number;bar:string} |{ foo:number } = {foo:number;bar:string}`
 
