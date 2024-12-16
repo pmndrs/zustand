@@ -15,7 +15,7 @@ Don't disregard it because it's cute. It has quite the claws, lots of time was s
 You can try a live demo [here](https://githubbox.com/pmndrs/zustand/tree/main/examples/demo).
 
 ```bash
-npm i zustand
+npm install zustand
 ```
 
 :warning: This readme is written for JavaScript users. If you are a TypeScript user, be sure to check out our [TypeScript Usage section](#typescript-usage).
