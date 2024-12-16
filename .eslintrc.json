@@ -8,22 +8,13 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:prettier/recommended"
   ],
-  "plugins": [
-    "@typescript-eslint",
-    "react",
-    "prettier",
-    "react-hooks",
-    "import",
-    "@vitest",
-    "jest-dom",
-    "testing-library",
-    "react-compiler"
-  ],
+  "plugins": ["react-compiler"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
@@ -77,8 +68,6 @@
         "pathGroupsExcludedImportTypes": ["builtin"]
       }
     ],
-    "react/jsx-uses-react": "off",
-    "react/react-in-jsx-scope": "off",
     "sort-imports": [
       "error",
       {
