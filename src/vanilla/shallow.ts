@@ -12,15 +12,36 @@ const hasIterableEntries = (
 const compareEntries = (
   valueA: { entries(): Iterable<[unknown, unknown]> },
   valueB: { entries(): Iterable<[unknown, unknown]> },
-) => {
+): boolean => {
+  if (
+    'size' in valueA &&
+    'size' in valueB &&
+    (valueA as { size: number }).size !== (valueB as { size: number }).size
+  ) {
+    return false
+  }
+
   const mapA = valueA instanceof Map ? valueA : new Map(valueA.entries())
   const mapB = valueB instanceof Map ? valueB : new Map(valueB.entries())
+
   if (mapA.size !== mapB.size) {
     return false
   }
+
+  const compared = new WeakMap()
+
   for (const [key, value] of mapA) {
-    if (!Object.is(value, mapB.get(key))) {
+    if (typeof key === 'object' && key !== null && compared.has(key)) {
+      continue
+    }
+
+    const valueB = mapB.get(key)
+    if (!Object.is(value, valueB)) {
       return false
+    }
+
+    if (typeof key === 'object' && key !== null) {
+      compared.set(key, true)
     }
   }
   return true
