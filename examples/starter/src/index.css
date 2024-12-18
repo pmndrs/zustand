@@ -1,0 +1,14 @@
+html,
+body,
+#app {
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  place-items: center;
+  justify-content: center;
+
+  color: #fff;
+  background-color: #131311;
+}
