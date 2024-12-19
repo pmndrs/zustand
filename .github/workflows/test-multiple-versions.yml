@@ -40,8 +40,7 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          cache-dependency-path: '**/pnpm-lock.yaml'
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
           pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
