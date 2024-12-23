@@ -17,6 +17,7 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
+  react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
   importPlugin.flatConfigs.errors,
   importPlugin.flatConfigs.warnings,
