@@ -2,8 +2,6 @@ import eslint from '@eslint/js'
 import vitest from '@vitest/eslint-plugin'
 import importPlugin from 'eslint-plugin-import'
 import jestDom from 'eslint-plugin-jest-dom'
-// eslint-disable-next-line import/extensions
-import prettierRecommended from 'eslint-plugin-prettier/recommended'
 import react from 'eslint-plugin-react'
 import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -136,5 +134,4 @@ export default tseslint.config(
       '@typescript-eslint/no-require-imports': 'off',
     },
   },
-  prettierRecommended,
 )
