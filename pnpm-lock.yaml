@@ -22,7 +22,7 @@ devDependencies:
     version: 6.0.1(rollup@4.28.0)
   '@rollup/plugin-typescript':
     specifier: ^12.1.1
-    version: 12.1.1(rollup@4.28.0)(typescript@5.7.2)
+    version: 12.1.1(rollup@4.28.0)(tslib@2.8.1)(typescript@5.7.2)
   '@testing-library/jest-dom':
     specifier: ^6.6.3
     version: 6.6.3
@@ -113,6 +113,9 @@ devDependencies:
   shx:
     specifier: ^0.3.4
     version: 0.3.4
+  tslib:
+    specifier: ^2.8.1
+    version: 2.8.1
   typescript:
     specifier: ^5.7.2
     version: 5.7.2
@@ -1031,7 +1034,7 @@ packages:
       rollup: 4.28.0
     dev: true
 
-  /@rollup/plugin-typescript@12.1.1(rollup@4.28.0)(typescript@5.7.2):
+  /@rollup/plugin-typescript@12.1.1(rollup@4.28.0)(tslib@2.8.1)(typescript@5.7.2):
     resolution: {integrity: sha512-t7O653DpfB5MbFrqPe/VcKFFkvRuFNp9qId3xq4Eth5xlyymzxNpye2z8Hrl0RIMuXTSr5GGcFpkdlMeacUiFQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1047,6 +1050,7 @@ packages:
       '@rollup/pluginutils': 5.1.3(rollup@4.28.0)
       resolve: 1.22.8
       rollup: 4.28.0
+      tslib: 2.8.1
       typescript: 5.7.2
     dev: true
 
@@ -4241,6 +4245,10 @@ packages:
       json5: 1.0.2
       minimist: 1.2.8
       strip-bom: 3.0.0
+    dev: true
+
+  /tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
     dev: true
 
   /type-check@0.4.0:
