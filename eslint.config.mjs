@@ -23,7 +23,6 @@ export default tseslint.config(
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals['shared-node-browser'],
         ...globals.node,
         ...globals.es2015,
       },
