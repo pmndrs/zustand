@@ -66,6 +66,7 @@ export default tseslint.config(
       'import/no-unresolved': ['error', { commonjs: true, amd: true }],
       'import/export': 'error',
       'import/no-duplicates': ['error'],
+      'import/no-named-as-default-member': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
