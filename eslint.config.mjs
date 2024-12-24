@@ -48,12 +48,9 @@ export default tseslint.config(
         '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
       'import/resolver': {
-        alias: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
-          map: [
-            ['^zustand$', './src/index.ts'],
-            ['zustand', './src'],
-          ],
+        typescript: {
+          alwaysTryTypes: true,
+          project: 'tsconfig.json',
         },
       },
     },
