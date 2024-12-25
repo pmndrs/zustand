@@ -17,8 +17,6 @@ export default tseslint.config(
   tseslint.configs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
-  importPlugin.flatConfigs.errors,
-  importPlugin.flatConfigs.warnings,
   {
     languageOptions: {
       globals: {
@@ -36,6 +34,7 @@ export default tseslint.config(
       },
     },
     plugins: {
+      import: importPlugin,
       'react-compiler': reactCompiler,
       'react-hooks': reactHooks,
     },
@@ -64,13 +63,12 @@ export default tseslint.config(
           ignoreDeclarationSort: true,
         },
       ],
-      'import/extensions': ['error', 'always'],
       'import/no-unresolved': ['error', { commonjs: true, amd: true }],
+      'import/default': 'error',
       'import/export': 'error',
-      'import/no-duplicates': ['error'],
-      'import/no-named-as-default-member': 'off',
-      'import/namespace': 'off',
-      'import/named': 'off',
+      'import/no-duplicates': 'error',
+      'import/no-named-as-default': 'warn',
+      'import/extensions': ['error', 'always'],
       'import/order': [
         'error',
         {
