@@ -56,7 +56,6 @@ export default tseslint.config(
     rules: {
       eqeqeq: 'error',
       curly: ['warn', 'multi-line', 'consistent'],
-      'no-console': 'off',
       'sort-imports': [
         'error',
         {
