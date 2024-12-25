@@ -55,26 +55,20 @@ export default tseslint.config(
       },
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-compiler/react-compiler': 'warn',
       eqeqeq: 'error',
-      'no-var': 'error',
-      'prefer-const': 'error',
       curly: ['warn', 'multi-line', 'consistent'],
       'no-console': 'off',
+      'sort-imports': [
+        'error',
+        {
+          ignoreDeclarationSort: true,
+        },
+      ],
       'import/extensions': ['error', 'always'],
       'import/no-unresolved': ['error', { commonjs: true, amd: true }],
       'import/export': 'error',
       'import/no-duplicates': ['error'],
       'import/no-named-as-default-member': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-      ],
-      '@typescript-eslint/no-use-before-define': 'off',
-      '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
       'import/namespace': 'off',
       'import/named': 'off',
       'import/order': [
@@ -101,12 +95,13 @@ export default tseslint.config(
           pathGroupsExcludedImportTypes: ['builtin'],
         },
       ],
-      'sort-imports': [
-        'error',
-        {
-          ignoreDeclarationSort: true,
-        },
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      '@typescript-eslint/no-explicit-any': 'off',
+      ...reactHooks.configs.recommended.rules,
+      'react-compiler/react-compiler': 'warn',
     },
   },
   {
@@ -115,8 +110,8 @@ export default tseslint.config(
     ...jestDom.configs['flat/recommended'],
     ...vitest.configs.recommended,
     rules: {
-      'testing-library/no-node-access': 'off',
       'import/extensions': ['error', 'never'],
+      'testing-library/no-node-access': 'off',
       'vitest/expect-expect': 'off',
       'vitest/consistent-test-it': [
         'error',
