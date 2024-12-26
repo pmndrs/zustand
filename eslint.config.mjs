@@ -6,7 +6,6 @@ import react from 'eslint-plugin-react'
 import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 import testingLibrary from 'eslint-plugin-testing-library'
-import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
@@ -19,11 +18,6 @@ export default tseslint.config(
   react.configs.flat['jsx-runtime'],
   {
     languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.es2015,
-      },
       parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: 2018,
