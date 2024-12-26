@@ -131,7 +131,6 @@
     "eslint-plugin-react-compiler": "19.0.0-beta-df7b47d-20241124",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-testing-library": "^7.0.0",
-    "globals": "^15.13.0",
     "immer": "^10.1.1",
     "jsdom": "^25.0.1",
     "json": "^11.0.0",
