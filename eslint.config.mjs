@@ -69,13 +69,13 @@ export default tseslint.config(
           pathGroupsExcludedImportTypes: ['builtin'],
         },
       ],
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      '@typescript-eslint/no-explicit-any': 'off',
-      ...reactHooks.configs.recommended.rules,
       'react-compiler/react-compiler': 'warn',
+      ...reactHooks.configs.recommended.rules,
     },
   },
   {
@@ -85,13 +85,13 @@ export default tseslint.config(
     ...vitest.configs.recommended,
     rules: {
       'import/extensions': ['error', 'never'],
+      '@typescript-eslint/no-unused-vars': 'off',
       'testing-library/no-node-access': 'off',
       'vitest/expect-expect': 'off',
       'vitest/consistent-test-it': [
         'error',
         { fn: 'it', withinDescribe: 'it' },
       ],
-      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   {
