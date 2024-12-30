@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'examples/**'],
+    ignores: ['dist/', 'examples/'],
   },
   eslint.configs.recommended,
   importPlugin.flatConfigs.recommended,
