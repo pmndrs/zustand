@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "packageManager": "pnpm@9.15.2",
   "dependencies": {
     "zustand": "^5.0.2",
     "react": "^18.3.1",
