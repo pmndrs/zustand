@@ -11,11 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - uses: ./.github/actions/setup
       - run: pnpm install
       - run: pnpm build # we don't have any other workflows to test build
       - run: pnpm test:spec
@@ -35,11 +31,7 @@ jobs:
           - 0.0.0-experimental-1b1283ad-20241203
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - uses: ./.github/actions/setup
       - run: pnpm install
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |

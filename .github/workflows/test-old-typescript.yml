@@ -26,11 +26,7 @@ jobs:
           - 4.5.5
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - uses: ./.github/actions/setup
       - run: pnpm install
       - run: pnpm build
       - name: Patch for all TS
