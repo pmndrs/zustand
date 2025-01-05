@@ -1,3 +1,5 @@
+export type ExtractState<S> = S extends { getState: () => infer T } ? T : never
+
 type SetStateInternal<T> = {
   _(
     partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
