@@ -1,14 +1,14 @@
-/* eslint-disable no-undef */
-const path = require('path')
-const alias = require('@rollup/plugin-alias')
-const resolve = require('@rollup/plugin-node-resolve')
-const replace = require('@rollup/plugin-replace')
-const typescript = require('@rollup/plugin-typescript')
-const { default: esbuild } = require('rollup-plugin-esbuild')
+/*global process*/
+import path from 'path'
+import alias from '@rollup/plugin-alias'
+import resolve from '@rollup/plugin-node-resolve'
+import replace from '@rollup/plugin-replace'
+import typescript from '@rollup/plugin-typescript'
+import esbuild from 'rollup-plugin-esbuild'
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
-const entries = [
+const _entries = [
   { find: /.*\/vanilla\/shallow\.ts$/, replacement: 'zustand/vanilla/shallow' },
   { find: /.*\/react\/shallow\.ts$/, replacement: 'zustand/react/shallow' },
   { find: /.*\/vanilla\.ts$/, replacement: 'zustand/vanilla' },
@@ -50,7 +50,9 @@ function createESMConfig(input, output) {
     output: { file: output, format: 'esm' },
     external,
     plugins: [
-      alias({ entries: entries.filter((e) => !e.find.test(input)) }),
+      alias({
+        entries: _entries.filter((entry) => !entry.find.test(input)),
+      }),
       resolve({ extensions }),
       replace({
         ...(output.endsWith('.js')
@@ -78,7 +80,9 @@ function createCommonJSConfig(input, output) {
     output: { file: output, format: 'cjs' },
     external,
     plugins: [
-      alias({ entries: entries.filter((e) => !e.find.test(input)) }),
+      alias({
+        entries: _entries.filter((e) => !e.find.test(input)),
+      }),
       resolve({ extensions }),
       replace({
         'import.meta.env?.MODE': 'process.env.NODE_ENV',
@@ -90,7 +94,7 @@ function createCommonJSConfig(input, output) {
   }
 }
 
-module.exports = function (args) {
+export default function (args) {
   let c = Object.keys(args).find((key) => key.startsWith('config-'))
   if (c) {
     c = c.slice('config-'.length).replace(/_/g, '/')
@@ -104,4 +108,4 @@ module.exports = function (args) {
   ]
 }
 
-module.exports.entries = []
+export const entries = []
