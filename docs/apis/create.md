@@ -449,8 +449,8 @@ const usePersonStore = create<PersonStore>()((set) => ({
 }))
 
 export default function Form() {
-  const person = usePersonStore((state) => person)
-  const setPerson = usePersonStore((state) => setPerson)
+  const person = usePersonStore((state) => state)
+  const setPerson = usePersonStore((state) => state.setPerson)
 
   function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
     person.firstName = e.target.value
