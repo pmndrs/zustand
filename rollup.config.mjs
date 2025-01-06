@@ -81,7 +81,7 @@ function createCommonJSConfig(input, output) {
     external,
     plugins: [
       alias({
-        entries: _entries.filter((e) => !e.find.test(input)),
+        entries: _entries.filter((entry) => !entry.find.test(input)),
       }),
       resolve({ extensions }),
       replace({
