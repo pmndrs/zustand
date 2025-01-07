@@ -242,7 +242,7 @@ import { createStore } from 'zustand/vanilla'
 
 type PositionStore = [number, number]
 
-const positionStore = create<PositionStore>()(() => [0, 0])
+const positionStore = createStore<PositionStore>()(() => [0, 0])
 
 const $dotContainer = document.getElementById('dot-container') as HTMLDivElement
 const $dot = document.getElementById('dot') as HTMLDivElement
