@@ -13,6 +13,8 @@ export interface StoreApi<T> {
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
 }
 
+export type ExtractState<S> = S extends { getState: () => infer T } ? T : never
+
 type Get<T, K, F> = K extends keyof T ? T[K] : F
 
 export type Mutate<S, Ms> = number extends Ms['length' & keyof Ms]

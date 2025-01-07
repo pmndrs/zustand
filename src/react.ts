@@ -1,13 +1,12 @@
 import React from 'react'
 import { createStore } from './vanilla.ts'
 import type {
+  ExtractState,
   Mutate,
   StateCreator,
   StoreApi,
   StoreMutatorIdentifier,
 } from './vanilla.ts'
-
-type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type ReadonlyStoreApi<T> = Pick<
   StoreApi<T>,
