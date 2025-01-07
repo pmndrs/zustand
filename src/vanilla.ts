@@ -1,5 +1,3 @@
-export type ExtractState<S> = S extends { getState: () => infer T } ? T : never
-
 type SetStateInternal<T> = {
   _(
     partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
@@ -14,6 +12,8 @@ export interface StoreApi<T> {
   getInitialState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
 }
+
+export type ExtractState<S> = S extends { getState: () => infer T } ? T : never
 
 type Get<T, K, F> = K extends keyof T ? T[K] : F
 
