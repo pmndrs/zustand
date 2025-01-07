@@ -104,4 +104,4 @@ module.exports = function (args) {
   ]
 }
 
-module.exports.entries = []
+module.exports.entries = entries
