@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   use-sync-external-store:
-    specifier: 1.2.2
+    specifier: ^1.2.2
     version: 1.2.2(react@19.0.0-rc.0)
 
 devDependencies:
@@ -3208,7 +3208,7 @@ packages:
     dependencies:
       semver: 7.6.3
       shelljs: 0.8.5
-      typescript: 5.6.0-dev.20240814
+      typescript: 5.8.0-dev.20250107
     dev: true
 
   /eastasianwidth@0.2.0:
@@ -5563,8 +5563,8 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript@5.6.0-dev.20240814:
-    resolution: {integrity: sha512-7N6qhxVbJ3E1LdEZ68/WbvZMwlXp9bErVUs2yNA7XaSVDkg+iAYPM24ba0VeGkpR105+e5gaGhAYShD274qBWQ==}
+  /typescript@5.8.0-dev.20250107:
+    resolution: {integrity: sha512-5S8fQVAfikyl3niFOaTOxfF281giwdT8CLPe1yaZFvzS1p6Az4sTCZsiap9sX6pQ5Kn+7L6SxhjPjFFT5iCVMw==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true
