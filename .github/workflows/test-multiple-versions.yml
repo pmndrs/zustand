@@ -31,8 +31,8 @@ jobs:
           - 18.2.0
           - 18.3.1
           - 19.0.0-rc.1
-          - 19.0.0-rc-1b1283ad-20241203
-          - 0.0.0-experimental-1b1283ad-20241203
+          - 19.1.0-canary-3ce77d55-20250106
+          - 0.0.0-experimental-3ce77d55-20250106
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
