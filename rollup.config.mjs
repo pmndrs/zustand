@@ -8,7 +8,7 @@ import esbuild from 'rollup-plugin-esbuild'
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
-const aliasEntries = [
+export const entries = [
   { find: /.*\/vanilla\/shallow\.ts$/, replacement: 'zustand/vanilla/shallow' },
   { find: /.*\/react\/shallow\.ts$/, replacement: 'zustand/react/shallow' },
   { find: /.*\/vanilla\.ts$/, replacement: 'zustand/vanilla' },
@@ -51,7 +51,7 @@ function createESMConfig(input, output) {
     external,
     plugins: [
       alias({
-        entries: aliasEntries.filter((entry) => !entry.find.test(input)),
+        entries: entries.filter((entry) => !entry.find.test(input)),
       }),
       resolve({ extensions }),
       replace({
@@ -81,7 +81,7 @@ function createCommonJSConfig(input, output) {
     external,
     plugins: [
       alias({
-        entries: aliasEntries.filter((entry) => !entry.find.test(input)),
+        entries: entries.filter((entry) => !entry.find.test(input)),
       }),
       resolve({ extensions }),
       replace({
@@ -107,5 +107,3 @@ export default function (args) {
     createESMConfig(`src/${c}.ts`, `dist/esm/${c}.mjs`),
   ]
 }
-
-export const entries = []
