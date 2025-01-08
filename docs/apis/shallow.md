@@ -78,8 +78,8 @@ shallow(booleanLeft, booleanRight) // -> true
 const bigIntLeft = 1n
 const bigIntRight = 1n
 
-Object.is(bigInLeft, bigInRight) // -> true
-shallow(bigInLeft, bigInRight) // -> true
+Object.is(bigIntLeft, bigIntRight) // -> true
+shallow(bigIntLeft, bigIntRight) // -> true
 ```
 
 ### Comparing Objects
