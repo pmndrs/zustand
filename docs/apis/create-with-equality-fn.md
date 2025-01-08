@@ -558,7 +558,7 @@ const usePersonStore = createWithEqualityFn<PersonStore>()(
       lastName: 'Hepworth',
       email: 'bhepworth@sculpture.com',
     },
-    setPerson: (nextPerson) => set({ person: nextPerson })
+    setPerson: (nextPerson) => set({ person: nextPerson }),
   }),
   shallow,
 )
