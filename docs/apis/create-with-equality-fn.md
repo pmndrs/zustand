@@ -558,7 +558,7 @@ const usePersonStore = createWithEqualityFn<PersonStore>()(
       lastName: 'Hepworth',
       email: 'bhepworth@sculpture.com',
     },
-    setPerson: (person) => set({ person }),
+    setPerson: (nextPerson) => set({ person: nextPerson }),
   }),
   shallow,
 )
@@ -567,15 +567,15 @@ export default function Form() {
   const person = usePersonStore((state) => state.person)
   const setPerson = usePersonStore((state) => state.setPerson)
 
-  function handleFirstNameChange(e: ChangeEvent<HTLMInputElement>) {
+  function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
     setPerson({ ...person, firstName: e.target.value })
   }
 
-  function handleLastNameChange(e: ChangeEvent<HTLMInputElement>) {
+  function handleLastNameChange(e: ChangeEvent<HTMLInputElement>) {
     setPerson({ ...person, lastName: e.target.value })
   }
 
-  function handleEmailChange(e: ChangeEvent<HTLMInputElement>) {
+  function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
     setPerson({ ...person, email: e.target.value })
   }
 
