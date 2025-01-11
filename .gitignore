@@ -10,3 +10,7 @@ $RECYCLE.BIN/
 coverage/
 .rpt2_cache/
 .idea
+examples/**/*/package-lock.json
+examples/**/*/yarn.lock
+examples/**/*/pnpm-lock.yaml
+examples/**/*/bun.lockb
