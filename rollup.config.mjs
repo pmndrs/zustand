@@ -50,7 +50,7 @@ function createESMConfig(input, output) {
     output: { file: output, format: 'esm' },
     external,
     plugins: [
-      alias({ entries: entries.filter((e) => !e.find.test(input)) }),
+      alias({ entries: entries.filter((entry) => !entry.find.test(input)) }),
       resolve({ extensions }),
       replace({
         ...(output.endsWith('.js')
@@ -78,7 +78,7 @@ function createCommonJSConfig(input, output) {
     output: { file: output, format: 'cjs' },
     external,
     plugins: [
-      alias({ entries: entries.filter((e) => !e.find.test(input)) }),
+      alias({ entries: entries.filter((entry) => !entry.find.test(input)) }),
       resolve({ extensions }),
       replace({
         'import.meta.env?.MODE': 'process.env.NODE_ENV',
