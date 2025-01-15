@@ -63,9 +63,9 @@ This can be done using third-party libraries created by the community.
 - [zustand-sync-tabs](https://github.com/mayank1513/zustand-sync-tabs) — Zustand middleware to easily sync Zustand state between tabs/windows/iframes with same origin.
 - [zustand-valtio](https://github.com/zustandjs/zustand-valtio) — A sweet combination of Zustand and Valtio
 - [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) — State management for vue (Vue3 / Vue2) based on zustand.
+- [zustand-x](https://github.com/udecode/zustand-x) — Zustand store factory for a best-in-class developer experience.
 - [zustand-xs](https://github.com/zustandjs/zustand-xs) — XState/store compabile middleware for Zustand
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
-- [zustood](https://github.com/udecode/zustood) — 🐻‍❄️ A modular store factory using Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) — Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
 - [zutron](https://github.com/goosewobbler/zutron) — Use Zustand in Electron apps, seamlessly.
