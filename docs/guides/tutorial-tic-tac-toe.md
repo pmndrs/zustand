@@ -327,10 +327,8 @@ const useGameStore = create(
 )
 
 export default function Board() {
-  const [squares, setSquares] = useGameStore((state) => [
-    state.squares,
-    state.setSquares,
-  ])
+  const squares = useGameStore((state) => state.squares)
+  const setSquares = useGameStore((state) => state.setSquares)
 
   return (
     <div
