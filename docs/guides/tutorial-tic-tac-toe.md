@@ -390,7 +390,7 @@ The `handleClick` function should take the index of the square to update and cre
 `squares` array (`nextSquares`). Then, `handleClick` updates the `nextSquares` array by adding `X`
 to the square at the specified index (`i`) if is not already filled.
 
-```jsx {7-12,29}
+```jsx {5-10,27}
 export default function Board() {
   const squares = useGameStore((state) => state.squares)
   const setSquares = useGameStore((state) => state.setSquares)
@@ -466,7 +466,7 @@ Each time a player moves, `xIsNext` (a boolean) will be flipped to determine whi
 and the game's state will be saved. You'll update the Board's `handleClick` function to flip the
 value of `xIsNext`:
 
-```jsx {2-5,10,15}
+```jsx {2-3,6,11}
 export default function Board() {
   const xIsNext = useGameStore((state) => state.xIsNext)
   const setXIsNext = useGameStore((state) => state.setXIsNext)
@@ -569,7 +569,7 @@ To let the players know when the game is over, you can display text such as `'Wi
 display the winner or draw if the game is over and if the game is ongoing you'll display which
 player's turn is next:
 
-```jsx {10-11,13,25}
+```jsx {6-7,9,21}
 export default function Board() {
   const xIsNext = useGameStore((state) => state.xIsNext)
   const setXIsNext = useGameStore((state) => state.setXIsNext)
@@ -784,7 +784,7 @@ component data and instruct the `Board` component to render previous turns from 
 First, add a `Game` component with `export default` and remove it from `Board` component. Here is
 what the code should look like:
 
-```jsx {1,48-65}
+```jsx {1,44-61}
 function Board() {
   const xIsNext = useGameStore((state) => state.xIsNext)
   const setXIsNext = useGameStore((state) => state.setXIsNext)
@@ -882,7 +882,7 @@ To render the squares for the current move, you'll need to read the most recent 
 the `history` state. You don't need an extra state for this because you already have enough
 information to calculate it during rendering:
 
-```jsx {2-3}
+```jsx {2-6}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
@@ -913,7 +913,7 @@ Next, create a `handlePlay` function inside the `Game` component that will be ca
 component to update the game. Pass `xIsNext`, `currentSquares` and `handlePlay` as props to the
 `Board` component:
 
-```jsx {5-7,18}
+```jsx {8-10,21}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
@@ -1174,7 +1174,7 @@ You'll use `map` to transform your `history` of moves into React elements repres
 screen, and display a list of buttons to **jump** to past moves. Let's `map` over the `history` in
 the `Game` component:
 
-```jsx {26-41}
+```jsx {29-44}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
@@ -1296,7 +1296,7 @@ function handlePlay(nextSquares) {
 Finally, you will modify the `Game` component to render the currently selected move, instead of
 always rendering the final move:
 
-```jsx {2-10}
+```jsx {2-8}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
@@ -1362,7 +1362,7 @@ There's no need to store `xIsNext` separately in the state. It’s better to avo
 because it can reduce bugs and make your code easier to understand. Instead, you can calculate
 `xIsNext` based on `currentMove`:
 
-```jsx {2,10,14}
+```jsx {2-5,13,17}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
