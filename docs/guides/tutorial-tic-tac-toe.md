@@ -123,8 +123,6 @@ function Board({ xIsNext, squares, onPlay }) {
 }
 
 export default function Game() {
-  const xIsNext = useGameStore((state) => state.xIsNext)
-  const setXIsNext = useGameStore((state) => state.setXIsNext)
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
   const currentMove = useGameStore((state) => state.currentMove)
@@ -1101,8 +1099,8 @@ function Board({ xIsNext, squares, onPlay }) {
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
-  const currentMove = useGameStore((state) => state.currentMove)
-  const setCurrentMove = useGameStore((state) => state.setCurrentMove)
+  const xIsNext = useGameStore((state) => state.xIsNext)
+  const setXIsNext = useGameStore((state) => state.setXIsNext)
   const currentSquares = history[history.length - 1]
 
   function handlePlay(nextSquares) {
