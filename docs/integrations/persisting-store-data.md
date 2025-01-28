@@ -42,8 +42,8 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 type BearStore = {
-   bears: number,
-   addBear: () => void
+  bears: number
+  addBear: () => void
 }
 
 export const useBearStore = create<BearStore>()(
