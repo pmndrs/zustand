@@ -293,7 +293,7 @@ You can persist your store's data using any kind of storage.
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-const useFishStore = create(
+const useFishStore = create()(
   persist(
     (set, get) => ({
       fishes: 0,
