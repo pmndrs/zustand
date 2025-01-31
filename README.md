@@ -328,6 +328,36 @@ const useBeeStore = create(
 )
 ```
 
+## Zustand Sync Middleware
+
+A middleware for Zustand that enables automatic state synchronization across multiple tabs/windows using `BroadcastChannel` and `localStorage` as a fallback.
+
+`syncStore(options)(config)`
+
+```jsx
+import { create } from 'zustand';
+import { syncStore } from 'zustand-sync-middleware';
+
+interface TestState {
+  count: number;
+  user: string;
+  increment: () => void;
+}
+
+const useStore = create(
+  syncStore<TestState>({
+    name: 'test-storage', // Unique storage key
+    fields: ['count'], // Only 'count' will be synced across tabs
+    storage: sessionStorage , // Use sessionStorage instead of localStorage (optional)
+  })((set) => ({
+    count: 0,
+    user: 'guest', // This field is NOT synced
+    increment: () => set((s) => ({ count: s.count + 1 })),
+  }))
+);
+
+```
+
 ## Can't live without redux-like reducers and action types?
 
 ```jsx
