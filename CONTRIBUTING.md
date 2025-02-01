@@ -73,22 +73,17 @@ After you have submitted your pull request, we'll try to get back to you as soon
 
 ##### Documentation
 
-1. Separately, clone the [`pmndrs/website`](https://github.com/pmndrs/website)
-   (you don't need to fork it).
-   1. This repo runs most of the doc websites under the pmndrs banner,
-      including React Three Fiber and Zustand.
-   2. Switch to the `docs` branch.
-   3. Now, you should have two repositories locally.
-2. Inside the `pmndrs/website` directory, run `npm install` and then `npm run dev`.
-   1. This will launch the website locally. You should be able to open and see the various documentation sites.
-3. One little catch here is that the website reads directly from Github, not locally. As a temporary measure, you can do the following (don't commit any changes made in the pmndrs/website repo):
-   1. In your own Zustand fork, create a new working branch (further related to as `[your-branch]`).
-   2. Inside website codebase, open `src/data/libraries.ts`.
-   3. Within the `zustand` key, change `docs: 'pmndrs/zustand/main/docs'` to `docs: '[your-username]/zustand/[your-branch]/docs'`. (e.g., `docs: 'foo/zustand/docs-test/docs'`)
-   4. Now, inside your Zustand fork, make the appropriate changes to the documentation files in the `docs` folder.
-   5. Restart the website locally (`control + c` -> `npm run dev`).
-   6. Sometimes you may have to also remove the `temp` directory in the website directory (`rm -r temp`).
-   7. Visit the Zustand docs locally and you should see the content you've just changed.
+Our [docs](https://zustand.docs.pmnd.rs) are based on [`pmndrs/docs`](https://github.com/pmndrs/docs).
+
+1. Separately, clone the `pmndrs/docs`. (you don't need to fork it)
+2. Inside the `pmndrs/docs` directory:
+   1. Create a `.env` file in the root directory with the next environment variables: `MDX=docs/zustand/docs` and `HOME_REDIRECT=/getting-started/introduction`.
+   2. Install dependencies by running `npm install`, then `npm run dev` to start the dev server.
+   3. Navigate to [`http://localhost:3000`](http://localhost:3000) to view the documents.
+3. Go Back to the forked repository:
+   1. Install dependencies by running `pnpm install`.
+   2. Navigate to the [`docs`](./docs/) folder and make necessary changes to the documents.
+   3. Add your changes to the documents and see them live reloaded in the browser. (if you don't see changes, try `control + c`, then run `npm run dev` in the cloned `pnmdrs/docs` repository)
 4. Follow step 4 and onwards from the [General](#General) guide above to bring it to the finish line.
 
 Thank you for contributing! :heart:
