@@ -78,8 +78,9 @@ Our [docs](https://zustand.docs.pmnd.rs) are based on [`pmndrs/docs`](https://gi
 1. Separately, clone the `pmndrs/docs`. (you don't need to fork it).
 2. Inside the `pmndrs/docs` directory:
    1. Create a `.env` file in the root directory with the next environment variables: `MDX=docs/zustand/docs` and `HOME_REDIRECT=/getting-started/introduction`.
-   2. Install dependencies by running `npm install`, then `npm run dev` to start the dev server.
-   3. Navigate to [`http://localhost:3000`](http://localhost:3000) to view the documents.
+   2. Install dependencies by running `npm install`.
+   3. Start the dev server by running `npm run dev`.
+   4. Navigate to [`http://localhost:3000`](http://localhost:3000) to view the documents.
 3. Go Back to the forked repository:
    1. Install dependencies by running `pnpm install`.
    2. Navigate to the [`docs`](./docs/) folder and make necessary changes to the documents.
