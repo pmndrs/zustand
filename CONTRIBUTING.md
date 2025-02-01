@@ -55,10 +55,10 @@ If you would like to contribute by fixing an open issue or developing a new feat
 
 ##### Core
 
-1. Install dependencies by running `pnpm install`.
+1. Run `npm install` to install dependencies.
 2. Create failing tests for your fix or new feature in the [`tests`](./tests/) folder.
 3. Implement your changes.
-4. Build the library by running `pnpm run build`. _(Pro-tip: `pnpm run build-watch` runs the build in watch mode)_
+4. Run `pnpm run build` to build the library. _(Pro-tip: `pnpm run build-watch` runs the build in watch mode)_
 5. Run the tests by running `pnpm run test` and ensure that they pass.
 6. You can use `pnpm link` to sym-link this package and test it locally on your own project. Alternatively, you may use CodeSandbox CI's canary releases to test the changes in your own project. (requires a PR to be created first)
 7. Follow step 4 and onwards from the [General](#General) guide above to bring it to the finish line.
@@ -78,11 +78,11 @@ Our [docs](https://zustand.docs.pmnd.rs) are based on [`pmndrs/docs`](https://gi
 1. Separately, clone the `pmndrs/docs`. (you don't need to fork it).
 2. Inside the `pmndrs/docs` directory:
    1. Create a `.env` file in the root directory with the next environment variables: `MDX=docs/zustand/docs` and `HOME_REDIRECT=/getting-started/introduction`.
-   2. Install dependencies by running `npm install`.
-   3. Start the dev server by running `npm run dev`.
+   2. Run `npm install` to install dependencies.
+   3. Run `npm run dev` to start the dev server.
    4. Navigate to [`http://localhost:3000`](http://localhost:3000) to view the documents.
 3. Go Back to the forked repository:
-   1. Install dependencies by running `pnpm install`.
+   1. Run `pnpm install` to install dependencies.
    2. Navigate to the [`docs`](./docs/) folder and make necessary changes to the documents.
    3. Add your changes to the documents and see them live reloaded in the browser. (if you don't see changes, try `control + c`, then run `npm run dev` in the cloned `pnmdrs/docs` repository)
 4. Follow step 4 and onwards from the [General](#General) guide above to bring it to the finish line.
