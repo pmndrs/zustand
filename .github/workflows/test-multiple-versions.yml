@@ -17,8 +17,8 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm build # we don't have any other workflows to test build
-      - run: pnpm test:spec
+      - run: pnpm run build # we don't have any other workflows to test build
+      - run: pnpm run test:spec
 
   test_matrix:
     runs-on: ubuntu-latest
@@ -44,4 +44,4 @@ jobs:
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
           pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
-          pnpm test:spec
+          pnpm run test:spec

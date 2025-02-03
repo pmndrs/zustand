@@ -17,6 +17,6 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm test:format
-      - run: pnpm test:types
-      - run: pnpm test:lint
+      - run: pnpm run test:format
+      - run: pnpm run test:types
+      - run: pnpm run test:lint
