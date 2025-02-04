@@ -264,10 +264,10 @@ export const HomePage = () => {
     <div>
       Count: {count}
       <hr />
-      <button type="button" onClick={() => void incrementCount()}>
+      <button type="button" onClick={incrementCount}>
         Increment Count
       </button>
-      <button type="button" onClick={() => void decrementCount()}>
+      <button type="button" onClick={decrementCount}>
         Decrement Count
       </button>
     </div>
@@ -334,10 +334,10 @@ export const HomePage = () => {
     <div>
       Count: {count}
       <hr />
-      <button type="button" onClick={() => void incrementCount()}>
+      <button type="button" onClick={incrementCount}>
         Increment Count
       </button>
-      <button type="button" onClick={() => void decrementCount()}>
+      <button type="button" onClick={decrementCount}>
         Decrement Count
       </button>
     </div>
