@@ -117,7 +117,8 @@ import { createStore, useStore } from 'zustand'
 const StoreContext = createContext(null)
 
 const StoreProvider = ({ children }) => {
-  const store] = useState(() => createStore((set) => ({
+  const [store] = useState(() =>
+    createStore((set) => ({
       // ...
     }))
   )
