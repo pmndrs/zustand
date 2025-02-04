@@ -13,5 +13,5 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm run build
       - run: pnpm dlx pkg-pr-new publish './dist' --compact --template './examples/*'

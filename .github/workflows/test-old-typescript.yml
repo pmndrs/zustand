@@ -32,7 +32,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm run build
       - name: Patch for all TS
         run: |
           sed -i~ 's/"isolatedDeclarations": true,//' tsconfig.json
@@ -52,4 +52,4 @@ jobs:
       - name: Install old TypeScript
         run: pnpm add -D typescript@${{ matrix.typescript }}
       - name: Test ${{ matrix.typescript }}
-        run: pnpm test:types
+        run: pnpm run test:types
