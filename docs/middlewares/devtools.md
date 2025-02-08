@@ -79,7 +79,7 @@ type JungleStore = {
 }
 
 const useJungleStore = create<JungleStore>()(
-  devtools((...args) => ({
+  devtools((set) => ({
     bears: 0,
     addBear: () =>
       set((state) => ({ bears: state.bears + 1 }), undefined, 'jungle/addBear'),
