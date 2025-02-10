@@ -243,8 +243,8 @@ it('can update the equality checker', async () => {
   )
 
   // This will cause a re-render due to the equality checker.
-  act(() => setState({ value: 0 }))
-  await screen.findByText('renderCount: 2, value: 0')
+  act(() => setState({ value: 1 }))
+  await screen.findByText('renderCount: 2, value: 1')
 
   // Set an equality checker that always returns true to never re-render.
   rerender(
@@ -254,8 +254,8 @@ it('can update the equality checker', async () => {
   )
 
   // This will NOT cause a re-render due to the equality checker.
-  act(() => setState({ value: 1 }))
-  await screen.findByText('renderCount: 3, value: 0')
+  act(() => setState({ value: 2 }))
+  await screen.findByText('renderCount: 3, value: 1')
 })
 
 it('can call useBoundStore with progressively more arguments', async () => {

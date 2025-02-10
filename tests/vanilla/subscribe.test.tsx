@@ -13,14 +13,17 @@ describe('subscribe()', () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
-  it('should be called if new state identity is different', () => {
+  it('should not be called if new state is the same', () => {
     const spy = vi.fn()
-    const initialState = { value: 1, other: 'a' }
+    const symbol = Symbol()
+    const initialState = { value: 1, [symbol]: 'a' }
     const { setState, getState, subscribe } = createStore(() => initialState)
 
     subscribe(spy)
-    setState({ ...getState() })
-    expect(spy).toHaveBeenCalledWith(initialState, initialState)
+    setState({ value: 1 })
+    setState({ [symbol]: 'a' })
+    setState({ value: 1, [symbol]: 'a' })
+    expect(spy).not.toHaveBeenCalled()
   })
 
   it('should not be called when state slice is the same', () => {

@@ -70,13 +70,28 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
       typeof partial === 'function'
         ? (partial as (state: TState) => TState)(state)
         : partial
-    if (!Object.is(nextState, state)) {
-      const previousState = state
-      state =
-        (replace ?? (typeof nextState !== 'object' || nextState === null))
-          ? (nextState as TState)
-          : Object.assign({}, state, nextState)
-      listeners.forEach((listener) => listener(state, previousState))
+
+    const shouldReplace =
+      replace ?? (typeof nextState !== 'object' || nextState === null)
+    const previousState = state
+    if (shouldReplace) {
+      if (!Object.is(state, nextState)) {
+        state = nextState as TState
+        listeners.forEach((listener) => listener(state, previousState))
+      }
+    } else {
+      // Doing a partial update, check if keys have changed
+      const keys = [
+        ...Object.keys(nextState),
+        ...Object.getOwnPropertySymbols(nextState),
+      ] as (keyof typeof nextState)[]
+      const hasChanged = keys.some(
+        (key) => !Object.is(state[key], nextState[key]),
+      )
+      if (hasChanged) {
+        state = Object.assign({}, state, nextState)
+        listeners.forEach((listener) => listener(state, previousState))
+      }
     }
   }
 
