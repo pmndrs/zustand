@@ -90,7 +90,7 @@ function UpdateBabyBearMeal() {
   useEffect(() => {
     const timer = setInterval(() => {
       useBearFamilyMealsStore.setState({
-        tinyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
+        babyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
       })
     }, 1000)
 
@@ -109,7 +109,7 @@ Finally, we combine both components in the `App` component to see them in action
 export default function App() {
   return (
     <>
-      <UpdateTinyBearPorridge />
+      <UpdateBabyBearPorridge />
       <BearNames />
     </>
   )
@@ -149,7 +149,7 @@ function UpdateBabyBearMeal() {
   useEffect(() => {
     const timer = setInterval(() => {
       useBearFamilyMealsStore.setState({
-        tinyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
+        babyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
       })
     }, 1000)
 
@@ -226,7 +226,7 @@ function UpdateBabyBearMeal() {
   useEffect(() => {
     const timer = setInterval(() => {
       useBearFamilyMealsStore.setState({
-        tinyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
+        babyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
       })
     }, 1000)
 
