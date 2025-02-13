@@ -32,6 +32,7 @@ This can be done using third-party libraries created by the community.
 - [solid-zustand](https://github.com/wobsoriano/solid-zustand) — State management in Solid using Zustand.
 - [treeshakable](https://github.com/react18-tools/treeshakable) — A wrapper for library creators to avoid redundant store creation.
 - [use-broadcast-ts](https://github.com/Romainlg29/use-broadcast) — Zustand middleware to share state between tabs.
+- [use-post-message-ts](https://github.com/paulschoen/use-post-message) — Zustand middleware for sharing state between cross-origin iframes via postMessage browser method.
 - [use-zustand](https://github.com/zustandjs/use-zustand) — Another custom hook to use Zustand vanilla store.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
