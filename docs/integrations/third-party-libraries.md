@@ -54,6 +54,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-middleware-computed-state](https://github.com/cmlarsen/zustand-middleware-computed-state) — A dead simple middleware for adding computed state to Zustand.
 - [zustand-middleware-xstate](https://github.com/biowaffeln/zustand-middleware-xstate) — A middleware for putting XState state machines into a global Zustand store.
 - [zustand-middleware-yjs](https://github.com/joebobmiles/zustand-middleware-yjs) — A middleware for synchronizing Zustand stores with Yjs.
+- [zustand-multi-persist](https://github.com/mooalot/zustand-multi-persist) — A middleware for persisting and rehydrating state to multiple storage engines.
 - [zustand-persist](https://github.com/roadmanfong/zustand-persist) — A middleware for persisting and rehydrating state.
 - [zustand-pub](https://github.com/AwesomeDevin/zustand-pub) — Cross-Application/Cross-Framework State Management And Sharing based on zustand and zustand-vue for React/Vue.
 - [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
