@@ -16,12 +16,13 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     dir: 'tests',
-    reporters: 'basic',
+    reporters: process.env.GITHUB_ACTIONS ? ['default', 'github-actions'] : ['default'],
     setupFiles: ['tests/setup.ts'],
     coverage: {
       include: ['src/**/'],
       reporter: ['text', 'json', 'html', 'text-summary'],
       reportsDirectory: './coverage/',
+      provider: 'v8',
     },
   },
 })
