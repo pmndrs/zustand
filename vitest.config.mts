@@ -16,7 +16,9 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     dir: 'tests',
-    reporters: process.env.GITHUB_ACTIONS ? ['default', 'github-actions'] : ['default'],
+    reporters: process.env.GITHUB_ACTIONS
+      ? ['default', 'github-actions']
+      : ['default'],
     setupFiles: ['tests/setup.ts'],
     coverage: {
       include: ['src/**/'],

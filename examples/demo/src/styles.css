@@ -19,7 +19,18 @@ body,
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    helvetica neue,
+    helvetica,
+    ubuntu,
+    roboto,
+    noto,
+    segoe ui,
+    arial,
     sans-serif;
 }
 
@@ -110,7 +121,18 @@ span.header-left {
 }
 
 a {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    helvetica neue,
+    helvetica,
+    ubuntu,
+    roboto,
+    noto,
+    segoe ui,
+    arial,
     sans-serif;
   font-weight: 400;
   font-size: 16px;
@@ -191,7 +213,7 @@ a.bottom-right {
     margin-right: -0px;
   }
   .code-container > pre[class*='language-'] {
-    font-size: 0.6rem!important;    
+    font-size: 0.6rem !important;
     border-radius: 10px 10px 0 0 !important;
   }
   .counter {
