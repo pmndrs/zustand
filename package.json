@@ -68,7 +68,7 @@
     "fix:format": "prettier . --write",
     "fix:lint": "eslint . --fix",
     "test": "pnpm run \"/^test:.*/\"",
-    "test:format": "prettier .  --list-different",
+    "test:format": "prettier . --list-different",
     "test:types": "tsc --noEmit",
     "test:lint": "eslint .",
     "test:spec": "vitest run",
