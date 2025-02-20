@@ -4,6 +4,4 @@ about: This is to create a new issue that already has an assignee. Please open a
 title: ''
 labels: ''
 assignees: ''
-
 ---
-

@@ -19,4 +19,3 @@
   "include": ["vite.config.ts", "./src/**/*"],
   "exclude": ["node_modules"]
 }
-
