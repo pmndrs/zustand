@@ -372,7 +372,7 @@ const devtoolsImpl: DevtoolsImpl =
   }
 export const devtools = devtoolsImpl as unknown as Devtools
 
-const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
+const parseJsonThen = <T>(stringified: string, fn: (parsed: T) => void) => {
   let parsed: T | undefined
   try {
     parsed = JSON.parse(stringified)
@@ -382,5 +382,5 @@ const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
       e,
     )
   }
-  if (parsed !== undefined) f(parsed as T)
+  if (parsed !== undefined) fn(parsed as T)
 }
