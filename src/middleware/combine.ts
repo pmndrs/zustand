@@ -11,5 +11,5 @@ export function combine<
   initialState: T,
   create: StateCreator<T, Mps, Mcs, U>,
 ): StateCreator<Write<T, U>, Mps, Mcs> {
-  return (...a) => Object.assign({}, initialState, (create as any)(...a))
+  return (...args) => Object.assign({}, initialState, (create as any)(...args))
 }
