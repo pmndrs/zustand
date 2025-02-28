@@ -63,8 +63,8 @@ type StoreDevtools<S> = S extends {
   }
 }
   ? {
-      setState(...args: [...arg0: TakeTwo<Sa1>, action?: Action]): Sr1
-      setState(...args: [...arg0: TakeTwo<Sa2>, action?: Action]): Sr2
+      setState(...args: [...args: TakeTwo<Sa1>, action?: Action]): Sr1
+      setState(...args: [...args: TakeTwo<Sa2>, action?: Action]): Sr2
     }
   : never
 
