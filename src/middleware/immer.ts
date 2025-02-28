@@ -40,8 +40,8 @@ type StoreImmer<S> = S extends {
   setState: infer SetState
 }
   ? SetState extends {
-      (...a: infer A1): infer Sr1
-      (...a: infer A2): infer Sr2
+      (...args: infer A1): infer Sr1
+      (...args: infer A2): infer Sr2
     }
     ? {
         // Ideally, we would want to infer the `nextStateOrUpdater` `T` type from the
@@ -53,14 +53,14 @@ type StoreImmer<S> = S extends {
             | Partial<SetStateType<A2>>
             | ((state: Draft<SetStateType<A2>>) => void),
           shouldReplace?: false,
-          ...a: SkipTwo<A1>
+          ...args: SkipTwo<A1>
         ): Sr1
         setState(
           nextStateOrUpdater:
             | SetStateType<A2>
             | ((state: Draft<SetStateType<A2>>) => void),
           shouldReplace: true,
-          ...a: SkipTwo<A2>
+          ...args: SkipTwo<A2>
         ): Sr2
       }
     : never
@@ -73,12 +73,12 @@ type ImmerImpl = <T>(
 const immerImpl: ImmerImpl = (initializer) => (set, get, store) => {
   type T = ReturnType<typeof initializer>
 
-  store.setState = (updater, replace, ...a) => {
+  store.setState = (updater, replace, ...args) => {
     const nextState = (
       typeof updater === 'function' ? produce(updater as any) : updater
     ) as ((s: T) => T) | T | Partial<T>
 
-    return set(nextState, replace as any, ...a)
+    return set(nextState, replace as any, ...args)
   }
 
   return initializer(store.setState, get, store)
