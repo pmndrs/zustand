@@ -283,8 +283,8 @@ export default defineConfig((configEnv) =>
         environment: 'jsdom',
         setupFiles: ['./setup-vitest.ts'],
       },
-    })
-  )
+    }),
+  ),
 )
 ```
 
