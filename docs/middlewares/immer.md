@@ -180,7 +180,10 @@ const personStore = createStore<PersonStore>()(
     },
     setPerson: (nextPerson) =>
       set((state) => {
-        state.person = typeof nextPerson ? nextPerson(state.person) : nextPerson
+        state.person =
+          typeof nextPerson === 'function'
+            ? nextPerson(state.person)
+            : nextPerson
       }),
   })),
 )
