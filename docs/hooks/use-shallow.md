@@ -109,7 +109,7 @@ Finally, we combine both components in the `App` component to see them in action
 export default function App() {
   return (
     <>
-      <UpdateBabyBearPorridge />
+      <UpdateBabyBearMeal />
       <BearNames />
     </>
   )
@@ -186,7 +186,9 @@ the state change:
 
 ```tsx
 function BearNames() {
-  const names = useBearFamilyStore(useShallow((state) => Object.keys(state)))
+  const names = useBearFamilyMealsStore(
+    useShallow((state) => Object.keys(state)),
+  )
 
   return <div>{names.join(', ')}</div>
 }
