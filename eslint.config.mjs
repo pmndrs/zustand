@@ -17,10 +17,10 @@ export default tseslint.config(
   tseslint.configs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
+  reactHooks.configs['recommended-latest'],
   {
     plugins: {
       'react-compiler': reactCompiler,
-      'react-hooks': reactHooks,
     },
     settings: {
       react: {
@@ -75,7 +75,6 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'react-compiler/react-compiler': 'warn',
-      ...reactHooks.configs.recommended.rules,
     },
   },
   {
