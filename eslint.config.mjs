@@ -18,10 +18,8 @@ export default tseslint.config(
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
   reactHooks.configs['recommended-latest'],
+  reactCompiler.configs.recommended,
   {
-    plugins: {
-      'react-compiler': reactCompiler,
-    },
     settings: {
       react: {
         version: 'detect',
@@ -74,7 +72,6 @@ export default tseslint.config(
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'react-compiler/react-compiler': 'warn',
     },
   },
   {
