@@ -36,6 +36,7 @@ This can be done using third-party libraries created by the community.
 - [use-zustand](https://github.com/zustandjs/use-zustand) — Another custom hook to use Zustand vanilla store.
 - [vue-zustand](https://github.com/wobsoriano/vue-zustand) — State management solution for Vue based on Zustand.
 - [zoov](https://github.com/InfiniteXyy/zoov) — State management solution based on Zustand with Module-like API.
+- [zubridge](https://github.com/goosewobbler/zubridge) — Use Zustand in cross-platform apps, seamlessly.  Supports Electron & Tauri.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) — Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) — 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
@@ -71,4 +72,4 @@ This can be done using third-party libraries created by the community.
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) — Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
-- [zutron](https://github.com/goosewobbler/zutron) — Use Zustand in Electron apps, seamlessly.
+
