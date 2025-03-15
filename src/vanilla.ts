@@ -11,6 +11,7 @@ export interface StoreApi<T> {
   getState: () => T
   getInitialState: () => T
   subscribe: (listener: (state: T, prevState: T) => void) => () => void
+  hydrate: (initial: Partial<T>) => void
 }
 
 export type ExtractState<S> = S extends { getState: () => infer T } ? T : never
@@ -57,6 +58,8 @@ type CreateStoreImpl = <
   initializer: StateCreator<T, [], Mos>,
 ) => Mutate<StoreApi<T>, Mos>
 
+const hydrateSets = new WeakSet()
+
 const createStoreImpl: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
   type Listener = (state: TState, prevState: TState) => void
@@ -82,6 +85,13 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 
   const getState: StoreApi<TState>['getState'] = () => state
 
+  const hydrate = (hydrateState: Partial<TState>) => {
+    if (hydrateSets.has(api)) return
+    initialState = { ...initialState, ...hydrateState }
+    state = { ...state, ...hydrateState }
+    hydrateSets.add(api)
+  }
+
   const getInitialState: StoreApi<TState>['getInitialState'] = () =>
     initialState
 
@@ -91,8 +101,8 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
     return () => listeners.delete(listener)
   }
 
-  const api = { setState, getState, getInitialState, subscribe }
-  const initialState = (state = createState(setState, getState, api))
+  const api = { setState, getState, getInitialState, subscribe, hydrate }
+  let initialState = (state = createState(setState, getState, api))
   return api as any
 }
 
