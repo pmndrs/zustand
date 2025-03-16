@@ -7,8 +7,11 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        command: ['format', 'types', 'lint']
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -17,6 +20,4 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm run test:format
-      - run: pnpm run test:types
-      - run: pnpm run test:lint
+      - run: pnpm run test:${{ matrix.command }}
