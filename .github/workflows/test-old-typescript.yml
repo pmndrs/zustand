@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test_matrix:
+  test_old_typescript:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
