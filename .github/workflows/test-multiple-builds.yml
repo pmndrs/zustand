@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test_matrix:
+  test_multiple_builds:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
