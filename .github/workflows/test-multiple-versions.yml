@@ -7,20 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
-      - run: pnpm install
-      - run: pnpm run build # we don't have any other workflows to test build
-      - run: pnpm run test:spec
-
-  test_matrix:
+  test_multiple_versions:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
