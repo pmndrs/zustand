@@ -17,5 +17,8 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm run test
+      - run: pnpm run test:format
+      - run: pnpm run test:types
+      - run: pnpm run test:lint
+      - run: pnpm run test:spec
       - run: pnpm run build # we don't have any other workflows to test build
