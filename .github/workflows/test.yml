@@ -9,10 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        command: ['format', 'types', 'lint', 'spec', 'build']
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -21,7 +17,5 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - if: matrix.command == 'build'
-        run: pnpm run build
-      - if: matrix.command != 'build'
-        run: pnpm run test:${{ matrix.command }}
+      - run: pnpm run test
+      - run: pnpm run build
