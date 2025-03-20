@@ -111,19 +111,20 @@ Discussion: https://github.com/pmndrs/zustand/discussions/1276
 Here's the new context usage with v4 API.
 
 ```jsx
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useRef } from 'react'
 import { createStore, useStore } from 'zustand'
 
 const StoreContext = createContext(null)
 
 const StoreProvider = ({ children }) => {
-  const [store] = useState(() =>
-    createStore((set) => ({
+  const storeRef = useRef()
+  if (storeRef.current === null) {
+    storeRef.current = createStore((set) => ({
       // ...
     }))
-  )
+  }
   return (
-    <StoreContext.Provider value={store}>
+    <StoreContext.Provider value={storeRef.current}>
       {children}
     </StoreContext.Provider>
   )
