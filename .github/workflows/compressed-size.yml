@@ -3,7 +3,7 @@ name: Compressed Size
 on: [pull_request]
 
 jobs:
-  compressed-size:
+  compressed_size:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
