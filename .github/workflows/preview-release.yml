@@ -1,9 +1,9 @@
-name: Publish Any Commit
+name: Preview Release
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  preview_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
