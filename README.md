@@ -466,27 +466,16 @@ Basic typescript usage doesn't require anything special except for writing `crea
 
 ```ts
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
-import type {} from '@redux-devtools/extension' // required for devtools typing
 
 interface BearState {
   bears: number
   increase: (by: number) => void
 }
 
-const useBearStore = create<BearState>()(
-  devtools(
-    persist(
-      (set) => ({
-        bears: 0,
-        increase: (by) => set((state) => ({ bears: state.bears + by })),
-      }),
-      {
-        name: 'bear-storage',
-      },
-    ),
-  ),
-)
+const useBearStore = create<BearState>()((set) => ({
+  bears: 0,
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+}))
 ```
 
 A more complete TypeScript guide is [here](docs/guides/typescript.md).
