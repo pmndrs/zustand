@@ -149,24 +149,26 @@ function Effects() {
 
 function FallbackScene() {
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#010101'
-    }}>
-      <img 
-        src="/ogimage.jpg" 
-        alt="Zustand Bear" 
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#010101',
+      }}
+    >
+      <img
+        src="/ogimage.jpg"
+        alt="Zustand Bear"
         style={{
           width: '100%',
           height: '100%',
-          objectFit: 'cover'
+          objectFit: 'cover',
         }}
       />
     </div>
@@ -181,7 +183,7 @@ export default function Scene() {
   }
 
   return (
-    <Canvas onError={(e) => setError(e)}>
+    <Canvas onError={setError}>
       <Experience />
       <Effects />
     </Canvas>
