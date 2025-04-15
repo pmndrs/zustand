@@ -147,49 +147,87 @@ function Effects() {
   )
 }
 
-export default function Scene() {
+function FallbackScene() {
   return (
-    <Canvas>
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#010101',
+      }}
+    >
+      <img
+        src="/ogimage.jpg"
+        alt="Zustand Bear"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
+    </div>
+  )
+}
+
+export default function Scene() {
+  const [error, setError] = useState(null)
+
+  if (error) {
+    return <FallbackScene />
+  }
+
+  return (
+    <Canvas onError={setError}>
       <Experience />
       <Effects />
     </Canvas>
   )
 }
 
-function Canvas({ children }) {
+function Canvas({ children, onError }) {
   extend({ Mesh, PlaneGeometry, Group })
   const canvas = useRef(null)
   const root = useRef(null)
   useLayoutEffect(() => {
-    if (!root.current) {
-      root.current = createRoot(canvas.current).configure({
-        events,
-        orthographic: true,
-        gl: { antialias: false },
-        camera: { zoom: 5, position: [0, 0, 200], far: 300, near: 50 },
-        onCreated: (state) => {
-          state.events.connect(document.getElementById('root'))
-          state.setEvents({
-            compute: (event, state) => {
-              state.pointer.set(
-                (event.clientX / state.size.width) * 2 - 1,
-                -(event.clientY / state.size.height) * 2 + 1,
-              )
-              state.raycaster.setFromCamera(state.pointer, state.camera)
-            },
-          })
-        },
-      })
+    try {
+      if (!root.current) {
+        root.current = createRoot(canvas.current).configure({
+          events,
+          orthographic: true,
+          gl: { antialias: false },
+          camera: { zoom: 5, position: [0, 0, 200], far: 300, near: 50 },
+          onCreated: (state) => {
+            state.events.connect(document.getElementById('root'))
+            state.setEvents({
+              compute: (event, state) => {
+                state.pointer.set(
+                  (event.clientX / state.size.width) * 2 - 1,
+                  -(event.clientY / state.size.height) * 2 + 1,
+                )
+                state.raycaster.setFromCamera(state.pointer, state.camera)
+              },
+            })
+          },
+        })
+      }
+      const resize = () =>
+        root.current.configure({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        })
+      window.addEventListener('resize', resize)
+      root.current.render(children)
+      return () => window.removeEventListener('resize', resize)
+    } catch (e) {
+      onError?.(e)
     }
-    const resize = () =>
-      root.current.configure({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      })
-    window.addEventListener('resize', resize)
-    root.current.render(children)
-    return () => window.removeEventListener('resize', resize)
-  }, [children])
+  }, [children, onError])
 
   return (
     <canvas
