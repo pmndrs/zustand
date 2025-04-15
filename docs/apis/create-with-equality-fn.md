@@ -8,6 +8,10 @@ nav: 25
 However, it offers a way to define a custom equality check. This allows for more granular control
 over when components re-render, improving performance and responsiveness.
 
+> [!IMPORTANT]
+> In order to use `createWithEqualityFn` from `zustand/traditional` you need to install
+> `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
+
 ```js
 const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ```
