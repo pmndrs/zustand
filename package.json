@@ -27,6 +27,10 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "react-native": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
@@ -37,6 +41,10 @@
       }
     },
     "./*": {
+      "react-native": {
+        "types": "./*.d.ts",
+        "default": "./*.js"
+      },
       "import": {
         "types": "./esm/*.d.mts",
         "default": "./esm/*.mjs"
