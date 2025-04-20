@@ -1,10 +1,15 @@
-import { describe, expect, it, vi } from 'vitest'
+import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 
 describe('subscribe()', () => {
+  let spy: Mock
+
+  beforeEach(() => {
+    spy = vi.fn()
+  })
+
   it('should not be called if new state identity is the same', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = createStore(() => initialState)
 
@@ -14,7 +19,6 @@ describe('subscribe()', () => {
   })
 
   it('should be called if new state identity is different', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, getState, subscribe } = createStore(() => initialState)
 
@@ -24,7 +28,6 @@ describe('subscribe()', () => {
   })
 
   it('should not be called when state slice is the same', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = createStore(
       subscribeWithSelector(() => initialState),
@@ -36,7 +39,6 @@ describe('subscribe()', () => {
   })
 
   it('should be called when state slice changes', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = createStore(
       subscribeWithSelector(() => initialState),
@@ -49,7 +51,6 @@ describe('subscribe()', () => {
   })
 
   it('should not be called when equality checker returns true', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = createStore(
       subscribeWithSelector(() => initialState),
@@ -61,7 +62,6 @@ describe('subscribe()', () => {
   })
 
   it('should be called when equality checker returns false', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = createStore(
       subscribeWithSelector(() => initialState),
@@ -74,7 +74,6 @@ describe('subscribe()', () => {
   })
 
   it('should unsubscribe correctly', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { setState, subscribe } = createStore(
       subscribeWithSelector(() => initialState),
@@ -91,7 +90,6 @@ describe('subscribe()', () => {
   })
 
   it('should keep consistent behavior with equality check', () => {
-    const spy = vi.fn()
     const initialState = { value: 1, other: 'a' }
     const { getState, setState, subscribe } = createStore(
       subscribeWithSelector(() => initialState),
