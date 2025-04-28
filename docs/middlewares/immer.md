@@ -6,6 +6,14 @@ nav: 206
 
 # immer
 
+### Installation
+
+Zustand does not comes with immer by default. Install it using npm to use middleware 
+
+```bash
+npm install immer
+```
+
 `immer` middleware lets you perform immutable updates.
 
 ```js
