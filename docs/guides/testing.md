@@ -720,7 +720,7 @@ describe('CounterWithContext', () => {
 
     await user.click(await screen.findByRole('button', { name: /one up/i }))
 
-    expect(counterStore.getState().count).toBeInTheDocument()
+    expect(counterStore.getState().count).toBe(2)
   })
 })
 
