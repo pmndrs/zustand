@@ -386,7 +386,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 const usePositionStore = createWithEqualityFn<PositionStore>()(
   (set) => ({
     position: { x: 0, y: 0 },
-    setPosition: (nextPosition) => set(nextPosition),
+    setPosition: (nextPosition) => set({ position: nextPosition }),
   }),
   shallow,
 )
