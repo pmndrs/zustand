@@ -187,7 +187,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 
 const usePositionStore = create<PositionStore>()((set) => ({
   position: { x: 0, y: 0 },
-  setPosition: (nextPosition) => set(nextPosition),
+  setPosition: (nextPosition) => set({ position: nextPosition }),
 }))
 
 export default function MovingDot() {
@@ -361,7 +361,7 @@ type PositionStore = PositionStoreState & PositionStoreActions
 
 const usePositionStore = create<PositionStore>()((set) => ({
   position: { x: 0, y: 0 },
-  setPosition: (nextPosition) => set(nextPosition),
+  setPosition: (nextPosition) => set({ position: nextPosition }),
 }))
 
 export default function MovingDot() {
