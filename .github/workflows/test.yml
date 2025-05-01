@@ -1,4 +1,4 @@
-name: Lint and Type
+name: Test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +17,8 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm test:format
-      - run: pnpm test:types
-      - run: pnpm test:lint
+      - run: pnpm run test:format
+      - run: pnpm run test:types
+      - run: pnpm run test:lint
+      - run: pnpm run test:spec
+      - run: pnpm run build # we don't have any other workflows to test build

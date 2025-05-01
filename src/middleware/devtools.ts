@@ -30,9 +30,9 @@ type Write<T, U> = Omit<T, keyof U> & U
 type TakeTwo<T> = T extends { length: 0 }
   ? [undefined, undefined]
   : T extends { length: 1 }
-    ? [...a0: Cast<T, unknown[]>, a1: undefined]
+    ? [...args0: Cast<T, unknown[]>, arg1: undefined]
     : T extends { length: 0 | 1 }
-      ? [...a0: Cast<T, unknown[]>, a1: undefined]
+      ? [...args0: Cast<T, unknown[]>, arg1: undefined]
       : T extends { length: 2 }
         ? T
         : T extends { length: 1 | 2 }
@@ -58,13 +58,13 @@ type Action =
 type StoreDevtools<S> = S extends {
   setState: {
     // capture both overloads of setState
-    (...a: infer Sa1): infer Sr1
-    (...a: infer Sa2): infer Sr2
+    (...args: infer Sa1): infer Sr1
+    (...args: infer Sa2): infer Sr2
   }
 }
   ? {
-      setState(...a: [...a: TakeTwo<Sa1>, action?: Action]): Sr1
-      setState(...a: [...a: TakeTwo<Sa2>, action?: Action]): Sr2
+      setState(...args: [...args: TakeTwo<Sa1>, action?: Action]): Sr1
+      setState(...args: [...args: TakeTwo<Sa2>, action?: Action]): Sr2
     }
   : never
 
@@ -231,10 +231,10 @@ const devtoolsImpl: DevtoolsImpl =
     ) {
       let didWarnAboutReservedActionType = false
       const originalDispatch = (api as any).dispatch
-      ;(api as any).dispatch = (...a: any[]) => {
+      ;(api as any).dispatch = (...args: any[]) => {
         if (
           import.meta.env?.MODE !== 'production' &&
-          a[0].type === '__setState' &&
+          args[0].type === '__setState' &&
           !didWarnAboutReservedActionType
         ) {
           console.warn(
@@ -243,7 +243,7 @@ const devtoolsImpl: DevtoolsImpl =
           )
           didWarnAboutReservedActionType = true
         }
-        ;(originalDispatch as any)(...a)
+        ;(originalDispatch as any)(...args)
       }
     }
 
@@ -372,7 +372,7 @@ const devtoolsImpl: DevtoolsImpl =
   }
 export const devtools = devtoolsImpl as unknown as Devtools
 
-const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
+const parseJsonThen = <T>(stringified: string, fn: (parsed: T) => void) => {
   let parsed: T | undefined
   try {
     parsed = JSON.parse(stringified)
@@ -382,5 +382,5 @@ const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
       e,
     )
   }
-  if (parsed !== undefined) f(parsed as T)
+  if (parsed !== undefined) fn(parsed as T)
 }
