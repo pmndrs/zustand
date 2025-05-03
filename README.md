@@ -381,8 +381,8 @@ import { devtools } from 'zustand/middleware'
 const usePlainStore1 = create(devtools((set) => ..., { name, store: storeName1 }))
 const usePlainStore2 = create(devtools((set) => ..., { name, store: storeName2 }))
 // Usage with a redux store, it will log full action types
-const useReduxStore = create(devtools(redux(reducer, initialState)), { name, store: storeName3 })
-const useReduxStore = create(devtools(redux(reducer, initialState)), { name, store: storeName4 })
+const useReduxStore1 = create(devtools(redux(reducer, initialState)), { name, store: storeName3 })
+const useReduxStore2 = create(devtools(redux(reducer, initialState)), { name, store: storeName4 })
 ```
 
 Assigning different connection names will separate stores in redux devtools. This also helps group different stores into separate redux devtools connections.
