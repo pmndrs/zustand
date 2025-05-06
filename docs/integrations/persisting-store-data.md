@@ -461,9 +461,9 @@ const storage = createJSONStorage(() => sessionStorage, {
     }
     return value
   },
-  replacer: (key, value) => {
-    if (value instanceof Date) {
-      return { type: 'date', value: value.toISOString() }
+  replacer: function (this, key, value) {
+    if (this[key] instanceof Date) {
+      return { type: 'date', value: this[key].toISOString() }
     }
     return value
   },
