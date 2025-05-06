@@ -1,9 +1,6 @@
 const isIterable = (obj: object): obj is Iterable<unknown> =>
   Symbol.iterator in obj
 
-const type = <T>(obj: T): string =>
-  Object.prototype.toString.apply(obj).slice(8, -1).toLowerCase()
-
 const hasIterableEntries = (
   value: Iterable<unknown>,
 ): value is Iterable<unknown> & {
@@ -52,9 +49,6 @@ export function shallow<T>(valueA: T, valueB: T): boolean {
   if (Object.is(valueA, valueB)) {
     return true
   }
-  if (type(valueA) !== type(valueB)) {
-    return false
-  }
   if (
     typeof valueA !== 'object' ||
     valueA === null ||
@@ -63,14 +57,18 @@ export function shallow<T>(valueA: T, valueB: T): boolean {
   ) {
     return false
   }
-  if (!isIterable(valueA) || !isIterable(valueB)) {
-    return compareEntries(
-      { entries: () => Object.entries(valueA) },
-      { entries: () => Object.entries(valueB) },
-    )
+  if (Object.getPrototypeOf(valueA) !== Object.getPrototypeOf(valueB)) {
+    return false
   }
-  if (hasIterableEntries(valueA) && hasIterableEntries(valueB)) {
-    return compareEntries(valueA, valueB)
+  if (isIterable(valueA) && isIterable(valueB)) {
+    if (hasIterableEntries(valueA) && hasIterableEntries(valueB)) {
+      return compareEntries(valueA, valueB)
+    }
+    return compareIterables(valueA, valueB)
   }
-  return compareIterables(valueA, valueB)
+  // assume plain objects
+  return compareEntries(
+    { entries: () => Object.entries(valueA) },
+    { entries: () => Object.entries(valueB) },
+  )
 }
