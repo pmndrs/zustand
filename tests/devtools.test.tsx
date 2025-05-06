@@ -2448,3 +2448,14 @@ describe('when create devtools was called multiple times with `name` and `store`
     })
   })
 })
+
+describe('cleanup', () => {
+  it('should unsubscribe from devtools when cleanup is called', async () => {
+    const options = { name: 'test' }
+    const store = createStore(devtools(() => ({ count: 0 }), options))
+    store.devtools.cleanup()
+
+    const [connection] = getNamedConnectionApis(options.name)
+    expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+})
