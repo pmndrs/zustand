@@ -1,5 +1,4 @@
 import React from 'react'
-// eslint-disable-next-line import/extensions
 import useSyncExternalStoreExports from 'use-sync-external-store/shim/with-selector'
 import { createStore } from './vanilla.ts'
 import type {
