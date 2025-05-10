@@ -42,7 +42,7 @@ export default tseslint.config(
       'import/namespace': 'off',
       'import/no-named-as-default-member': 'off',
       'import/no-duplicates': 'error',
-      'import/extensions': ['error', 'always'],
+      'import/extensions': ['error', 'always', { ignorePackages: true }],
       'import/order': [
         'error',
         {
