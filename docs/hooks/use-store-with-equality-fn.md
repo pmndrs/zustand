@@ -689,7 +689,7 @@ Next, we need a way to manage and access these stores throughout our app. We’l
 for this.
 
 ```tsx
-const CounterStoresContext = createContext(null)
+const CounterStoresContext = createContext<Map<string, ReturnType<typeof createCounterStore>> | null >(null)
 
 const CounterStoresProvider = ({ children }) => {
   const [stores] = useState(
@@ -714,12 +714,12 @@ const useCounterStore = <U,>(
 ) => {
   const stores = useContext(CounterStoresContext)
 
-  if (stores === undefined) {
+  if (stores === null) {
     throw new Error('useCounterStore must be used within CounterStoresProvider')
   }
 
   const getOrCreateCounterStoreByKey = useCallback(
-    () => createCounterStoreFactory(stores),
+    createCounterStoreFactory(stores),
     [stores],
   )
 
@@ -738,7 +738,7 @@ counter.
 function Tabs() {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
   const counterState = useCounterStore(
-    `tab-${currentTabIndex}`,
+    `${currentTabIndex}`,
     (state) => state,
   )
 
@@ -799,14 +799,20 @@ function Tabs() {
 ```
 
 Finally, we'll create the `App` component, which renders the tabs and their respective counters.
-The counter state is managed independently for each tab.
+Each `Tabs` is wrapped in a separate `CounterStoresProvider`, ensuring full state isolation.
+Each provider creates and manages its own internal map of stores.
 
 ```tsx
 export default function App() {
   return (
-    <CounterStoresProvider>
-      <Tabs />
-    </CounterStoresProvider>
+    <div>
+      <CounterStoresProvider>
+        <Tabs />
+      </CounterStoresProvider>
+      <CounterStoresProvider>
+        <Tabs />
+      </CounterStoresProvider>
+    </div>
   )
 }
 ```
@@ -874,12 +880,12 @@ const useCounterStore = <U,>(
 ) => {
   const stores = useContext(CounterStoresContext)
 
-  if (stores === undefined) {
+  if (stores === null) {
     throw new Error('useCounterStore must be used within CounterStoresProvider')
   }
 
   const getOrCreateCounterStoreByKey = useCallback(
-    (key: string) => createCounterStoreFactory(stores!)(key),
+    createCounterStoreFactory(stores!),
     [stores],
   )
 
@@ -889,7 +895,7 @@ const useCounterStore = <U,>(
 function Tabs() {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
   const counterState = useCounterStore(
-    `tab-${currentTabIndex}`,
+    `${currentTabIndex}`,
     (state) => state,
   )
 
@@ -950,9 +956,14 @@ function Tabs() {
 
 export default function App() {
   return (
-    <CounterStoresProvider>
-      <Tabs />
-    </CounterStoresProvider>
+    <div>
+      <CounterStoresProvider>
+        <Tabs />
+      </CounterStoresProvider>
+      <CounterStoresProvider>
+        <Tabs />
+      </CounterStoresProvider>
+    </div>
   )
 }
 ```
