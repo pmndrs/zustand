@@ -709,7 +709,7 @@ given tab.
 
 ```tsx
 const useCounterStore = <U,>(
-  currentTabIndex: number,
+  key: string,
   selector: (state: CounterStore) => U,
 ) => {
   const stores = useContext(CounterStoresContext)
@@ -719,15 +719,11 @@ const useCounterStore = <U,>(
   }
 
   const getOrCreateCounterStoreByKey = useCallback(
-    () => createCounterStoreFactory(stores),
+    (key: string) => createCounterStoreFactory(stores!)(key),
     [stores],
   )
 
-  return useStoreWithEqualityFn(
-    getOrCreateCounterStoreByKey(`tab-${currentTabIndex}`),
-    selector,
-    shallow,
-  )
+  return useStore(getOrCreateCounterStoreByKey(key), selector)
 }
 ```
 
