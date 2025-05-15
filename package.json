@@ -2,7 +2,7 @@
   "name": "zustand",
   "description": "🐻 Bear necessities for state management in React",
   "private": true,
-  "version": "4.5.6",
+  "version": "4.5.7",
   "main": "./index.js",
   "types": "./index.d.ts",
   "typesVersions": {
@@ -21,6 +21,10 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "react-native": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
       "import": {
         "types": "./esm/index.d.mts",
         "default": "./esm/index.mjs"
@@ -35,6 +39,10 @@
       }
     },
     "./vanilla": {
+      "react-native": {
+        "types": "./vanilla.d.ts",
+        "default": "./vanilla.js"
+      },
       "import": {
         "types": "./esm/vanilla.d.mts",
         "default": "./esm/vanilla.mjs"
@@ -49,6 +57,10 @@
       }
     },
     "./middleware": {
+      "react-native": {
+        "types": "./middleware.d.ts",
+        "default": "./middleware.js"
+      },
       "import": {
         "types": "./esm/middleware.d.mts",
         "default": "./esm/middleware.mjs"
@@ -63,6 +75,10 @@
       }
     },
     "./middleware/immer": {
+      "react-native": {
+        "types": "./middleware/immer.d.ts",
+        "default": "./middleware/immer.js"
+      },
       "import": {
         "types": "./esm/middleware/immer.d.mts",
         "default": "./esm/middleware/immer.mjs"
@@ -77,6 +93,10 @@
       }
     },
     "./shallow": {
+      "react-native": {
+        "types": "./shallow.d.ts",
+        "default": "./shallow.js"
+      },
       "import": {
         "types": "./esm/shallow.d.mts",
         "default": "./esm/shallow.mjs"
@@ -91,6 +111,10 @@
       }
     },
     "./vanilla/shallow": {
+      "react-native": {
+        "types": "./vanilla/shallow.d.ts",
+        "default": "./vanilla/shallow.js"
+      },
       "import": {
         "types": "./esm/vanilla/shallow.d.mts",
         "default": "./esm/vanilla/shallow.mjs"
@@ -105,6 +129,10 @@
       }
     },
     "./react/shallow": {
+      "react-native": {
+        "types": "./react/shallow.d.ts",
+        "default": "./react/shallow.js"
+      },
       "import": {
         "types": "./esm/react/shallow.d.mts",
         "default": "./esm/react/shallow.mjs"
@@ -119,6 +147,10 @@
       }
     },
     "./traditional": {
+      "react-native": {
+        "types": "./traditional.d.ts",
+        "default": "./traditional.js"
+      },
       "import": {
         "types": "./esm/traditional.d.mts",
         "default": "./esm/traditional.mjs"
@@ -133,6 +165,10 @@
       }
     },
     "./context": {
+      "react-native": {
+        "types": "./context.d.ts",
+        "default": "./context.js"
+      },
       "import": {
         "types": "./esm/context.d.mts",
         "default": "./esm/context.mjs"
