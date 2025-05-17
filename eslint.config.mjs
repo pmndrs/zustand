@@ -3,7 +3,6 @@ import vitest from '@vitest/eslint-plugin'
 import importPlugin from 'eslint-plugin-import'
 import jestDom from 'eslint-plugin-jest-dom'
 import react from 'eslint-plugin-react'
-import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 import testingLibrary from 'eslint-plugin-testing-library'
 import tseslint from 'typescript-eslint'
@@ -17,8 +16,7 @@ export default tseslint.config(
   tseslint.configs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
-  reactHooks.configs['recommended-latest'],
-  reactCompiler.configs.recommended,
+  reactHooks.configs.recommended,
   {
     settings: {
       react: {
@@ -72,6 +70,7 @@ export default tseslint.config(
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      'react-hooks/react-compiler': 'error',
     },
   },
   {
