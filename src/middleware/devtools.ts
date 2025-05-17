@@ -65,6 +65,9 @@ type StoreDevtools<S> = S extends {
   ? {
       setState(...args: [...args: TakeTwo<Sa1>, action?: Action]): Sr1
       setState(...args: [...args: TakeTwo<Sa2>, action?: Action]): Sr2
+      devtools: {
+        cleanup: () => void
+      }
     }
   : never
 
@@ -146,6 +149,19 @@ const extractConnectionInformation = (
   return { type: 'tracked' as const, store, ...newConnection }
 }
 
+const removeStoreFromTrackedConnections = (
+  name: string | undefined,
+  store: string | undefined,
+) => {
+  if (store === undefined) return
+  const connectionInfo = trackedConnections.get(name)
+  if (!connectionInfo) return
+  delete connectionInfo.stores[store]
+  if (Object.keys(connectionInfo.stores).length === 0) {
+    trackedConnections.delete(name)
+  }
+}
+
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
@@ -200,6 +216,17 @@ const devtoolsImpl: DevtoolsImpl =
       )
       return r
     }) as NamedSet<S>
+    ;(api as StoreApi<S> & StoreDevtools<S>).devtools = {
+      cleanup: () => {
+        if (
+          connection &&
+          typeof (connection as any).unsubscribe === 'function'
+        ) {
+          ;(connection as any).unsubscribe()
+        }
+        removeStoreFromTrackedConnections(options.name, store)
+      },
+    }
 
     const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
