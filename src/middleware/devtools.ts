@@ -154,12 +154,9 @@ const removeStoreFromTrackedConnections = (
   store: string | undefined,
 ) => {
   if (store === undefined) return
-
   const connectionInfo = trackedConnections.get(name)
   if (!connectionInfo) return
-
   delete connectionInfo.stores[store]
-
   if (Object.keys(connectionInfo.stores).length === 0) {
     trackedConnections.delete(name)
   }
@@ -227,7 +224,6 @@ const devtoolsImpl: DevtoolsImpl =
         ) {
           ;(connection as any).unsubscribe()
         }
-
         removeStoreFromTrackedConnections(options.name, store)
       },
     }
