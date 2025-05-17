@@ -13,7 +13,7 @@
     "verbatimModuleSyntax": true,
     "declaration": true,
     "isolatedDeclarations": true,
-    "types": ["@testing-library/jest-dom"],
+    "types": ["@testing-library/jest-dom", "vitest/globals"],
     "noEmit": true,
     "baseUrl": ".",
     "paths": {

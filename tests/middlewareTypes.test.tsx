@@ -1,7 +1,6 @@
 /* eslint @typescript-eslint/no-unused-expressions: off */ // FIXME
 /* eslint react-hooks/react-compiler: off */
 
-import { describe, expect, expectTypeOf, it } from 'vitest'
 import { create } from 'zustand'
 import type { StateCreator, StoreApi, StoreMutatorIdentifier } from 'zustand'
 import {

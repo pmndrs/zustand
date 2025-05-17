@@ -8,7 +8,6 @@ import {
 import type { ReactNode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import ReactDOM from 'react-dom'
-import { afterEach, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import type { StoreApi } from 'zustand'
 import { createWithEqualityFn } from 'zustand/traditional'

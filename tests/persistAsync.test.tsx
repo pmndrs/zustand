@@ -1,6 +1,5 @@
 import { StrictMode, useEffect } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { replacer, reviver } from './test-utils'

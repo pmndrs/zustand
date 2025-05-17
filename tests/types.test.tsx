@@ -1,4 +1,3 @@
-import { expect, it } from 'vitest'
 import { create } from 'zustand'
 import type {
   StateCreator,

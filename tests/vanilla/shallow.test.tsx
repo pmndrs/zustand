@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import { shallow } from 'zustand/vanilla/shallow'
 
 describe('shallow', () => {

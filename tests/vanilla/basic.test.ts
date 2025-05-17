@@ -1,4 +1,3 @@
-import { afterEach, expect, it, vi } from 'vitest'
 import { createStore } from 'zustand/vanilla'
 import type { StoreApi } from 'zustand/vanilla'
 
