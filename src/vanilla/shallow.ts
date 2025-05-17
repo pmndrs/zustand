@@ -57,14 +57,18 @@ export function shallow<T>(valueA: T, valueB: T): boolean {
   ) {
     return false
   }
-  if (!isIterable(valueA) || !isIterable(valueB)) {
-    return compareEntries(
-      { entries: () => Object.entries(valueA) },
-      { entries: () => Object.entries(valueB) },
-    )
+  if (Object.getPrototypeOf(valueA) !== Object.getPrototypeOf(valueB)) {
+    return false
   }
-  if (hasIterableEntries(valueA) && hasIterableEntries(valueB)) {
-    return compareEntries(valueA, valueB)
+  if (isIterable(valueA) && isIterable(valueB)) {
+    if (hasIterableEntries(valueA) && hasIterableEntries(valueB)) {
+      return compareEntries(valueA, valueB)
+    }
+    return compareIterables(valueA, valueB)
   }
-  return compareIterables(valueA, valueB)
+  // assume plain objects
+  return compareEntries(
+    { entries: () => Object.entries(valueA) },
+    { entries: () => Object.entries(valueB) },
+  )
 }

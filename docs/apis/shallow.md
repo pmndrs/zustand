@@ -25,6 +25,7 @@ const equal = shallow(a, b)
   - [Comparing Maps](#comparing-maps)
 - [Troubleshooting](#troubleshooting)
   - [Comparing objects returns `false` even if they are identical.](#comparing-objects-returns-false-even-if-they-are-identical)
+  - [Comparing objects with different prototypes](#comparing-objects-with-different-prototypes)
 
 ## Types
 
@@ -224,3 +225,24 @@ In this modified example, `objectLeft` and `objectRight` have the same top-level
 primitive values. Since `shallow` function only compares the top-level properties, it will return
 `true` because the primitive values (`firstName`, `lastName`, and `age`) are identical in both
 objects.
+
+### Comparing objects with different prototypes
+
+The `shallow` function checks whether the two objects have the same prototype. If their prototypes
+are referentially different, shallow will return `false`. This comparison is done using:
+
+```ts
+Object.getPrototypeOf(a) === Object.getPrototypeOf(b)
+```
+
+> [!IMPORTANT]
+> Objects created with the object initializer (`{}`) or with `new Object()` inherit from
+> `Object.prototype` by default. However, objects created with `Object.create(proto)` inherit from
+> the proto you pass in—which may not be `Object.prototype.`
+
+```ts
+const a = Object.create({}) // -> prototype is `{}`
+const b = {} // -> prototype is `Object.prototype`
+
+shallow(a, b) // -> false
+```

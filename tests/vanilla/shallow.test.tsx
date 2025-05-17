@@ -172,6 +172,25 @@ describe('shallow', () => {
   })
 })
 
+describe('mixed cases', () => {
+  const obj = { 0: 'foo', 1: 'bar' }
+  const arr = ['foo', 'bar']
+  const set = new Set(['foo', 'bar'])
+  const map = new Map([
+    [0, 'foo'],
+    [1, 'bar'],
+  ])
+
+  it('compares different data structures', () => {
+    expect(shallow<unknown>(obj, arr)).toBe(false)
+    expect(shallow<unknown>(obj, set)).toBe(false)
+    expect(shallow<unknown>(obj, map)).toBe(false)
+    expect(shallow<unknown>(arr, set)).toBe(false)
+    expect(shallow<unknown>(arr, map)).toBe(false)
+    expect(shallow<unknown>(set, map)).toBe(false)
+  })
+})
+
 describe('generators', () => {
   it('pure iterable', () => {
     function* gen() {
