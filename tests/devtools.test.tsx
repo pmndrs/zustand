@@ -98,7 +98,11 @@ const extensionConnector = {
         subscribers.push(f)
         return () => {}
       }),
-      unsubscribe: vi.fn(),
+      unsubscribe: vi.fn(() => {
+        connectionMap.delete(
+          areNameUndefinedMapsNeeded ? options.testConnectionId : key,
+        )
+      }),
       send: vi.fn(),
       init: vi.fn(),
       error: vi.fn(),
@@ -2453,9 +2457,35 @@ describe('cleanup', () => {
   it('should unsubscribe from devtools when cleanup is called', async () => {
     const options = { name: 'test' }
     const store = createStore(devtools(() => ({ count: 0 }), options))
+    const [connection] = getNamedConnectionApis(options.name)
     store.devtools.cleanup()
 
-    const [connection] = getNamedConnectionApis(options.name)
     expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove store from tracked connection after cleanup', async () => {
+    const options = {
+      name: 'test-store-name',
+      store: 'test-store-id',
+      enabled: true,
+    }
+
+    const store1 = createStore(devtools(() => ({ count: 0 }), options))
+    store1.devtools.cleanup()
+    const store2 = createStore(devtools(() => ({ count: 0 }), options))
+
+    const [connection] = getNamedConnectionApis(options.name)
+
+    store2.setState({ count: 15 }, false, 'updateCount')
+    expect(connection.send).toHaveBeenLastCalledWith(
+      { type: `${options.store}/updateCount` },
+      { [options.store]: { count: 15 } },
+    )
+
+    store1.setState({ count: 20 }, false, 'ignoredAction')
+    expect(connection.send).not.toHaveBeenLastCalledWith(
+      { type: `${options.store}/ignoredAction` },
+      expect.anything(),
+    )
   })
 })
