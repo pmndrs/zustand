@@ -58,8 +58,8 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
   - **optional** `enabled`: Defaults to `true` when is on development mode, and defaults to `false`
     when is on production mode. Enables or disables the Redux DevTools integration
     for this store.
-  - **optional** `anonymousActionType`: Defaults to `anonymous`. A string to use as the action type
-    for anonymous mutations in the Redux DevTools.
+  - **optional** `anonymousActionType`: Defaults to the inferred action type or `anonymous` if
+    unavailable. A string to use as the action type for anonymous mutations in the Redux DevTools.
   - **optional** `store`: A custom identifier for the store in the Redux DevTools.
 
 #### Returns

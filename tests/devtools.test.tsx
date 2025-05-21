@@ -193,6 +193,37 @@ describe('When state changes...', () => {
   })
 })
 
+describe('When state changes with automatic setter inferring...', () => {
+  it("sends { type: setStateName || 'setCount`, ...rest } as the action with current state", async () => {
+    const options = {
+      name: 'testOptionsName',
+      enabled: true,
+    }
+
+    const api = createStore<{
+      count: number
+      setCount: (count: number) => void
+    }>()(
+      devtools(
+        (set) => ({
+          count: 0,
+          setCount: (newCount: number) => {
+            set({ count: newCount })
+          },
+        }),
+        options,
+      ),
+    )
+
+    api.getState().setCount(10)
+    const [connection] = getNamedConnectionApis(options.name)
+    expect(connection.send).toHaveBeenLastCalledWith(
+      { type: 'Object.setCount' },
+      { count: 10, setCount: expect.any(Function) },
+    )
+  })
+})
+
 describe('when it receives a message of type...', () => {
   describe('ACTION...', () => {
     it('does nothing', async () => {
