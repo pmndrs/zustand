@@ -45,6 +45,6 @@ const reduxImpl: ReduxImpl = (reducer, initial) => (set, _get, api) => {
   }
   ;(api as any).dispatchFromDevtools = true
 
-  return { dispatch: (...a) => (api as any).dispatch(...a), ...initial }
+  return { dispatch: (...args) => (api as any).dispatch(...args), ...initial }
 }
 export const redux = reduxImpl as unknown as Redux

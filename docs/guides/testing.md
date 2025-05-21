@@ -274,19 +274,21 @@ vi.mock('zustand') // to make it work like Jest (auto-mocking)
 import { defineConfig, mergeConfig } from 'vitest/config'
 import viteConfig from './vite.config'
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: ['./setup-vitest.ts'],
-    },
-  }),
+export default defineConfig((configEnv) =>
+  mergeConfig(
+    viteConfig(configEnv),
+    defineConfig({
+      test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: ['./setup-vitest.ts'],
+      },
+    }),
+  ),
 )
 ```
 
-### Testing components
+### Testing Components
 
 In the next examples we are going to use `useCounterStore`
 
@@ -348,7 +350,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const counterStoreRef = useRef<CounterStoreApi>()
+  const counterStoreRef = useRef<CounterStoreApi>(null)
   if (!counterStoreRef.current) {
     counterStoreRef.current = createCounterStore()
   }
@@ -423,9 +425,7 @@ describe('Counter', () => {
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
 
-    await act(async () => {
-      await user.click(await screen.findByRole('button', { name: /one up/i }))
-    })
+    await user.click(await screen.findByRole('button', { name: /one up/i }))
 
     expect(await screen.findByText(/^2$/)).toBeInTheDocument()
   })
@@ -493,9 +493,7 @@ describe('CounterWithContext', () => {
 
     expect(await screen.findByText(/^1$/)).toBeInTheDocument()
 
-    await act(async () => {
-      await user.click(await screen.findByRole('button', { name: /one up/i }))
-    })
+    await user.click(await screen.findByRole('button', { name: /one up/i }))
 
     expect(await screen.findByText(/^2$/)).toBeInTheDocument()
   })
@@ -513,6 +511,229 @@ const renderCounterWithContext = () => {
 
 - Jest Demo: https://stackblitz.com/edit/jest-zustand
 - Vitest Demo: https://stackblitz.com/edit/vitest-zustand
+
+### Testing Stores
+
+In the next examples we are going to use `useCounterStore`
+
+> **Note**: all of these examples are written using TypeScript.
+
+```ts
+// shared/counter-store-creator.ts
+import { type StateCreator } from 'zustand'
+
+export type CounterStore = {
+  count: number
+  inc: () => void
+}
+
+export const counterStoreCreator: StateCreator<CounterStore> = (set) => ({
+  count: 1,
+  inc: () => set((state) => ({ count: state.count + 1 })),
+})
+```
+
+```ts
+// stores/use-counter-store.ts
+import { create } from 'zustand'
+
+import {
+  type CounterStore,
+  counterStoreCreator,
+} from '../shared/counter-store-creator'
+
+export const useCounterStore = create<CounterStore>()(counterStoreCreator)
+```
+
+```tsx
+// contexts/use-counter-store-context.tsx
+import { type ReactNode, createContext, useContext, useRef } from 'react'
+import { createStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { shallow } from 'zustand/shallow'
+
+import {
+  type CounterStore,
+  counterStoreCreator,
+} from '../shared/counter-store-creator'
+
+export const createCounterStore = () => {
+  return createStore<CounterStore>(counterStoreCreator)
+}
+
+export type CounterStoreApi = ReturnType<typeof createCounterStore>
+
+export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
+  undefined,
+)
+
+export interface CounterStoreProviderProps {
+  children: ReactNode
+}
+
+export const CounterStoreProvider = ({
+  children,
+}: CounterStoreProviderProps) => {
+  const counterStoreRef = useRef<CounterStoreApi>(null)
+  if (!counterStoreRef.current) {
+    counterStoreRef.current = createCounterStore()
+  }
+
+  return (
+    <CounterStoreContext.Provider value={counterStoreRef.current}>
+      {children}
+    </CounterStoreContext.Provider>
+  )
+}
+
+export type UseCounterStoreContextSelector<T> = (store: CounterStore) => T
+
+export const useCounterStoreContext = <T,>(
+  selector: UseCounterStoreContextSelector<T>,
+): T => {
+  const counterStoreContext = useContext(CounterStoreContext)
+
+  if (counterStoreContext === undefined) {
+    throw new Error(
+      'useCounterStoreContext must be used within CounterStoreProvider',
+    )
+  }
+
+  return useStoreWithEqualityFn(counterStoreContext, selector, shallow)
+}
+```
+
+```tsx
+// components/counter/counter.tsx
+import { useCounterStore } from '../../stores/use-counter-store'
+
+export function Counter() {
+  const { count, inc } = useCounterStore()
+
+  return (
+    <div>
+      <h2>Counter Store</h2>
+      <h4>{count}</h4>
+      <button onClick={inc}>One Up</button>
+    </div>
+  )
+}
+```
+
+```ts
+// components/counter/index.ts
+export * from './counter'
+```
+
+```tsx
+// components/counter/counter.test.tsx
+import { act, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import { Counter, useCounterStore } from '../../../stores/use-counter-store.ts'
+
+describe('Counter', () => {
+  test('should render with initial state of 1', async () => {
+    renderCounter()
+
+    expect(useCounterStore.getState().count).toBe(1)
+  })
+
+  test('should increase count by clicking a button', async () => {
+    const user = userEvent.setup()
+
+    renderCounter()
+
+    expect(useCounterStore.getState().count).toBe(1)
+
+    await user.click(await screen.findByRole('button', { name: /one up/i }))
+
+    expect(useCounterStore.getState().count).toBe(2)
+  })
+})
+
+const renderCounter = () => {
+  return render(<Counter />)
+}
+```
+
+```tsx
+// components/counter-with-context/counter-with-context.tsx
+import {
+  CounterStoreProvider,
+  useCounterStoreContext,
+} from '../../contexts/use-counter-store-context'
+
+const Counter = () => {
+  const { count, inc } = useCounterStoreContext((state) => state)
+
+  return (
+    <div>
+      <h2>Counter Store Context</h2>
+      <h4>{count}</h4>
+      <button onClick={inc}>One Up</button>
+    </div>
+  )
+}
+
+export const CounterWithContext = () => {
+  return (
+    <CounterStoreProvider>
+      <Counter />
+    </CounterStoreProvider>
+  )
+}
+```
+
+```tsx
+// components/counter-with-context/index.ts
+export * from './counter-with-context'
+```
+
+```tsx
+// components/counter-with-context/counter-with-context.test.tsx
+import { act, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import { CounterStoreContext } from '../../../contexts/use-counter-store-context'
+import { counterStoreCreator } from '../../../shared/counter-store-creator'
+
+describe('CounterWithContext', () => {
+  test('should render with initial state of 1', async () => {
+    const counterStore = counterStoreCreator()
+
+    renderCounterWithContext(counterStore)
+
+    expect(counterStore.getState().count).toBe(1)
+    expect(
+      await screen.findByRole('button', { name: /one up/i }),
+    ).toBeInTheDocument()
+  })
+
+  test('should increase count by clicking a button', async () => {
+    const user = userEvent.setup()
+    const counterStore = counterStoreCreator()
+
+    renderCounterWithContext(counterStore)
+
+    expect(counterStore.getState().count).toBe(1)
+
+    await user.click(await screen.findByRole('button', { name: /one up/i }))
+
+    expect(counterStore.getState().count).toBe(2)
+  })
+})
+
+const renderCounterWithContext = (store) => {
+  return render(<CounterWithContext />, {
+    wrapper: ({ children }) => (
+      <CounterStoreContext.Provider value={store}>
+        {children}
+      </CounterStoreContext.Provider>
+    ),
+  })
+}
+```
 
 ## References
 

@@ -7,20 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
-      - run: pnpm install
-      - run: pnpm build # we don't have any other workflows to test build
-      - run: pnpm test:spec
-
-  test_matrix:
+  test_multiple_versions:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -30,9 +17,10 @@ jobs:
           - 18.1.0
           - 18.2.0
           - 18.3.1
-          - 19.0.0-rc.1
-          - 19.1.0-canary-3ce77d55-20250106
-          - 0.0.0-experimental-3ce77d55-20250106
+          - 19.0.0
+          - 19.1.0
+          - 19.2.0-canary-e9db3cc2-20250501
+          - 0.0.0-experimental-e9db3cc2-20250501
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -44,4 +32,4 @@ jobs:
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
           pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
-          pnpm test:spec
+          pnpm run test:spec

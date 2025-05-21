@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test_matrix:
+  test_multiple_builds:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -22,7 +22,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm run build
       - name: Patch for DEV-ONLY
         if: ${{ matrix.env == 'development' }}
         run: |
@@ -46,6 +46,6 @@ jobs:
           NODE_ENV: ${{ matrix.env }}
       - name: Test ${{ matrix.build }} ${{ matrix.env }}
         run: |
-          pnpm test:spec
+          pnpm run test:spec
         env:
           NODE_ENV: ${{ matrix.env }}

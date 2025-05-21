@@ -3,7 +3,6 @@ import vitest from '@vitest/eslint-plugin'
 import importPlugin from 'eslint-plugin-import'
 import jestDom from 'eslint-plugin-jest-dom'
 import react from 'eslint-plugin-react'
-import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 import testingLibrary from 'eslint-plugin-testing-library'
 import tseslint from 'typescript-eslint'
@@ -17,11 +16,8 @@ export default tseslint.config(
   tseslint.configs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
+  reactHooks.configs.recommended,
   {
-    plugins: {
-      'react-compiler': reactCompiler,
-      'react-hooks': reactHooks,
-    },
     settings: {
       react: {
         version: 'detect',
@@ -44,7 +40,7 @@ export default tseslint.config(
       'import/namespace': 'off',
       'import/no-named-as-default-member': 'off',
       'import/no-duplicates': 'error',
-      'import/extensions': ['error', 'always'],
+      'import/extensions': ['error', 'always', { ignorePackages: true }],
       'import/order': [
         'error',
         {
@@ -74,8 +70,7 @@ export default tseslint.config(
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'react-compiler/react-compiler': 'warn',
-      ...reactHooks.configs.recommended.rules,
+      'react-hooks/react-compiler': 'error',
     },
   },
   {
@@ -92,12 +87,6 @@ export default tseslint.config(
         'error',
         { fn: 'it', withinDescribe: 'it' },
       ],
-    },
-  },
-  {
-    files: ['*.js'],
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 )

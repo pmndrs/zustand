@@ -1,3 +1,4 @@
+blank_issues_enabled: false
 contact_links:
   - name: Bug Reports
     url: https://github.com/pmndrs/zustand/discussions/new?category=bug-report

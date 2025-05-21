@@ -43,7 +43,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 type BearStore = {
   bears: number
-  addBear: () => void
+  addABear: () => void
 }
 
 export const useBearStore = create<BearStore>()(
@@ -462,9 +462,10 @@ const storage = createJSONStorage(() => sessionStorage, {
     return value
   },
   replacer: (key, value) => {
-    if (value instanceof Date) {
-      return { type: 'date', value: value.toISOString() }
-    }
+    // NOTE: the result of `.toJSON()` is passed to the
+    // replacer function as value if is available so
+    // a Date is always a `string` at this point
+    if (key === 'someDate') return { type: 'date', value }
     return value
   },
 })

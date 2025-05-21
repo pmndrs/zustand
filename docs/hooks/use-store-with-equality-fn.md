@@ -8,6 +8,10 @@ nav: 29
 `useStore`. However, it offers a way to define a custom equality check. This allows for more
 granular control over when components re-render, improving performance and responsiveness.
 
+> [!IMPORTANT]
+> In order to use `useStoreWithEqualityFn` from `zustand/traditional` you need to install
+> `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
+
 ```js
 const someState = useStoreWithEqualityFn(store, selectorFn, equalityFn)
 ```
@@ -705,7 +709,7 @@ given tab.
 
 ```tsx
 const useCounterStore = <U,>(
-  currentTabIndex: number,
+  key: string,
   selector: (state: CounterStore) => U,
 ) => {
   const stores = useContext(CounterStoresContext)
@@ -715,15 +719,11 @@ const useCounterStore = <U,>(
   }
 
   const getOrCreateCounterStoreByKey = useCallback(
-    () => createCounterStoreFactory(stores),
+    (key: string) => createCounterStoreFactory(stores!)(key),
     [stores],
   )
 
-  return useStoreWithEqualityFn(
-    getOrCreateCounterStoreByKey(`tab-${currentTabIndex}`),
-    selector,
-    shallow,
-  )
+  return useStore(getOrCreateCounterStoreByKey(key), selector)
 }
 ```
 

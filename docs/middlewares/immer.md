@@ -8,6 +8,10 @@ nav: 206
 
 `immer` middleware lets you perform immutable updates.
 
+> [!IMPORTANT]
+> In order to use `immer` from `zustand/middleware/immer` you need to install
+> `immer` library.
+
 ```js
 const nextStateCreatorFn = immer(stateCreatorFn)
 ```
@@ -180,7 +184,10 @@ const personStore = createStore<PersonStore>()(
     },
     setPerson: (nextPerson) =>
       set((state) => {
-        state.person = typeof nextPerson ? nextPerson(state.person) : nextPerson
+        state.person =
+          typeof nextPerson === 'function'
+            ? nextPerson(state.person)
+            : nextPerson
       }),
   })),
 )

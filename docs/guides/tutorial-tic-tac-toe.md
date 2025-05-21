@@ -957,7 +957,7 @@ function Board({ xIsNext, squares, onPlay }) {
     if (squares[i] || winner) return
     const nextSquares = squares.slice()
     nextSquares[i] = player
-    setSquares(nextSquares)
+    onPlay(nextSquares)
   }
 
   return (
@@ -1313,7 +1313,7 @@ export default function Game() {
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove)
-    setXIsNext(currentMove % 2 === 0)
+    setXIsNext(nextMove % 2 === 0)
   }
 
   return (

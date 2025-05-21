@@ -2,7 +2,7 @@
   <img src="docs/bear.jpg" />
 </p>
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/pmndrs/zustand/lint-and-type.yml?branch=main&style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/zustand/actions?query=workflow%3ALint)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/pmndrs/zustand/test.yml?branch=main&style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/zustand/actions?query=workflow%3ALint)
 [![Build Size](https://img.shields.io/bundlephobia/minzip/zustand?label=bundle%20size&style=flat&colorA=000000&colorB=000000)](https://bundlephobia.com/result?p=zustand)
 [![Version](https://img.shields.io/npm/v/zustand?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
@@ -381,8 +381,8 @@ import { devtools } from 'zustand/middleware'
 const usePlainStore1 = create(devtools((set) => ..., { name, store: storeName1 }))
 const usePlainStore2 = create(devtools((set) => ..., { name, store: storeName2 }))
 // Usage with a redux store, it will log full action types
-const useReduxStore = create(devtools(redux(reducer, initialState)), { name, store: storeName3 })
-const useReduxStore = create(devtools(redux(reducer, initialState)), { name, store: storeName4 })
+const useReduxStore1 = create(devtools(redux(reducer, initialState)), { name, store: storeName3 })
+const useReduxStore2 = create(devtools(redux(reducer, initialState)), { name, store: storeName4 })
 ```
 
 Assigning different connection names will separate stores in redux devtools. This also helps group different stores into separate redux devtools connections.

@@ -7,12 +7,15 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  test_matrix:
+  test_old_typescript:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         typescript:
+          - 5.8.3
+          - 5.7.3
+          - 5.6.3
           - 5.5.4
           - 5.4.5
           - 5.3.3
@@ -32,7 +35,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm run build
       - name: Patch for all TS
         run: |
           sed -i~ 's/"isolatedDeclarations": true,//' tsconfig.json
@@ -52,4 +55,4 @@ jobs:
       - name: Install old TypeScript
         run: pnpm add -D typescript@${{ matrix.typescript }}
       - name: Test ${{ matrix.typescript }}
-        run: pnpm test:types
+        run: pnpm run test:types

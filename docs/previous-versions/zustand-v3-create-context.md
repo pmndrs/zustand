@@ -118,7 +118,7 @@ const StoreContext = createContext(null)
 
 const StoreProvider = ({ children }) => {
   const storeRef = useRef()
-  if (!storeRef.current) {
+  if (storeRef.current === null) {
     storeRef.current = createStore((set) => ({
       // ...
     }))

@@ -90,7 +90,7 @@ function UpdateBabyBearMeal() {
   useEffect(() => {
     const timer = setInterval(() => {
       useBearFamilyMealsStore.setState({
-        tinyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
+        babyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
       })
     }, 1000)
 
@@ -109,7 +109,7 @@ Finally, we combine both components in the `App` component to see them in action
 export default function App() {
   return (
     <>
-      <UpdateTinyBearPorridge />
+      <UpdateBabyBearMeal />
       <BearNames />
     </>
   )
@@ -149,7 +149,7 @@ function UpdateBabyBearMeal() {
   useEffect(() => {
     const timer = setInterval(() => {
       useBearFamilyMealsStore.setState({
-        tinyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
+        babyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
       })
     }, 1000)
 
@@ -186,7 +186,9 @@ the state change:
 
 ```tsx
 function BearNames() {
-  const names = useBearFamilyStore(useShallow((state) => Object.keys(state)))
+  const names = useBearFamilyMealsStore(
+    useShallow((state) => Object.keys(state)),
+  )
 
   return <div>{names.join(', ')}</div>
 }
@@ -226,7 +228,7 @@ function UpdateBabyBearMeal() {
   useEffect(() => {
     const timer = setInterval(() => {
       useBearFamilyMealsStore.setState({
-        tinyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
+        babyBear: meals[Math.floor(Math.random() * (meals.length - 1))],
       })
     }, 1000)
 

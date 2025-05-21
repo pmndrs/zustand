@@ -172,6 +172,25 @@ describe('shallow', () => {
   })
 })
 
+describe('mixed cases', () => {
+  const obj = { 0: 'foo', 1: 'bar' }
+  const arr = ['foo', 'bar']
+  const set = new Set(['foo', 'bar'])
+  const map = new Map([
+    [0, 'foo'],
+    [1, 'bar'],
+  ])
+
+  it('compares different data structures', () => {
+    expect(shallow<unknown>(obj, arr)).toBe(false)
+    expect(shallow<unknown>(obj, set)).toBe(false)
+    expect(shallow<unknown>(obj, map)).toBe(false)
+    expect(shallow<unknown>(arr, set)).toBe(false)
+    expect(shallow<unknown>(arr, map)).toBe(false)
+    expect(shallow<unknown>(set, map)).toBe(false)
+  })
+})
+
 describe('generators', () => {
   it('pure iterable', () => {
     function* gen() {
@@ -180,6 +199,24 @@ describe('generators', () => {
     }
     expect(Symbol.iterator in gen()).toBe(true)
     expect(shallow(gen(), gen())).toBe(true)
+  })
+
+  it('pure iterable with different values returns false', () => {
+    const iterableA = {
+      [Symbol.iterator]: function* (): Generator<number> {
+        yield 1
+        yield 2
+      },
+    }
+
+    const iterableB = {
+      [Symbol.iterator]: function* (): Generator<number> {
+        yield 1
+        yield 3
+      },
+    }
+
+    expect(shallow(iterableA, iterableB)).toBe(false)
   })
 })
 
