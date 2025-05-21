@@ -24,6 +24,7 @@ const nextStateCreatorFn = devtools(stateCreatorFn, devtoolsOptions)
 - [Usage](#usage)
   - [Debugging a store](#debugging-a-store)
   - [Debugging a Slices pattern based store](#debugging-a-slices-pattern-based-store)
+  - [Cleanup](#cleanup)
 - [Troubleshooting](#troubleshooting)
   - [Only one store is displayed](#only-one-store-is-displayed)
   - [Action names are labeled as 'anonymous'](#all-action-names-are-labeled-as-anonymous)
@@ -155,6 +156,27 @@ const useJungleStore = create<JungleStore>()(
   })),
 )
 ```
+
+### Cleanup
+
+When a store is no longer needed, you can clean up the Redux DevTools connection by calling the `cleanup` method on the store:
+
+```ts
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+
+const useStore = create(
+  devtools((set) => ({
+    count: 0,
+    increment: () => set((state) => ({ count: state.count + 1 })),
+  })),
+)
+
+// When you're done with the store, clean it up
+useStore.devtools.cleanup()
+```
+
+This is particularly useful in applications that wrap store in context or create multiple stores dynamically.
 
 ## Troubleshooting
 
