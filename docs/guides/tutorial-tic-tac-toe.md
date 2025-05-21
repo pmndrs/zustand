@@ -1313,7 +1313,7 @@ export default function Game() {
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove)
-    setXIsNext(currentMove % 2 === 0)
+    setXIsNext(nextMove % 2 === 0)
   }
 
   return (
