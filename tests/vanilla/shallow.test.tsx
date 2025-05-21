@@ -181,6 +181,24 @@ describe('generators', () => {
     expect(Symbol.iterator in gen()).toBe(true)
     expect(shallow(gen(), gen())).toBe(true)
   })
+
+  it('pure iterable with different values returns false', () => {
+    const iterableA = {
+      [Symbol.iterator]: function* (): Generator<number> {
+        yield 1
+        yield 2
+      },
+    }
+
+    const iterableB = {
+      [Symbol.iterator]: function* (): Generator<number> {
+        yield 1
+        yield 3
+      },
+    }
+
+    expect(shallow(iterableA, iterableB)).toBe(false)
+  })
 })
 
 describe('unsupported cases', () => {
