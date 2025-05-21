@@ -114,13 +114,7 @@ type ConnectionInformation = {
   connection: Connection
   stores: Record<StoreName, StoreInformation>
 }
-const findCallerName = (stack: string) => {
-  const traceLines = stack?.split?.('\n') ?? []
-  const isBlinkStackTrace = stack.startsWith('Error')
-  return isBlinkStackTrace
-    ? traceLines?.[2]?.trim().split(' ')[1]
-    : traceLines?.[1]?.trim().split('@')[0]
-}
+
 const trackedConnections: Map<ConnectionName, ConnectionInformation> = new Map()
 
 const getTrackedConnectionState = (
@@ -171,6 +165,17 @@ const removeStoreFromTrackedConnections = (
   }
 }
 
+const findCallerName = (stack: string | undefined) => {
+  if (!stack) return undefined
+  const traceLines = stack.split('\n')
+  const apiSetStateLineIndex = traceLines.findIndex((traceLine) =>
+    traceLine.includes('api.setState'),
+  )
+  if (apiSetStateLineIndex < 0) return undefined
+  const callerLine = traceLines[apiSetStateLineIndex + 1]?.trim() || ''
+  return /.+ (.+) .+/.exec(callerLine)?.[1]
+}
+
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
@@ -204,13 +209,10 @@ const devtoolsImpl: DevtoolsImpl =
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
       if (!isRecording) return r
-      let defaultActionName = anonymousActionType
-      if (inferActionName) {
-        defaultActionName = findCallerName(new Error().stack ?? '')
-      }
+      const inferredActionType = findCallerName(new Error().stack)
       const action: { type: string } =
         nameOrAction === undefined
-          ? { type: defaultActionName || 'anonymous' }
+          ? { type: anonymousActionType || inferredActionType || 'anonymous' }
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
             : nameOrAction

@@ -201,7 +201,10 @@ describe('When state changes with automatic setter inferring...', () => {
       inferActionName: true,
     }
 
-    const api = createStore(
+    const api = createStore<{
+      count: number
+      setCount: (count: number) => void
+    }>()(
       devtools(
         (set) => ({
           count: 0,
@@ -212,8 +215,7 @@ describe('When state changes with automatic setter inferring...', () => {
         options,
       ),
     )
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+
     api.getState().setCount(10)
     const [connection] = getNamedConnectionApis(options.name)
     expect(connection.send).toHaveBeenLastCalledWith(
