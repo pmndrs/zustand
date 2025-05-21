@@ -76,7 +76,6 @@ export interface DevtoolsOptions extends Config {
   name?: string
   enabled?: boolean
   anonymousActionType?: string
-  inferActionName?: boolean
   store?: string
 }
 
@@ -179,8 +178,7 @@ const findCallerName = (stack: string | undefined) => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, inferActionName, store, ...options } =
-      devtoolsOptions
+    const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>

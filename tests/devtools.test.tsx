@@ -198,7 +198,6 @@ describe('When state changes with automatic setter inferring...', () => {
     const options = {
       name: 'testOptionsName',
       enabled: true,
-      inferActionName: true,
     }
 
     const api = createStore<{
