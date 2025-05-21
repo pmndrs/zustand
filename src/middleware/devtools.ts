@@ -1,4 +1,5 @@
 import type {} from '@redux-devtools/extension'
+
 import type {
   StateCreator,
   StoreApi,
@@ -112,6 +113,7 @@ type ConnectionInformation = {
   connection: Connection
   stores: Record<StoreName, StoreInformation>
 }
+
 const trackedConnections: Map<ConnectionName, ConnectionInformation> = new Map()
 
 const getTrackedConnectionState = (
@@ -162,6 +164,17 @@ const removeStoreFromTrackedConnections = (
   }
 }
 
+const findCallerName = (stack: string | undefined) => {
+  if (!stack) return undefined
+  const traceLines = stack.split('\n')
+  const apiSetStateLineIndex = traceLines.findIndex((traceLine) =>
+    traceLine.includes('api.setState'),
+  )
+  if (apiSetStateLineIndex < 0) return undefined
+  const callerLine = traceLines[apiSetStateLineIndex + 1]?.trim() || ''
+  return /.+ (.+) .+/.exec(callerLine)?.[1]
+}
+
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
@@ -194,9 +207,10 @@ const devtoolsImpl: DevtoolsImpl =
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
       if (!isRecording) return r
+      const inferredActionType = findCallerName(new Error().stack)
       const action: { type: string } =
         nameOrAction === undefined
-          ? { type: anonymousActionType || 'anonymous' }
+          ? { type: anonymousActionType || inferredActionType || 'anonymous' }
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
             : nameOrAction
