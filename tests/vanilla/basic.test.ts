@@ -73,7 +73,7 @@ it('can get the store', async () => {
 it('can get the initial state', () => {
   const initial = { value: 1 }
   const store = createStore(() => initial)
-store.setState({ value: 2 })
+  store.setState({ value: 2 })
   expect(store.getInitialState()).toBe(initial)
 })
 
