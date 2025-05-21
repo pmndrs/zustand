@@ -47,18 +47,15 @@ export function createJSONStorage<S>(
         }
         return JSON.parse(str, options?.reviver) as StorageValue<S>
       }
-      const str = (storage as StateStorage).getItem(name) ?? null
+      const str = storage.getItem(name) ?? null
       if (str instanceof Promise) {
         return str.then(parse)
       }
       return parse(str)
     },
     setItem: (name, newValue) =>
-      (storage as StateStorage).setItem(
-        name,
-        JSON.stringify(newValue, options?.replacer),
-      ),
-    removeItem: (name) => (storage as StateStorage).removeItem(name),
+      storage.setItem(name, JSON.stringify(newValue, options?.replacer)),
+    removeItem: (name) => storage.removeItem(name),
   }
   return persistStorage
 }
