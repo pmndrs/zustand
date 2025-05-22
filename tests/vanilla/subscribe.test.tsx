@@ -120,4 +120,15 @@ describe('subscribe()', () => {
     expect(spy2).toHaveBeenCalledTimes(1)
     expect(spy2).toHaveBeenCalledWith(1, 0)
   })
+
+  it('should call listener immediately when fireImmediately is true', () => {
+    const spy = vi.fn()
+    const initialState = { value: 1 }
+    const { subscribe } = createStore(subscribeWithSelector(() => initialState))
+
+    subscribe((s) => s.value, spy, { fireImmediately: true })
+
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(1, 1)
+  })
 })
