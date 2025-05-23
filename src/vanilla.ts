@@ -57,6 +57,8 @@ type CreateStoreImpl = <
   initializer: StateCreator<T, [], Mos>,
 ) => Mutate<StoreApi<T>, Mos>
 
+const isFunction = (x: unknown) => typeof x === 'function'
+
 const createStoreImpl: CreateStoreImpl = (createState) => {
   type TState = ReturnType<typeof createState>
   type Listener = (state: TState, prevState: TState) => void
@@ -64,12 +66,7 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
   const listeners: Set<Listener> = new Set()
 
   const setState: StoreApi<TState>['setState'] = (partial, replace) => {
-    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
-    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
-    const nextState =
-      typeof partial === 'function'
-        ? (partial as (state: TState) => TState)(state)
-        : partial
+    const nextState = isFunction(partial) ? partial(state) : partial
     if (!Object.is(nextState, state)) {
       const previousState = state
       state =
