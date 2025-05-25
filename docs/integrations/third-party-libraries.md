@@ -72,3 +72,4 @@ This can be done using third-party libraries created by the community.
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) — Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
+- [zustand-expo-devtools](https://github.com/csark0812/zustand-expo-devtools) — 🧭 Connect Zustand to Redux DevTools in Expo + React Native using the official Expo DevTools plugin system.
