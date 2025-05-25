@@ -15,6 +15,7 @@ This can be done using third-party libraries created by the community.
 > for someone looking to extend Zustand's feature set.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
+- [@csark0812/zustand-expo-devtools](https://github.com/csark0812/zustand-expo-devtools) — 🧭 Connect Zustand to Redux DevTools in Expo + React Native using the official Expo DevTools plugin system.
 - [@davstack/store](https://www.npmjs.com/package/@davstack/store) — A zustand store factory that auto generates selectors with get/set/use methods, supports inferred types, and makes global / local state management easy.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
@@ -72,4 +73,3 @@ This can be done using third-party libraries created by the community.
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) — Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
-- [zustand-expo-devtools](https://github.com/csark0812/zustand-expo-devtools) — 🧭 Connect Zustand to Redux DevTools in Expo + React Native using the official Expo DevTools plugin system.
