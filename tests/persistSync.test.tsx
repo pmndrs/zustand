@@ -168,7 +168,7 @@ describe('persist middleware with sync configuration', () => {
     expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
   })
 
-  it('can correclty handle a missing migrate function', () => {
+  it('can correctly handle a missing migrate function', () => {
     console.error = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
     const storage = {
