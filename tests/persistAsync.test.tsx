@@ -302,7 +302,7 @@ describe('persist middleware with async configuration', () => {
     )
   })
 
-  it('can correclty handle a missing migrate function', async () => {
+  it('can correctly handle a missing migrate function', async () => {
     console.error = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
     const storage = {
