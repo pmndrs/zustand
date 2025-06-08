@@ -2,7 +2,7 @@ export default function Details() {
   return (
     <>
       <nav className="nav">
-        <a href="https://docs.pmnd.rs/zustand">Documentation</a>
+        <a href="https://zustand.docs.pmnd.rs/">Documentation</a>
         <a href="https://github.com/pmndrs/zustand">Github</a>
       </nav>
       <div className="bottom">
