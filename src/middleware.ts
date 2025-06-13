@@ -1,5 +1,16 @@
-export * from './middleware/redux.ts'
-export * from './middleware/devtools.ts'
-export * from './middleware/subscribeWithSelector.ts'
-export * from './middleware/combine.ts'
-export * from './middleware/persist.ts'
+export { redux } from './middleware/redux.ts'
+export {
+  devtools,
+  type DevtoolsOptions,
+  type NamedSet,
+} from './middleware/devtools.ts'
+export { subscribeWithSelector } from './middleware/subscribeWithSelector.ts'
+export { combine } from './middleware/combine.ts'
+export {
+  persist,
+  createJSONStorage,
+  type StateStorage,
+  type StorageValue,
+  type PersistStorage,
+  type PersistOptions,
+} from './middleware/persist.ts'
