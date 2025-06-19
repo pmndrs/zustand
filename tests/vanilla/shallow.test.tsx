@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { shallow } from 'zustand/vanilla/shallow'
+import { shallow } from 'zustand/shallow'
 
 describe('shallow', () => {
   it('compares primitive values', () => {
