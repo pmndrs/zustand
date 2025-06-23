@@ -207,10 +207,14 @@ const devtoolsImpl: DevtoolsImpl =
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
       if (!isRecording) return r
-      const inferredActionType = findCallerName(new Error().stack)
       const action: { type: string } =
         nameOrAction === undefined
-          ? { type: anonymousActionType || inferredActionType || 'anonymous' }
+          ? {
+              type:
+                anonymousActionType ||
+                findCallerName(new Error().stack) ||
+                'anonymous',
+            }
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
             : nameOrAction
