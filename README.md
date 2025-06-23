@@ -125,7 +125,16 @@ const treats = useBearStore(
 The `set` function has a second argument, `false` by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
 
 ```jsx
-import omit from 'es-toolkit/compat/omit'
+function omit(obj, keys) {
+  const result = { ...obj }
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    delete result[key]
+  }
+
+  return result
+}
 
 const useFishStore = create((set) => ({
   salmon: 1,
