@@ -125,13 +125,11 @@ const treats = useBearStore(
 The `set` function has a second argument, `false` by default. Instead of merging, it will replace the state model. Be careful not to wipe out parts you rely on, like actions.
 
 ```jsx
-import omit from 'lodash-es/omit'
-
 const useFishStore = create((set) => ({
   salmon: 1,
   tuna: 2,
   deleteEverything: () => set({}, true), // clears the entire store, actions included
-  deleteTuna: () => set((state) => omit(state, ['tuna']), true),
+  deleteTuna: () => set(({ tuna, ...rest }) => rest, true),
 }))
 ```
 
