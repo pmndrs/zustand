@@ -129,11 +129,7 @@ const useFishStore = create((set) => ({
   salmon: 1,
   tuna: 2,
   deleteEverything: () => set({}, true), // clears the entire store, actions included
-  deleteTuna: () =>
-    set((state) => {
-      const { tuna, ...rest } = state
-      return rest
-    }, true),
+  deleteTuna: () => set(({ tuna, ...rest }) => rest, true),
 }))
 ```
 
