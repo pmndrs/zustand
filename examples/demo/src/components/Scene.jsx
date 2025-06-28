@@ -1,5 +1,5 @@
 import { Mesh, PlaneGeometry, Group, Vector3, MathUtils } from 'three'
-import { memo, useRef, useState, useLayoutEffect } from 'react'
+import { useRef, useState, useLayoutEffect } from 'react'
 import { createRoot, events, extend, useFrame } from '@react-three/fiber'
 import { Plane, useAspect, useTexture } from '@react-three/drei'
 import {
