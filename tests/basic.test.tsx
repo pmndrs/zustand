@@ -64,7 +64,7 @@ it('uses the store with no args', async () => {
     </>,
   )
 
-  await screen.findByText('count: 1')
+  expect(await screen.findByText('count: 1')).toBeInTheDocument()
 })
 
 it('uses the store with selectors', async () => {
@@ -86,7 +86,7 @@ it('uses the store with selectors', async () => {
     </>,
   )
 
-  await screen.findByText('count: 1')
+  expect(await screen.findByText('count: 1')).toBeInTheDocument()
 })
 
 it('uses the store with a selector and equality checker', async () => {
@@ -116,15 +116,21 @@ it('uses the store with a selector and equality checker', async () => {
     </>,
   )
 
-  await screen.findByText('renderCount: 1, value: 0')
+  expect(
+    await screen.findByText('renderCount: 1, value: 0'),
+  ).toBeInTheDocument()
 
   // This will not cause a re-render.
   act(() => setState({ item: { value: 1 } }))
-  await screen.findByText('renderCount: 1, value: 0')
+  expect(
+    await screen.findByText('renderCount: 1, value: 0'),
+  ).toBeInTheDocument()
 
   // This will cause a re-render.
   act(() => setState({ item: { value: 2 } }))
-  await screen.findByText('renderCount: 2, value: 2')
+  expect(
+    await screen.findByText('renderCount: 2, value: 2'),
+  ).toBeInTheDocument()
 })
 
 it('only re-renders if selected state has changed', async () => {
@@ -156,7 +162,7 @@ it('only re-renders if selected state has changed', async () => {
 
   fireEvent.click(screen.getByText('button'))
 
-  await screen.findByText('count: 1')
+  expect(await screen.findByText('count: 1')).toBeInTheDocument()
 
   expect(counterRenderCount).toBe(2)
   expect(controlRenderCount).toBe(1)
@@ -185,7 +191,7 @@ it('can batch updates', async () => {
     </>,
   )
 
-  await screen.findByText('count: 2')
+  expect(await screen.findByText('count: 2')).toBeInTheDocument()
 })
 
 it('can update the selector', async () => {
@@ -205,14 +211,14 @@ it('can update the selector', async () => {
       <Component selector={(s) => s.one} />
     </StrictMode>,
   )
-  await screen.findByText('one')
+  expect(await screen.findByText('one')).toBeInTheDocument()
 
   rerender(
     <StrictMode>
       <Component selector={(s) => s.two} />
     </StrictMode>,
   )
-  await screen.findByText('two')
+  expect(await screen.findByText('two')).toBeInTheDocument()
 })
 
 it('can update the equality checker', async () => {
@@ -244,7 +250,9 @@ it('can update the equality checker', async () => {
 
   // This will cause a re-render due to the equality checker.
   act(() => setState({ value: 0 }))
-  await screen.findByText('renderCount: 2, value: 0')
+  expect(
+    await screen.findByText('renderCount: 2, value: 0'),
+  ).toBeInTheDocument()
 
   // Set an equality checker that always returns true to never re-render.
   rerender(
@@ -255,7 +263,9 @@ it('can update the equality checker', async () => {
 
   // This will NOT cause a re-render due to the equality checker.
   act(() => setState({ value: 1 }))
-  await screen.findByText('renderCount: 3, value: 0')
+  expect(
+    await screen.findByText('renderCount: 3, value: 0'),
+  ).toBeInTheDocument()
 })
 
 it('can call useBoundStore with progressively more arguments', async () => {
@@ -287,7 +297,9 @@ it('can call useBoundStore with progressively more arguments', async () => {
       <Component />
     </>,
   )
-  await screen.findByText('renderCount: 1, value: {"value":0}')
+  expect(
+    await screen.findByText('renderCount: 1, value: {"value":0}'),
+  ).toBeInTheDocument()
 
   // Render with selector.
   rerender(
@@ -295,7 +307,9 @@ it('can call useBoundStore with progressively more arguments', async () => {
       <Component selector={(s) => s.value} />
     </>,
   )
-  await screen.findByText('renderCount: 2, value: 0')
+  expect(
+    await screen.findByText('renderCount: 2, value: 0'),
+  ).toBeInTheDocument()
 
   // Render with selector and equality checker.
   rerender(
@@ -309,10 +323,14 @@ it('can call useBoundStore with progressively more arguments', async () => {
 
   // Should not cause a re-render because new value is less than previous.
   act(() => setState({ value: -1 }))
-  await screen.findByText('renderCount: 3, value: 0')
+  expect(
+    await screen.findByText('renderCount: 3, value: 0'),
+  ).toBeInTheDocument()
 
   act(() => setState({ value: 1 }))
-  await screen.findByText('renderCount: 4, value: 1')
+  expect(
+    await screen.findByText('renderCount: 4, value: 1'),
+  ).toBeInTheDocument()
 })
 
 it('can throw an error in selector', async () => {
@@ -355,12 +373,12 @@ it('can throw an error in selector', async () => {
     </StrictMode>,
   )
 
-  await screen.findByText('no error')
+  expect(await screen.findByText('no error')).toBeInTheDocument()
 
   act(() => {
     setState({ value: 123 })
   })
-  await screen.findByText('errored')
+  expect(await screen.findByText('errored')).toBeInTheDocument()
 })
 
 it('can throw an error in equality checker', async () => {
@@ -404,12 +422,12 @@ it('can throw an error in equality checker', async () => {
     </StrictMode>,
   )
 
-  await screen.findByText('no error')
+  expect(await screen.findByText('no error')).toBeInTheDocument()
 
   act(() => {
     setState({ value: 123 })
   })
-  await screen.findByText('errored')
+  expect(await screen.findByText('errored')).toBeInTheDocument()
 })
 
 it('can get the store', () => {
@@ -499,17 +517,17 @@ it('only calls selectors when necessary with static selector', async () => {
       <Component />
     </>,
   )
-  await screen.findByText('static: 1')
+  expect(await screen.findByText('static: 1')).toBeInTheDocument()
 
   rerender(
     <>
       <Component />
     </>,
   )
-  await screen.findByText('static: 1')
+  expect(await screen.findByText('static: 1')).toBeInTheDocument()
 
   act(() => setState({ a: 1, b: 1 }))
-  await screen.findByText('static: 2')
+  expect(await screen.findByText('static: 2')).toBeInTheDocument()
 })
 
 it('only calls selectors when necessary (traditional)', async () => {
@@ -540,20 +558,20 @@ it('only calls selectors when necessary (traditional)', async () => {
       <Component />
     </>,
   )
-  await screen.findByText('inline: 1')
-  await screen.findByText('static: 1')
+  expect(await screen.findByText('inline: 1')).toBeInTheDocument()
+  expect(await screen.findByText('static: 1')).toBeInTheDocument()
 
   rerender(
     <>
       <Component />
     </>,
   )
-  await screen.findByText('inline: 2')
-  await screen.findByText('static: 1')
+  expect(await screen.findByText('inline: 2')).toBeInTheDocument()
+  expect(await screen.findByText('static: 1')).toBeInTheDocument()
 
   act(() => setState({ a: 1, b: 1 }))
-  await screen.findByText('inline: 4')
-  await screen.findByText('static: 2')
+  expect(await screen.findByText('inline: 4')).toBeInTheDocument()
+  expect(await screen.findByText('static: 2')).toBeInTheDocument()
 })
 
 it('ensures parent components subscribe before children', async () => {
@@ -602,7 +620,7 @@ it('ensures parent components subscribe before children', async () => {
 
   fireEvent.click(screen.getByText('change state'))
 
-  await screen.findByText('child 3')
+  expect(await screen.findByText('child 3')).toBeInTheDocument()
 })
 
 // https://github.com/pmndrs/zustand/issues/84
@@ -715,10 +733,10 @@ it('works with non-object state', async () => {
     </StrictMode>,
   )
 
-  await screen.findByText('count: 1')
+  expect(await screen.findByText('count: 1')).toBeInTheDocument()
 
   fireEvent.click(screen.getByText('button'))
-  await screen.findByText('count: 2')
+  expect(await screen.findByText('count: 2')).toBeInTheDocument()
 })
 
 it('works with "undefined" state', async () => {
@@ -735,5 +753,5 @@ it('works with "undefined" state', async () => {
     </StrictMode>,
   )
 
-  await screen.findByText('str: undefined')
+  expect(await screen.findByText('str: undefined')).toBeInTheDocument()
 })

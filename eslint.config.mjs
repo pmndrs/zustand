@@ -82,7 +82,6 @@ export default tseslint.config(
       'import/extensions': ['error', 'never'],
       '@typescript-eslint/no-unused-vars': 'off',
       'testing-library/no-node-access': 'off',
-      'vitest/expect-expect': 'off',
       'vitest/consistent-test-it': [
         'error',
         { fn: 'it', withinDescribe: 'it' },
