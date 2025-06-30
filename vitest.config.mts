@@ -20,10 +20,12 @@ export default defineConfig({
       : ['default'],
     setupFiles: ['tests/setup.ts'],
     coverage: {
+      enabled: true,
       include: ['src/**/'],
       reporter: ['text', 'json', 'html', 'text-summary'],
       reportsDirectory: './coverage/',
       provider: 'v8',
     },
+    typecheck: { enabled: true },
   },
 })
