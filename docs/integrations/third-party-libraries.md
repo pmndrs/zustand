@@ -72,4 +72,5 @@ This can be done using third-party libraries created by the community.
 - [zustand-xs](https://github.com/zustandjs/zustand-xs) — XState/store compabile middleware for Zustand
 - [zustand-yjs](https://github.com/tandem-pt/zustand-yjs) — Zustand stores for Yjs structures.
 - [zusteller](https://github.com/timkindberg/zusteller) — Your global state savior. "Just hooks" + Zustand.
+- [zustorm](https://github.com/mooalot/zustorm) — A simple and powerful form library for Zustand.
 - [zusty](https://github.com/oslabs-beta/Zusty) — Zustand tool to assist debugging with time travel, action logs, state snapshots, store view, render time metrics and state component tree.
