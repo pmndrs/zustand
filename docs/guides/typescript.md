@@ -428,7 +428,7 @@ interface FishSlice {
 
 interface SharedSlice {
   addBoth: () => void
-  getBoth: () => void
+  getBoth: () => number
 }
 
 const createBearSlice: StateCreator<
