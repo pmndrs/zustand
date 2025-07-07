@@ -52,7 +52,7 @@ persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistO
   Usually, you will return an object with the methods you want to expose.
 - `persistOptions`: An object to define storage options.
   - `name`: A unique name of the item for your store in the storage.
-  - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`. -
+  - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`.
   - **optional** `partialize`: A function to filter state fields before persisting it.
   - **optional** `onRehydrateStorage`: A function or function returning a function that allows
     custom logic before and after state rehydration.
