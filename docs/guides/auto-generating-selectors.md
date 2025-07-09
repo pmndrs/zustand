@@ -99,7 +99,7 @@ interface BearState {
   increment: () => void
 }
 
-const store = createStore<BearState>((set) => ({
+const store = createStore<BearState>()((set) => ({
   bears: 0,
   increase: (by) => set((state) => ({ bears: state.bears + by })),
   increment: () => set((state) => ({ bears: state.bears + 1 })),
