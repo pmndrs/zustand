@@ -70,7 +70,7 @@ type PersonStoreAction =
   | { type: 'person/setLastName'; lastName: string }
   | { type: 'person/setEmail'; email: string }
 
-type PersonStore = PersonStoreState & PersonStoreActions
+type PersonStore = PersonStoreState & PersonStoreAction
 
 const personStoreReducer = (
   state: PersonStoreState,
