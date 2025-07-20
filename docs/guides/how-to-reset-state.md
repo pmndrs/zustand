@@ -6,37 +6,10 @@ nav: 12
 The following pattern can be used to reset the state to its initial value.
 
 ```ts
-import { create } from 'zustand'
-
-// define types for state values and actions separately
-type State = {
-  salmon: number
-  tuna: number
-}
-
-type Actions = {
-  addSalmon: (qty: number) => void
-  addTuna: (qty: number) => void
-  reset: () => void
-}
-
-// define the initial state
-const initialState: State = {
-  salmon: 0,
-  tuna: 0,
-}
-
-// create store
-const useSlice = create<State & Actions>()((set, get) => ({
-  ...initialState,
-  addSalmon: (qty: number) => {
-    set({ salmon: get().salmon + qty })
-  },
-  addTuna: (qty: number) => {
-    set({ tuna: get().tuna + qty })
-  },
+const useSomeStore = create<State & Actions>()((set, get, store) => ({
+  // your code here
   reset: () => {
-    set(initialState)
+    set(store.getInitialState())
   },
 }))
 ```
@@ -58,9 +31,8 @@ const resetAllStores = () => {
 export const create = (<T>() => {
   return (stateCreator: StateCreator<T>) => {
     const store = actualCreate(stateCreator)
-    const initialState = store.getInitialState()
     storeResetFns.add(() => {
-      store.setState(initialState, true)
+      store.setState(store.getInitialState(), true)
     })
     return store
   }
@@ -69,6 +41,5 @@ export const create = (<T>() => {
 
 ## CodeSandbox Demo
 
-- Basic: https://codesandbox.io/s/zustand-how-to-reset-state-basic-demo-rrqyon
-- Advanced: https://codesandbox.io/s/zustand-how-to-reset-state-advanced-demo-gtu0qe
-- Immer: https://codesandbox.io/s/how-to-reset-state-advance-immer-demo-nyet3f
+- Basic: https://stackblitz.com/edit/zustand-how-to-reset-state-basic
+- Advanced: https://stackblitz.com/edit/zustand-how-to-reset-state-advanced
