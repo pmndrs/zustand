@@ -75,6 +75,8 @@ export const createBearFishSlice = (set, get) => ({
 })
 ```
 
+zustand can be increased with performance but there are not good ways to use it idk and it can decrase performance if not used wisely
+
 Combining all the stores together is the same as before.
 
 ```js
