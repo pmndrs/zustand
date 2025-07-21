@@ -53,6 +53,57 @@ const useStore = create((set) => ({
 }))
 ```
 
+<details>
+<summary><strong>Using TypeScript?</strong></summary>
+
+> #### TypeScript with Inference
+> 
+> To get **type-inference** in TypeScript, your property initializations need to be separated from your methods - use `combine` to do that:
+> 
+> ```ts
+> import { create } from 'zustand'
+> import { combine } from 'zustand/middleware'
+> 
+> const useStore = create(
+>   combine(
+>     {
+>       bears: 0,
+>     },
+>     (set) => ({
+>       increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+>       removeAllBears: () => set({ bears: 0 }),
+>       updateBears: (newBears: number) => set({ bears: newBears }),
+>     })
+>   )
+> )
+> ```
+>
+> #### TypeScript with Explicit Types
+> 
+> If you prefer **explicit type-hinting**, you don't need `combine` - instead, just do this:
+>
+> ```ts
+> import { create } from 'zustand'
+> 
+> interface BearStore {
+>   bears: number
+>   increasePopulation(): void
+>   removeAllBears(): void
+>   updateBears(newBears: number): void
+> }
+> 
+> const useStore = create<BearStore>((set) => ({
+>   bears: 0,
+>   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+>   removeAllBears: () => set({ bears: 0 }),
+>   updateBears: (newBears) => set({ bears: newBears }),
+> }))
+> ```
+>
+> For more details, refer to the [full TypeScript guide](/guides/typescript).
+
+</details>
+
 ## Then bind your components, and that's it!
 
 You can use the hook anywhere, without the need of providers.
