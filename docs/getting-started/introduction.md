@@ -104,6 +104,33 @@ const useStore = create((set) => ({
 
 </details>
 
+<details>
+<summary><strong>Need to compute stuff?</strong></summary>
+
+> #### Zustand only deals with state & updates.
+>
+> To compute derived states, just write regular React hooks:
+>
+> ```js
+> export const useProjectedBearPopulation = (years) =>
+>   useStore(({ bears }) => bears * Math.pow(1.05, years))
+> ```
+>
+> Too slow? Just combine with a regular `useMemo` hook:
+> 
+> ```js
+> import { useMemo } from 'react'
+> 
+> const useProjectedBearPopulation = (years) => {
+>   const bears = useStore(({ bears }) => bears)
+>   return useMemo(() => bears * Math.pow(1.05, years), [bears, years])
+> }
+> ```
+>
+> If this doesn't suit you, try a search for "computed" in the [list of third-party libraries](/integrations/third-party-libraries).
+
+</details>
+
 ## Then bind your components, and that's it!
 
 You can use the hook anywhere, without the need of providers.
