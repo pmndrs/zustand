@@ -29,8 +29,8 @@ export function useStore<TState, StateSlice>(
 ) {
   const slice = React.useSyncExternalStore(
     api.subscribe,
-    () => selector(api.getState()),
-    () => selector(api.getInitialState()),
+    React.useCallback(() => selector(api.getState()), [api, selector]),
+    React.useCallback(() => selector(api.getInitialState()), [api, selector]),
   )
   React.useDebugValue(slice)
   return slice
