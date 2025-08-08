@@ -118,17 +118,28 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-type StorePersist<S, Ps> = {
-  persist: {
-    setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
-    clearStorage: () => void
-    rehydrate: () => Promise<void> | void
-    hasHydrated: () => boolean
-    onHydrate: (fn: PersistListener<S>) => () => void
-    onFinishHydration: (fn: PersistListener<S>) => () => void
-    getOptions: () => Partial<PersistOptions<S, Ps>>
+type StorePersist<S, Ps> = S extends {
+  getState: () => infer T
+  setState: {
+    // capture both overloads of setState
+    (...args: infer Sa1): infer Sr1
+    (...args: infer Sa2): infer Sr2
   }
 }
+  ? {
+      setState(...args: Sa1): Sr1 | unknown | Promise<unknown>
+      setState(...args: Sa2): Sr2 | unknown | Promise<unknown>
+      persist: {
+        setOptions: (options: Partial<PersistOptions<T, Ps>>) => void
+        clearStorage: () => void
+        rehydrate: () => Promise<void> | void
+        hasHydrated: () => boolean
+        onHydrate: (fn: PersistListener<T>) => () => void
+        onFinishHydration: (fn: PersistListener<T>) => () => void
+        getOptions: () => Partial<PersistOptions<T, Ps>>
+      }
+    }
+  : never
 
 type Thenable<Value> = {
   then<V>(
@@ -212,13 +223,13 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   api.setState = (state, replace) => {
     savedSetState(state, replace as any)
-    void setItem()
+    return setItem()
   }
 
   const configResult = config(
     (...args) => {
       set(...(args as Parameters<typeof set>))
-      void setItem()
+      return setItem()
     },
     get,
     api,
@@ -307,7 +318,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       })
   }
 
-  ;(api as StoreApi<S> & StorePersist<S, S>).persist = {
+  ;(api as StoreApi<S> & StorePersist<StoreApi<S>, S>).persist = {
     setOptions: (newOptions) => {
       options = {
         ...options,
@@ -365,9 +376,7 @@ declare module '../vanilla' {
 
 type Write<T, U> = Omit<T, keyof U> & U
 
-type WithPersist<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StorePersist<T, A>>
-  : never
+type WithPersist<S, A> = Write<S, StorePersist<S, A>>
 
 type PersistImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
