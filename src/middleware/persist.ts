@@ -15,12 +15,12 @@ export type StorageValue<S> = {
   version?: number
 }
 
-export interface PersistStorage<S> {
+export interface PersistStorage<S, R> {
   getItem: (
     name: string,
   ) => StorageValue<S> | null | Promise<StorageValue<S> | null>
-  setItem: (name: string, value: StorageValue<S>) => unknown | Promise<unknown>
-  removeItem: (name: string) => unknown | Promise<unknown>
+  setItem: (name: string, value: StorageValue<S>) => R
+  removeItem: (name: string) => R
 }
 
 type JsonStorageOptions = {
@@ -31,7 +31,7 @@ type JsonStorageOptions = {
 export function createJSONStorage<S>(
   getStorage: () => StateStorage,
   options?: JsonStorageOptions,
-): PersistStorage<S> | undefined {
+): PersistStorage<S, unknown> | undefined {
   let storage: StateStorage | undefined
   try {
     storage = getStorage()
@@ -39,7 +39,7 @@ export function createJSONStorage<S>(
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
     return
   }
-  const persistStorage: PersistStorage<S> = {
+  const persistStorage: PersistStorage<S, unknown> = {
     getItem: (name) => {
       const parse = (str: string | null) => {
         if (str === null) {
@@ -60,7 +60,11 @@ export function createJSONStorage<S>(
   return persistStorage
 }
 
-export interface PersistOptions<S, PersistedState = S> {
+export interface PersistOptions<
+  S,
+  PersistedState = S,
+  PersistReturn = unknown,
+> {
   /** Name of the storage (must be unique) */
   name: string
   /**
@@ -71,7 +75,7 @@ export interface PersistOptions<S, PersistedState = S> {
    *
    * @default createJSONStorage(() => localStorage)
    */
-  storage?: PersistStorage<PersistedState> | undefined
+  storage?: PersistStorage<PersistedState, PersistReturn> | undefined
   /**
    * Filter the persisted value.
    *
@@ -118,17 +122,28 @@ export interface PersistOptions<S, PersistedState = S> {
 
 type PersistListener<S> = (state: S) => void
 
-type StorePersist<S, Ps> = {
-  persist: {
-    setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
-    clearStorage: () => void
-    rehydrate: () => Promise<void> | void
-    hasHydrated: () => boolean
-    onHydrate: (fn: PersistListener<S>) => () => void
-    onFinishHydration: (fn: PersistListener<S>) => () => void
-    getOptions: () => Partial<PersistOptions<S, Ps>>
+type StorePersist<S, Ps, Pr> = S extends {
+  getState: () => infer T
+  setState: {
+    // capture both overloads of setState
+    (...args: infer Sa1): infer Sr1
+    (...args: infer Sa2): infer Sr2
   }
 }
+  ? {
+      setState(...args: Sa1): Sr1 | Pr
+      setState(...args: Sa2): Sr2 | Pr
+      persist: {
+        setOptions: (options: Partial<PersistOptions<T, Ps, Pr>>) => void
+        clearStorage: () => void
+        rehydrate: () => Promise<void> | void
+        hasHydrated: () => boolean
+        onHydrate: (fn: PersistListener<T>) => () => void
+        onFinishHydration: (fn: PersistListener<T>) => () => void
+        getOptions: () => Partial<PersistOptions<T, Ps, Pr>>
+      }
+    }
+  : never
 
 type Thenable<Value> = {
   then<V>(
@@ -202,7 +217,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   const setItem = () => {
     const state = options.partialize({ ...get() })
-    return (storage as PersistStorage<S>).setItem(options.name, {
+    return (storage as PersistStorage<S, unknown>).setItem(options.name, {
       state,
       version: options.version,
     })
@@ -212,13 +227,13 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   api.setState = (state, replace) => {
     savedSetState(state, replace as any)
-    void setItem()
+    return setItem()
   }
 
   const configResult = config(
     (...args) => {
       set(...(args as Parameters<typeof set>))
-      void setItem()
+      return setItem()
     },
     get,
     api,
@@ -307,7 +322,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       })
   }
 
-  ;(api as StoreApi<S> & StorePersist<S, S>).persist = {
+  ;(api as StoreApi<S> & StorePersist<StoreApi<S>, S, unknown>).persist = {
     setOptions: (newOptions) => {
       options = {
         ...options,
@@ -365,9 +380,7 @@ declare module '../vanilla' {
 
 type Write<T, U> = Omit<T, keyof U> & U
 
-type WithPersist<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StorePersist<T, A>>
-  : never
+type WithPersist<S, A> = Write<S, StorePersist<S, A, unknown>>
 
 type PersistImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
