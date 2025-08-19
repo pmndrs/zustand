@@ -170,6 +170,10 @@ describe('shallow', () => {
     const arr = [1, 2]
     expect(shallow([arr, 1], [arr, 1])).toBe(true)
   })
+
+  it('should work with undefined (#3204)', () => {
+    expect(shallow({ a: undefined }, { b: 1 })).toBe(false)
+  })
 })
 
 describe('mixed cases', () => {
