@@ -4,7 +4,7 @@ import type {
   StoreMutatorIdentifier,
 } from '../vanilla.ts'
 
-export interface StateStorage<R> {
+export interface StateStorage<R = unknown> {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => R
   removeItem: (name: string) => R
@@ -15,7 +15,7 @@ export type StorageValue<S> = {
   version?: number
 }
 
-export interface PersistStorage<S, R> {
+export interface PersistStorage<S, R = unknown> {
   getItem: (
     name: string,
   ) => StorageValue<S> | null | Promise<StorageValue<S> | null>
@@ -28,7 +28,7 @@ type JsonStorageOptions = {
   replacer?: (key: string, value: unknown) => unknown
 }
 
-export function createJSONStorage<S, R>(
+export function createJSONStorage<S, R = unknown>(
   getStorage: () => StateStorage<R>,
   options?: JsonStorageOptions,
 ): PersistStorage<S, unknown> | undefined {
