@@ -4,10 +4,10 @@ import type {
   StoreMutatorIdentifier,
 } from '../vanilla.ts'
 
-export interface StateStorage {
+export interface StateStorage<R> {
   getItem: (name: string) => string | null | Promise<string | null>
-  setItem: (name: string, value: string) => unknown | Promise<unknown>
-  removeItem: (name: string) => unknown | Promise<unknown>
+  setItem: (name: string, value: string) => R
+  removeItem: (name: string) => R
 }
 
 export type StorageValue<S> = {
@@ -28,18 +28,18 @@ type JsonStorageOptions = {
   replacer?: (key: string, value: unknown) => unknown
 }
 
-export function createJSONStorage<S>(
-  getStorage: () => StateStorage,
+export function createJSONStorage<S, R>(
+  getStorage: () => StateStorage<R>,
   options?: JsonStorageOptions,
 ): PersistStorage<S, unknown> | undefined {
-  let storage: StateStorage | undefined
+  let storage: StateStorage<R> | undefined
   try {
     storage = getStorage()
   } catch {
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
     return
   }
-  const persistStorage: PersistStorage<S, unknown> = {
+  const persistStorage: PersistStorage<S, R> = {
     getItem: (name) => {
       const parse = (str: string | null) => {
         if (str === null) {
@@ -187,7 +187,7 @@ const toThenable =
 const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   type S = ReturnType<typeof config>
   let options = {
-    storage: createJSONStorage<S>(() => localStorage),
+    storage: createJSONStorage<S, void>(() => localStorage),
     partialize: (state: S) => state,
     version: 0,
     merge: (persistedState: unknown, currentState: S) => ({
