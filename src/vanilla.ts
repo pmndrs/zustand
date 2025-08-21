@@ -98,3 +98,63 @@ const createStoreImpl: CreateStoreImpl = (createState) => {
 
 export const createStore = ((createState) =>
   createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
+
+export type SetStateFnParam<T> = T | ((oldState: T) => T)
+export type SetStateFn<T> = (newState: SetStateFnParam<T>) => void
+
+// There is probably a better type to use than this. It is the type of the `set()` function
+type SetFn<StateObject extends Record<string, any>> = {
+  (
+    partial:
+      | StateObject
+      | Partial<StateObject>
+      | ((state: StateObject) => StateObject | Partial<StateObject>),
+    replace?: false,
+  ): void
+  (
+    state: StateObject | ((state: StateObject) => StateObject),
+    replace: true,
+  ): void
+}
+
+/** Creates the `setState` function for a given piece of state.
+ *
+ * ```ts
+ *  interface CounterStore {
+ *    count: number
+ *    setCount: SetStateFn<number>
+ *    increment: () => void
+ * }
+ *
+ * const useCounterStore = create<CounterStore>()((set) => {
+ *   const setCount = createSetterFn(set, 'count')
+ *
+ *   return {
+ *     count: 0,
+ *     setCount,
+ *     increment: () => setCount(oldCount => oldCount + 1),
+ *   }
+ * })
+ * ```
+ */
+export function createSetterFn<
+  State extends Record<string, any>,
+  Key extends keyof State,
+>(set: SetFn<State>, key: Key): SetStateFn<State[Key]> {
+  type Value = State[Key]
+  type Prev = (oldState: Value) => Value
+
+  const setterFn: SetStateFn<State[Key]> = (
+    newState: SetStateFnParam<State[Key]>,
+  ) => {
+    set((oldState) => ({
+      ...oldState,
+      [key as Key]:
+        typeof newState === 'function'
+          ? (newState as Prev)(oldState[key])
+          : newState,
+    }))
+  }
+
+  return setterFn
+}
