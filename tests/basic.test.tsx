@@ -9,7 +9,7 @@ import type { ReactNode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import ReactDOM from 'react-dom'
 import { afterEach, expect, it, vi } from 'vitest'
-import { create } from 'zustand'
+import { create, createSetterFn } from 'zustand'
 import type { StoreApi } from 'zustand'
 import { createWithEqualityFn } from 'zustand/traditional'
 
@@ -131,6 +131,30 @@ it('uses the store with a selector and equality checker', async () => {
   expect(
     await screen.findByText('renderCount: 2, value: 2'),
   ).toBeInTheDocument()
+})
+
+it('uses the store with createSetterFn', async () => {
+  const useBoundStore = create<CounterState>()((set) => {
+    const setCount = createSetterFn(set, 'count')
+    return {
+      count: 0,
+      inc: () => setCount((oldCount) => oldCount + 1),
+    }
+  })
+
+  function Counter() {
+    const { count, inc } = useBoundStore()
+    useEffect(inc, [inc])
+    return <div>count: {count}</div>
+  }
+
+  render(
+    <>
+      <Counter />
+    </>,
+  )
+
+  expect(await screen.findByText('count: 1')).toBeInTheDocument()
 })
 
 it('only re-renders if selected state has changed', async () => {
