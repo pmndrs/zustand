@@ -149,7 +149,7 @@ export function createSetterFn<
   ) => {
     set((oldState) => ({
       ...oldState,
-      [key as Key]:
+      [key]:
         typeof newState === 'function'
           ? (newState as Prev)(oldState[key])
           : newState,
