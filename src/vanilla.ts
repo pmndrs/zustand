@@ -142,16 +142,14 @@ export function createSetterFn<
   Key extends keyof State,
 >(set: SetFn<State>, key: Key): SetStateFn<State[Key]> {
   type Value = State[Key]
-  type Prev = (oldState: Value) => Value
+  type FunctionState = (oldState: Value) => Value
 
-  const setterFn: SetStateFn<State[Key]> = (
-    newState: SetStateFnParam<State[Key]>,
-  ) => {
+  function setterFn(newState: SetStateFnParam<Value>): void {
     set((oldState) => ({
       ...oldState,
       [key]:
         typeof newState === 'function'
-          ? (newState as Prev)(oldState[key])
+          ? (newState as FunctionState)(oldState[key])
           : newState,
     }))
   }
