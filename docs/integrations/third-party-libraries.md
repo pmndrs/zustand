@@ -47,6 +47,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
+- [zustand-create-setter-fn](https://www.npmjs.com/package/zustand-create-setter-fn) - A fully type safe utility for Zustand that allows you to easily update state using React style `setState` functions (framework agnostic, doesn't require React).
 - [zustand-di](https://github.com/charkour/zustand-di) — use react props to init zustand stores
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
 - [zustand-hash-storage](https://github.com/MartinGamesCZ/zustand-hash-storage) — Zustand middleware for saving state into URL hash, b64 encoded (can be configured) and debounce timer.
@@ -66,6 +67,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-slices](https://github.com/zustandjs/zustand-slices) — A slice utility for Zustand.
 - [zustand-store-addons](https://github.com/Diablow/zustand-store-addons) — React state management addons for Zustand.
 - [zustand-sync-tabs](https://github.com/mayank1513/zustand-sync-tabs) — Zustand middleware to easily sync Zustand state between tabs/windows/iframes with same origin.
+- [zustand-utils](https://www.npmjs.com/package/zustand-utils) - Utilities for Zustand - a `createContext` replacement, a devtools wrapper, and a store-updater factory function.
 - [zustand-valtio](https://github.com/zustandjs/zustand-valtio) — A sweet combination of Zustand and Valtio
 - [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) — State management for vue (Vue3 / Vue2) based on zustand.
 - [zustand-x](https://github.com/udecode/zustand-x) — Zustand store factory for a best-in-class developer experience.
