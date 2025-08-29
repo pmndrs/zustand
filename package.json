@@ -114,7 +114,7 @@
     "url": "https://github.com/pmndrs/zustand/issues"
   },
   "homepage": "https://github.com/pmndrs/zustand",
-  "packageManager": "pnpm@9.15.5",
+  "packageManager": "pnpm@10.15.0",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@redux-devtools/extension": "^3.3.0",
