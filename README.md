@@ -1,4 +1,3 @@
-test
 <p align="center">
   <img src="docs/bear.jpg" />
 </p>
