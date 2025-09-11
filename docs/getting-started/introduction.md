@@ -57,7 +57,8 @@ const useStore = create((set) => ({
 
 You can use the hook anywhere, without the need of providers.
 Select your state and the consuming component
-will re-render when that state changes.
+will re-render when that state changes. In `BearCounter`, `useStore` refers to the custom hook defined above.
+Zustand also provides its own `useStore` hook, so take care not to confuse them.
 
 ```jsx
 function BearCounter() {
