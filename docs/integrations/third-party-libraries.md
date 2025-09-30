@@ -18,7 +18,7 @@ This can be done using third-party libraries created by the community.
 - [@csark0812/zustand-expo-devtools](https://github.com/csark0812/zustand-expo-devtools) — 🧭 Connect Zustand to Redux DevTools in Expo + React Native using the official Expo DevTools plugin system.
 - [@davstack/store](https://www.npmjs.com/package/@davstack/store) — A zustand store factory that auto generates selectors with get/set/use methods, supports inferred types, and makes global / local state management easy.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
-- [@hpkv/zustand-multiplayer](https://github.com/hpkv-io/zustand-multiplayer/tree/main/packages/zustand-multiplayer) - HPKV multiplayer middleware for building realtime collaborative applications
+- [@hpkv/zustand-multiplayer](https://github.com/hpkv-io/zustand-multiplayer/tree/main/packages/zustand-multiplayer) — HPKV multiplayer middleware for building realtime collaborative applications
 - [@liveblocks/zustand](https://github.com/liveblocks/liveblocks/tree/main/packages/liveblocks-zustand) — Liveblocks middleware to make your application multiplayer.
 - [@prncss-xyz/zustand-optics](https://github.com/prncss-xyz/zustand-optics) — An adapter for [optics-ts](https://github.com/akheron/optics-ts).
 - [auto-zustand-selectors-hook](https://github.com/Albert-Gao/auto-zustand-selectors-hook) — Automatic generation of Zustand hooks with Typescript support.
