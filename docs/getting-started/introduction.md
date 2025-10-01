@@ -53,6 +53,28 @@ const useBear = create((set) => ({
 }))
 ```
 
+### TypeScript
+
+For TypeScript users, you can define the store interface for better type safety:
+
+```typescript
+import { create } from 'zustand'
+
+interface BearState {
+  bears: number
+  increasePopulation: () => void
+  removeAllBears: () => void
+  updateBears: (newBears: number) => void
+}
+
+const useBear = create<BearState>((set) => ({
+  bears: 0,
+  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+  removeAllBears: () => set({ bears: 0 }),
+  updateBears: (newBears) => set({ bears: newBears }),
+}))
+```
+
 ## Then bind your components, and that's it!
 
 You can use the hook anywhere, without the need of providers.
