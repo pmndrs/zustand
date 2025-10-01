@@ -10,7 +10,7 @@
 
 A small, fast and scalable bearbones state-management solution using simplified flux principles. Has a comfy API based on hooks, isn't boilerplatey or opinionated.
 
-Don't disregard it because it's cute. It has quite the claws, lots of time was spent dealing with common pitfalls, like the dreaded [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [react concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. It may be the one state-manager in the React space that gets all of these right.
+Don't let its cute appearance fool you—Zustand is powerful and robust. A lot of effort has gone into addressing common pitfalls, such as the [zombie child problem](https://react-redux.js.org/api/hooks#stale-props-and-zombie-children), [React concurrency](https://github.com/bvaughn/rfcs/blob/useMutableSource/text/0000-use-mutable-source.md), and [context loss](https://github.com/facebook/react/issues/13332) between mixed renderers. Zustand may be the only state manager in the React ecosystem that handles all of these challenges effectively.
 
 You can try a live [demo](https://zustand-demo.pmnd.rs/) and read the [docs](https://zustand.docs.pmnd.rs/).
 
