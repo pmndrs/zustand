@@ -53,19 +53,19 @@ This reduces re-renders and improves performance. JS can do this too, but with T
 import { useBearStore } from './store'
 
 function BearCounter() {
-    // Select only "bears" to avoid unnecessary re-renders
-    const bears = useBearStore((s) => s.bears)
-    return <h1>{bears} bears around</h1>
+  // Select only "bears" to avoid unnecessary re-renders
+  const bears = useBearStore((s) => s.bears)
+  return <h1>{bears} bears around</h1>
 }
 
 function BearFeeder() {
-    // Destructure multiple fields if needed
-    const { food, feed } = useBearStore()
-    return (
-        <button onClick={() => feed("berries")}>
-           Feed bears {food}
-        </button>
-    )
+  // Destructure multiple fields if needed
+  const { food, feed } = useBearStore()
+  return (
+    <button onClick={() => feed("berries")}>
+  Feed bears {food}
+  </button>
+)
 }
 ```
 
@@ -79,32 +79,32 @@ import { create } from 'zustand'
 
 // Bear store with explicit types
 interface BearState {
-    bears: number
-    addBear: () => void
+  bears: number
+  addBear: () => void
 }
 
 export const useBearStore = create<BearState>((set) => ({
-    bears: 2,
-    addBear: () => set((s) => ({ bears: s.bears + 1 })),
+  bears: 2,
+  addBear: () => set((s) => ({ bears: s.bears + 1 })),
 }))
 
 // Fish store with explicit types
 interface FishState {
-    fish: number
-    addFish: () => void
+  fish: number
+  addFish: () => void
 }
 
 export const useFishStore = create<FishState>((set) => ({
-    fish: 5,
-    addFish: () => set((s) => ({ fish: s.fish + 1 })),
+  fish: 5,
+  addFish: () => set((s) => ({ fish: s.fish + 1 })),
 }))
 
 // In components you can use both stores safely
 function Zoo() {
-    const bears = useBearStore((s) => s.bears)
-    const fish = useFishStore((s) => s.fish)
+  const bears = useBearStore((s) => s.bears)
+  const fish = useFishStore((s) => s.fish)
 
-    return <div>{bears} bears and {fish} fish</div>
+  return <div>{bears} bears and {fish} fish</div>
 }
 ```
 
@@ -339,14 +339,14 @@ With TS you get proper type inference for `bearStore`. In JS, you’d have no gu
 import { createStore, useStore } from 'zustand'
 
 interface BearState {
-    bears: number
+  bears: number
 }
 
 const bearStore = createStore<BearState>(() => ({ bears: 1 }))
 
 function Zoo() {
-    const bears = useStore(bearStore, (s) => s.bears)
-    return <div>{bears} bears</div>
+  const bears = useStore(bearStore, (s) => s.bears)
+  return <div>{bears} bears</div>
 }
 ```
 
@@ -372,39 +372,39 @@ import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
 
 interface BearState {
-    bears: number
-    location: string
-    increase: () => void
+  bears: number
+  location: string
+  increase: () => void
 }
 
 const useBearStore = create<BearState>((set) => ({
-    bears: 5,
-    location: "forest",
-    increase: () => set((s) => ({ bears: s.bears + 1 })),
+  bears: 5,
+  location: "forest",
+  increase: () => set((s) => ({ bears: s.bears + 1 })),
 }))
 
 function BearAmount() {
-    const { bears } = useBearStore(
-        useShallow((s) => ({ bears: s.bears })) // With useShallow: re-renders only if "bears" changes
-    )
+  const { bears } = useBearStore(
+    useShallow((s) => ({ bears: s.bears })) // With useShallow: re-renders only if "bears" changes
+  )
 
-    console.log("BearAmount rendered") // helps to see re-renders
+  console.log("BearAmount rendered") // helps to see re-renders
 
-    return <p>There are {bears} bears!</p>
+  return <p>There are {bears} bears!</p>
 }
 
 function App() {
-    const increase = useBearStore((s) => s.increase)
+  const increase = useBearStore((s) => s.increase)
 
-    return (
-        <>
-            <BearAmount />
-            <button onClick={increase}>Increase bears</button>
-            <button onClick={() => useBearStore.setState({ location: "mountains" })}>
-    		    Change location
-    	    </button>
-        </>
-    )
+  return (
+    <>
+      <BearAmount />
+    <button onClick={increase}>Increase bears</button>
+  <button onClick={() => useBearStore.setState({ location: "mountains" })}>
+  Change location
+  </button>
+  </>
+)
 }
 ```
 
