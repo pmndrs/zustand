@@ -232,7 +232,7 @@ console.log(`We need ${totalFood} jars of honey`)
 
 ### Middlewares
 
-#### `combine` Middleware
+#### `combine` middleware
 
 This middleware separates initial state and actions, making the code cleaner.
 TS automatically infers types from the state and actions, no interface needed.
@@ -251,7 +251,7 @@ export const useBearStore = create(
 )
 ```
 
-#### `devtools` Middleware
+#### `devtools` middleware
 
 This middleware connects Zustand to Redux DevTools. You can inspect changes, time-travel, and debug state.
 It’s extremely useful in development. TS ensures your actions and state remain type-checked even here.
@@ -275,7 +275,7 @@ const bearStoreCreator = devtools(bearCreator)
 export const useBearStore = create<BearState>()(bearStoreCreator)
 ```
 
-#### `persist` Middleware
+#### `persist` middleware
 
 This middleware keeps your store in `localStorage` (or another storage). This means your bears survive a page refresh.
 Great for apps where persistence matters. In TS, the state type stays consistent, so no runtime surprises.
