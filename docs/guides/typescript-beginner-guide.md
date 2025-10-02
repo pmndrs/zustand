@@ -441,8 +441,6 @@ const bears = useBearStore((s) => ({ bears: s.bears }), shallow)
 
 ### Conclusion
 
-Zustand together with TypeScript provides a balance:  
-you keep the simplicity of small, minimalistic stores, while gaining the safety of strong typing.  
+Zustand together with TypeScript provides a balance: you keep the simplicity of small, minimalistic stores, while gaining the safety of strong typing.
 You don’t need boilerplate or complex patterns - state and actions live side by side, fully typed, and ready to use.
-
 Start with a basic store to learn the pattern, then expand gradually: use `combine` for cleaner inference, `persist` for storage, and `devtools` for debugging.
