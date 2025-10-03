@@ -58,7 +58,7 @@ If you would like to contribute by fixing an open issue or developing a new feat
 1. Run `npm install` to install dependencies.
 2. Create failing tests for your fix or new feature in the [`tests`](./tests/) folder.
 3. Implement your changes.
-4. Run `pnpm run build` to build the library. _(Pro-tip: `pnpm run build-watch` runs the build in watch mode)_
+4. Run `pnpm run build` to build the library. _(Pro-tip: `pnpm run build:watch` runs the build in watch mode)_
 5. Run the tests by running `pnpm run test` and ensure that they pass.
 6. You can use `pnpm link` to sym-link this package and test it locally on your own project. Alternatively, you may use CodeSandbox CI's canary releases to test the changes in your own project. (requires a PR to be created first)
 7. Follow step 4 and onwards from the [General](#General) guide above to bring it to the finish line.
