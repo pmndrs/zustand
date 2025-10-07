@@ -192,7 +192,7 @@ const devtoolsImpl: DevtoolsImpl =
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
 
-    let callerName = '';
+    let callerName = ''
     let isRecording = true
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
@@ -200,10 +200,7 @@ const devtoolsImpl: DevtoolsImpl =
       const action: { type: string } =
         nameOrAction === undefined
           ? {
-              type:
-                anonymousActionType ||
-                callerName ||
-                'anonymous',
+              type: anonymousActionType || callerName || 'anonymous',
             }
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
@@ -245,19 +242,21 @@ const devtoolsImpl: DevtoolsImpl =
 
     const _initialState = stateCreatorFn(api.setState, get, api)
     const initialState = Object.fromEntries(
-      Object.entries(_initialState as Record<string, unknown>).map(([key, value]) => {
-        if (typeof value === 'function') {
-          return [
-            key,
-            (...args: unknown[]): unknown => {
-              callerName = key;
-              return value(...args);
-            },
-          ];
-        }
-        return [key, value];
-      }),
-    ) as S;
+      Object.entries(_initialState as Record<string, unknown>).map(
+        ([key, value]) => {
+          if (typeof value === 'function') {
+            return [
+              key,
+              (...args: unknown[]): unknown => {
+                callerName = key
+                return value(...args)
+              },
+            ]
+          }
+          return [key, value]
+        },
+      ),
+    ) as S
 
     if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
