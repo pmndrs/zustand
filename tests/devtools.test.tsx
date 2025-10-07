@@ -2520,3 +2520,53 @@ describe('cleanup', () => {
     )
   })
 })
+
+describe('actionBlacklist', () => {
+  it('should filter out blacklisted actions (array)', async () => {
+    const options = {
+      name: 'test-filter',
+      enabled: true,
+      actionBlacklist: ['secretAction'],
+    }
+    const api = createStore(
+      devtools(() => ({ count: 0 }), options),
+    )
+
+    // Normal action should be sent
+    api.setState({ count: 1 }, false, 'increment')
+    const [connection] = getNamedConnectionApis(options.name)
+    expect(connection.send).toHaveBeenLastCalledWith(
+      { type: 'increment' },
+      { count: 1 },
+    )
+
+    // Blacklisted action should be filtered out
+    connection.send.mockClear()
+    api.setState({ count: 2 }, false, 'secretAction')
+    expect(connection.send).not.toHaveBeenCalled()
+  })
+
+  it('should filter out blacklisted actions (function)', async () => {
+    const options = {
+      name: 'test-func-filter',
+      enabled: true,
+      actionBlacklist: (action: { type: string }) => action.type.startsWith('private'),
+    }
+    const api = createStore(
+      devtools(() => ({ count: 0 }), options),
+    )
+
+    // Normal action should be sent
+    api.setState({ count: 1 }, false, 'publicAction')
+    const [connection] = getNamedConnectionApis(options.name)
+    expect(connection.send).toHaveBeenLastCalledWith(
+      { type: 'publicAction' },
+      { count: 1 },
+    )
+
+    // Blacklisted action should be filtered out
+    connection.send.mockClear()
+    api.setState({ count: 2 }, false, 'privateAction')
+    expect(connection.send).not.toHaveBeenCalled()
+  })
+})

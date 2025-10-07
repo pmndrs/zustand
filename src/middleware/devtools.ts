@@ -77,6 +77,7 @@ export interface DevtoolsOptions extends Config {
   enabled?: boolean
   anonymousActionType?: string
   store?: string
+  actionBlacklist?: string[] | ((action: { type: string }) => boolean)
 }
 
 type Devtools = <
@@ -178,7 +179,7 @@ const findCallerName = (stack: string | undefined) => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
+    const { enabled, anonymousActionType, store, actionBlacklist, ...options } = devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -203,6 +204,17 @@ const devtoolsImpl: DevtoolsImpl =
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
 
+    const isActionBlacklisted = (action: { type: string }): boolean => {
+      if (!actionBlacklist) return false
+      if (Array.isArray(actionBlacklist)) {
+        return actionBlacklist.includes(action.type)
+      }
+      if (typeof actionBlacklist === 'function') {
+        return actionBlacklist(action)
+      }
+      return false
+    }
+
     let isRecording = true
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
@@ -218,6 +230,12 @@ const devtoolsImpl: DevtoolsImpl =
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
             : nameOrAction
+      
+      // Check if action should be filtered out
+      if (isActionBlacklisted(action)) {
+        return r
+      }
+      
       if (store === undefined) {
         connection?.send(action, get())
         return r
