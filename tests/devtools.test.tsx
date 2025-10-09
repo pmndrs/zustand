@@ -2528,9 +2528,7 @@ describe('actionBlacklist', () => {
       enabled: true,
       actionBlacklist: ['secretAction'],
     }
-    const api = createStore(
-      devtools(() => ({ count: 0 }), options),
-    )
+    const api = createStore(devtools(() => ({ count: 0 }), options))
 
     // Normal action should be sent
     api.setState({ count: 1 }, false, 'increment')
@@ -2550,11 +2548,10 @@ describe('actionBlacklist', () => {
     const options = {
       name: 'test-func-filter',
       enabled: true,
-      actionBlacklist: (action: { type: string }) => action.type.startsWith('private'),
+      actionBlacklist: (action: { type: string }) =>
+        action.type.startsWith('private'),
     }
-    const api = createStore(
-      devtools(() => ({ count: 0 }), options),
-    )
+    const api = createStore(devtools(() => ({ count: 0 }), options))
 
     // Normal action should be sent
     api.setState({ count: 1 }, false, 'publicAction')

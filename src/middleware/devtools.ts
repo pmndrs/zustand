@@ -179,7 +179,8 @@ const findCallerName = (stack: string | undefined) => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, store, actionBlacklist, ...options } = devtoolsOptions
+    const { enabled, anonymousActionType, store, actionBlacklist, ...options } =
+      devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -230,12 +231,12 @@ const devtoolsImpl: DevtoolsImpl =
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
             : nameOrAction
-      
+
       // Check if action should be filtered out
       if (isActionBlacklisted(action)) {
         return r
       }
-      
+
       if (store === undefined) {
         connection?.send(action, get())
         return r
