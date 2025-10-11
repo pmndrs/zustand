@@ -29,10 +29,7 @@
     ".": {
       "react-native": {
         "types": "./index.d.ts",
-        "default": "./index.js"
-      },
-      "browser": {
-        "types": "./index.d.ts",
+        "browser": "./index.js",
         "default": "./index.js"
       },
       "import": {
@@ -47,10 +44,7 @@
     "./*": {
       "react-native": {
         "types": "./*.d.ts",
-        "default": "./*.js"
-      },
-    "browser": {
-        "types": "./*.d.ts",
+        "browser": "./*.js",
         "default": "./*.js"
       },
       "import": {
