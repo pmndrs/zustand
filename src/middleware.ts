@@ -14,3 +14,4 @@ export {
   type PersistStorage,
   type PersistOptions,
 } from './middleware/persist.ts'
+export { history } from './middleware/history.ts'
