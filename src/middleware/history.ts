@@ -132,11 +132,16 @@ const historyImpl: HistoryImpl = (fn, options = {}) => (set, get, api) => {
 
   // Create a custom set function that tracks history
   const setWithHistory = (partial: any, replace?: boolean) => {
+    // Store the current state before the update
+    const currentState = api.getState()
+    const { history: _, ...stateWithoutHistory } = currentState as any
+    
+    // Apply the update
     set(partial, replace)
     
+    // Add the previous state to history (not the new state)
     if (!isUndoing && !isRedoing) {
-      const newState = api.getState()
-      addToHistory(newState)
+      addToHistory(stateWithoutHistory as ReturnType<typeof fn>)
     }
   }
 
