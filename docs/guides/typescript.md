@@ -11,14 +11,6 @@ When you create a Store with TypeScript, you should use a small variation of the
 >
 > - The `<T>` is the type describing your state.
 > - The extra pair of parentheses.
-
-Two different jobs:
-
-1. The first call `create<T>()` is only for typing. The `<T>` tells TypeScript: “My store will look like type `T`.”
-2. The second call `(...)` is where you give Zustand the function that builds the store (`initial state` + `actions`).
-
-So you’re really saying: “Create a typed store of type `T`, and here is the function that creates everything necessary.”
-
 ```ts
 import { create } from 'zustand'
 
