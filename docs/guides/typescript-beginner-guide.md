@@ -44,6 +44,32 @@ export const useBearStore = create<BearState>((set) => ({
 }))
 ```
 
+`create` also supports a curried version. It's useful when you want to fix the state type first and initialize later (for example, inside a factory).
+```ts
+import { create } from 'zustand'
+
+// Define types for state & actions
+interface BearState {
+  bears: number
+  food: string
+  increase: (by: number) => void
+  feed: (food: string) => void
+}
+
+// Fix the type with create<BearState>()
+const createBearStore = create<BearState>()
+
+// Initialize the store separately
+export const useBearStore = createBearStore((set) => ({
+  bears: 2,
+  food: 'honey',
+  increase: (by) => set((state) => ({ bears: state.bears + by })),
+  feed: (food) => set(() => ({ food })),
+}))
+```
+Both forms are functionally identical. They produce the same store type `UseBoundStore<StoreApi<BearState>>`.
+The curried form is just syntactic sugar for scenarios where you want more flexibility in how and when you define your initializer.
+
 ### Using the Store in Components
 
 Inside components, you can read state and call actions. Selectors `(s) => s.bears` subscribe to only what you need.
