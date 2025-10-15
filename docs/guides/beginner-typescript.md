@@ -1,5 +1,5 @@
 ---
-title: TypeScript beginner guide
+title: Beginner TypeScript Guide
 nav: 7
 ---
 
