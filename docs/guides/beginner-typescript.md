@@ -57,11 +57,8 @@ interface BearState {
   feed: (food: string) => void
 }
 
-// Fix the type with create<BearState>()
-const createBearStore = create<BearState>()
-
-// Initialize the store separately
-export const useBearStore = createBearStore((set) => ({
+// Create store using the curried form of the `create`
+export const useBearStore = create<BearState>()((set) => ({
   bears: 2,
   food: 'honey',
   increase: (by) => set((state) => ({ bears: state.bears + by })),
