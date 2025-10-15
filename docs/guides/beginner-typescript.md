@@ -45,6 +45,7 @@ export const useBearStore = create<BearState>((set) => ({
 ```
 
 `create` also supports a curried version. It's useful when you want to fix the state type first and initialize later (for example, inside a factory).
+
 ```ts
 import { create } from 'zustand'
 
@@ -67,6 +68,7 @@ export const useBearStore = createBearStore((set) => ({
   feed: (food) => set(() => ({ food })),
 }))
 ```
+
 Both forms are functionally identical. They produce the same store type `UseBoundStore<StoreApi<BearState>>`.
 The curried form is just syntactic sugar for scenarios where you want more flexibility in how and when you define your initializer.
 
@@ -89,9 +91,9 @@ function BearFeeder() {
   const { food, feed } = useBearStore()
   return (
     <button onClick={() => feed("berries")}>
-  Feed bears {food}
-  </button>
-)
+		Feed bears {food}
+		</button>
+	)
 }
 ```
 
