@@ -23,51 +23,26 @@ In this basic guide we’ll cover:
 
 Here we describe state and actions using an Typescript interface. The `<BearState>` generic forces the store to match this shape.
 This means if you forget a field or use the wrong type, TypeScript will complain. Unlike plain JS, this guarantees type-safe state management.
+The `create` function uses the curried form, which results in a store of type `UseBoundStore<StoreApi<BearState>>`.
 
 ```ts
+// store.ts
 import { create } from 'zustand'
 
 // Define types for state & actions
 interface BearState {
   bears: number
   food: string
-  increase: (by: number) => void
   feed: (food: string) => void
 }
 
-// Create store with explicit generic <BearState>
-export const useBearStore = create<BearState>((set) => ({
-  bears: 2,
-  food: 'honey',
-  increase: (by) => set((state) => ({ bears: state.bears + by })),
-  feed: (food) => set(() => ({ food })),
-}))
-```
-
-`create` also supports a curried version. It's useful when you want to fix the state type first and initialize later (for example, inside a factory).
-
-```ts
-import { create } from 'zustand'
-
-// Define types for state & actions
-interface BearState {
-  bears: number
-  food: string
-  increase: (by: number) => void
-  feed: (food: string) => void
-}
-
-// Create store using the curried form of the `create`
+// Create store using the curried form of `create`
 export const useBearStore = create<BearState>()((set) => ({
   bears: 2,
   food: 'honey',
-  increase: (by) => set((state) => ({ bears: state.bears + by })),
   feed: (food) => set(() => ({ food })),
 }))
 ```
-
-Both forms are functionally identical. They produce the same store type `UseBoundStore<StoreApi<BearState>>`.
-The curried form is just syntactic sugar for scenarios where you want more flexibility in how and when you define your initializer.
 
 ### Using the Store in Components
 
@@ -88,9 +63,9 @@ function BearFeeder() {
   const { food, feed } = useBearStore()
   return (
     <button onClick={() => feed("berries")}>
-		Feed bears {food}
-		</button>
-	)
+      Feed bears {food}
+    </button>
+  )
 }
 ```
 
@@ -108,7 +83,7 @@ interface BearState {
   addBear: () => void
 }
 
-export const useBearStore = create<BearState>((set) => ({
+const useBearStore = create<BearState>()((set) => ({
   bears: 2,
   addBear: () => set((s) => ({ bears: s.bears + 1 })),
 }))
@@ -119,17 +94,27 @@ interface FishState {
   addFish: () => void
 }
 
-export const useFishStore = create<FishState>((set) => ({
+const useFishStore = create<FishState>()((set) => ({
   fish: 5,
   addFish: () => set((s) => ({ fish: s.fish + 1 })),
 }))
 
-// In components you can use both stores safely
+// In components, you can use both stores safely
 function Zoo() {
-  const bears = useBearStore((s) => s.bears)
-  const fish = useFishStore((s) => s.fish)
+  const { bears, addBear } = useBearStore()
+  const { fish, addFish } = useFishStore()
 
-  return <div>{bears} bears and {fish} fish</div>
+  return (
+    <div>
+      <div>{bears} bears and {fish} fish</div>
+      <button onClick={addBear}>
+        Add bear
+      </button>
+      <button onClick={addFish}>
+        Add fish
+      </button>
+    </div>
+  )
 }
 ```
 
@@ -149,11 +134,27 @@ type BearState = typeof initialState & {
   reset: () => void
 }
 
-export const useBearStore = create<BearState>((set) => ({
+const useBearStore = create<BearState>()((set) => ({
   ...initialState,
   increase: (by) => set((s) => ({ bears: s.bears + by })),
   reset: () => set(initialState),
 }))
+
+function ResetZoo() {
+  const { bears, increase, reset } = useBearStore()
+
+  return (
+    <div>
+      <div>{bears}</div>
+      <button onClick={() => increase(5)}>
+        Increase by 5
+      </button>
+      <button onClick={reset}>
+        Reset
+      </button>
+    </div>
+  )
+}
 ```
 
 ### Extracting Types
@@ -224,12 +225,25 @@ Sometimes you need more than one property. Returning an object from the selector
 This is more efficient than subscribing to the whole store. TypeScript ensures you can’t accidentally misspell `bears` or `food`.
 
 ```ts
-import { useBearStore } from './store'
+import { create } from 'zustand'
 
-const { bears, food } = useBearStore((s) => ({
-  bears: s.bears,
-  food: s.food,
+// Bear store with explicit types
+interface BearState {
+  bears: number
+  food: number
+}
+
+const useBearStore = create<BearState>()(() => ({
+  bears: 2,
+  food: 10
 }))
+
+// In components, you can use both stores safely
+function MultipleSelectors() {
+  const { bears, food } = useBearStore()
+
+  return <div>We have {food} units of food for {bears} bears</div>
+}
 ```
 
 #### Derived State with Selectors
@@ -238,21 +252,24 @@ Not all values need to be stored directly - some can be computed from existing s
 This avoids duplication and keeps the store minimal. TypeScript ensures `bears` is a number, so math is safe.
 
 ```ts
+import { create } from 'zustand';
+
 interface BearState {
   bears: number
   foodPerBear: number
 }
 
-export const useBearStore = create<BearState>(() => ({
+const useBearStore = create<BearState>()(() => ({
   bears: 3,
   foodPerBear: 2,
 }))
 
-// Derived value: required amount food for all bears
-const totalFood = useBearStore((s) => s.bears * s.foodPerBear) // don't need to have extra property `{ totalFood: 6 }` in your Store
+function TotalFood() {
+  // Derived value: required amount food for all bears
+  const totalFood = useBearStore((s) => s.bears * s.foodPerBear) // don't need to have extra property `{ totalFood: 6 }` in your Store
 
-// Usage
-console.log(`We need ${totalFood} jars of honey`)
+  return <div>We need ${totalFood} jars of honey</div>
+}
 ```
 
 ### Middlewares
@@ -342,7 +359,7 @@ interface BearState {
   fetchBears: () => Promise<void>
 }
 
-export const useBearStore = create<BearState>((set) => ({
+export const useBearStore = create<BearState>()((set) => ({
   bears: 0,
   fetchBears: async () => {
     const res = await fetch('/api/bears')
@@ -367,7 +384,7 @@ interface BearState {
   bears: number
 }
 
-const bearStore = createStore<BearState>(() => ({ bears: 1 }))
+const bearStore = createStore<BearState>()(() => ({ bears: 2 }))
 
 function Zoo() {
   const bears = useStore(bearStore, (s) => s.bears)
@@ -402,7 +419,7 @@ interface BearState {
   increase: () => void
 }
 
-const useBearStore = create<BearState>((set) => ({
+const useBearStore = create<BearState>()((set) => ({
   bears: 5,
   location: "forest",
   increase: () => set((s) => ({ bears: s.bears + 1 })),
@@ -418,18 +435,20 @@ function BearAmount() {
   return <p>There are {bears} bears!</p>
 }
 
-function App() {
+function OptimizedZoo() {
   const increase = useBearStore((s) => s.increase)
 
   return (
     <>
       <BearAmount />
-    <button onClick={increase}>Increase bears</button>
-  <button onClick={() => useBearStore.setState({ location: "mountains" })}>
-  Change location
-  </button>
-  </>
-)
+      <button onClick={increase}>
+        Increase bears
+      </button>
+      <button onClick={() => useBearStore.setState({ location: "mountains" })}>
+        Change location
+      </button>
+    </>
+  )
 }
 ```
 
