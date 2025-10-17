@@ -507,7 +507,7 @@ const renderCounterWithContext = () => {
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
 > to add `import { describe, test, expect } from 'vitest'` at the top of each test file.
 
-**CodeSandbox Demos**
+**Demos**
 
 - Jest Demo: https://stackblitz.com/edit/jest-zustand
 - Vitest Demo: https://stackblitz.com/edit/vitest-zustand
