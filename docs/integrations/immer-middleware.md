@@ -125,5 +125,5 @@ Zustand will skip calling the subscriptions.
 
 ## Demos
 
-- [Basic](https://codesandbox.io/p/sandbox/zustand-updating-draft-states-basic-demo-forked-96mkdw),
-- [Advanced](https://codesandbox.io/p/sandbox/zustand-updating-draft-states-advanced-demo-forked-phkzzg).
+- Basic: https://codesandbox.io/p/sandbox/zustand-updating-draft-states-basic-demo-forked-96mkdw
+- Advanced: https://codesandbox.io/p/sandbox/zustand-updating-draft-states-advanced-demo-forked-phkzzg
