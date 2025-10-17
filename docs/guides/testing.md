@@ -507,11 +507,6 @@ const renderCounterWithContext = () => {
 > **Note**: without [globals configuration](https://vitest.dev/config/#globals) enabled, we need
 > to add `import { describe, test, expect } from 'vitest'` at the top of each test file.
 
-**Demos**
-
-- Jest Demo: https://stackblitz.com/edit/jest-zustand
-- Vitest Demo: https://stackblitz.com/edit/vitest-zustand
-
 ### Testing Stores
 
 In the next examples we are going to use `useCounterStore`
@@ -747,3 +742,8 @@ const renderCounterWithContext = (store) => {
   functions are built on top of `react-test-renderer`.
 - **Testing Implementation Details**: Blog post by Kent C. Dodds on why he recommends to avoid
   [testing implementation details](https://kentcdodds.com/blog/testing-implementation-details).
+  
+## Demos
+
+- Jest: https://stackblitz.com/edit/jest-zustand
+- Vitest: https://stackblitz.com/edit/vitest-zustand
