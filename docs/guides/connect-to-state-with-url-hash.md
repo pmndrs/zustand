@@ -43,10 +43,6 @@ export const useBoundStore = create(
 )
 ```
 
-### CodeSandbox Demo
-
-https://codesandbox.io/s/zustand-state-with-url-hash-demo-f29b88?file=/src/store/index.ts
-
 ## Persist and Connect State with URL Parameters (Example: URL Query Parameters)
 
 There are times when you want to conditionally connect the state to the URL.
@@ -150,3 +146,8 @@ export const buildShareableUrl = (params, version) => {
 The generated URL would look like (here without any encoding, for readability):
 
 `https://localhost/search?fishAndBearsStore={"state":{"typesOfFish":["tilapia","salmon"],"numberOfBears":15},"version":0}}`
+
+### Demo
+
+- Hash: https://stackblitz.com/edit/vitejs-vite-9vg24prg
+- Query: https://stackblitz.com/edit/vitejs-vite-hyc97ynf
