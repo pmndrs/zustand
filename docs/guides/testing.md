@@ -742,7 +742,7 @@ const renderCounterWithContext = (store) => {
   functions are built on top of `react-test-renderer`.
 - **Testing Implementation Details**: Blog post by Kent C. Dodds on why he recommends to avoid
   [testing implementation details](https://kentcdodds.com/blog/testing-implementation-details).
-  
+
 ## Demos
 
 - Jest: https://stackblitz.com/edit/jest-zustand
