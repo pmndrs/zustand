@@ -123,7 +123,7 @@ so since both the current state and the next state are
 equal (if you don't do it correctly),
 Zustand will skip calling the subscriptions.
 
-## CodeSandbox Demo
+## Demos
 
-- [Basic](https://codesandbox.io/p/sandbox/zustand-updating-draft-states-basic-demo-forked-96mkdw),
-- [Advanced](https://codesandbox.io/p/sandbox/zustand-updating-draft-states-advanced-demo-forked-phkzzg).
+- Basic: https://codesandbox.io/p/sandbox/zustand-updating-draft-states-basic-demo-forked-96mkdw
+- Advanced: https://codesandbox.io/p/sandbox/zustand-updating-draft-states-advanced-demo-forked-phkzzg
