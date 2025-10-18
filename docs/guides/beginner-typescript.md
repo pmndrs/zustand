@@ -283,12 +283,9 @@ interface BearState {
 
 // State + actions are separated
 export const useBearStore = create<BearState>()(
-  combine(
-    { bears: 0 },
-    (set) => ({
-      increase: () => set((s) => ({ bears: s.bears + 1 })),
-    })
-  )
+  combine({ bears: 0 }, (set) => ({
+    increase: () => set((s) => ({ bears: s.bears + 1 })),
+  })),
 )
 ```
 
@@ -308,9 +305,9 @@ interface BearState {
 
 export const useBearStore = create<BearState>()(
   devtools((set) => ({
-  	bears: 0,
-  	increase: () => set((s) => ({ bears: s.bears + 1 })),
-	}))
+    bears: 0,
+    increase: () => set((s) => ({ bears: s.bears + 1 })),
+  })),
 )
 ```
 
