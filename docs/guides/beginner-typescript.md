@@ -159,21 +159,13 @@ function ResetZoo() {
 
 ### Extracting Types
 
-With TS you can extract store types automatically. This is great for tests, utility functions, or component props.
-
-There are two main ways:
-
-- TypeScript ReturnType: built-in, extracts the return type of a function.
-- Zustand ExtractState: a convenience helper that does the same thing but reads more clearly in a Zustand context.
-
-Both produce the same result. Zustand just added `ExtractState` because `ReturnType<typeof store.getState>` looked a bit “too TypeScript-heavy”.
+Zustand provides a built-in helper called `ExtractState`. This is useful for tests, utility functions, or component props.
+It returns the full type of your store’s state and actions without having to manually redefine them.
 
 ```ts
 import { ExtractState } from 'zustand'
 
 type BearState = ExtractState<typeof useBearStore>
-// or
-type BearSnapshot = ReturnType<typeof useBearStore.getState>
 ```
 
 Extracting the Store type:
@@ -284,12 +276,19 @@ This is different from JS, where type safety is missing. It’s a very popular s
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
 
+interface BearState {
+  bears: number
+  increase: () => void
+}
+
 // State + actions are separated
-export const useBearStore = create(
-  combine({ bears: 0 as number, food: 'honey' as string }, (set) => ({
-    increase: () => set((s) => ({ bears: s.bears + 1 })),
-    reset: () => set({ bears: 0, food: 'honey' }),
-  })),
+export const useBearStore = create<BearState>()(
+  combine(
+    { bears: 0 },
+    (set) => ({
+      increase: () => set((s) => ({ bears: s.bears + 1 })),
+    })
+  )
 )
 ```
 
@@ -307,14 +306,12 @@ interface BearState {
   increase: () => void
 }
 
-const bearCreator: StateCreator<BearState> = (set) => ({
-  bears: 0,
-  increase: () => set((s) => ({ bears: s.bears + 1 })),
-})
-
-const bearStoreCreator = devtools(bearCreator)
-
-export const useBearStore = create<BearState>()(bearStoreCreator)
+export const useBearStore = create<BearState>()(
+  devtools((set) => ({
+  	bears: 0,
+  	increase: () => set((s) => ({ bears: s.bears + 1 })),
+	}))
+)
 ```
 
 #### `persist` middleware
