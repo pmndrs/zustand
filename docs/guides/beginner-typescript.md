@@ -14,7 +14,7 @@ In this basic guide we’ll cover:
 - Resetting the store safely with types
 - Extracting and reusing Store type (for props, tests, and utilities)
 - Composing multiple selectors and building derived state (with type inference and without extra re-renders)
-- Middlewares with TypeScript support (`persist`, `devtools`, `immer`)
+- Middlewares with TypeScript support (`combine`, `devtools`, `persist`)
 - Async actions with typed API responses
 - Using `useStore`, `useStoreWithEqualityFn` and `useShallow` hooks with Typescript
 - Additional API (`createStore`, `createWithEqualityFn`)
