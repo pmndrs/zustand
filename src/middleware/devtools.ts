@@ -72,12 +72,12 @@ type StoreDevtools<S> = S extends {
     }
   : never
 
-export interface DevtoolsOptions extends Config {
+export interface DevtoolsOptions extends Omit<Config, 'actionsDenylist'> {
   name?: string
   enabled?: boolean
   anonymousActionType?: string
   store?: string
-  actionBlacklist?: string[] | ((action: { type: string }) => boolean)
+  actionsDenylist?: string[] | ((action: { type: string }) => boolean)
 }
 
 type Devtools = <
@@ -132,7 +132,10 @@ const extractConnectionInformation = (
   extensionConnector: NonNullable<
     (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
   >,
-  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>,
+  options: Omit<
+    DevtoolsOptions,
+    'enabled' | 'anonymousActionType' | 'store' | 'actionsDenylist'
+  >,
 ) => {
   if (store === undefined) {
     return {
@@ -179,8 +182,13 @@ const findCallerName = (stack: string | undefined) => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, store, actionBlacklist, ...options } =
-      devtoolsOptions
+    const {
+      enabled,
+      anonymousActionType,
+      store,
+      actionsDenylist,
+      ...options
+    } = devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -205,13 +213,13 @@ const devtoolsImpl: DevtoolsImpl =
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
 
-    const isActionBlacklisted = (action: { type: string }): boolean => {
-      if (!actionBlacklist) return false
-      if (Array.isArray(actionBlacklist)) {
-        return actionBlacklist.includes(action.type)
+    const isActionDenylisted = (action: { type: string }): boolean => {
+      if (!actionsDenylist) return false
+      if (Array.isArray(actionsDenylist)) {
+        return actionsDenylist.includes(action.type)
       }
-      if (typeof actionBlacklist === 'function') {
-        return actionBlacklist(action)
+      if (typeof actionsDenylist === 'function') {
+        return actionsDenylist(action)
       }
       return false
     }
@@ -233,7 +241,7 @@ const devtoolsImpl: DevtoolsImpl =
             : nameOrAction
 
       // Check if action should be filtered out
-      if (isActionBlacklisted(action)) {
+      if (isActionDenylisted(action)) {
         return r
       }
 

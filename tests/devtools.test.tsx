@@ -2521,12 +2521,12 @@ describe('cleanup', () => {
   })
 })
 
-describe('actionBlacklist', () => {
+describe('actionsDenylist', () => {
   it('should filter out blacklisted actions (array)', async () => {
     const options = {
       name: 'test-filter',
       enabled: true,
-      actionBlacklist: ['secretAction'],
+      actionsDenylist: ['secretAction'],
     }
     const api = createStore(devtools(() => ({ count: 0 }), options))
 
@@ -2548,7 +2548,7 @@ describe('actionBlacklist', () => {
     const options = {
       name: 'test-func-filter',
       enabled: true,
-      actionBlacklist: (action: { type: string }) =>
+      actionsDenylist: (action: { type: string }) =>
         action.type.startsWith('private'),
     }
     const api = createStore(devtools(() => ({ count: 0 }), options))
