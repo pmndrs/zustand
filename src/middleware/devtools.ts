@@ -72,12 +72,11 @@ type StoreDevtools<S> = S extends {
     }
   : never
 
-export interface DevtoolsOptions extends Omit<Config, 'actionsDenylist'> {
+export interface DevtoolsOptions extends Config {
   name?: string
   enabled?: boolean
   anonymousActionType?: string
   store?: string
-  actionsDenylist?: string[] | ((action: { type: string }) => boolean)
 }
 
 type Devtools = <
@@ -132,10 +131,7 @@ const extractConnectionInformation = (
   extensionConnector: NonNullable<
     (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
   >,
-  options: Omit<
-    DevtoolsOptions,
-    'enabled' | 'anonymousActionType' | 'store' | 'actionsDenylist'
-  >,
+  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>,
 ) => {
   if (store === undefined) {
     return {
@@ -182,13 +178,8 @@ const findCallerName = (stack: string | undefined) => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const {
-      enabled,
-      anonymousActionType,
-      store,
-      actionsDenylist,
-      ...options
-    } = devtoolsOptions
+    const { enabled, anonymousActionType, store, ...options } =
+      devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -213,17 +204,6 @@ const devtoolsImpl: DevtoolsImpl =
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
 
-    const isActionDenylisted = (action: { type: string }): boolean => {
-      if (!actionsDenylist) return false
-      if (Array.isArray(actionsDenylist)) {
-        return actionsDenylist.includes(action.type)
-      }
-      if (typeof actionsDenylist === 'function') {
-        return actionsDenylist(action)
-      }
-      return false
-    }
-
     let isRecording = true
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
@@ -236,14 +216,9 @@ const devtoolsImpl: DevtoolsImpl =
                 findCallerName(new Error().stack) ||
                 'anonymous',
             }
-          : typeof nameOrAction === 'string'
-            ? { type: nameOrAction }
-            : nameOrAction
-
-      // Check if action should be filtered out
-      if (isActionDenylisted(action)) {
-        return r
-      }
+            : typeof nameOrAction === 'string'
+              ? { type: nameOrAction }
+              : nameOrAction
 
       if (store === undefined) {
         connection?.send(action, get())
