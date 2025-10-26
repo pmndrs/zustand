@@ -2528,7 +2528,8 @@ describe('actionsDenylist', () => {
       enabled: true,
       actionsDenylist: ['secret.*'],
     }
-    const api = createStore(devtools(() => ({ count: 0 }), options))
+    
+    createStore(devtools(() => ({ count: 0 }), options))
 
     // Verify that actionsDenylist was passed to the connect call
     const extensionConnector = (window as any).__REDUX_DEVTOOLS_EXTENSION__
