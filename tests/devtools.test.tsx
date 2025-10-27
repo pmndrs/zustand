@@ -2528,7 +2528,7 @@ describe('actionsDenylist', () => {
       enabled: true,
       actionsDenylist: ['secret.*'],
     }
-    
+
     createStore(devtools(() => ({ count: 0 }), options))
 
     // Verify that actionsDenylist was passed to the connect call
