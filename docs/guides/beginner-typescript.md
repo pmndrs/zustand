@@ -10,14 +10,14 @@ In this basic guide we’ll cover:
 
 - Creating a typed store (state + actions)
 - Using the store in React components with type safety
-- Structuring and coordinating multiple stores
 - Resetting the store safely with types
 - Extracting and reusing Store type (for props, tests, and utilities)
 - Composing multiple selectors and building derived state (with type inference and without extra re-renders)
 - Middlewares with TypeScript support (`combine`, `devtools`, `persist`)
 - Async actions with typed API responses
 - Using `useStore`, `useStoreWithEqualityFn` and `useShallow` hooks with Typescript
-- Additional API (`createStore`, `createWithEqualityFn`)
+- Working with `createWithEqualityFn` (enhanced `create` store function)
+- Structuring and coordinating multiple stores
 
 ### Creating a Store with State & Actions
 
@@ -53,68 +53,9 @@ This reduces re-renders and improves performance. JS can do this too, but with T
 import { useBearStore } from './store'
 
 function BearCounter() {
-  // Select only "bears" to avoid unnecessary re-renders
+  // Select only 'bears' to avoid unnecessary re-renders
   const bears = useBearStore((s) => s.bears)
   return <h1>{bears} bears around</h1>
-}
-
-function BearFeeder() {
-  // Destructure multiple fields if needed
-  const { food, feed } = useBearStore()
-  return (
-    <button onClick={() => feed("berries")}>
-      Feed bears {food}
-    </button>
-  )
-}
-```
-
-### Multiple Stores
-
-You can create more than one store for different domains. For example, `BearStore` manages bears and `FishStore` manages fish.  
-This keeps state isolated and easier to maintain in larger apps. With TypeScript, each store has its own strict type - you can’t accidentally mix bears and fish.
-
-```ts
-import { create } from 'zustand'
-
-// Bear store with explicit types
-interface BearState {
-  bears: number
-  addBear: () => void
-}
-
-const useBearStore = create<BearState>()((set) => ({
-  bears: 2,
-  addBear: () => set((s) => ({ bears: s.bears + 1 })),
-}))
-
-// Fish store with explicit types
-interface FishState {
-  fish: number
-  addFish: () => void
-}
-
-const useFishStore = create<FishState>()((set) => ({
-  fish: 5,
-  addFish: () => set((s) => ({ fish: s.fish + 1 })),
-}))
-
-// In components, you can use both stores safely
-function Zoo() {
-  const { bears, addBear } = useBearStore()
-  const { fish, addFish } = useFishStore()
-
-  return (
-    <div>
-      <div>{bears} bears and {fish} fish</div>
-      <button onClick={addBear}>
-        Add bear
-      </button>
-      <button onClick={addFish}>
-        Add fish
-      </button>
-    </div>
-  )
 }
 ```
 
@@ -163,7 +104,7 @@ Zustand provides a built-in helper called `ExtractState`. This is useful for tes
 It returns the full type of your store’s state and actions without having to manually redefine them.
 
 ```ts
-import { ExtractState } from 'zustand'
+import type { ExtractState } from 'zustand'
 
 type BearState = ExtractState<typeof useBearStore>
 ```
@@ -172,7 +113,7 @@ Extracting the Store type:
 
 ```ts
 // store.ts
-import { create, ExtractState } from 'zustand'
+import { create, type ExtractState } from 'zustand'
 
 export const useBearStore = create((set) => ({
   bears: 3,
@@ -213,7 +154,9 @@ logBearState(useBearStore.getState())
 
 #### Multiple Selectors
 
-Sometimes you need more than one property. Returning an object from the selector gives you both.
+Sometimes you need more than one property. Returning an object from the selector lets you access multiple fields at once.
+However, directly destructuring properties from that object can cause unnecessary re-renders.
+To avoid this, it’s recommended to wrap the selector with `useShallow`, which prevents re-renders when the selected values remain shallowly equal.
 This is more efficient than subscribing to the whole store. TypeScript ensures you can’t accidentally misspell `bears` or `food`.
 
 ```ts
@@ -232,7 +175,9 @@ const useBearStore = create<BearState>()(() => ({
 
 // In components, you can use both stores safely
 function MultipleSelectors() {
-  const { bears, food } = useBearStore()
+  const { bears, food } = useBearStore(
+    useShallow((state) => ({ bears: state.bears, food: state.food }))
+  )
 
   return <div>We have {food} units of food for {bears} bears</div>
 }
@@ -388,13 +333,34 @@ function Zoo() {
 
 #### `useStoreWithEqualityFn`
 
-This adds a custom equality check for selectors. It’s useful if you select nested objects or want deep comparison.
+Similar to `useStore`, but adds a custom equality check for selectors. It’s useful if you select nested objects or want deep comparison.
+Here we use `shallow` as the second argument to perform shallow comparison. It prevents re-renders when all selected fields (like `bears` and `food`) have the same values, even though a new object reference is created on each render.
 TS ensures your selector matches store state. For most apps it’s optional, but good to know.
 
 ```ts
-import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { createStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional';	// make sure to install `use-sync-external-store` package
+import { shallow } from 'zustand/vanilla/shallow';
 
-const bears = useStoreWithEqualityFn(useBearStore, (s) => s.bears, Object.is)
+interface BearState {
+  bears: number
+  food: number
+}
+
+const bearStore = createStore<BearState>()(() => ({
+  bears: 2,
+  food: 10,
+}))
+
+function ZooUseStoreWithEqualityFn() {
+  const { bears, food } = useStoreWithEqualityFn(
+    bearStore,
+    (s) => ({ bears: s.bears, food: s.food }),
+    shallow
+  )
+
+  return <div>{bears} bears eating {food} units of food</div>
+}
 ```
 
 #### `useShallow`
@@ -404,8 +370,8 @@ If you return an object with multiple fields, Zustand compares by reference, whi
 The `useShallow` helper fixes this by doing a shallow equality check on objects or arrays.
 
 ```ts
-import { create } from "zustand"
-import { useShallow } from "zustand/react/shallow"
+import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 interface BearState {
   bears: number
@@ -415,16 +381,16 @@ interface BearState {
 
 const useBearStore = create<BearState>()((set) => ({
   bears: 5,
-  location: "forest",
+  location: 'forest',
   increase: () => set((s) => ({ bears: s.bears + 1 })),
 }))
 
 function BearAmount() {
   const { bears } = useBearStore(
-    useShallow((s) => ({ bears: s.bears })) // With useShallow: re-renders only if "bears" changes
+    useShallow((s) => ({ bears: s.bears })) // With useShallow: re-renders only if 'bears' changes
   )
 
-  console.log("BearAmount rendered") // helps to see re-renders
+  console.log('BearAmount rendered') // helps to see re-renders
 
   return <p>There are {bears} bears!</p>
 }
@@ -438,7 +404,7 @@ function OptimizedZoo() {
       <button onClick={increase}>
         Increase bears
       </button>
-      <button onClick={() => useBearStore.setState({ location: "mountains" })}>
+      <button onClick={() => useBearStore.setState({ location: 'mountains' })}>
         Change location
       </button>
     </>
@@ -446,20 +412,7 @@ function OptimizedZoo() {
 }
 ```
 
-### Additional API
-
-#### `createStore (non-React use)`
-
-Used for logic outside React (e.g., Node.js). TS guarantees store shape even without React.
-Rare in apps, but handy for testing.
-
-```ts
-import { createStore } from 'zustand'
-
-const store = createStore(() => ({ bears: 1 }))
-```
-
-#### `createWithEqualityFn`
+### `createWithEqualityFn`
 
 Variant of `create` with equality built-in. Useful if you always want custom equality checks.
 Not common, but shows Zustand’s flexibility. TS still keeps full type inference.
@@ -475,6 +428,55 @@ const useBearStore = createWithEqualityFn(() => ({
 const bears = useBearStore((s) => s.bears, Object.is)
 // or
 const bears = useBearStore((s) => ({ bears: s.bears }), shallow)
+```
+
+### Multiple Stores
+
+You can create more than one store for different domains. For example, `BearStore` manages bears and `FishStore` manages fish.
+This keeps state isolated and easier to maintain in larger apps. With TypeScript, each store has its own strict type - you can’t accidentally mix bears and fish.
+
+```ts
+import { create } from 'zustand'
+
+// Bear store with explicit types
+interface BearState {
+  bears: number
+  addBear: () => void
+}
+
+const useBearStore = create<BearState>()((set) => ({
+  bears: 2,
+  addBear: () => set((s) => ({ bears: s.bears + 1 })),
+}))
+
+// Fish store with explicit types
+interface FishState {
+  fish: number
+  addFish: () => void
+}
+
+const useFishStore = create<FishState>()((set) => ({
+  fish: 5,
+  addFish: () => set((s) => ({ fish: s.fish + 1 })),
+}))
+
+// In components, you can use both stores safely
+function Zoo() {
+  const { bears, addBear } = useBearStore()
+  const { fish, addFish } = useFishStore()
+
+  return (
+    <div>
+      <div>{bears} bears and {fish} fish</div>
+  <button onClick={addBear}>
+    Add bear
+  </button>
+  <button onClick={addFish}>
+    Add fish
+  </button>
+  </div>
+)
+}
 ```
 
 ### Conclusion
