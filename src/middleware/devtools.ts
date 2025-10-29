@@ -218,7 +218,6 @@ const devtoolsImpl: DevtoolsImpl =
           : typeof nameOrAction === 'string'
             ? { type: nameOrAction }
             : nameOrAction
-
       if (store === undefined) {
         connection?.send(action, get())
         return r
