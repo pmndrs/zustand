@@ -101,15 +101,7 @@ function ResetZoo() {
 ### Extracting Types
 
 Zustand provides a built-in helper called `ExtractState`. This is useful for tests, utility functions, or component props.
-It returns the full type of your store’s state and actions without having to manually redefine them.
-
-```ts
-import type { ExtractState } from 'zustand'
-
-type BearState = ExtractState<typeof useBearStore>
-```
-
-Extracting the Store type:
+It returns the full type of your store’s state and actions without having to manually redefine them. Extracting the Store type:
 
 ```ts
 // store.ts
@@ -161,6 +153,7 @@ This is more efficient than subscribing to the whole store. TypeScript ensures y
 
 ```ts
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 // Bear store with explicit types
 interface BearState {
@@ -189,7 +182,7 @@ Not all values need to be stored directly - some can be computed from existing s
 This avoids duplication and keeps the store minimal. TypeScript ensures `bears` is a number, so math is safe.
 
 ```ts
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 interface BearState {
   bears: number
@@ -339,8 +332,8 @@ TS ensures your selector matches store state. For most apps it’s optional, but
 
 ```ts
 import { createStore } from 'zustand'
-import { useStoreWithEqualityFn } from 'zustand/traditional';	// make sure to install `use-sync-external-store` package
-import { shallow } from 'zustand/vanilla/shallow';
+import { useStoreWithEqualityFn } from 'zustand/traditional'	// make sure to install `use-sync-external-store` package
+import { shallow } from 'zustand/vanilla/shallow'
 
 interface BearState {
   bears: number
