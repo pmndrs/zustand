@@ -178,8 +178,7 @@ const findCallerName = (stack: string | undefined) => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, store, ...options } =
-      devtoolsOptions
+    const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -216,9 +215,9 @@ const devtoolsImpl: DevtoolsImpl =
                 findCallerName(new Error().stack) ||
                 'anonymous',
             }
-            : typeof nameOrAction === 'string'
-              ? { type: nameOrAction }
-              : nameOrAction
+          : typeof nameOrAction === 'string'
+            ? { type: nameOrAction }
+            : nameOrAction
 
       if (store === undefined) {
         connection?.send(action, get())
