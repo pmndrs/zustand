@@ -182,10 +182,8 @@ const useStore = create<Store>()(
     (set) => ({
       user: null,
       token: null,
-      login: (user, token) =>
-        set({ user, token }, undefined, 'auth/login'),
-      logout: () =>
-        set({ user: null, token: null }, undefined, 'auth/logout'),
+      login: (user, token) => set({ user, token }, undefined, 'auth/login'),
+      logout: () => set({ user: null, token: null }, undefined, 'auth/logout'),
       updateData: () =>
         set({ user: 'updated' }, undefined, 'internal/updateData'),
     }),
