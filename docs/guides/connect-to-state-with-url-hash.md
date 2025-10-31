@@ -29,7 +29,7 @@ const hashStorage: StateStorage = {
   },
 }
 
-export const useBoundStore = create(
+export const useBoundStore = create()(
   persist(
     (set, get) => ({
       fishes: 0,
@@ -102,7 +102,7 @@ const storageOptions = {
   storage: createJSONStorage<LocalAndUrlStore>(() => persistentStorage),
 }
 
-const useLocalAndUrlStore = create(
+const useLocalAndUrlStore = create()(
   persist<LocalAndUrlStore>(
     (set) => ({
       typesOfFish: [],
