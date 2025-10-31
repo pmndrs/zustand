@@ -10,14 +10,14 @@ import tseslint from 'typescript-eslint'
 
 export default defineConfig(
   {
-    ignores: ['dist/', 'examples/'],
+    ignores: ['dist/', 'examples/', 'website/'],
   },
   eslint.configs.recommended,
   importPlugin.flatConfigs.recommended,
   tseslint.configs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
-  reactHooks.configs.recommended,
+  reactHooks.configs.flat.recommended,
   {
     settings: {
       react: {
@@ -71,7 +71,6 @@ export default defineConfig(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'react-hooks/react-compiler': 'error',
     },
   },
   {
@@ -81,7 +80,6 @@ export default defineConfig(
     ...vitest.configs.recommended,
     rules: {
       'import/extensions': ['error', 'never'],
-      'testing-library/no-node-access': 'off',
       'vitest/consistent-test-it': [
         'error',
         { fn: 'it', withinDescribe: 'it' },

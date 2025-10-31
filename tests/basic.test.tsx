@@ -645,6 +645,7 @@ it('ensures the correct subscriber is removed on unmount', async () => {
   function Component() {
     const [Counter, setCounter] = useState(() => CountWithInitialIncrement)
     useLayoutEffect(() => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCounter(() => Count)
     }, [])
     return (
