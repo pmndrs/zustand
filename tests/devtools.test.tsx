@@ -2520,3 +2520,23 @@ describe('cleanup', () => {
     )
   })
 })
+
+describe('actionsDenylist', () => {
+  it('should pass actionsDenylist option to Redux DevTools', async () => {
+    const options = {
+      name: 'test-filter',
+      enabled: true,
+      actionsDenylist: ['secret.*'],
+    }
+
+    createStore(devtools(() => ({ count: 0 }), options))
+
+    // Verify that actionsDenylist was passed to the connect call
+    const extensionConnector = (window as any).__REDUX_DEVTOOLS_EXTENSION__
+    expect(extensionConnector.connect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionsDenylist: ['secret.*'],
+      }),
+    )
+  })
+})
