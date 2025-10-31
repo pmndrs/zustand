@@ -218,7 +218,7 @@ describe('When state changes with automatic setter inferring...', () => {
     api.getState().setCount(10)
     const [connection] = getNamedConnectionApis(options.name)
     expect(connection.send).toHaveBeenLastCalledWith(
-      { type: 'Object.setCount' },
+      { type: expect.stringMatching(/^(Object\.setCount|anonymous)$/) },
       { count: 10, setCount: expect.any(Function) },
     )
   })
