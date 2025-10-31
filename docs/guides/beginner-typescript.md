@@ -86,12 +86,8 @@ function ResetZoo() {
   return (
     <div>
       <div>{bears}</div>
-      <button onClick={() => increase(5)}>
-        Increase by 5
-      </button>
-      <button onClick={reset}>
-        Reset
-      </button>
+      <button onClick={() => increase(5)}>Increase by 5</button>
+      <button onClick={reset}>Reset</button>
     </div>
   )
 }
@@ -163,16 +159,20 @@ interface BearState {
 
 const useBearStore = create<BearState>()(() => ({
   bears: 2,
-  food: 10
+  food: 10,
 }))
 
 // In components, you can use both stores safely
 function MultipleSelectors() {
   const { bears, food } = useBearStore(
-    useShallow((state) => ({ bears: state.bears, food: state.food }))
+    useShallow((state) => ({ bears: state.bears, food: state.food })),
   )
 
-  return <div>We have {food} units of food for {bears} bears</div>
+  return (
+    <div>
+      We have {food} units of food for {bears} bears
+    </div>
+  )
 }
 ```
 
@@ -361,13 +361,11 @@ function Zoo() {
 
   return (
     <div>
-      <div>{bears} bears and {fish} fish</div>
-      <button onClick={addBear}>
-        Add bear
-      </button>
-      <button onClick={addFish}>
-        Add fish
-      </button>
+      <div>
+        {bears} bears and {fish} fish
+      </div>
+      <button onClick={addBear}>Add bear</button>
+      <button onClick={addFish}>Add fish</button>
     </div>
   )
 }
