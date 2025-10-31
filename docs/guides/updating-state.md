@@ -136,6 +136,6 @@ You can also use [Ramda](https://ramdajs.com/):
 
 Both ramda and optics-ts also work with types.
 
-### CodeSandbox Demo
+### Demo
 
-https://codesandbox.io/s/zustand-normal-immer-optics-ramda-updating-ynn3o?file=/src/App.tsx
+https://stackblitz.com/edit/vitejs-vite-j6bjdygu
