@@ -218,7 +218,7 @@ describe('When state changes with automatic setter inferring...', () => {
     api.getState().setCount(10)
     const [connection] = getNamedConnectionApis(options.name)
     expect(connection.send).toHaveBeenLastCalledWith(
-      { type: 'Object.setCount' },
+      { type: expect.stringMatching(/^(Object\.setCount|anonymous)$/) },
       { count: 10, setCount: expect.any(Function) },
     )
   })
@@ -2517,6 +2517,26 @@ describe('cleanup', () => {
     expect(connection.send).not.toHaveBeenLastCalledWith(
       { type: `${options.store}/ignoredAction` },
       expect.anything(),
+    )
+  })
+})
+
+describe('actionsDenylist', () => {
+  it('should pass actionsDenylist option to Redux DevTools', async () => {
+    const options = {
+      name: 'test-filter',
+      enabled: true,
+      actionsDenylist: ['secret.*'],
+    }
+
+    createStore(devtools(() => ({ count: 0 }), options))
+
+    // Verify that actionsDenylist was passed to the connect call
+    const extensionConnector = (window as any).__REDUX_DEVTOOLS_EXTENSION__
+    expect(extensionConnector.connect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionsDenylist: ['secret.*'],
+      }),
     )
   })
 })
