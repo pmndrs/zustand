@@ -48,7 +48,7 @@ export const useBearStore = create<BearState>()((set) => ({
 Inside components, you can read state and call actions. Selectors `(s) => s.bears` subscribe to only what you need.
 This reduces re-renders and improves performance. JS can do this too, but with TS your IDE autocompletes state fields.
 
-```ts
+```tsx
 import { useBearStore } from './store'
 
 function BearCounter() {
@@ -63,7 +63,7 @@ function BearCounter() {
 Resetting is useful after logout or “clear session”. We use `typeof initialState` to avoid repeating property types.
 TypeScript updates automatically if `initialState` changes. This is safer and cleaner compared to JS.
 
-```ts
+```tsx
 import { create } from 'zustand'
 
 const initialState = { bears: 0, food: 'honey' }
@@ -151,7 +151,7 @@ To avoid this, it’s recommended to wrap the selector with `useShallow`, which 
 This is more efficient than subscribing to the whole store. TypeScript ensures you can’t accidentally misspell `bears` or `food`.
 See the [API documentation](https://zustand.docs.pmnd.rs/hooks/use-shallow) for more details on `useShallow`.
 
-```ts
+```tsx
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -181,7 +181,7 @@ function MultipleSelectors() {
 Not all values need to be stored directly - some can be computed from existing state. You can derive values using selectors.
 This avoids duplication and keeps the store minimal. TypeScript ensures `bears` is a number, so math is safe.
 
-```ts
+```tsx
 import { create } from 'zustand'
 
 interface BearState {
@@ -329,7 +329,7 @@ const bears = useBearStore((s) => ({ bears: s.bears }), shallow)
 You can create more than one store for different domains. For example, `BearStore` manages bears and `FishStore` manages fish.
 This keeps state isolated and easier to maintain in larger apps. With TypeScript, each store has its own strict type - you can’t accidentally mix bears and fish.
 
-```ts
+```tsx
 import { create } from 'zustand'
 
 // Bear store with explicit types
