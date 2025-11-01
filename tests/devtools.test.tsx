@@ -669,25 +669,25 @@ describe('different envs', () => {
   })
 
   it('works in non-browser env', async () => {
-    const originalWindow = global.window
-    global.window = undefined as any
+    const originalWindow = globalThis.window
+    globalThis.window = undefined as any
 
     expect(() => {
       createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     }).not.toThrow()
 
-    global.window = originalWindow
+    globalThis.window = originalWindow
   })
 
   it('works in react native env', async () => {
-    const originalWindow = global.window
-    global.window = {} as any
+    const originalWindow = globalThis.window
+    globalThis.window = {} as any
 
     expect(() => {
       createStore(devtools(() => ({ count: 0 }), { enabled: true }))
     }).not.toThrow()
 
-    global.window = originalWindow
+    globalThis.window = originalWindow
   })
 })
 

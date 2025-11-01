@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { StrictMode, useEffect } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
