@@ -116,7 +116,7 @@
   "homepage": "https://github.com/pmndrs/zustand",
   "packageManager": "pnpm@10.18.3",
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^9.39.0",
     "@redux-devtools/extension": "^3.3.0",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
