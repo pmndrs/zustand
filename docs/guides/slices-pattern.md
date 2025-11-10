@@ -117,4 +117,4 @@ Please keep in mind you should only apply middlewares in the combined store. App
 
 ## Usage with TypeScript
 
-A detailed guide on how to use the slice pattern in Zustand with TypeScript can be found [here](./typescript.md#slices-pattern).
+A detailed guide on how to use the slice pattern in Zustand with TypeScript can be found [here](./advanced-typescript.md#slices-pattern).

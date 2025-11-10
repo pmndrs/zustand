@@ -19,7 +19,7 @@ npm install immer
 
 ## Usage
 
-(Notice the extra parentheses after the type parameter as mentioned in the [Typescript Guide](../guides/typescript.md)).
+(Notice the extra parentheses after the type parameter as mentioned in the [Advanced Typescript Guide](../guides/advanced-typescript.md)).
 
 Updating simple states
 
