@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -18,6 +21,4 @@ jobs:
       - run: pnpm install
       - run: pnpm run build
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: dist
