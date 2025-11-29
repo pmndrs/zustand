@@ -158,14 +158,26 @@ a {
   flex: 0 0 auto;
 }
 
-a.bottom-left {
+.bottom {
+  position: fixed;
   bottom: 40px;
   left: 40px;
+  right: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-a.bottom-right {
-  bottom: 40px;
-  right: 40px;
+.bottom a {
+  position: static;
+}
+
+.bottom-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
 .snippet-container {
