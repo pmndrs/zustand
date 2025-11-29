@@ -14,3 +14,4 @@ export {
   type PersistStorage,
   type PersistOptions,
 } from './middleware/persist.ts'
+export { ssrSafe as unstable_ssrSafe } from './middleware/ssrSafe.ts'

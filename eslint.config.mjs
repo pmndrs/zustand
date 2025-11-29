@@ -1,5 +1,6 @@
 import eslint from '@eslint/js'
 import vitest from '@vitest/eslint-plugin'
+import { defineConfig } from 'eslint/config'
 import importPlugin from 'eslint-plugin-import'
 import jestDom from 'eslint-plugin-jest-dom'
 import react from 'eslint-plugin-react'
@@ -7,16 +8,16 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import testingLibrary from 'eslint-plugin-testing-library'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig(
   {
-    ignores: ['dist/', 'examples/'],
+    ignores: ['dist/', 'examples/', 'website/'],
   },
   eslint.configs.recommended,
   importPlugin.flatConfigs.recommended,
   tseslint.configs.recommended,
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
-  reactHooks.configs.recommended,
+  reactHooks.configs.flat.recommended,
   {
     settings: {
       react: {
@@ -67,10 +68,9 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
-        'warn',
+        'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'react-hooks/react-compiler': 'error',
     },
   },
   {
@@ -80,8 +80,6 @@ export default tseslint.config(
     ...vitest.configs.recommended,
     rules: {
       'import/extensions': ['error', 'never'],
-      '@typescript-eslint/no-unused-vars': 'off',
-      'testing-library/no-node-access': 'off',
       'vitest/consistent-test-it': [
         'error',
         { fn: 'it', withinDescribe: 'it' },

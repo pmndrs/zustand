@@ -39,7 +39,7 @@ export const create = (<T>() => {
 }) as typeof actualCreate
 ```
 
-## CodeSandbox Demo
+## Demo
 
 - Basic: https://stackblitz.com/edit/zustand-how-to-reset-state-basic
 - Advanced: https://stackblitz.com/edit/zustand-how-to-reset-state-advanced

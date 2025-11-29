@@ -1,5 +1,5 @@
 ---
-title: TypeScript Guide
+title: Advanced TypeScript Guide
 nav: 7
 ---
 

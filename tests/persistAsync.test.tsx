@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { StrictMode, useEffect } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -165,7 +167,9 @@ describe('persist middleware with async configuration', () => {
     })
 
     // Write something to the store
-    act(() => useBoundStore.setState({ count: 42 }))
+    act(() => {
+      useBoundStore.setState({ count: 42 })
+    })
     expect(await screen.findByText('count: 42')).toBeInTheDocument()
     expect(setItemSpy).toBeCalledWith(
       'test-storage',
@@ -788,7 +792,9 @@ describe('persist middleware with async configuration', () => {
 
     // Write something to the store
     const updatedMap = new Map(map).set('foo', 'bar')
-    act(() => useBoundStore.setState({ map: updatedMap }))
+    act(() => {
+      useBoundStore.setState({ map: updatedMap })
+    })
     expect(await screen.findByText('map-content: bar')).toBeInTheDocument()
 
     expect(setItemSpy).toBeCalledWith(

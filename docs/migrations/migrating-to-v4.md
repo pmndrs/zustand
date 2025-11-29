@@ -10,7 +10,7 @@ this guide applies.
 Otherwise, no migration is required.
 
 Also, it's recommended to first read
-the new [TypeScript Guide](../guides/typescript.md),
+the new [TypeScript Guide](../guides/advanced-typescript.md),
 so that the migration is easier to understand.
 
 In addition to this migration guide,
@@ -87,8 +87,8 @@ If you are using `StateCreator`,
 you are likely authoring a middleware
 or using the "slices" pattern.
 For that check the
-[Authoring middlewares and advanced usage](../guides/typescript.md#authoring-middlewares-and-advanced-usage)
-and [Common recipes](../guides/typescript.md#common-recipes)
+[Authoring middlewares and advanced usage](../guides/advanced-typescript.md#authoring-middlewares-and-advanced-usage)
+and [Common recipes](../guides/advanced-typescript.md#common-recipes)
 sections of the TypeScript Guide.
 
 ## `PartialState`

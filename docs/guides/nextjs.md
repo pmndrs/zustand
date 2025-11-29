@@ -3,6 +3,9 @@ title: Setup with Next.js
 nav: 17
 ---
 
+> [!NOTE]
+> We will be updating this guide soon based on our discussion in https://github.com/pmndrs/zustand/discussions/2740.
+
 [Next.js](https://nextjs.org) is a popular server-side rendering framework for React that presents
 some unique challenges for using Zustand properly.
 Keep in mind that Zustand store is a global
