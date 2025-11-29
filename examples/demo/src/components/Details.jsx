@@ -6,18 +6,17 @@ export default function Details() {
         <a href="https://github.com/pmndrs/zustand">Github</a>
       </nav>
       <div className="bottom">
-        <a
-          href="https://github.com/pmndrs/zustand/tree/main/examples/demo"
-          className="bottom-right"
-        >
-          {'<Source />'}
-        </a>
-        <a
-          href="https://www.instagram.com/tina.henschel/"
-          className="bottom-left"
-        >
+        <a href="https://www.instagram.com/tina.henschel/">
           Illustrations @ Tina Henschel
         </a>
+        <div className="bottom-links">
+          <a href="https://github.com/pmndrs/zustand/tree/main/examples/demo">
+            {'<Source />'}
+          </a>
+          <a href="https://stackblitz.com/github/pmndrs/zustand/tree/main/examples/starter?file=src%2Findex.tsx">
+            {'<Playground />'}
+          </a>
+        </div>
       </div>
       <span className="header-left">Zustand</span>
     </>
