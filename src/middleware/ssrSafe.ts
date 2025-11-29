@@ -1,5 +1,8 @@
 import type { StateCreator, StoreMutatorIdentifier } from '../vanilla.ts'
 
+// This is experimental middleware. It will be changed before finalizing it.
+// https://github.com/pmndrs/zustand/discussions/2740
+// TODO Not very happy with the middleware name. Will revisit it later.
 export function ssrSafe<
   T extends object,
   U extends object,
