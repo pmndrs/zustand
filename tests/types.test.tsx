@@ -185,14 +185,16 @@ it('state is covariant', () => {
     foo: '',
   }))
 
-  const _testIsCovariant: StoreApi<{ count: number }> = store
+  const testIsCovariant: StoreApi<{ count: number }> = store
+  expect(testIsCovariant).toBeDefined()
 
   // @ts-expect-error should not compile
-  const _testIsNotContravariant: StoreApi<{
+  const testIsNotContravariant: StoreApi<{
     count: number
     foo: string
     baz: string
   }> = store
+  expect(testIsNotContravariant).toBeDefined()
 })
 
 it('StateCreator<T, [StoreMutatorIdentfier, unknown][]> is StateCreator<T, []>', () => {
@@ -229,8 +231,9 @@ it('StateCreator subtyping', () => {
 
   create<State>()(persist(foo(), { name: 'prefix' }))
 
-  const _testSubtyping: StateCreator<State, [['zustand/persist', unknown]]> =
+  const testSubtyping: StateCreator<State, [['zustand/persist', unknown]]> =
     {} as StateCreator<State, []>
+  expect(testSubtyping).toBeDefined()
 })
 
 it('set state exists on store with readonly store', () => {
