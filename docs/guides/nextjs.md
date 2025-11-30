@@ -71,6 +71,8 @@ request.
 
 > **Note:** do not forget to remove all comments from your `tsconfig.json` file.
 
+### Initializing the store
+
 ```ts
 // src/stores/counter-store.ts
 import { createStore } from 'zustand/vanilla'
@@ -157,93 +159,6 @@ export const useCounterStore = <T,>(
 > rendered once per request on the server, but might be re-rendered multiple times on the client if
 > there are stateful client components located above this component in the tree, or if this component
 > also contains other mutable state that causes a re-render.
-
-### Initializing the store
-
-```ts
-// src/stores/counter-store.ts
-import { createStore } from 'zustand/vanilla'
-
-export type CounterState = {
-  count: number
-}
-
-export type CounterActions = {
-  decrementCount: () => void
-  incrementCount: () => void
-}
-
-export type CounterStore = CounterState & CounterActions
-
-export const initCounterStore = (): CounterState => {
-  return { count: new Date().getFullYear() }
-}
-
-export const defaultInitState: CounterState = {
-  count: 0,
-}
-
-export const createCounterStore = (
-  initState: CounterState = defaultInitState,
-) => {
-  return createStore<CounterStore>()((set) => ({
-    ...initState,
-    decrementCount: () => set((state) => ({ count: state.count - 1 })),
-    incrementCount: () => set((state) => ({ count: state.count + 1 })),
-  }))
-}
-```
-
-```tsx
-// src/providers/counter-store-provider.tsx
-'use client'
-
-import { type ReactNode, createContext, useRef, useContext } from 'react'
-import { useStore } from 'zustand'
-
-import {
-  type CounterStore,
-  createCounterStore,
-  initCounterStore,
-} from '@/stores/counter-store'
-
-export type CounterStoreApi = ReturnType<typeof createCounterStore>
-
-export const CounterStoreContext = createContext<CounterStoreApi | undefined>(
-  undefined,
-)
-
-export interface CounterStoreProviderProps {
-  children: ReactNode
-}
-
-export const CounterStoreProvider = ({
-  children,
-}: CounterStoreProviderProps) => {
-  const storeRef = useRef<CounterStoreApi | null>(null)
-  if (storeRef.current === null) {
-    storeRef.current = createCounterStore(initCounterStore())
-  }
-
-  return (
-    <CounterStoreContext.Provider value={storeRef.current}>
-      {children}
-    </CounterStoreContext.Provider>
-  )
-}
-
-export const useCounterStore = <T,>(
-  selector: (store: CounterStore) => T,
-): T => {
-  const counterStoreContext = useContext(CounterStoreContext)
-
-  if (!counterStoreContext) {
-    throw new Error(`useCounterStore must be used within CounterStoreProvider`)
-  }
-
-  return useStore(counterStoreContext, selector)
-}
-```
 
 ### Using the store with different architectures
 
