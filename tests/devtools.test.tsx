@@ -18,7 +18,7 @@ type TupleOfEqualLength<Arr extends unknown[], T> = number extends Arr['length']
 type Connection = {
   subscribers: ((message: unknown) => void)[]
   api: {
-    subscribe: Mock<any>
+    subscribe: Mock<(f: (message: unknown) => void) => () => void>
     unsubscribe: Mock<any>
     send: Mock<any>
     init: Mock<any>
@@ -93,7 +93,7 @@ const extensionConnector = {
       ? unnamedConnections
       : namedConnections
     const subscribers: Connection['subscribers'] = []
-    const api = {
+    const api: Connection['api'] = {
       subscribe: vi.fn((f: (m: unknown) => void) => {
         subscribers.push(f)
         return () => {}
