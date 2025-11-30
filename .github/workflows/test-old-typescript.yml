@@ -45,7 +45,7 @@ jobs:
         run: |
           sed -i~ 's/"verbatimModuleSyntax": true,//' tsconfig.json
       - name: Patch for Old TS
-        if: ${{ matrix.typescript == '4.7.4' || matrix.typescript == '4.6.4' || matrix.typescript == '4.5.5' }}
+        if: ${{ matrix.typescript == '5.3.3' || matrix.typescript == '5.2.2' || matrix.typescript == '5.1.6' || matrix.typescript == '5.0.4' || matrix.typescript == '4.9.5' || matrix.typescript == '4.8.4' || matrix.typescript == '4.7.4' || matrix.typescript == '4.6.4' || matrix.typescript == '4.5.5' }}
         run: |
           sed -i~ 's/"moduleResolution": "bundler",/"moduleResolution": "node",/' tsconfig.json
           sed -i~ 's/"allowImportingTsExtensions": true,//' tsconfig.json
@@ -53,7 +53,11 @@ jobs:
           sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/*.d.ts"]/' tsconfig.json
           sed -i~ 's/"include": .*/"include": ["src\/types.d.ts", "dist\/**\/*", "tests\/**\/*"],/' tsconfig.json
           pnpm json -I -f package.json -e "this.resolutions={}; this.resolutions['@types/node']='18.13.0';"
-          pnpm add -D @types/node@18.13.0 vitest@3.2.4 @vitest/coverage-v8@3.2.4 @vitest/ui@3.2.4
+          pnpm add -D @types/node@18.13.0
+      - name: Patch for Older TS
+        if: ${{ matrix.typescript == '4.7.4' || matrix.typescript == '4.6.4' || matrix.typescript == '4.5.5' }}
+        run: |
+          pnpm add -D vitest@3.2.4 @vitest/coverage-v8@3.2.4 @vitest/ui@3.2.4
       - name: Install old TypeScript
         run: pnpm add -D typescript@${{ matrix.typescript }}
       - name: Test ${{ matrix.typescript }}
