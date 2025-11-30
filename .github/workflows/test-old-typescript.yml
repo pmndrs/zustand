@@ -55,6 +55,8 @@ jobs:
       - name: Patch for Older TS
         if: ${{ matrix.typescript == '4.7.4' || matrix.typescript == '4.6.4' || matrix.typescript == '4.5.5' }}
         run: |
+          pnpm json -I -f package.json -e "this.resolutions={}; this.resolutions['@types/node']='18.13.0';"
+          pnpm add -D @types/node@18.13.0
           pnpm add -D vitest@3.2.4 @vitest/coverage-v8@3.2.4 @vitest/ui@3.2.4
       - name: Install old TypeScript
         run: pnpm add -D typescript@${{ matrix.typescript }}
