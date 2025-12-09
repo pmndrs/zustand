@@ -12,6 +12,6 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'pnpm'
-      - uses: preactjs/compressed-size-action@v2
+      - uses: preactjs/compressed-size-action@v3
         with:
           pattern: './dist/**/*.{js,mjs}'
