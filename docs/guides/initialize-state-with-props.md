@@ -44,10 +44,10 @@ export const BearContext = createContext<BearStore | null>(null)
 
 ```tsx
 // Provider implementation
-import { useRef } from 'react'
+import { useState } from 'react'
 
 function App() {
-  const store = useRef(createBearStore()).current
+  const [store] = useState(createBearStore)
   return (
     <BearContext.Provider value={store}>
       <BasicConsumer />
@@ -64,8 +64,10 @@ import { useStore } from 'zustand'
 function BasicConsumer() {
   const store = useContext(BearContext)
   if (!store) throw new Error('Missing BearContext.Provider in the tree')
+
   const bears = useStore(store, (s) => s.bears)
   const addBear = useStore(store, (s) => s.addBear)
+
   return (
     <>
       <div>{bears} Bears.</div>
@@ -81,17 +83,14 @@ function BasicConsumer() {
 
 ```tsx
 // Provider wrapper
-import { useRef } from 'react'
+import { useState } from 'react'
 
 type BearProviderProps = React.PropsWithChildren<BearProps>
 
 function BearProvider({ children, ...props }: BearProviderProps) {
-  const storeRef = useRef<BearStore>()
-  if (!storeRef.current) {
-    storeRef.current = createBearStore(props)
-  }
+  const [store] = useState(() => createBearStore(props))
   return (
-    <BearContext.Provider value={storeRef.current}>
+    <BearContext.Provider value={store}>
       {children}
     </BearContext.Provider>
   )

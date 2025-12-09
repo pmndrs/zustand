@@ -323,7 +323,7 @@ export const useCounterStore = create<CounterStore>()(counterStoreCreator)
 
 ```tsx
 // contexts/use-counter-store-context.tsx
-import { type ReactNode, createContext, useContext, useRef } from 'react'
+import { type ReactNode, createContext, useContext, useState } from 'react'
 import { createStore } from 'zustand'
 import { useStoreWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/shallow'
@@ -350,11 +350,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const counterStoreRef = useRef<CounterStoreApi>(null)
-  if (!counterStoreRef.current) {
-    counterStoreRef.current = createCounterStore()
-  }
-
+  const [store] = useState(createCounterStore);
   return (
     <CounterStoreContext.Provider value={counterStoreRef.current}>
       {children}
@@ -542,7 +538,7 @@ export const useCounterStore = create<CounterStore>()(counterStoreCreator)
 
 ```tsx
 // contexts/use-counter-store-context.tsx
-import { type ReactNode, createContext, useContext, useRef } from 'react'
+import { type ReactNode, createContext, useContext, useState } from 'react'
 import { createStore } from 'zustand'
 import { useStoreWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/shallow'
@@ -569,11 +565,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const counterStoreRef = useRef<CounterStoreApi>(null)
-  if (!counterStoreRef.current) {
-    counterStoreRef.current = createCounterStore()
-  }
-
+  const [store] = useState(createCounterStore)
   return (
     <CounterStoreContext.Provider value={counterStoreRef.current}>
       {children}
