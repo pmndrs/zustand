@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint'
 
 export default defineConfig(
   {
-    ignores: ['dist/', 'examples/', 'website/'],
+    ignores: ['dist/', 'examples/', 'website/', 'coverage/'],
   },
   eslint.configs.recommended,
   importPlugin.flatConfigs.recommended,
@@ -19,6 +19,11 @@ export default defineConfig(
   react.configs.flat['jsx-runtime'],
   reactHooks.configs.flat.recommended,
   {
+    languageOptions: {
+      parserOptions: {
+        project: true,
+      },
+    },
     settings: {
       react: {
         version: 'detect',
@@ -76,14 +81,32 @@ export default defineConfig(
   {
     files: ['tests/**/*.{ts,tsx}'],
     ...testingLibrary.configs['flat/react'],
+  },
+  {
+    files: ['tests/**/*.{ts,tsx}'],
     ...jestDom.configs['flat/recommended'],
+  },
+  {
+    files: ['tests/**/*.{ts,tsx}'],
     ...vitest.configs.recommended,
+    settings: { vitest: { typecheck: true } },
+  },
+  {
+    files: ['tests/**/*.{ts,tsx}'],
     rules: {
       'import/extensions': ['error', 'never'],
       'vitest/consistent-test-it': [
         'error',
         { fn: 'it', withinDescribe: 'it' },
       ],
+    },
+  },
+  {
+    files: ['*.config.*'],
+    languageOptions: {
+      parserOptions: {
+        project: null,
+      },
     },
   },
 )
