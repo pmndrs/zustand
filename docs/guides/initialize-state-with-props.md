@@ -47,7 +47,7 @@ export const BearContext = createContext<BearStore | null>(null)
 import { useState } from 'react'
 
 function App() {
-  const [store] = useState(createBearStore)
+  const [store] = useState(() => createBearStore())
   return (
     <BearContext.Provider value={store}>
       <BasicConsumer />
