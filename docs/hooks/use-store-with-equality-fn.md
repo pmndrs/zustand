@@ -458,10 +458,9 @@ const PositionStoreContext = createContext<ReturnType<
 > | null>(null)
 
 function PositionStoreProvider({ children }: { children: ReactNode }) {
-  const [positionStore] = useState(createPositionStore)
-
+  const [store] = useState(() => createPositionStore())
   return (
-    <PositionStoreContext.Provider value={positionStore}>
+    <PositionStoreContext.Provider value={store}>
       {children}
     </PositionStoreContext.Provider>
   )
@@ -573,10 +572,9 @@ const PositionStoreContext = createContext<ReturnType<
 > | null>(null)
 
 function PositionStoreProvider({ children }: { children: ReactNode }) {
-  const [positionStore] = useState(createPositionStore)
-
+  const [store] = useState(() => createPositionStore())
   return (
-    <PositionStoreContext.Provider value={positionStore}>
+    <PositionStoreContext.Provider value={store}>
       {children}
     </PositionStoreContext.Provider>
   )
