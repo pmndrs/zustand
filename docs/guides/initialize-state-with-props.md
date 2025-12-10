@@ -89,11 +89,7 @@ type BearProviderProps = React.PropsWithChildren<BearProps>
 
 function BearProvider({ children, ...props }: BearProviderProps) {
   const [store] = useState(() => createBearStore(props))
-  return (
-    <BearContext.Provider value={store}>
-      {children}
-    </BearContext.Provider>
-  )
+  return <BearContext.Provider value={store}>{children}</BearContext.Provider>
 }
 ```
 

@@ -350,7 +350,7 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const [store] = useState(() => createCounterStore());
+  const [store] = useState(() => createCounterStore())
   return (
     <CounterStoreContext.Provider value={counterStoreRef.current}>
       {children}
