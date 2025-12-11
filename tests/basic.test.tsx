@@ -356,6 +356,7 @@ it('can throw an error in selector', async () => {
       return { hasError: true }
     }
     render() {
+      // eslint-disable-next-line testing-library/no-node-access
       return this.state.hasError ? <div>errored</div> : this.props.children
     }
   }
@@ -405,6 +406,7 @@ it('can throw an error in equality checker', async () => {
       return { hasError: true }
     }
     render() {
+      // eslint-disable-next-line testing-library/no-node-access
       return this.state.hasError ? <div>errored</div> : this.props.children
     }
   }
@@ -576,11 +578,11 @@ it('only calls selectors when necessary (traditional)', async () => {
 
 it('ensures parent components subscribe before children', async () => {
   type State = {
-    children: { [key: string]: { text: string } }
+    childItems: { [key: string]: { text: string } }
   }
   type Props = { id: string }
   const useBoundStore = create<State>(() => ({
-    children: {
+    childItems: {
       '1': { text: 'child 1' },
       '2': { text: 'child 2' },
     },
@@ -589,19 +591,19 @@ it('ensures parent components subscribe before children', async () => {
 
   function changeState() {
     api.setState({
-      children: {
+      childItems: {
         '3': { text: 'child 3' },
       },
     })
   }
 
   function Child({ id }: Props) {
-    const text = useBoundStore((s) => s.children[id]?.text)
+    const text = useBoundStore((s) => s.childItems[id]?.text)
     return <div>{text}</div>
   }
 
   function Parent() {
-    const childStates = useBoundStore((s) => s.children)
+    const childStates = useBoundStore((s) => s.childItems)
     return (
       <>
         <button onClick={changeState}>change state</button>
