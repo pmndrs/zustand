@@ -213,7 +213,8 @@ it('StateCreator<T, [StoreMutatorIdentfier, unknown][]> is StateCreator<T, []>',
     },
   })
 
-  create<State>()(persist(foo(), { name: 'prefix' }))
+  const store = create<State>()(persist(foo(), { name: 'prefix' }))
+  expect(store).toBeDefined()
 })
 
 it('StateCreator subtyping', () => {
@@ -248,4 +249,5 @@ it('set state exists on store with readonly store', () => {
   }))
 
   useStore.setState((state) => ({ ...state, count: state.count + 1 }))
+  expect(useStore).toBeDefined()
 })
