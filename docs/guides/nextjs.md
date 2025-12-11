@@ -111,7 +111,7 @@ Let's use the `createCounterStore` in our component and share it using a context
 // src/providers/counter-store-provider.tsx
 'use client'
 
-import { type ReactNode, createContext, useRef, useContext } from 'react'
+import { type ReactNode, createContext, useState, useContext } from 'react'
 import { useStore } from 'zustand'
 
 import { type CounterStore, createCounterStore } from '@/stores/counter-store'
@@ -129,13 +129,9 @@ export interface CounterStoreProviderProps {
 export const CounterStoreProvider = ({
   children,
 }: CounterStoreProviderProps) => {
-  const storeRef = useRef<CounterStoreApi | null>(null)
-  if (storeRef.current === null) {
-    storeRef.current = createCounterStore()
-  }
-
+  const [store] = useState(() => createCounterStore())
   return (
-    <CounterStoreContext.Provider value={storeRef.current}>
+    <CounterStoreContext.Provider value={store}>
       {children}
     </CounterStoreContext.Provider>
   )
@@ -145,7 +141,6 @@ export const useCounterStore = <T,>(
   selector: (store: CounterStore) => T,
 ): T => {
   const counterStoreContext = useContext(CounterStoreContext)
-
   if (!counterStoreContext) {
     throw new Error(`useCounterStore must be used within CounterStoreProvider`)
   }
