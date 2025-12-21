@@ -61,8 +61,7 @@ describe.skipIf(!React.version.startsWith('18'))(
         )
       })
 
-      const bearCountText = await screen.findByText('bears: 1')
-      expect(bearCountText).toBeInTheDocument()
+      expect(screen.getByText('bears: 1')).toBeInTheDocument()
       document.body.removeChild(container)
     })
     it('should not have hydration errors', async () => {
@@ -110,8 +109,7 @@ describe.skipIf(!React.version.startsWith('18'))(
 
       expect(consoleMock).toHaveBeenCalledTimes(0)
 
-      const bearCountText = await screen.findByText('bears: 1')
-      expect(bearCountText).toBeInTheDocument()
+      expect(screen.getByText('bears: 1')).toBeInTheDocument()
       document.body.removeChild(container)
     })
   },
