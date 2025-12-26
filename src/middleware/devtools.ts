@@ -1,5 +1,3 @@
-import type {} from '@redux-devtools/extension'
-
 import type {
   StateCreator,
   StoreApi,
@@ -72,11 +70,12 @@ type StoreDevtools<S> = S extends {
     }
   : never
 
-export interface DevtoolsOptions extends Config {
+export interface DevtoolsOptions extends Omit<Config, 'actionCreators'> {
   name?: string
   enabled?: boolean
   anonymousActionType?: string
   store?: string
+  actionCreators?: boolean | (<A, P extends any[] = any[]>(...args: P) => A) | Record<string, boolean |(<A, P extends any[] = any[]>(...args: P) => A)>;
 }
 
 type Devtools = <
@@ -131,7 +130,7 @@ const extractConnectionInformation = (
   extensionConnector: NonNullable<
     (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
   >,
-  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store'>,
+  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store' | 'actionCreators'>,
 ) => {
   if (store === undefined) {
     return {
@@ -200,9 +199,6 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const { connection, ...connectionInformation } =
-      extractConnectionInformation(store, extensionConnector, options)
-
     let isRecording = true
     ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
@@ -254,6 +250,18 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
+    if (options.actionCreators === true) {
+      options.actionCreators = getActionsArray(initialState) as any;
+    } else if (options.actionCreators === false) { 
+      options.actionCreators = [] as any;
+    } else if (options.actionCreators && !Array.isArray(options.actionCreators)) {
+      options.actionCreators = getActionsArray(options.actionCreators) as any;
+    }
+    const actionCreators = (options.actionCreators ?? []) as unknown as ActionCreatorDefinition[];
+
+    // We connect after extracting action creators from the initial state
+    const { connection, ...connectionInformation } = extractConnectionInformation(store, extensionConnector, options);
+
     if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
     } else {
@@ -268,6 +276,28 @@ const devtoolsImpl: DevtoolsImpl =
           ]),
         ),
       )
+    }
+    
+    // Not using the redux plugin
+    if (!(api as any).dispatchFromDevtools) {
+      (api as any).dispatchFromDevtools = true;
+      (api as any).dispatch = (payload: { type: string }, ...args: any[]) => {
+        console.log('payload', payload, 'args', args);
+        if (!('type' in payload)) {
+          console.error('[zustand devtools middleware] Payload must have a "type" property which should match an action creator');
+          return;
+        }
+
+        const { type: actionType, ...actionArgs } = payload;
+        const selectedIndex = actionCreators.findIndex((action) => action.name === actionType);
+        if (selectedIndex === -1) {
+          console.error(`[zustand devtools middleware] Action type "${actionType}" not found in actionCreators`);
+          return;
+        }
+
+        const action = actionCreators[selectedIndex]!;
+        return action.func(...action.args.map((arg) => actionArgs[arg as keyof typeof actionArgs]));
+      }
     }
 
     if (
@@ -301,52 +331,59 @@ const devtoolsImpl: DevtoolsImpl =
       }
     ).subscribe((message: any) => {
       switch (message.type) {
-        case 'ACTION':
+        case 'ACTION': {
+          
+          // When using the action dropdown we get an object with the action
+          // to dispatch immediately
           if (typeof message.payload !== 'string') {
-            console.error(
-              '[zustand devtools middleware] Unsupported action format',
-            )
+            return evalAction(message.payload, actionCreators as any[]);
+          }
+          
+          const action = evalAction(message.payload, actionCreators as any[]);
+          if (action.type === '__setState') {
+            if (store === undefined) {
+              if (!('state' in action)) {
+                console.warn(
+                  `
+                  [zustand devtools middleware] Calling __setState without a state property.
+                  This may not be what you intended, you should explicitly set the state you want to set.
+                  Example: { "type": "__setState", "state": { "foo": "bar" } }
+                  `,
+                );
+                return;
+              }
+              setStateFromDevtools(action.state as PartialState)
+              return
+            }
+            if (Object.keys(action.state as S).length !== 1) {
+              console.error(
+                `
+                [zustand devtools middleware] Unsupported __setState action format.
+                When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
+                and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
+                `,
+              )
+            }
+            const stateFromDevtools = (action.state as S)[store]
+            if (
+              stateFromDevtools === undefined ||
+              stateFromDevtools === null
+            ) {
+              return
+            }
+            if (
+              JSON.stringify(api.getState()) !==
+              JSON.stringify(stateFromDevtools)
+            ) {
+              setStateFromDevtools(stateFromDevtools)
+            }
             return
           }
-          return parseJsonThen<{ type: unknown; state?: PartialState }>(
-            message.payload,
-            (action) => {
-              if (action.type === '__setState') {
-                if (store === undefined) {
-                  setStateFromDevtools(action.state as PartialState)
-                  return
-                }
-                if (Object.keys(action.state as S).length !== 1) {
-                  console.error(
-                    `
-                    [zustand devtools middleware] Unsupported __setState action format.
-                    When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
-                    and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
-                    `,
-                  )
-                }
-                const stateFromDevtools = (action.state as S)[store]
-                if (
-                  stateFromDevtools === undefined ||
-                  stateFromDevtools === null
-                ) {
-                  return
-                }
-                if (
-                  JSON.stringify(api.getState()) !==
-                  JSON.stringify(stateFromDevtools)
-                ) {
-                  setStateFromDevtools(stateFromDevtools)
-                }
-                return
-              }
 
-              if (!(api as any).dispatchFromDevtools) return
-              if (typeof (api as any).dispatch !== 'function') return
-              ;(api as any).dispatch(action)
-            },
-          )
-
+          if (!(api as any).dispatchFromDevtools) return
+          if (typeof (api as any).dispatch !== 'function') return
+          return (api as any).dispatch(action)
+        }
         case 'DISPATCH':
           switch (message.payload.type) {
             case 'RESET':
@@ -428,4 +465,125 @@ const parseJsonThen = <T>(stringified: string, fn: (parsed: T) => void) => {
     )
   }
   if (parsed !== undefined) fn(parsed as T)
+}
+
+type ActionCreatorDefinition = {
+  name: string;
+  func: (...args: any[]) => any;
+  args: string[];
+}
+
+// Adapted from @redux-devtools/utils (https://github.com/reduxjs/redux-devtools/blob/8f5cf1b5bca26009ea1bc29741d07166a79231a9/packages/redux-devtools-utils/src/index.ts#L18C1-L36C2)
+function flatTree(
+  obj: object,
+  namespace = '',
+): ActionCreatorDefinition[] {
+  let functions: {
+    name: string;
+    func: (...args: any[]) => any;
+    args: string[];
+  }[] = [];
+  Object.keys(obj).forEach((key) => {
+    const prop = (obj as Record<string, any>)[key];
+    if (!prop) return;
+    if (typeof prop === 'function') {
+      functions.push({
+        name: namespace + (key || prop.name || 'anonymous'),
+        func: prop,
+        args: getParams(prop),
+      });
+    } else if (typeof prop === 'object') {
+      functions = functions.concat(flatTree(prop, namespace + key + '.'));
+    }
+  });
+
+  return functions;
+}
+
+
+function getActionsArray(actionCreators: unknown): ActionCreatorDefinition[] {
+  if (Array.isArray(actionCreators)) return actionCreators;
+  if (typeof actionCreators !== 'object') return [];
+  return flatTree(actionCreators as Record<string, any>);
+}
+
+// Adapted from https://github.com/fahad19/get-params/blob/master/index.js#L2-L28
+function getParams(func: (...args: any[]) => any): string[] {
+  if (typeof func !== 'function') return [];
+
+  const src = func
+    .toString()
+    // remove comments
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '')
+    .trim();
+
+  let paramsSrc = '';
+
+  // function foo(a, b)
+  const fnMatch = src.match(/^[^(]*\(\s*([^)]*)\)/);
+
+  // (a, b) => or a =>
+  const arrowMatch = src.match(/^(?:\(\s*([^)]*)\)|([^\s=]+))\s*=>/);
+
+  if (fnMatch) {
+    paramsSrc = fnMatch[1] ?? '';
+  } else if (arrowMatch) {
+    paramsSrc = arrowMatch[1] ?? arrowMatch[2] ?? '';
+  } else {
+    return [];
+  }
+
+  if (!paramsSrc) return [];
+
+  const params: string[] = [];
+  let current = '';
+  let depth = 0;
+
+  for (let i = 0; i < paramsSrc.length; i++) {
+    const ch = paramsSrc[i];
+
+    if (ch === ',' && depth === 0) {
+      params.push(current.trim());
+      current = '';
+      continue;
+    }
+
+    if (ch === '{' || ch === '[' || ch === '(') depth++;
+    if (ch === '}' || ch === ']' || ch === ')') depth--;
+
+    current += ch;
+  }
+
+  if (current.trim()) {
+    params.push(current.trim());
+  }
+
+  // remove default values: a = 1 → a
+  return params.map(p => p.replace(/=.*/, '').trim());
+}
+
+const interpretArg = (arg: string): unknown =>
+  new Function('return ' + arg)();
+
+function evalArgs(inArgs: string[], restArgs: string): unknown[] {
+  const args = inArgs.map(interpretArg);
+  if (!restArgs) return args;
+  const rest = interpretArg(restArgs);
+  if (Array.isArray(rest)) return args.concat(...(rest as unknown[]));
+  throw new Error('rest must be an array');
+}
+
+export function evalAction(
+  action: string | { args: string[]; rest: string; selected: number },
+  actionCreators: any[],
+): any {
+  if (typeof action === 'string') {
+     
+    return new Function('return ' + action)();
+  }
+
+  const actionCreator = actionCreators[action.selected].func;
+  const args = evalArgs(action.args, action.rest);
+  return actionCreator(...args);
 }
