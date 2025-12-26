@@ -94,7 +94,7 @@ export const useBoundStore = create((...a) => ({
 
 Adding middlewares to a combined store is the same as with other normal stores.
 
-Adding `persist` middleware to our `useBoundStore`:
+Adding [`persist` middleware](https://zustand.docs.pmnd.rs/integrations/persisting-store-data) to our `useBoundStore`:
 
 ```js
 import { create } from 'zustand'
