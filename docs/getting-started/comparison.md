@@ -49,14 +49,13 @@ type State = {
   count: number
 }
 
-type Actions = {
-  increment: (qty: number) => void
-  decrement: (qty: number) => void
+type Action = {
+  type: 'increment' | 'decrement'
+  qty: number
 }
 
-type Action = {
-  type: keyof Actions
-  qty: number
+type Actions = {
+  dispatch: (action: Action) => void
 }
 
 const countReducer = (state: State, action: Action) => {
