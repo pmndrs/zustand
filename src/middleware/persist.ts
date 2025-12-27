@@ -60,6 +60,47 @@ export function createJSONStorage<S, R = unknown>(
   return persistStorage
 }
 
+/**
+ * Creates a low-level StateStorage adapter for react-native-mmkv.
+ * Use with createJSONStorage for Zustand persist:
+ *   storage: createJSONStorage(createMMKVStorage)
+ *
+ * This is optional and requires the user to install @mrousavy/react-native-mmkv separately.
+ * It's lazy-loaded to avoid errors in non-RN environments.
+ */
+export function createMMKVStorage(): StateStorage<void> {
+  let MMKVInstance: any | null = null
+
+  const initializeMMKV = async () => {
+    if (!MMKVInstance) {
+      try {
+        const { MMKV } = await import('@mrousavy/react-native-mmkv')
+        MMKVInstance = new MMKV()
+      } catch (error) {
+        throw new Error(
+          'react-native-mmkv is not installed or not available in this environment. Install it with: npm i @mrousavy/react-native-mmkv'
+        )
+      }
+    }
+    return MMKVInstance
+  }
+
+  return {
+    getItem: async (name: string) => {
+      const mmkv = await initializeMMKV()
+      return mmkv.getString(name) ?? null
+    },
+    setItem: async (name: string, value: string) => {
+      const mmkv = await initializeMMKV()
+      mmkv.set(name, value)
+    },
+    removeItem: async (name: string) => {
+      const mmkv = await initializeMMKV()
+      mmkv.delete(name)
+    },
+  }
+}
+
 export interface PersistOptions<
   S,
   PersistedState = S,
