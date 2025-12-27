@@ -76,9 +76,10 @@ export function createMMKVStorage(): StateStorage<void> {
       try {
         const { MMKV } = await import('@mrousavy/react-native-mmkv')
         MMKVInstance = new MMKV()
-      } catch (error) {
+      } catch (e) {
+        console.warn('MMKV import failed:', e)
         throw new Error(
-          'react-native-mmkv is not installed or not available in this environment. Install it with: npm i @mrousavy/react-native-mmkv'
+          'react-native-mmkv is not installed or not available in this environment. Install it with: npm i @mrousavy/react-native-mmkv',
         )
       }
     }
