@@ -198,6 +198,9 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   }
 
   let hasHydrated = false
+  // Counter to track hydration versions and prevent race conditions
+  // when multiple rehydrate() calls happen concurrently
+  let hydrationVersion = 0
   const hydrationListeners = new Set<PersistListener<S>>()
   const finishHydrationListeners = new Set<PersistListener<S>>()
   let storage = options.storage
@@ -255,6 +258,8 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     // as a backup  to 'get()' so listeners and 'onRehydrateStorage' are called with
     // the latest available state.
 
+    // Increment version to invalidate any in-flight hydration
+    const currentVersion = ++hydrationVersion
     hasHydrated = false
     hydrationListeners.forEach((cb) => cb(get() ?? configResult))
 
@@ -264,6 +269,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     // bind is used to avoid `TypeError: Illegal invocation` error
     return toThenable(storage.getItem.bind(storage))(options.name)
       .then((deserializedStorageValue) => {
+        // Abort if a newer hydration has started
+        if (currentVersion !== hydrationVersion) {
+          return [false, undefined, true] as const
+        }
         if (deserializedStorageValue) {
           if (
             typeof deserializedStorageValue.version === 'number' &&
@@ -275,21 +284,31 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
                 deserializedStorageValue.version,
               )
               if (migration instanceof Promise) {
-                return migration.then((result) => [true, result] as const)
+                return migration.then((result) => {
+                  // Check again after async migration
+                  if (currentVersion !== hydrationVersion) {
+                    return [false, undefined, true] as const
+                  }
+                  return [true, result, false] as const
+                })
               }
-              return [true, migration] as const
+              return [true, migration, false] as const
             }
             console.error(
               `State loaded from storage couldn't be migrated since no migrate function was provided`,
             )
           } else {
-            return [false, deserializedStorageValue.state] as const
+            return [false, deserializedStorageValue.state, false] as const
           }
         }
-        return [false, undefined] as const
+        return [false, undefined, false] as const
       })
       .then((migrationResult) => {
-        const [migrated, migratedState] = migrationResult
+        const [migrated, migratedState, aborted] = migrationResult
+        // Abort if a newer hydration has started
+        if (aborted || currentVersion !== hydrationVersion) {
+          return
+        }
         stateFromStorage = options.merge(
           migratedState as S,
           get() ?? configResult,
@@ -301,6 +320,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         }
       })
       .then(() => {
+        // Abort if a newer hydration has started
+        if (currentVersion !== hydrationVersion) {
+          return
+        }
         // TODO: In the asynchronous case, it's possible that the state has changed
         // since it was set in the prior callback. As such, it would be better to
         // pass 'get()' to the 'postRehydrationCallback' to ensure the most up-to-date
@@ -318,7 +341,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
       .catch((e: Error) => {
-        postRehydrationCallback?.(undefined, e)
+        // Only call error callback if this hydration wasn't superseded
+        if (currentVersion === hydrationVersion) {
+          postRehydrationCallback?.(undefined, e)
+        }
       })
   }
 

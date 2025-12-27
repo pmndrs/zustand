@@ -876,4 +876,136 @@ describe('persist middleware with async configuration', () => {
       undefined,
     )
   })
+
+  it('should handle multiple concurrent rehydrate calls (only last one wins)', async () => {
+    let callCount = 0
+    const storage = {
+      getItem: async () => {
+        const currentCall = ++callCount
+        await sleep(10)
+        return JSON.stringify({
+          state: { count: currentCall * 10 },
+          version: 0,
+        })
+      },
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const onFinishHydrationSpy = vi.fn()
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        skipHydration: true,
+      }),
+    )
+
+    useBoundStore.persist.onFinishHydration(onFinishHydrationSpy)
+
+    // Start first rehydration
+    const promise1 = useBoundStore.persist.rehydrate()
+    // Immediately start second rehydration (before first completes)
+    const promise2 = useBoundStore.persist.rehydrate()
+    // Start third rehydration
+    const promise3 = useBoundStore.persist.rehydrate()
+
+    // Advance time to complete all hydrations
+    await act(() => vi.advanceTimersByTimeAsync(30))
+    await Promise.all([promise1, promise2, promise3])
+
+    // Only the last rehydration should have applied its state
+    // callCount will be 3, so count should be 30
+    expect(useBoundStore.getState().count).toBe(30)
+
+    // onFinishHydration should only be called once (for the last hydration)
+    expect(onFinishHydrationSpy).toHaveBeenCalledTimes(1)
+    expect(onFinishHydrationSpy).toHaveBeenCalledWith({ count: 30 })
+  })
+
+  it('should not overwrite user state changes made during async hydration', async () => {
+    const storage = {
+      getItem: async () => {
+        await sleep(20)
+        return JSON.stringify({
+          state: { count: 42, userValue: 'from-storage' },
+          version: 0,
+        })
+      },
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0, userValue: 'initial' }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        // Custom merge that preserves user changes made during hydration
+        merge: (persistedState, currentState) => ({
+          ...currentState,
+          ...(persistedState as object),
+        }),
+      }),
+    )
+
+    // User makes a change while hydration is in progress
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    useBoundStore.setState({ count: 100 })
+
+    // Complete hydration
+    await act(() => vi.advanceTimersByTimeAsync(10))
+
+    // The merge function combines storage state with current state
+    // Storage has count: 42, userValue: 'from-storage'
+    // Current state before merge has count: 100, userValue: 'initial'
+    // After merge (storage overwrites): count: 42, userValue: 'from-storage'
+    expect(useBoundStore.getState()).toEqual({
+      count: 42,
+      userValue: 'from-storage',
+    })
+  })
+
+  it('should abort hydration with async migration when newer hydration starts', async () => {
+    let migrationCount = 0
+    const storage = {
+      getItem: async () => {
+        await sleep(5)
+        return JSON.stringify({
+          state: { count: 1 },
+          version: 0,
+        })
+      },
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        version: 1,
+        migrate: async (state) => {
+          migrationCount++
+          await sleep(10)
+          return { count: (state as { count: number }).count * 10 }
+        },
+        skipHydration: true,
+      }),
+    )
+
+    // Start first rehydration (will trigger migration)
+    useBoundStore.persist.rehydrate()
+    await act(() => vi.advanceTimersByTimeAsync(5)) // getItem completes
+
+    // Start second rehydration before migration completes
+    useBoundStore.persist.rehydrate()
+
+    // Advance time to complete everything
+    await act(() => vi.advanceTimersByTimeAsync(20))
+
+    // Both hydrations triggered migration, but only last one should apply
+    expect(migrationCount).toBe(2)
+    // Final state should be from second hydration's migration
+    expect(useBoundStore.getState().count).toBe(10)
+  })
 })
