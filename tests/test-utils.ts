@@ -31,3 +31,7 @@ const isReplacedMap = (value: any): value is ReplacedMap => {
 
   return false
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

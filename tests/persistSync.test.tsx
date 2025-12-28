@@ -617,12 +617,7 @@ describe('persist middleware with sync configuration', () => {
       name: 'empty',
     })
 
-    // Because `skipHydration` is only in newImpl and the hydration function for newImpl is now a promise
-    // In the default case we would need to await `onFinishHydration` to assert the auto hydration has completed
-    // As we are testing the skip hydration case we await nextTick, to make sure the store is initialised
-    await new Promise((resolve) => process.nextTick(resolve))
-
-    // Asserting store hasn't hydrated from nextTick
+    // Asserting store hasn't hydrated
     expect(useBoundStore.persist.hasHydrated()).toBe(false)
 
     await useBoundStore.persist.rehydrate()
@@ -631,7 +626,7 @@ describe('persist middleware with sync configuration', () => {
       count: 42,
       name: 'test-storage',
     })
-    expect(onRehydrateStorageSpy).toBeCalledWith(
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
       { count: 42, name: 'test-storage' },
       undefined,
     )
