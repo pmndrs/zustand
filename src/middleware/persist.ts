@@ -285,7 +285,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
               )
               if (migration instanceof Promise) {
                 return migration.then((result) => {
-                  // Check again after async migration
+                  // Abort if a newer hydration has started
                   if (currentVersion !== hydrationVersion) {
                     return
                   }
@@ -341,10 +341,11 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
       .catch((e: Error) => {
-        // Only call error callback if this hydration wasn't superseded
-        if (currentVersion === hydrationVersion) {
-          postRehydrationCallback?.(undefined, e)
+        // Abort if a newer hydration has started
+        if (currentVersion !== hydrationVersion) {
+          return
         }
+        postRehydrationCallback?.(undefined, e)
       })
   }
 
