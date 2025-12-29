@@ -121,6 +121,34 @@ function CommonConsumer() {
 }
 ```
 
+### Optionally use memoized selector for stable outputs
+
+```tsx
+import { useShallow } from 'zustand/react/shallow'
+
+const meals = ['Salmon', 'Berries', 'Nuts']
+
+function CommonConsumer() {
+  const bearMealsOrder = useBearContext(
+    useShallow((s) =>
+      Array.from({ length: s.bears }).map((_, index) =>
+        meals.at(index % meals.length),
+      ),
+    ),
+  )
+  return (
+    <>
+      Order:
+      <ul>
+        {bearMealsOrder.map((meal) => (
+          <li key={meal}>{meal}</li>
+        ))}
+      </ul>
+    </>
+  )
+}
+```
+
 ### Optionally allow using a custom equality function
 
 ```tsx
