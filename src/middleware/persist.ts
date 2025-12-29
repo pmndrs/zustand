@@ -295,7 +295,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       })
       .then((migrationResult) => {
         // Abort if a newer hydration has started
-        if (!migrationResult || currentVersion !== hydrationVersion) {
+        if (currentVersion !== hydrationVersion) {
           return
         }
         const [migrated, migratedState] = migrationResult
