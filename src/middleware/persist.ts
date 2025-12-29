@@ -271,7 +271,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       .then((deserializedStorageValue) => {
         // Abort if a newer hydration has started
         if (currentVersion !== hydrationVersion) {
-          return [false, undefined, true] as const
+          return
         }
         if (deserializedStorageValue) {
           if (
@@ -287,28 +287,28 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
                 return migration.then((result) => {
                   // Check again after async migration
                   if (currentVersion !== hydrationVersion) {
-                    return [false, undefined, true] as const
+                    return
                   }
-                  return [true, result, false] as const
+                  return [true, result] as const
                 })
               }
-              return [true, migration, false] as const
+              return [true, migration] as const
             }
             console.error(
               `State loaded from storage couldn't be migrated since no migrate function was provided`,
             )
           } else {
-            return [false, deserializedStorageValue.state, false] as const
+            return [false, deserializedStorageValue.state] as const
           }
         }
-        return [false, undefined, false] as const
+        return [false, undefined] as const
       })
       .then((migrationResult) => {
-        const [migrated, migratedState, aborted] = migrationResult
         // Abort if a newer hydration has started
-        if (aborted || currentVersion !== hydrationVersion) {
+        if (!migrationResult || currentVersion !== hydrationVersion) {
           return
         }
+        const [migrated, migratedState] = migrationResult
         stateFromStorage = options.merge(
           migratedState as S,
           get() ?? configResult,
