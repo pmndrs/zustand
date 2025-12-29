@@ -1,26 +1,29 @@
 /// <reference types="node" />
 
 import { StrictMode, useEffect } from 'react'
-import { act, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { replacer, reviver } from './test-utils'
+import { replacer, reviver, sleep } from './test-utils'
 
 const createPersistantStore = (initialValue: string | null) => {
   let state = initialValue
 
   const getItem = async (): Promise<string | null> => {
     getItemSpy()
+    await sleep(10)
     return state
   }
   const setItem = async (name: string, newState: string) => {
     setItemSpy(name, newState)
+    await sleep(10)
     state = newState
   }
 
   const removeItem = async (name: string) => {
     removeItemSpy(name)
+    await sleep(10)
     state = null
   }
 
@@ -38,18 +41,26 @@ const createPersistantStore = (initialValue: string | null) => {
 
 describe('persist middleware with async configuration', () => {
   const consoleError = console.error
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
   afterEach(() => {
+    vi.useRealTimers()
     console.error = consoleError
   })
 
   it('can rehydrate state', async () => {
     const onRehydrateStorageSpy = vi.fn()
     const storage = {
-      getItem: async (name: string) =>
-        JSON.stringify({
+      getItem: async (name: string) => {
+        await sleep(10)
+        return JSON.stringify({
           state: { count: 42, name },
           version: 0,
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -83,11 +94,12 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0, name: empty')).toBeInTheDocument()
+    expect(screen.getByText('count: 0, name: empty')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
     expect(
-      await screen.findByText('count: 42, name: test-storage'),
+      screen.getByText('count: 42, name: test-storage'),
     ).toBeInTheDocument()
-    expect(onRehydrateStorageSpy).toBeCalledWith(
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
       { count: 42, name: 'test-storage' },
       undefined,
     )
@@ -98,6 +110,7 @@ describe('persist middleware with async configuration', () => {
 
     const storage = {
       getItem: async () => {
+        await sleep(10)
         throw new Error('getItem error')
       },
       setItem: () => {},
@@ -123,13 +136,12 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith(
-        undefined,
-        new Error('getItem error'),
-      )
-    })
+    expect(screen.getByText('count: 0')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
+      undefined,
+      new Error('getItem error'),
+    )
   })
 
   it('can persist state', async () => {
@@ -161,17 +173,16 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
-    })
+    expect(screen.getByText('count: 0')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith({ count: 0 }, undefined)
 
     // Write something to the store
     act(() => {
       useBoundStore.setState({ count: 42 })
     })
-    expect(await screen.findByText('count: 42')).toBeInTheDocument()
-    expect(setItemSpy).toBeCalledWith(
+    expect(screen.getByText('count: 42')).toBeInTheDocument()
+    expect(setItemSpy).toHaveBeenCalledWith(
       'test-storage',
       JSON.stringify({ state: { count: 42 }, version: 0 }),
     )
@@ -184,7 +195,7 @@ describe('persist middleware with async configuration', () => {
     } = createStore()
     function Counter2() {
       const { count } = useBoundStore2()
-      return <div>count: {count}</div>
+      return <div>count2: {count}</div>
     }
 
     render(
@@ -193,23 +204,30 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 42')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy2).toBeCalledWith({ count: 42 }, undefined)
-    })
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count2: 42')).toBeInTheDocument()
+    expect(onRehydrateStorageSpy2).toHaveBeenCalledWith(
+      { count: 42 },
+      undefined,
+    )
   })
 
   it('can async migrate persisted state', async () => {
     const setItemSpy = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
-    const migrateSpy = vi.fn(() => Promise.resolve({ count: 99 }))
+    const migrateSpy = vi.fn(async () => {
+      await sleep(10)
+      return { count: 99 }
+    })
 
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: { count: 42 },
           version: 12,
-        }),
+        })
+      },
       setItem: setItemSpy,
       removeItem: () => {},
     }
@@ -235,25 +253,28 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0')).toBeInTheDocument()
-    expect(await screen.findByText('count: 99')).toBeInTheDocument()
-    expect(migrateSpy).toBeCalledWith({ count: 42 }, 12)
-    expect(setItemSpy).toBeCalledWith(
+    expect(screen.getByText('count: 0')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(20))
+    expect(screen.getByText('count: 99')).toBeInTheDocument()
+    expect(migrateSpy).toHaveBeenCalledWith({ count: 42 }, 12)
+    expect(setItemSpy).toHaveBeenCalledWith(
       'test-storage',
       JSON.stringify({
         state: { count: 99 },
         version: 13,
       }),
     )
-    expect(onRehydrateStorageSpy).toBeCalledWith({ count: 99 }, undefined)
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith({ count: 99 }, undefined)
   })
 
   it('can merge partial persisted state', async () => {
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: { count: 42 },
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -297,8 +318,9 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 42')).toBeInTheDocument()
-    expect(await screen.findByText('name: test')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count: 42')).toBeInTheDocument()
+    expect(screen.getByText('name: test')).toBeInTheDocument()
 
     expect(useBoundStore.getState()).toEqual(
       expect.objectContaining({
@@ -312,11 +334,13 @@ describe('persist middleware with async configuration', () => {
     console.error = vi.fn()
     const onRehydrateStorageSpy = vi.fn()
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: { count: 42 },
           version: 12,
-        }),
+        })
+      },
       setItem: (_: string, _value: string) => {},
       removeItem: () => {},
     }
@@ -341,15 +365,10 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0')).toBeInTheDocument()
-
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalled()
-    })
-
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 }, undefined)
-    })
+    expect(screen.getByText('count: 0')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(console.error).toHaveBeenCalled()
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith({ count: 0 }, undefined)
   })
 
   it('can throw migrate error', async () => {
@@ -357,11 +376,13 @@ describe('persist middleware with async configuration', () => {
     const onRehydrateStorageSpy = vi.fn()
 
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: {},
           version: 12,
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -389,20 +410,22 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith(
-        undefined,
-        new Error('migrate error'),
-      )
-    })
+    expect(screen.getByText('count: 0')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
+      undefined,
+      new Error('migrate error'),
+    )
   })
 
   it('passes the latest state to onRehydrateStorage and onHydrate on first hydrate', async () => {
     const onRehydrateStorageSpy = vi.fn()
 
     const storage = {
-      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({ state: { count: 1 } })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -424,7 +447,8 @@ describe('persist middleware with async configuration', () => {
      * const onHydrateSpy = vi.fn()
      * useBoundStore.persist.onHydrate(onHydrateSpy)
      * ...
-     * await waitFor(() => expect(onHydrateSpy).toBeCalledWith({ count: 0 }))
+     * await act(() => vi.advanceTimersByTimeAsync(10))
+     * expect(onHydrateSpy).toHaveBeenCalledWith({ count: 0 })
      */
 
     function Counter() {
@@ -438,24 +462,25 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 1')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count: 1')).toBeInTheDocument()
 
     // The 'onRehydrateStorage' spy is invoked prior to rehydration, so it should
     // be passed the default state.
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith({ count: 0 })
-    })
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith({ count: 0 })
   })
 
   it('gives the merged state to onRehydrateStorage', async () => {
     const onRehydrateStorageSpy = vi.fn()
 
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: { count: 1 },
           version: 0,
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -481,25 +506,26 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 0')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith(
-        { count: 1, unstorableMethod },
-        undefined,
-      )
-    })
+    expect(screen.getByText('count: 0')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
+      { count: 1, unstorableMethod },
+      undefined,
+    )
   })
 
   it('can custom merge the stored state', async () => {
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: {
             count: 1,
             actions: {},
           },
           version: 0,
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -533,7 +559,8 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 1')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count: 1')).toBeInTheDocument()
     expect(useBoundStore.getState()).toEqual({
       count: 1,
       actions: {
@@ -544,12 +571,14 @@ describe('persist middleware with async configuration', () => {
 
   it("can merge the state when the storage item doesn't have a version", async () => {
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: {
             count: 1,
           },
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -572,7 +601,8 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 1')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count: 1')).toBeInTheDocument()
     expect(useBoundStore.getState()).toEqual({
       count: 1,
     })
@@ -582,7 +612,10 @@ describe('persist middleware with async configuration', () => {
     const storageValue = '{"state":{"count":1},"version":0}'
 
     const storage = {
-      getItem: async () => '',
+      getItem: async () => {
+        await sleep(10)
+        return ''
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -594,8 +627,13 @@ describe('persist middleware with async configuration', () => {
       }),
     )
 
-    storage.getItem = async () => storageValue
-    await useBoundStore.persist.rehydrate()
+    storage.getItem = async () => {
+      await sleep(10)
+      return storageValue
+    }
+    const rehydratePromise = useBoundStore.persist.rehydrate()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    await rehydratePromise
     expect(useBoundStore.getState()).toEqual({
       count: 1,
     })
@@ -603,7 +641,10 @@ describe('persist middleware with async configuration', () => {
 
   it('can check if the store has been hydrated through the api', async () => {
     const storage = {
-      getItem: async () => null,
+      getItem: async () => {
+        await sleep(10)
+        return null
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -615,21 +656,24 @@ describe('persist middleware with async configuration', () => {
       }),
     )
     expect(useBoundStore.persist.hasHydrated()).toBe(false)
-    await new Promise((resolve) =>
-      useBoundStore.persist.onFinishHydration(resolve),
-    )
+    await act(() => vi.advanceTimersByTimeAsync(10))
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
 
-    await useBoundStore.persist.rehydrate()
+    const rehydratePromise = useBoundStore.persist.rehydrate()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    await rehydratePromise
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
   })
 
   it('can skip initial hydration', async () => {
     const storage = {
-      getItem: async (name: string) => ({
-        state: { count: 42, name },
-        version: 0,
-      }),
+      getItem: async (name: string) => {
+        await sleep(10)
+        return {
+          state: { count: 42, name },
+          version: 0,
+        }
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -655,21 +699,18 @@ describe('persist middleware with async configuration', () => {
       name: 'empty',
     })
 
-    // Because `skipHydration` is only in newImpl and the hydration function for newImpl is now a promise
-    // In the default case we would need to await `onFinishHydration` to assert the auto hydration has completed
-    // As we are testing the skip hydration case we await nextTick, to make sure the store is initialised
-    await new Promise((resolve) => process.nextTick(resolve))
-
-    // Asserting store hasn't hydrated from nextTick
+    // Asserting store hasn't hydrated
     expect(useBoundStore.persist.hasHydrated()).toBe(false)
 
-    await useBoundStore.persist.rehydrate()
+    const rehydratePromise = useBoundStore.persist.rehydrate()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    await rehydratePromise
 
     expect(useBoundStore.getState()).toEqual({
       count: 42,
       name: 'test-storage',
     })
-    expect(onRehydrateStorageSpy).toBeCalledWith(
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
       { count: 42, name: 'test-storage' },
       undefined,
     )
@@ -677,7 +718,10 @@ describe('persist middleware with async configuration', () => {
 
   it('handles state updates during onRehydrateStorage', async () => {
     const storage = {
-      getItem: async () => JSON.stringify({ state: { count: 1 } }),
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({ state: { count: 1 } })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -707,19 +751,22 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('count: 2')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count: 2')).toBeInTheDocument()
     expect(useBoundStore.getState().count).toEqual(2)
   })
 
   it('can rehydrate state with custom deserialized Map', async () => {
     const onRehydrateStorageSpy = vi.fn()
     const storage = {
-      getItem: async () =>
-        JSON.stringify({
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
           state: {
             map: { type: 'Map', value: [['foo', 'bar']] },
           },
-        }),
+        })
+      },
       setItem: () => {},
       removeItem: () => {},
     }
@@ -748,8 +795,9 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('map: bar')).toBeInTheDocument()
-    expect(onRehydrateStorageSpy).toBeCalledWith(
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('map: bar')).toBeInTheDocument()
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
       { map: new Map([['foo', 'bar']]) },
       undefined,
     )
@@ -785,19 +833,18 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('map-content:')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy).toBeCalledWith({ map }, undefined)
-    })
+    expect(screen.getByText('map-content:')).toBeInTheDocument()
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith({ map }, undefined)
 
     // Write something to the store
     const updatedMap = new Map(map).set('foo', 'bar')
     act(() => {
       useBoundStore.setState({ map: updatedMap })
     })
-    expect(await screen.findByText('map-content: bar')).toBeInTheDocument()
+    expect(screen.getByText('map-content: bar')).toBeInTheDocument()
 
-    expect(setItemSpy).toBeCalledWith(
+    expect(setItemSpy).toHaveBeenCalledWith(
       'test-storage',
       JSON.stringify({
         state: { map: { type: 'Map', value: [['foo', 'bar']] } },
@@ -813,7 +860,7 @@ describe('persist middleware with async configuration', () => {
     } = createStore()
     function MapDisplay2() {
       const { map } = useBoundStore2()
-      return <div>map-content: {map.get('foo')}</div>
+      return <div>map-content2: {map.get('foo')}</div>
     }
 
     render(
@@ -822,12 +869,11 @@ describe('persist middleware with async configuration', () => {
       </StrictMode>,
     )
 
-    expect(await screen.findByText('map-content: bar')).toBeInTheDocument()
-    await waitFor(() => {
-      expect(onRehydrateStorageSpy2).toBeCalledWith(
-        { map: updatedMap },
-        undefined,
-      )
-    })
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('map-content2: bar')).toBeInTheDocument()
+    expect(onRehydrateStorageSpy2).toHaveBeenCalledWith(
+      { map: updatedMap },
+      undefined,
+    )
   })
 })
