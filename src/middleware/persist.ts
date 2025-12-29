@@ -269,10 +269,6 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     // bind is used to avoid `TypeError: Illegal invocation` error
     return toThenable(storage.getItem.bind(storage))(options.name)
       .then((deserializedStorageValue) => {
-        // Abort if a newer hydration has started
-        if (currentVersion !== hydrationVersion) {
-          return
-        }
         if (deserializedStorageValue) {
           if (
             typeof deserializedStorageValue.version === 'number' &&
@@ -284,13 +280,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
                 deserializedStorageValue.version,
               )
               if (migration instanceof Promise) {
-                return migration.then((result) => {
-                  // Abort if a newer hydration has started
-                  if (currentVersion !== hydrationVersion) {
-                    return
-                  }
-                  return [true, result] as const
-                })
+                return migration.then((result) => [true, result] as const)
               }
               return [true, migration] as const
             }
