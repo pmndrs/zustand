@@ -114,6 +114,19 @@ take a look at an example:
 
 What a reduction! Please take note of the [gotchas listed here](../integrations/immer-middleware.md).
 
+### With Limu
+[Limu](https://github.com/tnfe/limu) is a high performance immutable lib alternative to immer with the same api, 
+it is nearly more than 2 or 20 times faster than immer in different situations, 
+and its draft is more readable in debug mode.
+
+```ts
+import { produce } from 'limu';
+
+  limuInc: () =>
+    // If you watch state on in debug mode, you will find that it is very easily to read just like a normal object
+    set(produce((state: State) => { ++state.deep.nested.obj.count })),
+```
+
 ### With optics-ts
 
 There is another option with [optics-ts](https://github.com/akheron/optics-ts/):
