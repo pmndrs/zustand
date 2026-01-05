@@ -316,10 +316,10 @@ const devtoolsImpl: DevtoolsImpl =
       }
     }
     
-    let usingReduxMiddleware = typeof (api as any).dispatch === 'function';
+    const usingReduxMiddleware =
+      (api as any).dispatchFromDevtools && typeof (api as any).dispatch === 'function';
     if (!usingReduxMiddleware) {
-      (api as any).dispatchFromDevtools = true;
-      (api as any).dispatch = (payload: {
+      (api as any).__dispatch = (payload: {
         type: string,
         args: unknown[] | Record<string, unknown>
       }) => {
@@ -409,14 +409,11 @@ const devtoolsImpl: DevtoolsImpl =
             if (usingReduxMiddleware) {
               // When using the redux plugin, we dispatch the action ourselves.
               const action = evalAction(message.payload, actionCreators as any[]);
-              if (!(api as any).dispatchFromDevtools) return
-              if (typeof (api as any).dispatch !== 'function') return
               return (api as any).dispatch(action);
             } 
 
-            // When not using the redux plugin, action creators are expected
+            // When not using the `redux` middleware, action creators are expected
             // to cause the state change themselves.
-            if (!(api as any).dispatchFromDevtools) return
             return evalAction(message.payload, actionCreators as any[]);
           }
 
@@ -483,10 +480,8 @@ const devtoolsImpl: DevtoolsImpl =
             return
           }
 
-          if (!(api as any).dispatchFromDevtools) return
-          if (typeof (api as any).dispatch !== 'function') return
-          ;(api as any).dispatch(action)
-          return;
+          if (!usingReduxMiddleware) return (api as any).__dispatch(action);
+          return (api as any).dispatch(action);
         }
         case 'DISPATCH':
           switch (message.payload.type) {
