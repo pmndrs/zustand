@@ -16,7 +16,7 @@ This can be done using third-party libraries created by the community.
 
 - [@colorfy-software/zfy](https://colorfy-software.gitbook.io/zfy/) — 🧸 Useful helpers for state management in React with Zustand.
 - [@csark0812/zustand-expo-devtools](https://github.com/csark0812/zustand-expo-devtools) — 🧭 Connect Zustand to Redux DevTools in Expo + React Native using the official Expo DevTools plugin system.
-- [@csark0812/zustand-getters](https://github.com/csark0812/zustand-getters) — 🔄 Make JavaScript object getters reactive in Zustand stores - define derived values with `get propertyName()` and they automatically trigger subscription updates when accessed.
+- [@csark0812/zustand-getters](https://github.com/csark0812/zustand-getters) — 🔄 Make JavaScript object getters reactive in Zustand stores — define derived values with `get propertyName()` and they automatically trigger subscription updates when accessed.
 - [@davstack/store](https://www.npmjs.com/package/@davstack/store) — A zustand store factory that auto generates selectors with get/set/use methods, supports inferred types, and makes global / local state management easy.
 - [@dhmk/zustand-lens](https://github.com/dhmk083/dhmk-zustand-lens) — Lens support for Zustand.
 - [@hpkv/zustand-multiplayer](https://github.com/hpkv-io/zustand-multiplayer/tree/main/packages/zustand-multiplayer) — HPKV multiplayer middleware for building realtime collaborative applications
@@ -43,7 +43,7 @@ This can be done using third-party libraries created by the community.
 - [zukeeper](https://github.com/oslabs-beta/Zukeeper) — Native devtools with state and action tracking, diffing, tree display, and time travel
 - [zundo](https://github.com/charkour/zundo) — 🍜 Undo and redo middleware for Zustand, enabling time-travel in your apps.
 - [zustand-ards](https://github.com/ivoilic/zustand-ards) — 💁 Simple opinionated utilities for example alternative selector formats and default shallow hooks
-- [zustand-async-slice](https://github.com/mym0404/zustand-async-slice) - Simple Zustand utility to create Async Slice. TypeScript Fully Supported 🖖
+- [zustand-async-slice](https://github.com/mym0404/zustand-async-slice) — Simple Zustand utility to create Async Slice. TypeScript Fully Supported 🖖
 - [zustand-boilerplate](https://github.com/sagiereder/zustand-boilerplate) — A tool that automatically generates getters, setters and more for your zustand store.
 - [zustand-computed](https://github.com/chrisvander/zustand-computed) — A Zustand middleware to create computed states.
 - [zustand-computed-state](https://github.com/yasintz/zustand-computed-state) — Simple middleware to add computed states.
@@ -61,7 +61,8 @@ This can be done using third-party libraries created by the community.
 - [zustand-middleware-yjs](https://github.com/joebobmiles/zustand-middleware-yjs) — A middleware for synchronizing Zustand stores with Yjs.
 - [zustand-mmkv-storage](https://github.com/1mehdifaraji/zustand-mmkv-storage) — Fast, lightweight MMKV storage adapter for Zustand persist middleware in React Native.
 - [zustand-multi-persist](https://github.com/mooalot/zustand-multi-persist) — A middleware for persisting and rehydrating state to multiple storage engines.
-- [zustand-namespaces](https://github.com/mooalot/zustand-namespaces) - One store to rule them all. Namespaced Zustand stores.
+- [zustand-mutable](https://github.com/zustandjs/zustand-mutable) — A sweet way to use immer-like mutable updates.
+- [zustand-namespaces](https://github.com/mooalot/zustand-namespaces) — One store to rule them all. Namespaced Zustand stores.
 - [zustand-persist](https://github.com/roadmanfong/zustand-persist) — A middleware for persisting and rehydrating state.
 - [zustand-pub](https://github.com/AwesomeDevin/zustand-pub) — Cross-Application/Cross-Framework State Management And Sharing based on zustand and zustand-vue for React/Vue.
 - [zustand-querystring](https://github.com/nitedani/zustand-querystring) — A Zustand middleware that syncs the store with the querystring.
@@ -70,7 +71,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-slices](https://github.com/zustandjs/zustand-slices) — A slice utility for Zustand.
 - [zustand-store-addons](https://github.com/Diablow/zustand-store-addons) — React state management addons for Zustand.
 - [zustand-sync-tabs](https://github.com/mayank1513/zustand-sync-tabs) — Zustand middleware to easily sync Zustand state between tabs/windows/iframes with same origin.
-- [zustand-utils](https://www.npmjs.com/package/zustand-utils) — Utilities for Zustand - a `createContext` replacement, a devtools wrapper, and a store-updater factory function.
+- [zustand-utils](https://www.npmjs.com/package/zustand-utils) — Utilities for Zustand — a `createContext` replacement, a devtools wrapper, and a store-updater factory function.
 - [zustand-valtio](https://github.com/zustandjs/zustand-valtio) — A sweet combination of Zustand and Valtio
 - [zustand-vue](https://github.com/AwesomeDevin/zustand-vue) — State management for vue (Vue3 / Vue2) based on zustand.
 - [zustand-x](https://github.com/udecode/zustand-x) — Zustand store factory for a best-in-class developer experience.
