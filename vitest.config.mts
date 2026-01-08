@@ -1,7 +1,7 @@
 import { resolve } from 'path'
-import { defineConfig } from 'vitest/config'
+import { type ViteUserConfigExport, defineConfig } from 'vitest/config'
 
-export default defineConfig({
+const config: ViteUserConfigExport = defineConfig({
   resolve: {
     alias: [
       { find: /^zustand$/, replacement: resolve('./src/index.ts') },
@@ -27,3 +27,4 @@ export default defineConfig({
     },
   },
 })
+export default config
