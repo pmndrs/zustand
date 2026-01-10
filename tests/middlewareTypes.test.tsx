@@ -1,5 +1,3 @@
-/* eslint @typescript-eslint/no-unused-expressions: off */ // FIXME
-
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { create } from 'zustand'
 import type { StateCreator, StoreApi, StoreMutatorIdentifier } from 'zustand'
@@ -46,15 +44,15 @@ describe('counter state spec (no middleware)', () => {
       inc: () => set({ count: get().count + 1 }, false),
     }))
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
@@ -71,15 +69,15 @@ describe('counter state spec (single middleware)', () => {
       })),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
       return <></>
     }
-    TestComponent
+    void TestComponent
 
     const testSubtyping: StoreApi<object> = createStore(
       immer(() => ({ count: 0 })),
@@ -135,13 +133,13 @@ describe('counter state spec (single middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.dispatch)({ type: 'INC' })
-      useBoundStore().dispatch({ type: 'INC' })
-      useBoundStore.dispatch({ type: 'INC' })
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.dispatch)({ type: 'INC' })
+      void useBoundStore().dispatch({ type: 'INC' })
+      void useBoundStore.dispatch({ type: 'INC' })
       return <></>
     }
-    TestComponent
+    void TestComponent
 
     const testSubtyping: StoreApi<object> = createStore(
       redux((x) => x, { count: 0 }),
@@ -160,16 +158,16 @@ describe('counter state spec (single middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
-    TestComponent
+    void TestComponent
 
     const testSubtyping: StoreApi<object> = createStore(
       devtools(() => ({ count: 0 })),
@@ -203,19 +201,19 @@ describe('counter state spec (single middleware)', () => {
       })),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
       return <></>
     }
-    TestComponent
+    void TestComponent
 
     const testSubtyping: StoreApi<object> = createStore(
       subscribeWithSelector(() => ({ count: 0 })),
@@ -230,15 +228,15 @@ describe('counter state spec (single middleware)', () => {
       })),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
       return <></>
     }
-    TestComponent
+    void TestComponent
 
     const testSubtyping: StoreApi<object> = createStore(
       combine({ count: 0 }, () => ({})),
@@ -257,16 +255,16 @@ describe('counter state spec (single middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.persist.hasHydrated()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
 
     const testSubtyping: StoreApi<object> = createStore(
       persist(() => ({ count: 0 }), { name: 'prefix' }),
@@ -285,20 +283,20 @@ describe('counter state spec (single middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.persist.hasHydrated()
-      useBoundStore.persist.setOptions({
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.persist.hasHydrated()
+      void useBoundStore.persist.setOptions({
         // @ts-expect-error to test if the partialized state is inferred as number
         partialize: () => 'not-a-number',
       })
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -313,15 +311,15 @@ describe('counter state spec (single middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
@@ -347,16 +345,16 @@ describe('counter state spec (double middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -378,14 +376,14 @@ describe('counter state spec (double middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.dispatch)({ type: 'INC' })
-      useBoundStore().dispatch({ type: 'INC' })
-      useBoundStore.dispatch({ type: 'INC' })
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.dispatch)({ type: 'INC' })
+      void useBoundStore().dispatch({ type: 'INC' })
+      void useBoundStore.dispatch({ type: 'INC' })
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -399,16 +397,16 @@ describe('counter state spec (double middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -421,19 +419,19 @@ describe('counter state spec (double middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -448,20 +446,20 @@ describe('counter state spec (double middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -479,17 +477,17 @@ describe('counter state spec (double middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
@@ -512,17 +510,17 @@ describe('counter state spec (triple middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -538,20 +536,20 @@ describe('counter state spec (triple middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -571,21 +569,21 @@ describe('counter state spec (triple middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
@@ -610,21 +608,21 @@ describe('counter state spec (quadruple middleware)', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      void useBoundStore.setState({ count: 0 }, false, 'reset')
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
@@ -642,17 +640,17 @@ describe('more complex state spec with subscribeWithSelector', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.foo)
-      useBoundStore().foo
-      useBoundStore.getState().foo
-      useBoundStore.subscribe(
+      void useBoundStore((s) => s.foo)
+      void useBoundStore().foo
+      void useBoundStore.getState().foo
+      void useBoundStore.subscribe(
         (state) => state.foo,
         (foo) => console.log(foo),
       )
-      useBoundStore.persist.hasHydrated()
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -669,16 +667,16 @@ describe('more complex state spec with subscribeWithSelector', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.foo)
-      useBoundStore().foo
-      useBoundStore.getState().foo
-      useBoundStore.subscribe(
+      void useBoundStore((s) => s.foo)
+      void useBoundStore().foo
+      void useBoundStore.getState().foo
+      void useBoundStore.subscribe(
         (state) => state.foo,
         (foo) => console.log(foo),
       )
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 
@@ -701,15 +699,15 @@ describe('more complex state spec with subscribeWithSelector', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.authenticated)
-      useBoundStore((s) => s.authenticate)('u', 'p')
-      useBoundStore().authenticated
-      useBoundStore().authenticate('u', 'p')
-      useBoundStore.getState().authenticated
-      useBoundStore.getState().authenticate('u', 'p')
+      void useBoundStore((s) => s.authenticated)
+      void useBoundStore((s) => s.authenticate)('u', 'p')
+      void useBoundStore().authenticated
+      void useBoundStore().authenticate('u', 'p')
+      void useBoundStore.getState().authenticated
+      void useBoundStore.getState().authenticate('u', 'p')
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
@@ -734,21 +732,21 @@ describe('create with explicitly annotated mutators', () => {
       ),
     )
     const TestComponent = () => {
-      useBoundStore((s) => s.count) * 2
-      useBoundStore((s) => s.inc)()
-      useBoundStore().count * 2
-      useBoundStore().inc()
-      useBoundStore.getState().count * 2
-      useBoundStore.getState().inc()
-      useBoundStore.subscribe(
+      void (useBoundStore((s) => s.count) * 2)
+      void useBoundStore((s) => s.inc)()
+      void (useBoundStore().count * 2)
+      void useBoundStore().inc()
+      void (useBoundStore.getState().count * 2)
+      void useBoundStore.getState().inc()
+      void useBoundStore.subscribe(
         (state) => state.count,
         (count) => console.log(count * 2),
       )
-      useBoundStore.setState({ count: 0 }, false)
-      useBoundStore.persist.hasHydrated()
+      void useBoundStore.setState({ count: 0 }, false)
+      void useBoundStore.persist.hasHydrated()
       return <></>
     }
-    TestComponent
+    void TestComponent
     expect(useBoundStore).toBeDefined()
   })
 })
