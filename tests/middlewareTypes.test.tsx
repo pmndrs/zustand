@@ -776,7 +776,9 @@ describe('create with explicitly annotated mutators', () => {
           (count) => console.log(count * 2),
         ),
       ).toEqualTypeOf<() => void>()
-      expectTypeOf(useBoundStore.setState({ count: 0 }, false)).toEqualTypeOf<unknown>()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false),
+      ).toEqualTypeOf<unknown>()
       expectTypeOf(useBoundStore.persist.hasHydrated()).toEqualTypeOf<boolean>()
       return <></>
     }
