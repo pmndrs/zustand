@@ -151,7 +151,7 @@ afterEach(() => {
 
 ```ts
 // setup-jest.ts
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 ```
 
 ```ts
@@ -261,7 +261,7 @@ afterEach(() => {
 
 ```ts
 // setup-vitest.ts
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 
 vi.mock('zustand') // to make it work like Jest (auto-mocking)
 ```
