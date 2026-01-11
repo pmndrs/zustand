@@ -96,23 +96,23 @@ describe('counter state spec (single middleware)', () => {
               type OmitFn<T> = Exclude<T, (...args: any[]) => any>
               expectTypeOf<
                 OmitFn<Parameters<typeof set>[0]>
-              >().not.toHaveProperty('additional')
-              expectTypeOf<ReturnType<typeof get>>().toHaveProperty(
-                'additional',
-              )
+              >().not.toExtend<{ additional: number }>()
+              expectTypeOf<ReturnType<typeof get>>().toExtend<{
+                additional: number
+              }>()
             }),
         })),
       ),
     )
     expect(testDerivedSetStateType).toBeDefined()
     // the type of the `getState` should include our new property
-    expectTypeOf(testDerivedSetStateType.getState()).toHaveProperty(
-      'additional',
-    )
+    expectTypeOf(testDerivedSetStateType.getState()).toExtend<{
+      additional: number
+    }>()
     // the type of the `setState` should not include our new property
     expectTypeOf<
       Parameters<typeof testDerivedSetStateType.setState>[0]
-    >().not.toHaveProperty('additional')
+    >().not.toExtend<{ additional: number }>()
   })
 
   it('redux', () => {
