@@ -55,7 +55,7 @@ If you would like to contribute by fixing an open issue or developing a new feat
 
 ##### Core
 
-1. Run `npm install` to install dependencies.
+1. Run `pnpm install` to install dependencies.
 2. Create failing tests for your fix or new feature in the [`tests`](./tests/) folder.
 3. Implement your changes.
 4. Run `pnpm run build` to build the library. _(Pro-tip: `pnpm run build-watch` runs the build in watch mode)_
