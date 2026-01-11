@@ -53,7 +53,6 @@ describe('counter state spec (no middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
 
@@ -303,7 +302,6 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('persist without custom api (#638)', () => {
@@ -326,7 +324,6 @@ describe('counter state spec (single middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
 
@@ -363,7 +360,6 @@ describe('counter state spec (double middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('devtools & redux', () => {
@@ -400,7 +396,6 @@ describe('counter state spec (double middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('devtools & combine', () => {
@@ -425,7 +420,6 @@ describe('counter state spec (double middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('subscribeWithSelector & combine', () => {
@@ -450,7 +444,6 @@ describe('counter state spec (double middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('devtools & subscribeWithSelector', () => {
@@ -482,7 +475,6 @@ describe('counter state spec (double middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('devtools & persist', () => {
@@ -512,7 +504,6 @@ describe('counter state spec (double middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
 
@@ -547,7 +538,6 @@ describe('counter state spec (triple middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('devtools & subscribeWithSelector & combine', () => {
@@ -580,7 +570,6 @@ describe('counter state spec (triple middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('devtools & subscribeWithSelector & persist', () => {
@@ -618,7 +607,6 @@ describe('counter state spec (triple middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
 
@@ -661,7 +649,6 @@ describe('counter state spec (quadruple middleware)', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
 
@@ -689,7 +676,6 @@ describe('more complex state spec with subscribeWithSelector', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('#631', () => {
@@ -715,7 +701,6 @@ describe('more complex state spec with subscribeWithSelector', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 
   it('#650', () => {
@@ -756,7 +741,6 @@ describe('more complex state spec with subscribeWithSelector', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
 
@@ -797,6 +781,5 @@ describe('create with explicitly annotated mutators', () => {
       return <></>
     }
     expect(TestComponent).toBeDefined()
-    expect(useBoundStore).toBeDefined()
   })
 })
