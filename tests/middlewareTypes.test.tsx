@@ -94,9 +94,9 @@ describe('counter state spec (single middleware)', () => {
             set((state) => {
               state.count = get().count + 1
               type OmitFn<T> = Exclude<T, (...args: any[]) => any>
-              expectTypeOf<
-                OmitFn<Parameters<typeof set>[0]>
-              >().not.toExtend<{ additional: number }>()
+              expectTypeOf<OmitFn<Parameters<typeof set>[0]>>().not.toExtend<{
+                additional: number
+              }>()
               expectTypeOf<ReturnType<typeof get>>().toExtend<{
                 additional: number
               }>()
