@@ -98,14 +98,18 @@ describe('counter state spec (single middleware)', () => {
               expectTypeOf<
                 OmitFn<Parameters<typeof set>[0]>
               >().not.toHaveProperty('additional')
-              expectTypeOf<ReturnType<typeof get>>().toHaveProperty('additional')
+              expectTypeOf<ReturnType<typeof get>>().toHaveProperty(
+                'additional',
+              )
             }),
         })),
       ),
     )
     expect(testDerivedSetStateType).toBeDefined()
     // the type of the `getState` should include our new property
-    expectTypeOf(testDerivedSetStateType.getState()).toHaveProperty('additional')
+    expectTypeOf(testDerivedSetStateType.getState()).toHaveProperty(
+      'additional',
+    )
     // the type of the `setState` should not include our new property
     expectTypeOf<
       Parameters<typeof testDerivedSetStateType.setState>[0]
@@ -128,9 +132,15 @@ describe('counter state spec (single middleware)', () => {
     )
     const TestComponent = () => {
       expectTypeOf(useBoundStore((s) => s.count) * 2).toEqualTypeOf<number>()
-      expectTypeOf(useBoundStore((s) => s.dispatch)({ type: 'INC' })).toEqualTypeOf<{ type: 'INC' }>()
-      expectTypeOf(useBoundStore().dispatch({ type: 'INC' })).toEqualTypeOf<{ type: 'INC' }>()
-      expectTypeOf(useBoundStore.dispatch({ type: 'INC' })).toEqualTypeOf<{ type: 'INC' }>()
+      expectTypeOf(
+        useBoundStore((s) => s.dispatch)({ type: 'INC' }),
+      ).toEqualTypeOf<{ type: 'INC' }>()
+      expectTypeOf(useBoundStore().dispatch({ type: 'INC' })).toEqualTypeOf<{
+        type: 'INC'
+      }>()
+      expectTypeOf(useBoundStore.dispatch({ type: 'INC' })).toEqualTypeOf<{
+        type: 'INC'
+      }>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -158,7 +168,9 @@ describe('counter state spec (single middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -345,7 +357,9 @@ describe('counter state spec (double middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -371,10 +385,18 @@ describe('counter state spec (double middleware)', () => {
     )
     const TestComponent = () => {
       expectTypeOf(useBoundStore((s) => s.count) * 2).toEqualTypeOf<number>()
-      expectTypeOf(useBoundStore((s) => s.dispatch)({ type: 'INC' })).toEqualTypeOf<{ type: 'INC' }>()
-      expectTypeOf(useBoundStore().dispatch({ type: 'INC' })).toEqualTypeOf<{ type: 'INC' }>()
-      expectTypeOf(useBoundStore.dispatch({ type: 'INC' })).toEqualTypeOf<{ type: 'INC' }>()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      expectTypeOf(
+        useBoundStore((s) => s.dispatch)({ type: 'INC' }),
+      ).toEqualTypeOf<{ type: 'INC' }>()
+      expectTypeOf(useBoundStore().dispatch({ type: 'INC' })).toEqualTypeOf<{
+        type: 'INC'
+      }>()
+      expectTypeOf(useBoundStore.dispatch({ type: 'INC' })).toEqualTypeOf<{
+        type: 'INC'
+      }>()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -397,7 +419,9 @@ describe('counter state spec (double middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -446,11 +470,15 @@ describe('counter state spec (double middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.subscribe(
-        (state) => state.count,
-        (count) => console.log(count * 2),
-      )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      expectTypeOf(
+        useBoundStore.subscribe(
+          (state) => state.count,
+          (count) => console.log(count * 2),
+        ),
+      ).toEqualTypeOf<() => void>()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -477,8 +505,10 @@ describe('counter state spec (double middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<unknown>()
+      expectTypeOf(useBoundStore.persist.hasHydrated()).toEqualTypeOf<boolean>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -510,8 +540,10 @@ describe('counter state spec (triple middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<unknown>()
+      expectTypeOf(useBoundStore.persist.hasHydrated()).toEqualTypeOf<boolean>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -536,11 +568,15 @@ describe('counter state spec (triple middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.subscribe(
-        (state) => state.count,
-        (count) => console.log(count * 2),
-      )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
+      expectTypeOf(
+        useBoundStore.subscribe(
+          (state) => state.count,
+          (count) => console.log(count * 2),
+        ),
+      ).toEqualTypeOf<() => void>()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -569,12 +605,16 @@ describe('counter state spec (triple middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.subscribe(
-        (state) => state.count,
-        (count) => console.log(count * 2),
-      )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      expectTypeOf(
+        useBoundStore.subscribe(
+          (state) => state.count,
+          (count) => console.log(count * 2),
+        ),
+      ).toEqualTypeOf<() => void>()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<unknown>()
+      expectTypeOf(useBoundStore.persist.hasHydrated()).toEqualTypeOf<boolean>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -608,12 +648,16 @@ describe('counter state spec (quadruple middleware)', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.subscribe(
-        (state) => state.count,
-        (count) => console.log(count * 2),
-      )
-      useBoundStore.setState({ count: 0 }, false, 'reset')
-      useBoundStore.persist.hasHydrated()
+      expectTypeOf(
+        useBoundStore.subscribe(
+          (state) => state.count,
+          (count) => console.log(count * 2),
+        ),
+      ).toEqualTypeOf<() => void>()
+      expectTypeOf(
+        useBoundStore.setState({ count: 0 }, false, 'reset'),
+      ).toEqualTypeOf<unknown>()
+      expectTypeOf(useBoundStore.persist.hasHydrated()).toEqualTypeOf<boolean>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -693,12 +737,22 @@ describe('more complex state spec with subscribeWithSelector', () => {
       ),
     )
     const TestComponent = () => {
-      expectTypeOf(useBoundStore((s) => s.authenticated)).toEqualTypeOf<boolean>()
-      expectTypeOf(useBoundStore((s) => s.authenticate)('u', 'p')).resolves.toEqualTypeOf<void>()
+      expectTypeOf(
+        useBoundStore((s) => s.authenticated),
+      ).toEqualTypeOf<boolean>()
+      expectTypeOf(
+        useBoundStore((s) => s.authenticate)('u', 'p'),
+      ).resolves.toEqualTypeOf<void>()
       expectTypeOf(useBoundStore().authenticated).toEqualTypeOf<boolean>()
-      expectTypeOf(useBoundStore().authenticate('u', 'p')).resolves.toEqualTypeOf<void>()
-      expectTypeOf(useBoundStore.getState().authenticated).toEqualTypeOf<boolean>()
-      expectTypeOf(useBoundStore.getState().authenticate('u', 'p')).resolves.toEqualTypeOf<void>()
+      expectTypeOf(
+        useBoundStore().authenticate('u', 'p'),
+      ).resolves.toEqualTypeOf<void>()
+      expectTypeOf(
+        useBoundStore.getState().authenticated,
+      ).toEqualTypeOf<boolean>()
+      expectTypeOf(
+        useBoundStore.getState().authenticate('u', 'p'),
+      ).resolves.toEqualTypeOf<void>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
@@ -732,12 +786,14 @@ describe('create with explicitly annotated mutators', () => {
       expectTypeOf(useBoundStore().inc()).toEqualTypeOf<void>()
       expectTypeOf(useBoundStore.getState().count * 2).toEqualTypeOf<number>()
       expectTypeOf(useBoundStore.getState().inc()).toEqualTypeOf<void>()
-      useBoundStore.subscribe(
-        (state) => state.count,
-        (count) => console.log(count * 2),
-      )
-      useBoundStore.setState({ count: 0 }, false)
-      useBoundStore.persist.hasHydrated()
+      expectTypeOf(
+        useBoundStore.subscribe(
+          (state) => state.count,
+          (count) => console.log(count * 2),
+        ),
+      ).toEqualTypeOf<() => void>()
+      expectTypeOf(useBoundStore.setState({ count: 0 }, false)).toEqualTypeOf<unknown>()
+      expectTypeOf(useBoundStore.persist.hasHydrated()).toEqualTypeOf<boolean>()
       return <></>
     }
     expect(TestComponent).toBeDefined()
