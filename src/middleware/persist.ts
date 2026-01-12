@@ -198,6 +198,9 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   }
 
   let hasHydrated = false
+  // Counter to track hydration versions and prevent race conditions
+  // when multiple rehydrate() calls happen concurrently
+  let hydrationVersion = 0
   const hydrationListeners = new Set<PersistListener<S>>()
   const finishHydrationListeners = new Set<PersistListener<S>>()
   let storage = options.storage
@@ -255,6 +258,8 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     // as a backup  to 'get()' so listeners and 'onRehydrateStorage' are called with
     // the latest available state.
 
+    // Increment version to invalidate any in-flight hydration
+    const currentVersion = ++hydrationVersion
     hasHydrated = false
     hydrationListeners.forEach((cb) => cb(get() ?? configResult))
 
@@ -289,6 +294,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         return [false, undefined] as const
       })
       .then((migrationResult) => {
+        // Abort if a newer hydration has started
+        if (currentVersion !== hydrationVersion) {
+          return
+        }
         const [migrated, migratedState] = migrationResult
         stateFromStorage = options.merge(
           migratedState as S,
@@ -301,6 +310,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         }
       })
       .then(() => {
+        // Abort if a newer hydration has started
+        if (currentVersion !== hydrationVersion) {
+          return
+        }
         // TODO: In the asynchronous case, it's possible that the state has changed
         // since it was set in the prior callback. As such, it would be better to
         // pass 'get()' to the 'postRehydrationCallback' to ensure the most up-to-date
@@ -318,6 +331,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
       .catch((e: Error) => {
+        // Abort if a newer hydration has started
+        if (currentVersion !== hydrationVersion) {
+          return
+        }
         postRehydrationCallback?.(undefined, e)
       })
   }
