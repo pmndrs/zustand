@@ -151,7 +151,7 @@ afterEach(() => {
 
 ```ts
 // setup-jest.ts
-import '@testing-library/jest-dom/vitest'
+import '@testing-library/jest-dom'
 ```
 
 ```ts
