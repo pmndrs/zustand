@@ -3,7 +3,7 @@
   "description": "🐻 Bear necessities for state management in React",
   "private": true,
   "type": "commonjs",
-  "version": "5.0.9",
+  "version": "5.0.10",
   "main": "./index.js",
   "types": "./index.d.ts",
   "typesVersions": {
