@@ -31,86 +31,83 @@ function Counter() {
   return <div>bears: {bears}</div>
 }
 
-describe.skipIf(!React.version.startsWith('18'))(
-  'ssr behavior with react 18',
-  () => {
-    it('should handle different states between server and client correctly', async () => {
-      const { hydrateRoot } =
-        await vi.importActual<typeof import('react-dom/client')>(
-          'react-dom/client',
-        )
+describe('ssr behavior with react 18+', () => {
+  it('should handle different states between server and client correctly', async () => {
+    const { hydrateRoot } =
+      await vi.importActual<typeof import('react-dom/client')>(
+        'react-dom/client',
+      )
 
-      const view = renderToString(
+    const view = renderToString(
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <Counter />
+      </React.Suspense>,
+    )
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    container.innerHTML = view
+
+    expect(container).toHaveTextContent(/bears: 0/)
+
+    await act(async () => {
+      hydrateRoot(
+        container,
         <React.Suspense fallback={<div>Loading...</div>}>
           <Counter />
         </React.Suspense>,
       )
-
-      const container = document.createElement('div')
-      document.body.appendChild(container)
-      container.innerHTML = view
-
-      expect(container).toHaveTextContent(/bears: 0/)
-
-      await act(async () => {
-        hydrateRoot(
-          container,
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <Counter />
-          </React.Suspense>,
-        )
-      })
-
-      expect(screen.getByText('bears: 1')).toBeInTheDocument()
-      document.body.removeChild(container)
     })
-    it('should not have hydration errors', async () => {
-      const useStore = create(() => ({
-        bears: 0,
-      }))
 
-      const { hydrateRoot } =
-        await vi.importActual<typeof import('react-dom/client')>(
-          'react-dom/client',
-        )
+    expect(screen.getByText('bears: 1')).toBeInTheDocument()
+    document.body.removeChild(container)
+  })
+  it('should not have hydration errors', async () => {
+    const useStore = create(() => ({
+      bears: 0,
+    }))
 
-      const Component = () => {
-        const bears = useStore((state) => state.bears)
-        return <div>bears: {bears}</div>
-      }
+    const { hydrateRoot } =
+      await vi.importActual<typeof import('react-dom/client')>(
+        'react-dom/client',
+      )
 
-      const view = renderToString(
+    const Component = () => {
+      const bears = useStore((state) => state.bears)
+      return <div>bears: {bears}</div>
+    }
+
+    const view = renderToString(
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <Component />
+      </React.Suspense>,
+    )
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    container.innerHTML = view
+
+    expect(container).toHaveTextContent(/bears: 0/)
+
+    const consoleMock = vi.spyOn(console, 'error')
+
+    const hydratePromise = act(async () => {
+      hydrateRoot(
+        container,
         <React.Suspense fallback={<div>Loading...</div>}>
           <Component />
         </React.Suspense>,
       )
-
-      const container = document.createElement('div')
-      document.body.appendChild(container)
-      container.innerHTML = view
-
-      expect(container).toHaveTextContent(/bears: 0/)
-
-      const consoleMock = vi.spyOn(console, 'error')
-
-      const hydratePromise = act(async () => {
-        hydrateRoot(
-          container,
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <Component />
-          </React.Suspense>,
-        )
-      })
-
-      // set state during hydration
-      useStore.setState({ bears: 1 })
-
-      await hydratePromise
-
-      expect(consoleMock).toHaveBeenCalledTimes(0)
-
-      expect(screen.getByText('bears: 1')).toBeInTheDocument()
-      document.body.removeChild(container)
     })
-  },
-)
+
+    // set state during hydration
+    useStore.setState({ bears: 1 })
+
+    await hydratePromise
+
+    expect(consoleMock).toHaveBeenCalledTimes(0)
+
+    expect(screen.getByText('bears: 1')).toBeInTheDocument()
+    document.body.removeChild(container)
+  })
+})
