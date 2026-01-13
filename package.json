@@ -62,6 +62,7 @@
   "scripts": {
     "prebuild": "shx rm -rf dist",
     "build": "pnpm run prebuild && pnpm run \"/^build:.*/\" && pnpm run postbuild",
+    "build-watch": "pnpm run \"/^build:.*/\" --watch",
     "build:base": "rollup -c",
     "build:vanilla": "rollup -c --config-vanilla",
     "build:react": "rollup -c --config-react",
