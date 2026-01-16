@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: How to use Zustand
+description: How to use Zustand!
 nav: 0
 ---
 
