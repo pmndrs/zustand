@@ -15,11 +15,11 @@ const hashStorage: StateStorage = {
   getItem: (key): string => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
     const storedValue = searchParams.get(key) ?? ''
-    return JSON.parse(storedValue)
+    return storedValue as string
   },
   setItem: (key, newValue): void => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
-    searchParams.set(key, JSON.stringify(newValue))
+    searchParams.set(key, newValue)
     location.hash = searchParams.toString()
   },
   removeItem: (key): void => {
@@ -67,7 +67,7 @@ const persistentStorage: StateStorage = {
     if (getUrlSearch()) {
       const searchParams = new URLSearchParams(getUrlSearch())
       const storedValue = searchParams.get(key)
-      return JSON.parse(storedValue as string)
+      return storedValue as string
     } else {
       // Otherwise, we should load from localstorage or alternative storage
       return JSON.parse(localStorage.getItem(key) as string)
@@ -77,11 +77,11 @@ const persistentStorage: StateStorage = {
     // Check if query params exist at all, can remove check if always want to set URL
     if (getUrlSearch()) {
       const searchParams = new URLSearchParams(getUrlSearch())
-      searchParams.set(key, JSON.stringify(newValue))
+      searchParams.set(key, newValue)
       window.history.replaceState(null, '', `?${searchParams.toString()}`)
     }
 
-    localStorage.setItem(key, JSON.stringify(newValue))
+    localStorage.setItem(key, newValue)
   },
   removeItem: (key): void => {
     const searchParams = new URLSearchParams(getUrlSearch())
