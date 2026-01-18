@@ -27,9 +27,13 @@ type Message = {
 }
 
 type WithDispatch = {
-  dispatch: (...args: any[]) => any
-  dispatchFromDevtools: boolean
+  dispatch: (...args: unknown[]) => void
+  dispatchFromDevtools: true
 }
+
+const hasDispatch = (api: unknown): api is WithDispatch =>
+  typeof (api as WithDispatch).dispatch === 'function' &&
+  (api as WithDispatch).dispatchFromDevtools
 
 type Cast<T, U> = T extends U ? T : U
 type Write<T, U> = Omit<T, keyof U> & U
@@ -184,7 +188,6 @@ const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
     const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
-    const apiWithDispatch = api as typeof api & WithDispatch
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -276,13 +279,10 @@ const devtoolsImpl: DevtoolsImpl =
       )
     }
 
-    if (
-      apiWithDispatch.dispatchFromDevtools &&
-      typeof apiWithDispatch.dispatch === 'function'
-    ) {
+    if (hasDispatch(api)) {
       let didWarnAboutReservedActionType = false
-      const originalDispatch = apiWithDispatch.dispatch
-      apiWithDispatch.dispatch = (...args: any[]) => {
+      const originalDispatch = api.dispatch
+      api.dispatch = (...args: any[]) => {
         if (
           import.meta.env?.MODE !== 'production' &&
           args[0].type === '__setState' &&
@@ -347,9 +347,9 @@ const devtoolsImpl: DevtoolsImpl =
                 return
               }
 
-              if (!apiWithDispatch.dispatchFromDevtools) return
-              if (typeof apiWithDispatch.dispatch !== 'function') return
-              apiWithDispatch.dispatch(action)
+              if (hasDispatch(api)) {
+                api.dispatch(action)
+              }
             },
           )
 
