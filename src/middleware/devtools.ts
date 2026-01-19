@@ -28,12 +28,12 @@ type Message = {
 
 type WithDispatch = {
   dispatch: (...args: unknown[]) => void
-  dispatchFromDevtools: true
+  dispatchFromDevtools: unknown
 }
 
-const hasDispatch = (api: unknown): api is WithDispatch =>
-  typeof (api as WithDispatch).dispatch === 'function' &&
-  (api as WithDispatch).dispatchFromDevtools
+const shouldDispatchFromDevtools = (api: unknown): api is WithDispatch =>
+  (api as WithDispatch).dispatchFromDevtools === true &&
+  typeof (api as WithDispatch).dispatch === 'function'
 
 type Cast<T, U> = T extends U ? T : U
 type Write<T, U> = Omit<T, keyof U> & U
@@ -279,7 +279,7 @@ const devtoolsImpl: DevtoolsImpl =
       )
     }
 
-    if (hasDispatch(api)) {
+    if (shouldDispatchFromDevtools(api)) {
       let didWarnAboutReservedActionType = false
       const originalDispatch = api.dispatch
       api.dispatch = (...args: any[]) => {
@@ -347,7 +347,7 @@ const devtoolsImpl: DevtoolsImpl =
                 return
               }
 
-              if (hasDispatch(api)) {
+              if (shouldDispatchFromDevtools(api)) {
                 api.dispatch(action)
               }
             },
