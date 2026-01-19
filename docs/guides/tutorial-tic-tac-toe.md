@@ -556,7 +556,7 @@ both cases:
 function handleClick(i) {
   if (squares[i] || winner) return
   const nextSquares = squares.slice()
-  nextSquares[i] = player'
+  nextSquares[i] = player
   setSquares(nextSquares)
   setXIsNext(!xIsNext)
 }
