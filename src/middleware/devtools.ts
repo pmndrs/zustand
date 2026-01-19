@@ -32,7 +32,7 @@ type WithDispatch = {
 }
 
 const shouldDispatchFromDevtools = (api: unknown): api is WithDispatch =>
-  (api as WithDispatch).dispatchFromDevtools === true &&
+  !!(api as WithDispatch).dispatchFromDevtools &&
   typeof (api as WithDispatch).dispatch === 'function'
 
 type Cast<T, U> = T extends U ? T : U
