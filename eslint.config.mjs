@@ -1,6 +1,6 @@
 import eslint from '@eslint/js'
 import vitest from '@vitest/eslint-plugin'
-import { defineConfig } from 'eslint/config'
+import { defineConfig, globalIgnores } from 'eslint/config'
 import importPlugin from 'eslint-plugin-import'
 import jestDom from 'eslint-plugin-jest-dom'
 import react from 'eslint-plugin-react'
@@ -9,9 +9,7 @@ import testingLibrary from 'eslint-plugin-testing-library'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
-  {
-    ignores: ['dist/', 'examples/', 'website/', 'coverage/'],
-  },
+  globalIgnores(['dist/', 'examples/', 'website/', 'coverage/']),
   eslint.configs.recommended,
   importPlugin.flatConfigs.recommended,
   tseslint.configs.recommended,
