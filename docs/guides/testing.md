@@ -352,7 +352,7 @@ export const CounterStoreProvider = ({
 }: CounterStoreProviderProps) => {
   const [store] = useState(() => createCounterStore())
   return (
-    <CounterStoreContext.Provider value={counterStoreRef.current}>
+    <CounterStoreContext.Provider value={store}>
       {children}
     </CounterStoreContext.Provider>
   )
@@ -567,7 +567,7 @@ export const CounterStoreProvider = ({
 }: CounterStoreProviderProps) => {
   const [store] = useState(() => createCounterStore())
   return (
-    <CounterStoreContext.Provider value={counterStoreRef.current}>
+    <CounterStoreContext.Provider value={store}>
       {children}
     </CounterStoreContext.Provider>
   )
