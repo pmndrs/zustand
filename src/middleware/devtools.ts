@@ -9,7 +9,7 @@ import type {
 type Config = Parameters<
   (Window extends { __REDUX_DEVTOOLS_EXTENSION__?: infer T }
     ? T
-    : { connect: (param: any) => any })['connect']
+    : { connect: (param: object) => object })['connect']
 >[0]
 
 declare module '../vanilla' {
@@ -25,6 +25,15 @@ type Message = {
   payload?: any
   state?: any
 }
+
+type WithDispatch = {
+  dispatch: (...args: unknown[]) => void
+  dispatchFromDevtools: unknown
+}
+
+const shouldDispatchFromDevtools = (api: unknown): api is WithDispatch =>
+  !!(api as WithDispatch).dispatchFromDevtools &&
+  typeof (api as WithDispatch).dispatch === 'function'
 
 type Cast<T, U> = T extends U ? T : U
 type Write<T, U> = Omit<T, keyof U> & U
@@ -204,7 +213,7 @@ const devtoolsImpl: DevtoolsImpl =
       extractConnectionInformation(store, extensionConnector, options)
 
     let isRecording = true
-    ;(api.setState as any) = ((state, replace, nameOrAction: Action) => {
+    api.setState = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
       if (!isRecording) return r
       const action: { type: string } =
@@ -270,13 +279,10 @@ const devtoolsImpl: DevtoolsImpl =
       )
     }
 
-    if (
-      (api as any).dispatchFromDevtools &&
-      typeof (api as any).dispatch === 'function'
-    ) {
+    if (shouldDispatchFromDevtools(api)) {
       let didWarnAboutReservedActionType = false
-      const originalDispatch = (api as any).dispatch
-      ;(api as any).dispatch = (...args: any[]) => {
+      const originalDispatch = api.dispatch
+      api.dispatch = (...args: any[]) => {
         if (
           import.meta.env?.MODE !== 'production' &&
           args[0].type === '__setState' &&
@@ -288,7 +294,7 @@ const devtoolsImpl: DevtoolsImpl =
           )
           didWarnAboutReservedActionType = true
         }
-        ;(originalDispatch as any)(...args)
+        originalDispatch(...args)
       }
     }
 
@@ -299,7 +305,7 @@ const devtoolsImpl: DevtoolsImpl =
           listener: (message: Message) => void,
         ) => (() => void) | undefined
       }
-    ).subscribe((message: any) => {
+    ).subscribe((message) => {
       switch (message.type) {
         case 'ACTION':
           if (typeof message.payload !== 'string') {
@@ -341,9 +347,9 @@ const devtoolsImpl: DevtoolsImpl =
                 return
               }
 
-              if (!(api as any).dispatchFromDevtools) return
-              if (typeof (api as any).dispatch !== 'function') return
-              ;(api as any).dispatch(action)
+              if (shouldDispatchFromDevtools(api)) {
+                api.dispatch(action)
+              }
             },
           )
 
