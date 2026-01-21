@@ -270,7 +270,7 @@ export const useBearStore = create<BearState>()(
   persist(
     (set) => ({
       bears: 0,
-      increase: () => set((s) => ({ bears: s.bears + 1 })), // <-- тип явно
+      increase: () => set((s) => ({ bears: s.bears + 1 })),
     }),
     { name: 'bear-storage' }, // localStorage key
   ),
