@@ -6,7 +6,7 @@ type Immer = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  U = T
+  U = T,
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs, U>,
 ) => StateCreator<T, Mps, [['zustand/immer', never], ...Mcs], U>
