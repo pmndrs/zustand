@@ -787,7 +787,7 @@ describe('create with explicitly annotated mutators', () => {
 })
 
 describe('single middleware with sliced store', () => {
-  it('immer', () => {
+  it('immer with slices where slice type differs from store (#3371)', () => {
     interface BearSlice {
       bears: number
       addBear: () => void
