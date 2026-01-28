@@ -785,3 +785,53 @@ describe('create with explicitly annotated mutators', () => {
     expect(TestComponent).toBeDefined()
   })
 })
+
+describe('single middleware with sliced store', () => {
+  it('immer with slices where slice type differs from store (#3371)', () => {
+    interface BearSlice {
+      bears: number
+      addBear: () => void
+      eatFish: () => void
+    }
+
+    interface FishSlice {
+      fishes: number
+      addFish: () => void
+    }
+
+    const createBearSlice: StateCreator<
+      BearSlice & FishSlice,
+      [['zustand/immer', never]],
+      [],
+      BearSlice
+    > = (set) => ({
+      bears: 0,
+      addBear: () => set((state) => ({ bears: state.bears + 1 })),
+      eatFish: () => set((state) => ({ fishes: state.fishes - 1 })),
+    })
+
+    const createFishSlice: StateCreator<
+      BearSlice & FishSlice,
+      [['zustand/immer', never]],
+      [],
+      FishSlice
+    > = (set) => ({
+      fishes: 0,
+      addFish: () => set((state) => ({ fishes: state.fishes + 1 })),
+    })
+
+    const useBoundStore = create<BearSlice & FishSlice>()((...a) => ({
+      ...immer(createBearSlice)(...a),
+      ...immer(createFishSlice)(...a),
+    }))
+
+    const TestComponent = () => {
+      expectTypeOf(useBoundStore((s) => s.bears)).toEqualTypeOf<number>()
+      expectTypeOf(useBoundStore((s) => s.fishes)).toEqualTypeOf<number>()
+      expectTypeOf(useBoundStore((s) => s.addBear)()).toEqualTypeOf<void>()
+      expectTypeOf(useBoundStore((s) => s.eatFish)()).toEqualTypeOf<void>()
+      return <></>
+    }
+    expect(TestComponent).toBeDefined()
+  })
+})
