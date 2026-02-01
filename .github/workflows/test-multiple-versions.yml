@@ -20,8 +20,8 @@ jobs:
           - 19.0.0
           - 19.1.0
           - 19.2.0
-          - 19.3.0-canary-d6cae440-20260106
-          - 0.0.0-experimental-d6cae440-20260106
+          - 19.3.0-canary-da641178-20260129
+          - 0.0.0-experimental-da641178-20260129
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
