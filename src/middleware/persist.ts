@@ -73,7 +73,7 @@ export interface PersistOptions<
    * Combining `createJSONStorage` helps creating a persist storage
    * with JSON.parse and JSON.stringify.
    *
-   * @default createJSONStorage(() => localStorage)
+   * @default createJSONStorage(() => window.localStorage)
    */
   storage?: PersistStorage<PersistedState, PersistReturn> | undefined
   /**
@@ -187,7 +187,7 @@ const toThenable =
 const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   type S = ReturnType<typeof config>
   let options = {
-    storage: createJSONStorage<S, void>(() => localStorage),
+    storage: createJSONStorage<S, void>(() => window.localStorage),
     partialize: (state: S) => state,
     version: 0,
     merge: (persistedState: unknown, currentState: S) => ({
