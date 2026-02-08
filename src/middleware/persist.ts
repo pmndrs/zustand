@@ -39,6 +39,11 @@ export function createJSONStorage<S, R = unknown>(
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
     return
   }
+  if (!storage || typeof storage.setItem !== 'function') {
+    throw new Error(
+      'Storage does not have setItem method. Please provide a valid storage object.',
+    )
+  }
   const persistStorage: PersistStorage<S, R> = {
     getItem: (name) => {
       const parse = (str: string | null) => {

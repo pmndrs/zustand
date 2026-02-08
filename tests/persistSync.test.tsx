@@ -757,4 +757,31 @@ describe('persist middleware with sync configuration', () => {
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
     expect(setItem).toBeCalledTimes(0)
   })
+
+  it('throws error when storage does not have setItem method (Node 25 stub)', () => {
+    // Node 25 with --localstorage-file flag without a path creates a bare {} object
+    const invalidStorage = {} as any
+
+    expect(() => {
+      createJSONStorage(() => invalidStorage)
+    }).toThrow('Storage does not have setItem method')
+  })
+
+  it('throws error when storage is null', () => {
+    expect(() => {
+      createJSONStorage(() => null as any)
+    }).toThrow('Storage does not have setItem method')
+  })
+
+  it('throws error when storage has setItem but it is not a function', () => {
+    const invalidStorage = {
+      getItem: () => null,
+      setItem: 'not-a-function',
+      removeItem: () => {},
+    } as any
+
+    expect(() => {
+      createJSONStorage(() => invalidStorage)
+    }).toThrow('Storage does not have setItem method')
+  })
 })
