@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@v2
+    uses: pmndrs/docs/.github/workflows/build.yml@5be39035b7f84cd67f8f0b2b05f24b4fc8274d99 # v2.20.4
     with:
       mdx: 'docs'
       libname: 'Zustand'
@@ -37,4 +37,4 @@ jobs:
 
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
