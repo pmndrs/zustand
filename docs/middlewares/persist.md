@@ -24,6 +24,9 @@ const nextStateCreatorFn = persist(stateCreatorFn, persistOptions)
   - [Persisting a state through versioning and migrations](#persisting-a-state-through-versioning-and-migrations)
   - [Persisting a state with nested objects](#persisting-a-state-with-nested-objects)
   - [Persisting a state and hydrate it manually](#persisting-a-state-and-hydrate-it-manually)
+  - [Clearing persisted data](#clearing-persisted-data)
+  - [onRehydrateStorage patterns](#onrehydratestorage-patterns)
+  - [Handling initial state](#handling-initial-state)
 - [Troubleshooting](#troubleshooting)
 
 ## Types
@@ -131,7 +134,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here’s the complete code.
+Here's the complete code.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
@@ -174,7 +177,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here's the `html` code
+Here's the `HTML` code
 
 ```html
 <div
@@ -192,10 +195,10 @@ Here's the `html` code
 
 In this tutorial, we'll create a simple position tracker using vanilla store and the `persist`
 middleware. Additionally, we'll show you how to persist only part of the state
-(partial persistence), which can be useful when you don’t want to store the entire state in
+(partial persistence), which can be useful when you don't want to store the entire state in
 `localStorage`.
 
-We’ll first create a vanilla store that holds the position state and actions to update it. We'll
+We'll first create a vanilla store that holds the position state and actions to update it. We'll
 use the `persist` middleware to persist only the relevant part of the state (in this case, the
 context containing the position).
 
@@ -264,7 +267,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here’s the full code to create a dot that follows your mouse movement inside a container and
+Here's the full code to create a dot that follows your mouse movement inside a container and
 persists the `context` in `localStorage`.
 
 ```ts
@@ -323,7 +326,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here's the `html` code
+Here's the `HTML` code
 
 ```html
 <div
@@ -339,7 +342,7 @@ Here's the `html` code
 
 ### Persisting a state with custom storage
 
-In this mini tutorial, we’ll create a simple position-tracking system using vanilla store, where
+In this mini tutorial, we'll create a simple position-tracking system using vanilla store, where
 the position state is persisted in the URL's search parameters. This approach allows state
 persistence directly in the browser's URL, which can be useful for maintaining state across page
 reloads or sharing links with state embedded.
@@ -393,7 +396,7 @@ const searchParamsStorage = {
 ```
 
 Now, we initialize the vanilla store using the `persist` middleware, specifying that we want to use
-our custom storage. Instead of the default `localStorage` or `sessionStorage`, we’ll persist the
+our custom storage. Instead of the default `localStorage` or `sessionStorage`, we'll persist the
 position data in the URL search parameters.
 
 ```ts
@@ -449,7 +452,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here’s the full code to create a dot that follows your mouse movement inside a container and
+Here's the full code to create a dot that follows your mouse movement inside a container and
 persists the position in URL's search parameters.
 
 ```ts
@@ -533,7 +536,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here's the `html` code
+Here's the `HTML` code
 
 ```html
 <div
@@ -549,7 +552,7 @@ Here's the `html` code
 
 ### Persisting a state through versioning and migrations
 
-In this tutorial, we’ll explore how to manage state persistence using versioning and migration.
+In this tutorial, we'll explore how to manage state persistence using versioning and migration.
 We will demonstrate how to evolve your state schema across versions without breaking existing
 persisted data.
 
@@ -613,7 +616,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here’s the complete code.
+Here's the complete code.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
@@ -679,7 +682,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here's the `html` code
+Here's the `HTML` code
 
 ```html
 <div
@@ -695,12 +698,12 @@ Here's the `html` code
 
 ### Persisting a state with nested objects
 
-In this tutorial, we’ll create a vanilla store that keeps track of a position represented by `x`
+In this tutorial, we'll create a vanilla store that keeps track of a position represented by `x`
 and `y` coordinates. We will also implement persistence using `localStorage` and demonstrate how to
 handle merging of state with potentially missing fields.
 
 To simulate an initial state for the tutorial, we will check if our position data exists in
-`localStorage`. If it doesn't, we’ll set it up.
+`localStorage`. If it doesn't, we'll set it up.
 
 ```ts
 if (!localStorage.getItem('position-storage')) {
@@ -772,7 +775,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here’s the complete code.
+Here's the complete code.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
@@ -833,7 +836,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here's the `html` code
+Here's the `HTML` code
 
 ```html
 <div
@@ -849,7 +852,7 @@ Here's the `html` code
 
 ### Persisting a state and hydrate it manually
 
-In this tutorial, we’ll create a vanilla store that keeps track of a position represented by `x`
+In this tutorial, we'll create a vanilla store that keeps track of a position represented by `x`
 and `y` coordinates. We will also implement persistence using `localStorage` and explore how to
 skip the hydration process and manually trigger rehydration after a delay.
 
@@ -883,7 +886,7 @@ const positionStore = createStore<PositionStore>()(
 )
 ```
 
-Since we skipped hydration in the initial setup, we will manually rehydrate the state. Here, we’re
+Since we skipped hydration in the initial setup, we will manually rehydrate the state. Here, we're
 using `setTimeout` to simulate a delayed rehydration.
 
 ```ts
@@ -919,7 +922,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here’s the complete code.
+Here's the complete code.
 
 ```ts
 import { createStore } from 'zustand/vanilla'
@@ -969,7 +972,7 @@ render(positionStore.getState(), positionStore.getState())
 positionStore.subscribe(render)
 ```
 
-Here's the `html` code
+Here's the `HTML` code
 
 ```html
 <div
@@ -983,6 +986,374 @@ Here's the `html` code
 </div>
 ```
 
+### Clearing persisted data
+
+In this tutorial, we'll explore how to clear persisted data from your store. This is useful when
+users want to reset their application state or when you need to clear sensitive information.
+
+There are several ways to clear persisted data depending on your use case.
+
+#### Clear all persisted data
+
+To clear all persisted data for a store, use the `clearStorage` method:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+type Store = {
+  count: number
+  increment: () => void
+  reset: () => void
+}
+
+const useStore = create<Store>()(
+  persist(
+    (set) => ({
+      count: 0,
+      increment: () => set((state) => ({ count: state.count + 1 })),
+      reset: () => set({ count: 0 }),
+    }),
+    { name: 'my-store' },
+  ),
+)
+
+// Clear all persisted data
+useStore.persist.clearStorage()
+```
+
+#### Clear specific key
+
+If you need to clear data for a specific store, you can remove it directly from storage:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({ count: 0 }),
+    { name: 'my-store' },
+  ),
+)
+
+// Clear the specific store's data
+localStorage.removeItem('my-store')
+```
+
+#### User-triggered reset pattern
+
+A common pattern is to provide a reset button that clears persisted data:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+type Store = {
+  formData: { name: string; email: string } | null
+  setFormData: (data: { name: string; email: string }) => void
+  clearForm: () => void
+}
+
+const useFormStore = create<Store>()(
+  persist(
+    (set) => ({
+      formData: null,
+      setFormData: (data) => set({ formData: data }),
+      clearForm: () => set({ formData: null }),
+    }),
+    { name: 'form-storage' },
+  ),
+)
+
+function ResetButton() {
+  const clearForm = useFormStore((state) => state.clearForm)
+  const clearStorage = useFormStore.persist.clearStorage
+
+  const handleReset = () => {
+    clearForm()
+    clearStorage()
+  }
+
+  return <button onClick={handleReset}>Clear All Data</button>
+}
+```
+
+### onRehydrateStorage patterns
+
+The `onRehydrateStorage` option allows you to execute logic before and after the store is hydrated
+from storage. This is useful for logging, analytics, or coordinating with other systems.
+
+#### Basic pattern
+
+The simplest pattern is to return a callback that runs after hydration:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({ count: 0 }),
+    {
+      name: 'my-store',
+      onRehydrateStorage: () => (state) => {
+        console.log('hydration finished', state)
+      },
+    },
+  ),
+)
+```
+
+#### Before and after callbacks
+
+You can also track both before and after hydration by returning a function from the callback:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({ count: 0 }),
+    {
+      name: 'my-store',
+      onRehydrateStorage: () => (state) => {
+        console.log('about to hydrate', state)
+        return (finalState) => {
+          console.log('hydrated', finalState)
+        }
+      },
+    },
+  ),
+)
+```
+
+#### Async initialization
+
+You can use the hydration callback to perform async operations like tracking analytics:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({
+      count: 0,
+      lastVisit: null,
+    }),
+    {
+      name: 'my-store',
+      onRehydrateStorage: () => async (state) => {
+        if (state) {
+          // Track that state was restored
+          await analytics.track('stateRestored', {
+            count: state.count,
+            lastVisit: state.lastVisit,
+          })
+        }
+      },
+    },
+  ),
+)
+```
+
+#### Error handling
+
+You can also handle hydration errors:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({ count: 0 }),
+    {
+      name: 'my-store',
+      onRehydrateStorage: () => (state) => {
+        console.log('hydration completed successfully')
+      },
+    },
+  ),
+)
+```
+
+### Handling initial state
+
+By default, Zustand returns the initial state immediately, then hydrates from storage. This means
+your store will have the default values first, then update with persisted values after hydration.
+
+#### Store-first behavior
+
+By default, the store returns initial state before hydration completes:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({
+      isLoading: true,
+      data: null,
+      count: 0,
+    }),
+    { name: 'my-store' },
+  ),
+)
+
+// Initially: { isLoading: true, data: null, count: 0 }
+// After hydration: { isLoading: false, data: {...}, count: 5 }
+```
+
+#### Loading state pattern
+
+A common pattern is to track loading state:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({
+      isLoading: true,
+      data: null,
+      count: 0,
+      _hasHydrated: false,
+    }),
+    {
+      name: 'my-store',
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state._hasHydrated = true
+        }
+      },
+    },
+  ),
+)
+
+// In your component:
+function MyComponent() {
+  const isLoading = useStore((state) => state.isLoading)
+  const hasHydrated = useStore((state) => state._hasHydrated)
+
+  if (isLoading || !hasHydrated) {
+    return <Loading />
+  }
+
+  return <Content />
+}
+```
+
+#### Skipping automatic hydration
+
+For SSR or when you need more control, use `skipHydration`:
+
+```ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+const useStore = create()(
+  persist(
+    (set) => ({
+      count: 0,
+      _hydrated: false,
+    }),
+    {
+      name: 'my-store',
+      skipHydration: true,
+    },
+  ),
+)
+
+// Manually trigger hydration when ready
+useStore.persist.rehydrate()
+
+// Or track when it completes
+useStore.persist.onHydrate(() => {
+  console.log('hydration triggered')
+})
+```
+
 ## Troubleshooting
 
-TBD
+### State not persisting across page reloads
+
+If your state isn't being persisted, check the following:
+
+1. **Unique name**: Ensure each store has a unique `name` in persist options.
+2. **Storage availability**: Verify `localStorage` is available (may be blocked in private browsing).
+3. **Storage quota**: Check if storage quota has been exceeded (5MB limit in most browsers).
+
+```ts
+const useStore = create()(
+  persist(
+    (set) => ({ count: 0 }),
+    { name: 'my-unique-store-name' },
+  ),
+)
+```
+
+### Hydration mismatch errors in React
+
+If you see hydration errors in React, you may need to skip initial hydration for SSR:
+
+```ts
+const useStore = create()(
+  persist(
+    (set) => ({ count: 0 }),
+    {
+      name: 'my-store',
+      skipHydration: true,
+    },
+  ),
+)
+
+// In your component
+useEffect(() => {
+  useStore.persist.rehydrate()
+}, [])
+```
+
+### State merging unexpectedly
+
+By default, persisted state is merged shallowly. If you have nested objects, use the `merge` option:
+
+```ts
+merge: (persisted, current) => deepMerge(current, persisted),
+```
+
+### Migration not running
+
+Make sure your `version` option is set higher than the stored version:
+
+```ts
+{
+  name: 'my-store',
+  version: 1, // Increment this when making breaking changes
+  migrate: (persisted, version) => {
+    // Migration logic
+  },
+}
+```
+
+### Custom storage not working
+
+Ensure your custom storage implements the correct interface:
+
+```ts
+const customStorage = {
+  getItem: (name: string) => string | null | Promise<string | null>,
+  setItem: (name: string, value: string) => void,
+  removeItem: (name: string) => void,
+}
+```
+
+If using `createJSONStorage`, your storage should return raw JSON strings.
+
+## Related
+
+- [zustand-persist-plus](https://github.com/PeterPCW/zustand-persist-plus) — Advanced persistence extensions including encryption, compression, migrations, and cloud sync adapters
