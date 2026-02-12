@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@5be39035b7f84cd67f8f0b2b05f24b4fc8274d99 # v2.20.4
+    uses: pmndrs/docs/.github/workflows/build.yml@v2 # v2.20.4
     with:
       mdx: 'docs'
       libname: 'Zustand'
