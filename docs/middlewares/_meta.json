@@ -1,0 +1,8 @@
+[
+  "persist",
+  "devtools",
+  "redux",
+  "immer",
+  "combine",
+  "subscribe-with-selector"
+]

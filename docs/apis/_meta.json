@@ -1,0 +1,6 @@
+[
+  "create",
+  "create-with-equality-fn",
+  "create-store",
+  "shallow"
+]
