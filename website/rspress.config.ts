@@ -1,5 +1,5 @@
-import * as path from 'node:path';
-import { defineConfig } from '@rspress/core';
+import * as path from 'node:path'
+import { defineConfig } from '@rspress/core'
 
 const learnSidebar = [
   {
@@ -129,7 +129,7 @@ const learnSidebar = [
       },
     ],
   },
-];
+]
 
 const referenceSidebar = [
   {
@@ -199,7 +199,7 @@ const referenceSidebar = [
       { text: 'Migrating to v4', link: '/migrations/migrating-to-v4' },
     ],
   },
-];
+]
 
 export default defineConfig({
   root: path.join(path.dirname(__dirname), 'docs'),
@@ -248,4 +248,4 @@ export default defineConfig({
       },
     ],
   },
-});
+})

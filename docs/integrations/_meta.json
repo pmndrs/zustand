@@ -1,5 +1,1 @@
-[
-  "persisting-store-data",
-  "immer-middleware",
-  "third-party-libraries"
-]
+["persisting-store-data", "immer-middleware", "third-party-libraries"]

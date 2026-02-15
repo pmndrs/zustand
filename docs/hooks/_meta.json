@@ -1,5 +1,1 @@
-[
-  "use-store",
-  "use-store-with-equality-fn",
-  "use-shallow"
-]
+["use-store", "use-store-with-equality-fn", "use-shallow"]
