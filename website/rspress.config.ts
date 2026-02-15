@@ -6,7 +6,10 @@ const learnSidebar = [
     text: 'Start here',
     items: [
       { text: 'Introduction', link: '/getting-started/introduction' },
-      { text: 'Comparison with other tools', link: '/getting-started/comparison' },
+      {
+        text: 'Comparison with other tools',
+        link: '/getting-started/comparison',
+      },
       { text: 'Tutorial: Tic Tac Toe', link: '/guides/tutorial-tic-tac-toe' },
     ],
   },
@@ -14,18 +17,33 @@ const learnSidebar = [
     text: 'State management basics',
     items: [
       { text: 'Updating state', link: '/guides/updating-state' },
-      { text: 'Practice with no store actions', link: '/guides/practice-with-no-store-actions' },
+      {
+        text: 'Practice with no store actions',
+        link: '/guides/practice-with-no-store-actions',
+      },
       { text: 'Slices pattern', link: '/guides/slices-pattern' },
-      { text: 'Immutable state and merging', link: '/guides/immutable-state-and-merging' },
+      {
+        text: 'Immutable state and merging',
+        link: '/guides/immutable-state-and-merging',
+      },
       { text: 'Maps and sets usage', link: '/guides/maps-and-sets-usage' },
     ],
   },
   {
     text: 'Performance and rendering',
     items: [
-      { text: 'Prevent rerenders with useShallow', link: '/guides/prevent-rerenders-with-use-shallow' },
-      { text: 'Connect to state with URL hash', link: '/guides/connect-to-state-with-url-hash' },
-      { text: 'Event handler in pre React 18', link: '/guides/event-handler-in-pre-react-18' },
+      {
+        text: 'Prevent rerenders with useShallow',
+        link: '/guides/prevent-rerenders-with-use-shallow',
+      },
+      {
+        text: 'Connect to state with URL hash',
+        link: '/guides/connect-to-state-with-url-hash',
+      },
+      {
+        text: 'Event handler in pre React 18',
+        link: '/guides/event-handler-in-pre-react-18',
+      },
     ],
   },
   {
@@ -33,7 +51,10 @@ const learnSidebar = [
     items: [
       { text: 'Beginner TypeScript', link: '/guides/beginner-typescript' },
       { text: 'Advanced TypeScript', link: '/guides/advanced-typescript' },
-      { text: 'Auto-generating selectors', link: '/guides/auto-generating-selectors' },
+      {
+        text: 'Auto-generating selectors',
+        link: '/guides/auto-generating-selectors',
+      },
     ],
   },
   {
@@ -41,14 +62,20 @@ const learnSidebar = [
     items: [
       { text: 'Next.js', link: '/guides/nextjs' },
       { text: 'SSR and hydration', link: '/guides/ssr-and-hydration' },
-      { text: 'Initialize state with props', link: '/guides/initialize-state-with-props' },
+      {
+        text: 'Initialize state with props',
+        link: '/guides/initialize-state-with-props',
+      },
     ],
   },
   {
     text: 'Testing and quality',
     items: [
       { text: 'Testing stores and components', link: '/guides/testing' },
-      { text: 'Flux-inspired practice', link: '/guides/flux-inspired-practice' },
+      {
+        text: 'Flux-inspired practice',
+        link: '/guides/flux-inspired-practice',
+      },
       { text: 'How to reset state', link: '/guides/how-to-reset-state' },
     ],
   },
@@ -56,26 +83,50 @@ const learnSidebar = [
     text: 'Hands-on tutorials',
     items: [
       { text: 'Build Tic Tac Toe', link: '/guides/tutorial-tic-tac-toe' },
-      { text: 'Persist state to storage', link: '/integrations/persisting-store-data' },
-      { text: 'Initialize state from props', link: '/guides/initialize-state-with-props' },
-      { text: 'Hydrate on the server and client', link: '/guides/ssr-and-hydration' },
+      {
+        text: 'Persist state to storage',
+        link: '/integrations/persisting-store-data',
+      },
+      {
+        text: 'Initialize state from props',
+        link: '/guides/initialize-state-with-props',
+      },
+      {
+        text: 'Hydrate on the server and client',
+        link: '/guides/ssr-and-hydration',
+      },
     ],
   },
   {
     text: 'Tutorials: performance and UX',
     items: [
-      { text: 'Prevent rerenders with useShallow', link: '/guides/prevent-rerenders-with-use-shallow' },
-      { text: 'Connect to state with URL hash', link: '/guides/connect-to-state-with-url-hash' },
+      {
+        text: 'Prevent rerenders with useShallow',
+        link: '/guides/prevent-rerenders-with-use-shallow',
+      },
+      {
+        text: 'Connect to state with URL hash',
+        link: '/guides/connect-to-state-with-url-hash',
+      },
     ],
   },
   {
     text: 'Tutorials: testing and fixes',
     items: [
       { text: 'Test stores and components', link: '/guides/testing' },
-      { text: 'Flux-inspired practice', link: '/guides/flux-inspired-practice' },
+      {
+        text: 'Flux-inspired practice',
+        link: '/guides/flux-inspired-practice',
+      },
       { text: 'How to reset state', link: '/guides/how-to-reset-state' },
-      { text: 'Event handler in pre React 18', link: '/guides/event-handler-in-pre-react-18' },
-      { text: 'Practice with no store actions', link: '/guides/practice-with-no-store-actions' },
+      {
+        text: 'Event handler in pre React 18',
+        link: '/guides/event-handler-in-pre-react-18',
+      },
+      {
+        text: 'Practice with no store actions',
+        link: '/guides/practice-with-no-store-actions',
+      },
     ],
   },
 ];
@@ -94,7 +145,10 @@ const referenceSidebar = [
     text: 'Hooks',
     items: [
       { text: 'useStore', link: '/hooks/use-store' },
-      { text: 'useStore with equality fn', link: '/hooks/use-store-with-equality-fn' },
+      {
+        text: 'useStore with equality fn',
+        link: '/hooks/use-store-with-equality-fn',
+      },
       { text: 'useShallow', link: '/hooks/use-shallow' },
     ],
   },
@@ -106,15 +160,24 @@ const referenceSidebar = [
       { text: 'redux', link: '/middlewares/redux' },
       { text: 'immer', link: '/middlewares/immer' },
       { text: 'combine', link: '/middlewares/combine' },
-      { text: 'subscribeWithSelector', link: '/middlewares/subscribe-with-selector' },
+      {
+        text: 'subscribeWithSelector',
+        link: '/middlewares/subscribe-with-selector',
+      },
     ],
   },
   {
     text: 'Integrations',
     items: [
-      { text: 'Persisting store data', link: '/integrations/persisting-store-data' },
+      {
+        text: 'Persisting store data',
+        link: '/integrations/persisting-store-data',
+      },
       { text: 'Immer middleware', link: '/integrations/immer-middleware' },
-      { text: 'Third-party libraries', link: '/integrations/third-party-libraries' },
+      {
+        text: 'Third-party libraries',
+        link: '/integrations/third-party-libraries',
+      },
     ],
   },
   {
@@ -122,7 +185,10 @@ const referenceSidebar = [
     items: [
       { text: 'Slices pattern', link: '/guides/slices-pattern' },
       { text: 'SSR and hydration', link: '/guides/ssr-and-hydration' },
-      { text: 'Prevent rerenders with useShallow', link: '/guides/prevent-rerenders-with-use-shallow' },
+      {
+        text: 'Prevent rerenders with useShallow',
+        link: '/guides/prevent-rerenders-with-use-shallow',
+      },
       { text: 'Testing', link: '/guides/testing' },
     ],
   },
@@ -137,13 +203,14 @@ const referenceSidebar = [
 
 export default defineConfig({
   root: path.join(path.dirname(__dirname), 'docs'),
-  title: 'My Site',
-  icon: '/rspress-icon.png',
-  logo: {
-    light: '/rspress-light-logo.png',
-    dark: '/rspress-dark-logo.png',
-  },
+  title: 'Zustand Docs',
+  icon: '/favicon.ico',
+  logo: '/favicon.ico',
+  llms: true,
   themeConfig: {
+    editLink: {
+      docRepoBaseUrl: 'https://github.com/pmndrs/zustand/tree/main/docs',
+    },
     nav: [
       {
         text: 'Learn',
@@ -154,10 +221,6 @@ export default defineConfig({
         text: 'Reference',
         link: '/reference/',
         activeMatch: '/reference/',
-      },
-      {
-        text: 'API',
-        link: 'https://rspress.rs/api/index.html',
       },
     ],
     sidebar: {
@@ -176,7 +239,12 @@ export default defineConfig({
       {
         icon: 'github',
         mode: 'link',
-        content: 'https://github.com/web-infra-dev/rspress',
+        content: 'https://github.com/pmndrs/zustand',
+      },
+      {
+        icon: 'npm',
+        mode: 'link',
+        content: 'https://www.npmjs.com/package/zustand',
       },
     ],
   },
