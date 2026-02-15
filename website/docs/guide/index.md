@@ -127,22 +127,22 @@ You can use the \`\`\` syntax to create code blocks and support custom titles. F
 
 ````md
 ```js
-console.log('Hello World');
+console.log('Hello World')
 ```
 
 ```js title="hello.js"
-console.log('Hello World');
+console.log('Hello World')
 ```
 ````
 
 **Output:**
 
 ```js
-console.log('Hello World');
+console.log('Hello World')
 ```
 
 ```js title="hello.js"
-console.log('Hello World');
+console.log('Hello World')
 ```
 
 ### Show line numbers
@@ -155,7 +155,7 @@ export default {
   markdown: {
     showLineNumbers: true,
   },
-};
+}
 ```
 
 ### Wrap code
@@ -168,7 +168,7 @@ export default {
   markdown: {
     defaultWrapCode: true,
   },
-};
+}
 ```
 
 ### Line highlighting
@@ -179,16 +179,16 @@ You can also apply line highlighting and code block title at the same time, for 
 
 ````md
 ```js title="hello.js"
-console.log('Hello World'); // [\!code highlight]
+console.log('Hello World') // [\!code highlight]
 
 // [\!code highlight:3]
-const a = 1;
+const a = 1
 
-console.log(a);
+console.log(a)
 
-const b = 2;
+const b = 2
 
-console.log(b);
+console.log(b)
 ```
 ````
 
@@ -199,16 +199,16 @@ The backslash (`\`) in `[\!code highlight]` is for Markdown escaping to display 
 **Output:**
 
 ```js title="hello.js"
-console.log('Hello World'); // [!code highlight]
+console.log('Hello World') // [!code highlight]
 
 // [!code highlight:3]
-const a = 1;
+const a = 1
 
-console.log(a);
+console.log(a)
 
-const b = 2;
+const b = 2
 
-console.log(b);
+console.log(b)
 ```
 
 ## Rustify MDX compiler
