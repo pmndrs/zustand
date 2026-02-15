@@ -1,0 +1,20 @@
+[
+  "tutorial-tic-tac-toe",
+  "beginner-typescript",
+  "advanced-typescript",
+  "updating-state",
+  "practice-with-no-store-actions",
+  "slices-pattern",
+  "flux-inspired-practice",
+  "immutable-state-and-merging",
+  "maps-and-sets-usage",
+  "prevent-rerenders-with-use-shallow",
+  "initialize-state-with-props",
+  "how-to-reset-state",
+  "connect-to-state-with-url-hash",
+  "event-handler-in-pre-react-18",
+  "auto-generating-selectors",
+  "ssr-and-hydration",
+  "testing",
+  "nextjs"
+]

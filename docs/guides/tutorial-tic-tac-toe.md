@@ -301,7 +301,7 @@ parent `Board` component instead of in each `Square` component. The `Board` comp
 `Square` component what to display by passing a prop, like you did when you passed a number to each
 `Square` component.
 
-> [!IMPORTANT]
+> [!WARNING]
 > To collect data from multiple children, or to have two or more child components
 > communicate with each other, declare the shared state in their parent component instead. The
 > parent component can pass that state back down to the children via props. This keeps the child
@@ -423,7 +423,7 @@ export default function Board() {
 }
 ```
 
-> [!IMPORTANT]
+> [!WARNING]
 > Note how in `handleClick` function, you call `.slice()` to create a copy of the squares array
 > instead of modifying the existing array.
 
