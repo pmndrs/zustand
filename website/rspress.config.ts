@@ -135,21 +135,24 @@ const referenceSidebar = [
   {
     text: 'APIs',
     items: [
-      { text: 'create', link: '/apis/create' },
+      { text: 'create ⚛️', link: '/apis/create' },
       { text: 'createStore', link: '/apis/create-store' },
-      { text: 'createWithEqualityFn', link: '/apis/create-with-equality-fn' },
+      {
+        text: 'createWithEqualityFn ⚛️',
+        link: '/apis/create-with-equality-fn',
+      },
       { text: 'shallow', link: '/apis/shallow' },
     ],
   },
   {
     text: 'Hooks',
     items: [
-      { text: 'useStore', link: '/hooks/use-store' },
+      { text: 'useStore ⚛️', link: '/hooks/use-store' },
       {
-        text: 'useStore with equality fn',
+        text: 'useStoreWithEqualityFn ⚛️',
         link: '/hooks/use-store-with-equality-fn',
       },
-      { text: 'useShallow', link: '/hooks/use-shallow' },
+      { text: 'useShallow ⚛️', link: '/hooks/use-shallow' },
     ],
   },
   {
