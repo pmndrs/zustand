@@ -84,7 +84,7 @@ Our [docs](https://zustand.docs.pmnd.rs) are based on [`pmndrs/docs`](https://gi
 3. Go Back to the forked repository:
    1. Run `pnpm install` to install dependencies.
    2. Navigate to the [`docs`](./docs/) folder and make necessary changes to the documents.
-   3. Add your changes to the documents and see them live reloaded in the browser. (if you don't see changes, try `control + c`, then run `npm run dev` in the cloned `pnmdrs/docs` repository)
+   3. Add your changes to the documents and see them live reloaded in the browser. (if you don't see changes, try `control + c`, then run `npm run dev` in the cloned `pmndrs/docs` repository)
 4. Follow step 4 and onwards from the [General](#General) guide above to bring it to the finish line.
 
 Thank you for contributing! :heart:
