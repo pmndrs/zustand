@@ -166,7 +166,7 @@ both architectures should be the same with slight differences related to each ar
 
 ```tsx
 // src/components/pages/home-page.tsx
-import { useCounterStore } from '@/providers/counter-store-provider.ts'
+import { useCounterStore } from '@/providers/counter-store-provider.tsx'
 
 export const HomePage = () => {
   const { count, incrementCount, decrementCount } = useCounterStore(
