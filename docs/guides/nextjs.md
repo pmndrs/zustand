@@ -166,7 +166,7 @@ both architectures should be the same with slight differences related to each ar
 
 ```tsx
 // src/components/pages/home-page.tsx
-import { useCounterStore } from '@/providers/counter-store-provider.tsx'
+import { useCounterStore } from '@/providers/counter-store-provider'
 
 export const HomePage = () => {
   const { count, incrementCount, decrementCount } = useCounterStore(
@@ -192,7 +192,7 @@ export const HomePage = () => {
 // src/_app.tsx
 import type { AppProps } from 'next/app'
 
-import { CounterStoreProvider } from '@/providers/counter-store-provider.tsx'
+import { CounterStoreProvider } from '@/providers/counter-store-provider'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -205,7 +205,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
 ```tsx
 // src/pages/index.tsx
-import { HomePage } from '@/components/pages/home-page.tsx'
+import { HomePage } from '@/components/pages/home-page'
 
 export default function Home() {
   return <HomePage />
@@ -218,8 +218,8 @@ export default function Home() {
 
 ```tsx
 // src/pages/index.tsx
-import { CounterStoreProvider } from '@/providers/counter-store-provider.tsx'
-import { HomePage } from '@/components/pages/home-page.tsx'
+import { CounterStoreProvider } from '@/providers/counter-store-provider'
+import { HomePage } from '@/components/pages/home-page'
 
 export default function Home() {
   return (
