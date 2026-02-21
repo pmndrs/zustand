@@ -1,8 +1,8 @@
+import './index.css'
 import {
   HomeLayout as BasicHomeLayout,
   PackageManagerTabs,
 } from '@rspress/core/theme-original'
-import {} from '@rspress/core'
 
 export default function HomeLayout() {
   return (
