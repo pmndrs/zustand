@@ -209,6 +209,7 @@ export default defineConfig({
   title: 'Zustand Docs',
   icon: '/favicon.ico',
   logo: '/favicon.ico',
+  logoText: 'Zustand',
   llms: true,
   themeConfig: {
     editLink: {
@@ -230,7 +231,6 @@ export default defineConfig({
       '/learn/': learnSidebar,
       '/getting-started/': learnSidebar,
       '/guides/': learnSidebar,
-      '/tutorials/': learnSidebar,
       '/reference/': referenceSidebar,
       '/apis/': referenceSidebar,
       '/hooks/': referenceSidebar,
