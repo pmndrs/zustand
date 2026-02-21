@@ -1,0 +1,20 @@
+:where(:root) {
+  --rp-c-brand: #0095ff;
+  --rp-c-brand-light: #33adff;
+  --rp-c-brand-lighter: #c6e0fd;
+  --rp-c-brand-dark: #07f;
+  --rp-c-brand-darker: #005fcc;
+  --rp-c-brand-tint: #7fa3ff29;
+}
+
+:where(html:not(.rp-dark)) {
+  --rp-c-bg: #f7f9ff;
+  --rp-home-background-bg: var(--rp-c-bg);
+  --rp-home-hero-title-bg: var(--rp-c-brand-dark);
+}
+
+:where(html.rp-dark) {
+  --rp-c-bg: #111111;
+  --rp-home-background-bg: var(--rp-c-bg);
+  --rp-home-hero-title-bg: var(--rp-c-brand-dark);
+}

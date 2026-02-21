@@ -2,7 +2,6 @@
 pageType: home
 
 hero:
-  name: Zustand
   text: Bear necessities for React state
   tagline: A tiny, predictable store with hooks-first ergonomics and escape hatches that stay out of your way.
   actions:
@@ -12,9 +11,6 @@ hero:
     - theme: alt
       text: Quick Start
       link: /learn/
-  image:
-    src: /bear.jpg
-    alt: Zustand bear logo
 features:
   - title: Minimal API, fast adoption
     details: Create a store with a single hook, subscribe with selectors, and avoid boilerplate or providers.
