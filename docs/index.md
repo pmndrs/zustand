@@ -11,7 +11,7 @@ hero:
       link: /getting-started/introduction
     - theme: alt
       text: Quick Start
-      link: /getting-started/
+      link: /learn/
   image:
     src: /bear.jpg
     alt: Zustand bear logo
@@ -29,19 +29,3 @@ features:
   - title: Small footprint
     details: Tiny bundle size with zero config and performance that keeps pace in production.
 ---
-
-## Install
-
-Pick your package manager and drop this in:
-
-```bash
-pnpm add zustand
-```
-
-```bash
-npm install zustand
-```
-
-```bash
-yarn add zustand
-```
