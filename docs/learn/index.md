@@ -44,5 +44,5 @@ description: A guided path to understand Zustand fundamentals, common patterns, 
 ## Keep going
 
 - Jump to the [Reference](/reference/) for APIs and hook signatures.
-- Explore hands-on flows in [Tutorials](/tutorials/).
+- Explore the hands-on flows across this Learn section.
 - Add your own guide following the [Docs style guide](/style-guide).

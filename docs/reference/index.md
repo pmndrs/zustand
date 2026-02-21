@@ -45,4 +45,4 @@ description: API-first reference for stores, hooks, middlewares, and integration
 
 ## Need a walkthrough?
 
-If you want a step-by-step flow, start with [Tutorials](/tutorials/) instead of this section.
+If you want a step-by-step flow, start with [Learn](/learn/) instead of this section.
