@@ -17,8 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v4
-      - run: pnpm i --workspace website 
-      - run: pnpm build --workspace website 
+      - run: pnpm i --prefix website 
+      - run: pnpm build --prefix website 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: website/doc_build
