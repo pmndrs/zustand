@@ -18,3 +18,7 @@
   --rp-home-background-bg: var(--rp-c-bg);
   --rp-home-hero-title-bg: var(--rp-c-brand-dark);
 }
+
+.rp-badge {
+  vertical-align: middle;
+}
