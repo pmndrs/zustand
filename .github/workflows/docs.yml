@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-      - run: pnpm --dir website install 
+      - run: pnpm --dir website install
       - run: pnpm --dir website build
       - uses: actions/upload-pages-artifact@v4
         with:
