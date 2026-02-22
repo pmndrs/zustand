@@ -205,6 +205,8 @@ const referenceSidebar = [
 ]
 
 export default defineConfig({
+  // @ts-expect-error - RSPress doesn't have the correct types for this yet
+  base: import.meta.env.BASE_PATH,
   root: path.join(path.dirname(__dirname), 'docs'),
   title: 'Zustand Docs',
   icon: '/favicon.ico',
