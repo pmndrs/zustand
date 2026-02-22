@@ -1,6 +1,5 @@
 ---
 title: Setup with Next.js
-nav: 17
 ---
 
 > [!NOTE]

@@ -1,7 +1,6 @@
 ---
 title: subscribeWithSelector
 description: How to subscribe to granular store updates in a store
-nav: 210
 ---
 
 # subscribeWithSelector

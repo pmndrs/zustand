@@ -1,6 +1,5 @@
 ---
 title: Persisting store data
-nav: 20
 ---
 
 The Persist middleware enables you to store

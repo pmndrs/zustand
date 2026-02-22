@@ -1,0 +1,32 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rspress build",
+    "dev": "rspress dev",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "preview": "rspress preview"
+  },
+  "dependencies": {
+    "@rspress/core": "^2.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@rspress/plugin-llms": "^2.0.3",
+    "@rspress/plugin-playground": "^2.0.3",
+    "@rspress/plugin-preview": "^2.0.3",
+    "@shikijs/transformers": "^3.22.0",
+    "@types/node": "^22.8.1",
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript-eslint": "^8.48.0"
+  }
+}

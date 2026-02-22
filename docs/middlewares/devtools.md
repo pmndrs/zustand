@@ -1,7 +1,6 @@
 ---
 title: devtools
 description: How to time-travel debug your store
-nav: 205
 ---
 
 # devtools
@@ -9,7 +8,7 @@ nav: 205
 `devtools` middleware lets you use [Redux DevTools Extension](https://github.com/reduxjs/redux-devtools)
 without Redux. Read more about the benefits of using [Redux DevTools for debugging](https://redux.js.org/style-guide/#use-the-redux-devtools-extension-for-debugging).
 
-> [!IMPORTANT]
+> [!WARNING]
 > In order to use `devtools` from `zustand/middleware` you need to install
 > `@redux-devtools/extension` library.
 
@@ -347,6 +346,6 @@ const useJungleStore = create<JungleStore>()(
 )
 ```
 
-> [!IMPORTANT]
+> [!WARNING]
 > Do not set the second parameter to `true` or `false` unless you want to override the default
 > replacement logic

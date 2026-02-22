@@ -1,7 +1,6 @@
 ---
 title: redux
 description: How to use actions and reducers in a store
-nav: 208
 ---
 
 # redux

@@ -1,7 +1,7 @@
 ---
-title: useShallow ⚛️
+title: useShallow
 description: How to memoize selector functions
-nav: 28
+tag: react
 ---
 
 `useShallow` is a React Hook that lets you optimize re-renders.

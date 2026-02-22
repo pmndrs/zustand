@@ -1,0 +1,21 @@
+[
+  {
+    "text": "Learn",
+    "link": "/learn/",
+    "activeMatch": "/learn/"
+  },
+  {
+    "text": "Reference",
+    "link": "/reference/",
+    "activeMatch": "/reference/"
+  },
+  {
+    "text": "Migrations",
+    "link": "/migrations/",
+    "activeMatch": "/migrations/"
+  },
+  {
+    "text": "API",
+    "link": "https://rspress.rs/api/index.html"
+  }
+]

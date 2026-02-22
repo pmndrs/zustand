@@ -1,6 +1,5 @@
 ---
 title: Third-party Libraries
-nav: 19
 ---
 
 Zustand provides bear necessities for state management.

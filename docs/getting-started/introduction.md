@@ -1,7 +1,6 @@
 ---
 title: Introduction
 description: How to use Zustand
-nav: 0
 ---
 
 <div class="flex justify-center mb-4">

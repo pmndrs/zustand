@@ -1,7 +1,6 @@
 ---
 title: createStore
 description: How to create vanilla stores
-nav: 24
 ---
 
 `createStore` lets you create a vanilla store that exposes API utilities.
@@ -231,7 +230,7 @@ By default, `set` function performs a shallow merge. To update array values we s
 values to ensure updates are applied correctly, and avoid unexpected behaviors. To completely
 replace the state with a new one, use the `replace` parameter set to `true`.
 
-> [!IMPORTANT]
+> [!WARNING]
 > We should prefer immutable operations like: `[...array]`, `concat(...)`, `filter(...)`,
 > `slice(...)`, `map(...)`, `toSpliced(...)`, `toSorted(...)`, and `toReversed(...)`, and avoid
 > mutable operations like `array[arrayIndex] = ...`, `push(...)`, `unshift(...)`, `pop(...)`,
@@ -449,7 +448,7 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```ts {32-34,38-40,44-46}
+```ts
 import { createStore } from 'zustand/vanilla'
 
 type PersonStoreState = {
@@ -480,6 +479,7 @@ const $result = document.getElementById('result') as HTMLDivElement
 
 function handleFirstNameChange(event: Event) {
   personStore.getState().setPerson({
+    // [!code highlight:3]
     ...personStore.getState().person,
     firstName: (event.target as any).value,
   })
@@ -487,6 +487,7 @@ function handleFirstNameChange(event: Event) {
 
 function handleLastNameChange(event: Event) {
   personStore.getState().setPerson({
+    // [!code highlight:3]
     ...personStore.getState().person,
     lastName: (event.target as any).value,
   })
@@ -494,6 +495,7 @@ function handleLastNameChange(event: Event) {
 
 function handleEmailChange(event: Event) {
   personStore.getState().setPerson({
+    // [!code highlight:3]
     ...personStore.getState().person,
     email: (event.target as any).value,
   })

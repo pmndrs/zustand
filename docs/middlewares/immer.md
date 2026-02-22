@@ -1,14 +1,13 @@
 ---
 title: immer
 description: How to perform immutable updates in a store without boilerplate code
-nav: 206
 ---
 
 # immer
 
 `immer` middleware lets you perform immutable updates.
 
-> [!IMPORTANT]
+> [!WARNING]
 > In order to use `immer` from `zustand/middleware/immer` you need to install
 > `immer` library.
 

@@ -5,36 +5,43 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Cancel previous run (see: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
+
+env:
+  GITHUB_PAGES: true
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@v2 # v2.20.4
-    with:
-      mdx: 'docs'
-      libname: 'Zustand'
-      home_redirect: '/getting-started/introduction'
-      icon: '/favicon.ico'
-      logo: '/bear.jpg'
-      github: 'https://github.com/pmndrs/zustand'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm --dir website install
+      - run: pnpm --dir website build
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: website/doc_build
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
-
-    # Deploy to the github-pages environment
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@v4

@@ -20,6 +20,7 @@ export default defineConfig(
     languageOptions: {
       parserOptions: {
         project: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     settings: {

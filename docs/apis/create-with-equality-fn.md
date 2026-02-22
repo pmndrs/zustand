@@ -1,14 +1,14 @@
 ---
-title: createWithEqualityFn ⚛️
+title: createWithEqualityFn
 description: How to create efficient stores
-nav: 25
+tag: react
 ---
 
 `createWithEqualityFn` lets you create a React Hook with API utilities attached, just like `create`.
 However, it offers a way to define a custom equality check. This allows for more granular control
 over when components re-render, improving performance and responsiveness.
 
-> [!IMPORTANT]
+> [!WARNING]
 > In order to use `createWithEqualityFn` from `zustand/traditional` you need to install
 > `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
 
@@ -253,7 +253,7 @@ By default, `set` function performs a shallow merge. To update array values we s
 values to ensure updates are applied correctly, and avoid unexpected behaviors. To completely
 replace the state with a new one, use the `replace` parameter set to `true`.
 
-> [!IMPORTANT]
+> [!WARNING]
 > We should prefer immutable operations like: `[...array]`, `concat(...)`, `filter(...)`,
 > `slice(...)`, `map(...)`, `toSpliced(...)`, `toSorted(...)`, and `toReversed(...)`, and avoid
 > mutable operations like `array[arrayIndex] = ...`, `push(...)`, `unshift(...)`, `pop(...)`,
@@ -540,7 +540,7 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```tsx {32,36,40}
+```tsx
 import { type ChangeEvent } from 'react'
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
@@ -572,15 +572,15 @@ export default function Form() {
   const setPerson = usePersonStore((state) => state.setPerson)
 
   function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
-    setPerson({ ...person, firstName: e.target.value })
+    setPerson({ ...person, firstName: e.target.value }) // [!code highlight]
   }
 
   function handleLastNameChange(e: ChangeEvent<HTMLInputElement>) {
-    setPerson({ ...person, lastName: e.target.value })
+    setPerson({ ...person, lastName: e.target.value }) // [!code highlight]
   }
 
   function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
-    setPerson({ ...person, email: e.target.value })
+    setPerson({ ...person, email: e.target.value }) // [!code highlight]
   }
 
   return (

@@ -1,14 +1,14 @@
 ---
-title: useStoreWithEqualityFn ⚛️
+title: useStoreWithEqualityFn
 description: How to use vanilla stores effectively in React
-nav: 29
+tag: react
 ---
 
 `useStoreWithEqualityFn` is a React Hook that lets you use a vanilla store in React, just like
 `useStore`. However, it offers a way to define a custom equality check. This allows for more
 granular control over when components re-render, improving performance and responsiveness.
 
-> [!IMPORTANT]
+> [!WARNING]
 > In order to use `useStoreWithEqualityFn` from `zustand/traditional` you need to install
 > `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
 
