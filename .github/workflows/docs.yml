@@ -17,8 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v4
-        with:
-          version: latest
       - run: pnpm i --workspace website 
       - run: pnpm build --workspace website 
       - uses: actions/upload-pages-artifact@v3
