@@ -17,7 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v4
-      - run: pnpm --dir website i 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - uses: actions/configure-pages@v5
+      - run: pnpm --dir website install 
       - run: pnpm --dir website build 
       - uses: actions/upload-pages-artifact@v3
         with:
