@@ -540,7 +540,7 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```tsx {32,36,40}
+```tsx
 import { type ChangeEvent } from 'react'
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/vanilla/shallow'
@@ -572,15 +572,15 @@ export default function Form() {
   const setPerson = usePersonStore((state) => state.setPerson)
 
   function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
-    setPerson({ ...person, firstName: e.target.value })
+    setPerson({ ...person, firstName: e.target.value }) // [!code highlight]
   }
 
   function handleLastNameChange(e: ChangeEvent<HTMLInputElement>) {
-    setPerson({ ...person, lastName: e.target.value })
+    setPerson({ ...person, lastName: e.target.value }) // [!code highlight]
   }
 
   function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
-    setPerson({ ...person, email: e.target.value })
+    setPerson({ ...person, email: e.target.value }) // [!code highlight]
   }
 
   return (

@@ -388,12 +388,12 @@ The `handleClick` function should take the index of the square to update and cre
 `squares` array (`nextSquares`). Then, `handleClick` updates the `nextSquares` array by adding `X`
 to the square at the specified index (`i`) if is not already filled.
 
-```jsx {5-10,27}
+```jsx
 export default function Board() {
   const squares = useGameStore((state) => state.squares)
   const setSquares = useGameStore((state) => state.setSquares)
 
-  function handleClick(i) {
+  function handleClick(i) { // [!code highlight:6]
     if (squares[i]) return
     const nextSquares = squares.slice()
     nextSquares[i] = 'X'
@@ -412,7 +412,7 @@ export default function Board() {
       }}
     >
       {squares.map((square, squareIndex) => (
-        <Square
+        <Square // [!code highlight]
           key={squareIndex}
           value={square}
           onSquareClick={() => handleClick(squareIndex)}
@@ -435,9 +435,9 @@ board.
 You'll set the first move to be `'X'` by default. Let's keep track of this by adding another piece
 of state to the `useGameStore` hook:
 
-```jsx {2,12-18}
+```jsx
 const useGameStore = create(
-  combine({ squares: Array(9).fill(null), xIsNext: true }, (set) => {
+  combine({ squares: Array(9).fill(null), xIsNext: true }, (set) => { // [!code highlight]
     return {
       setSquares: (nextSquares) => {
         set((state) => ({
@@ -447,7 +447,7 @@ const useGameStore = create(
               : nextSquares,
         }))
       },
-      setXIsNext: (nextXIsNext) => {
+      setXIsNext: (nextXIsNext) => { // [!code highlight:7]
         set((state) => ({
           xIsNext:
             typeof nextXIsNext === 'function'
@@ -464,20 +464,20 @@ Each time a player moves, `xIsNext` (a boolean) will be flipped to determine whi
 and the game's state will be saved. You'll update the Board's `handleClick` function to flip the
 value of `xIsNext`:
 
-```jsx {2-3,6,11}
+```jsx
 export default function Board() {
-  const xIsNext = useGameStore((state) => state.xIsNext)
+  const xIsNext = useGameStore((state) => state.xIsNext) // [!code highlight:2]
   const setXIsNext = useGameStore((state) => state.setXIsNext)
   const squares = useGameStore((state) => state.squares)
   const setSquares = useGameStore((state) => state.setSquares)
-  const player = xIsNext ? 'X' : 'O'
+  const player = xIsNext ? 'X' : 'O' // [!code highlight]
 
   function handleClick(i) {
     if (squares[i]) return
     const nextSquares = squares.slice()
     nextSquares[i] = player
     setSquares(nextSquares)
-    setXIsNext(!xIsNext)
+    setXIsNext(!xIsNext) // [!code highlight]
   }
 
   return (
@@ -552,9 +552,9 @@ function to check if a player has won. You can perform this check at the same ti
 user has clicked a square that already has a `'X'` or and `'O'`. We'd like to return early in
 both cases:
 
-```js {2}
+```js
 function handleClick(i) {
-  if (squares[i] || winner) return
+  if (squares[i] || winner) return // [!code highlight]
   const nextSquares = squares.slice()
   nextSquares[i] = player
   setSquares(nextSquares)
@@ -567,16 +567,16 @@ To let the players know when the game is over, you can display text such as `'Wi
 display the winner or draw if the game is over and if the game is ongoing you'll display which
 player's turn is next:
 
-```jsx {6-7,9,21}
+```jsx
 export default function Board() {
   const xIsNext = useGameStore((state) => state.xIsNext)
   const setXIsNext = useGameStore((state) => state.setXIsNext)
   const squares = useGameStore((state) => state.squares)
   const setSquares = useGameStore((state) => state.setSquares)
-  const winner = calculateWinner(squares)
+  const winner = calculateWinner(squares) // [!code highlight:2]
   const turns = calculateTurns(squares)
   const player = xIsNext ? 'X' : 'O'
-  const status = calculateStatus(winner, turns, player)
+  const status = calculateStatus(winner, turns, player) // [!code highlight]
 
   function handleClick(i) {
     if (squares[i] || winner) return
@@ -588,7 +588,7 @@ export default function Board() {
 
   return (
     <>
-      <div style={{ marginBottom: '0.5rem' }}>{status}</div>
+      <div style={{ marginBottom: '0.5rem' }}>{status}</div> // [!code highlight]
       <div
         style={{
           display: 'grid',

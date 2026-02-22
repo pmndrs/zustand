@@ -449,7 +449,7 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```ts {32-34,38-40,44-46}
+```ts
 import { createStore } from 'zustand/vanilla'
 
 type PersonStoreState = {
@@ -479,21 +479,21 @@ const $emailInput = document.getElementById('email') as HTMLInputElement
 const $result = document.getElementById('result') as HTMLDivElement
 
 function handleFirstNameChange(event: Event) {
-  personStore.getState().setPerson({
+  personStore.getState().setPerson({ // [!code highlight:3]
     ...personStore.getState().person,
     firstName: (event.target as any).value,
   })
 }
 
 function handleLastNameChange(event: Event) {
-  personStore.getState().setPerson({
+  personStore.getState().setPerson({ // [!code highlight:3]
     ...personStore.getState().person,
     lastName: (event.target as any).value,
   })
 }
 
 function handleEmailChange(event: Event) {
-  personStore.getState().setPerson({
+  personStore.getState().setPerson({ // [!code highlight:3]
     ...personStore.getState().person,
     email: (event.target as any).value,
   })
