@@ -393,7 +393,8 @@ export default function Board() {
   const squares = useGameStore((state) => state.squares)
   const setSquares = useGameStore((state) => state.setSquares)
 
-  function handleClick(i) { // [!code highlight:6]
+  function handleClick(i) {
+    // [!code highlight:6]
     if (squares[i]) return
     const nextSquares = squares.slice()
     nextSquares[i] = 'X'
@@ -437,7 +438,8 @@ of state to the `useGameStore` hook:
 
 ```jsx
 const useGameStore = create(
-  combine({ squares: Array(9).fill(null), xIsNext: true }, (set) => { // [!code highlight]
+  combine({ squares: Array(9).fill(null), xIsNext: true }, (set) => {
+    // [!code highlight]
     return {
       setSquares: (nextSquares) => {
         set((state) => ({
@@ -447,7 +449,8 @@ const useGameStore = create(
               : nextSquares,
         }))
       },
-      setXIsNext: (nextXIsNext) => { // [!code highlight:7]
+      setXIsNext: (nextXIsNext) => {
+        // [!code highlight:7]
         set((state) => ({
           xIsNext:
             typeof nextXIsNext === 'function'
@@ -588,7 +591,8 @@ export default function Board() {
 
   return (
     <>
-      <div style={{ marginBottom: '0.5rem' }}>{status}</div> // [!code highlight]
+      <div style={{ marginBottom: '0.5rem' }}>{status}</div> // [!code
+      highlight]
       <div
         style={{
           display: 'grid',
