@@ -1,5 +1,5 @@
 ---
-title: useStore 
+title: useStore
 description: How to use vanilla stores in React
 tag: react
 ---

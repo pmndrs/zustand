@@ -5,16 +5,16 @@ description: API-first reference for stores, hooks, middlewares, and integration
 
 ## APIs
 
-- [`create`](/apis/create) 
+- [`create`](/apis/create)
 - [`createStore`](/apis/create-store)
-- [`createWithEqualityFn`](/apis/create-with-equality-fn) 
+- [`createWithEqualityFn`](/apis/create-with-equality-fn)
 - [`shallow`](/apis/shallow)
 
 ## Hooks
 
-- [`useStore`](/hooks/use-store) 
-- [`useStoreWithEqualityFn`](/hooks/use-store-with-equality-fn) 
-- [`useShallow`](/hooks/use-shallow) 
+- [`useStore`](/hooks/use-store)
+- [`useStoreWithEqualityFn`](/hooks/use-store-with-equality-fn)
+- [`useShallow`](/hooks/use-shallow)
 
 ## Middlewares
 

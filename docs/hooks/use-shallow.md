@@ -1,5 +1,5 @@
 ---
-title: useShallow 
+title: useShallow
 description: How to memoize selector functions
 tag: react
 ---

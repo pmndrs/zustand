@@ -1,5 +1,5 @@
 ---
-title: createWithEqualityFn 
+title: createWithEqualityFn
 description: How to create efficient stores
 tag: react
 ---
