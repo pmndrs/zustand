@@ -139,11 +139,12 @@ const referenceSidebar = [
   {
     text: 'APIs',
     items: [
-      { text: 'create ⚛️', link: '/apis/create' },
+      { text: 'create', link: '/apis/create', tag: 'react' },
       { text: 'createStore', link: '/apis/create-store' },
       {
-        text: 'createWithEqualityFn ⚛️',
+        text: 'createWithEqualityFn',
         link: '/apis/create-with-equality-fn',
+        tag: 'react',
       },
       { text: 'shallow', link: '/apis/shallow' },
     ],
@@ -151,12 +152,13 @@ const referenceSidebar = [
   {
     text: 'Hooks',
     items: [
-      { text: 'useStore ⚛️', link: '/hooks/use-store' },
+      { text: 'useStore', link: '/hooks/use-store', tag: 'react' },
       {
-        text: 'useStoreWithEqualityFn ⚛️',
+        text: 'useStoreWithEqualityFn',
         link: '/hooks/use-store-with-equality-fn',
+        tag: 'react',
       },
-      { text: 'useShallow ⚛️', link: '/hooks/use-shallow' },
+      { text: 'useShallow', link: '/hooks/use-shallow', tag: 'react' },
     ],
   },
   {
@@ -222,8 +224,8 @@ export default defineConfig({
   icon: '/favicon.ico',
   logo: '/favicon.ico',
   logoText: 'Zustand',
-  llms: true,
   themeConfig: {
+    llmsUI: true,
     editLink: {
       docRepoBaseUrl: 'https://github.com/pmndrs/zustand/tree/main/docs',
     },
