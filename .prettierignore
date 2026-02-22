@@ -1,2 +1,3 @@
 dist
 pnpm-lock.yaml
+website/doc_build
