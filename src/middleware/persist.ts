@@ -314,12 +314,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         if (currentVersion !== hydrationVersion) {
           return
         }
-        // TODO: In the asynchronous case, it's possible that the state has changed
-        // since it was set in the prior callback. As such, it would be better to
-        // pass 'get()' to the 'postRehydrationCallback' to ensure the most up-to-date
-        // state is used. However, this could be a breaking change, so this isn't being
-        // done now.
-        postRehydrationCallback?.(stateFromStorage, undefined)
+        postRehydrationCallback?.(get() ?? stateFromStorage, undefined)
 
         // It's possible that 'postRehydrationCallback' updated the state. To ensure
         // that isn't overwritten when returning 'stateFromStorage' below
