@@ -18,6 +18,7 @@
     "@rspress/plugin-llms": "^2.0.3",
     "@rspress/plugin-playground": "^2.0.3",
     "@rspress/plugin-preview": "^2.0.3",
+    "@shikijs/transformers": "^3.22.0",
     "@types/node": "^22.8.1",
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",

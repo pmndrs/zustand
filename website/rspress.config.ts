@@ -1,5 +1,6 @@
 import * as path from 'node:path'
 import { defineConfig } from '@rspress/core'
+import { transformerNotationHighlight } from '@shikijs/transformers'
 import { pluginLlms } from '@rspress/plugin-llms'
 import { pluginPreview } from '@rspress/plugin-preview'
 import { pluginPlayground } from '@rspress/plugin-playground'
@@ -209,6 +210,11 @@ const referenceSidebar = [
 
 export default defineConfig({
   plugins: [pluginLlms(), pluginPreview(), pluginPlayground()],
+  markdown: {
+    shiki: {
+      transformers: [transformerNotationHighlight()],
+    },
+  },
   // @ts-expect-error - RSPress doesn't have the correct types for this yet
   base: import.meta.env.GITHUB_PAGES === 'true' ? '/zustand/' : undefined,
   root: path.join(path.dirname(__dirname), 'docs'),
