@@ -1,7 +1,6 @@
 ---
 title: devtools
 description: How to time-travel debug your store
-nav: 205
 ---
 
 # devtools

@@ -1,7 +1,7 @@
 ---
-title: useStoreWithEqualityFn ⚛️
+title: useStoreWithEqualityFn
 description: How to use vanilla stores effectively in React
-nav: 29
+tag: react
 ---
 
 `useStoreWithEqualityFn` is a React Hook that lets you use a vanilla store in React, just like

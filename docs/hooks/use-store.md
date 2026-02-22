@@ -1,7 +1,7 @@
 ---
-title: useStore ⚛️
+title: useStore 
 description: How to use vanilla stores in React
-nav: 30
+tag: react
 ---
 
 `useStore` is a React Hook that lets you use a vanilla store in React.

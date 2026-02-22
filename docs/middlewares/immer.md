@@ -1,7 +1,6 @@
 ---
 title: immer
 description: How to perform immutable updates in a store without boilerplate code
-nav: 206
 ---
 
 # immer

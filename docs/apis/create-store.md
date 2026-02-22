@@ -1,7 +1,6 @@
 ---
 title: createStore
 description: How to create vanilla stores
-nav: 24
 ---
 
 `createStore` lets you create a vanilla store that exposes API utilities.

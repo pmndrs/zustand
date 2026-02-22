@@ -1,6 +1,5 @@
 ---
 title: Updating state
-nav: 2
 ---
 
 ## Flat updates

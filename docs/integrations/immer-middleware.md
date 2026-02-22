@@ -1,6 +1,5 @@
 ---
 title: Immer middleware
-nav: 18
 ---
 
 The [Immer](https://github.com/immerjs/immer) middleware enables you
