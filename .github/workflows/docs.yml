@@ -12,14 +12,18 @@ concurrency:
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@v2 # v2.20.4
-    with:
-      mdx: 'docs'
-      libname: 'Zustand'
-      home_redirect: '/getting-started/introduction'
-      icon: '/favicon.ico'
-      logo: '/bear.jpg'
-      github: 'https://github.com/pmndrs/zustand'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+      - run: pnpm i --workspace website 
+      - run: pnpm build --workspace website 
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/doc_build
 
   deploy:
     needs: build
@@ -37,4 +41,4 @@ jobs:
 
     steps:
       - id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@v4
