@@ -112,7 +112,7 @@ take a look at an example:
     set(produce((state: State) => { ++state.deep.nested.obj.count })),
 ```
 
-What a reduction! Please take note of the [gotchas listed here](../integrations/immer-middleware.md).
+What a reduction! Please take note of the [gotchas listed here](../../reference/integrations/immer-middleware.md).
 
 ### With optics-ts
 

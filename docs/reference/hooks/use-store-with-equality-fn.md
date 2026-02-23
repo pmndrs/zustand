@@ -1,46 +1,53 @@
 ---
-title: useStore ⚛️
-description: How to use vanilla stores in React
-nav: 30
+title: useStoreWithEqualityFn
+description: How to use vanilla stores effectively in React
+tag: react
+nav: 29
 ---
 
-`useStore` is a React Hook that lets you use a vanilla store in React.
+`useStoreWithEqualityFn` is a React Hook that lets you use a vanilla store in React, just like
+`useStore`. However, it offers a way to define a custom equality check. This allows for more
+granular control over when components re-render, improving performance and responsiveness.
+
+> [!IMPORTANT]
+> In order to use `useStoreWithEqualityFn` from `zustand/traditional` you need to install
+> `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
 
 ```js
-const someState = useStore(store, selectorFn)
+const someState = useStoreWithEqualityFn(store, selectorFn, equalityFn)
 ```
 
 - [Types](#types)
   - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
-  - [Use a vanilla store in React](#use-a-vanilla-store-in-react)
+  - [Using a global vanilla store in React](#using-a-global-vanilla-store-in-react)
   - [Using dynamic vanilla stores in React](#using-dynamic-global-vanilla-stores-in-react)
   - [Using scoped (non-global) vanilla store in React](#using-scoped-non-global-vanilla-store-in-react)
   - [Using dynamic scoped (non-global) vanilla stores in React](#using-dynamic-scoped-non-global-vanilla-stores-in-react)
 - [Troubleshooting](#troubleshooting)
 
-## Types
-
 ### Signature
 
 ```ts
-useStore<StoreApi<T>, U = T>(store: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
+useStoreWithEqualityFn<T, U = T>(store: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: T, b: T) => boolean): U
 ```
 
 ## Reference
 
-### `useStore(store, selectorFn)`
+### `useStoreWithEqualityFn(store, selectorFn, equalityFn)`
 
 #### Parameters
 
 - `storeApi`: The instance that lets you access to store API utilities.
 - `selectorFn`: A function that lets you return data that is based on current state.
+- `equalityFn`: A function that lets you skip re-renders.
 
 #### Returns
 
-`useStore` returns any data based on current state depending on the selector function. It should
-take a store, and a selector function as arguments.
+`useStoreWithEqualityFn` returns any data based on current state depending on the selector function,
+and lets you skip re-renders using an equality function. It should take a store, a selector
+function, and an equality function as arguments.
 
 ## Usage
 
@@ -50,6 +57,8 @@ First, let's set up a store that will hold the position of the dot on the screen
 store to manage `x` and `y` coordinates and provide an action to update these coordinates.
 
 ```tsx
+import { createStore, useStore } from 'zustand'
+
 type PositionStoreState = { position: { x: number; y: number } }
 
 type PositionStoreActions = {
@@ -69,8 +78,16 @@ will use the store to track and update the dot's position.
 
 ```tsx
 function MovingDot() {
-  const position = useStore(positionStore, (state) => state.position)
-  const setPosition = useStore(positionStore, (state) => state.setPosition)
+  const position = useStoreWithEqualityFn(
+    positionStore,
+    (state) => state.position,
+    shallow,
+  )
+  const setPosition = useStoreWithEqualityFn(
+    positionStore,
+    (state) => state.setPosition,
+    shallow,
+  )
 
   return (
     <div
@@ -114,7 +131,9 @@ export default function App() {
 Here is what the code should look like:
 
 ```tsx
-import { createStore, useStore } from 'zustand'
+import { createStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { shallow } from 'zustand/shallow'
 
 type PositionStoreState = { position: { x: number; y: number } }
 
@@ -130,8 +149,16 @@ const positionStore = createStore<PositionStore>()((set) => ({
 }))
 
 function MovingDot() {
-  const position = useStore(positionStore, (state) => state.position)
-  const setPosition = useStore(positionStore, (state) => state.setPosition)
+  const position = useStoreWithEqualityFn(
+    positionStore,
+    (state) => state.position,
+    shallow,
+  )
+  const setPosition = useStoreWithEqualityFn(
+    positionStore,
+    (state) => state.setPosition,
+    shallow,
+  )
 
   return (
     <div
@@ -174,6 +201,8 @@ First, we'll create a factory function that generates a store for managing the c
 Each tab will have its own instance of this store.
 
 ```ts
+import { createStore } from 'zustand'
+
 type CounterState = {
   count: number
 }
@@ -221,8 +250,10 @@ counter.
 
 ```tsx
 const [currentTabIndex, setCurrentTabIndex] = useState(0)
-const counterState = useStore(
+const counterState = useStoreWithEqualityFn(
   getOrCreateCounterStoreByKey(`tab-${currentTabIndex}`),
+  (state) => state,
+  shallow,
 )
 
 return (
@@ -293,7 +324,9 @@ Here is what the code should look like:
 
 ```tsx
 import { useState } from 'react'
-import { createStore, useStore } from 'zustand'
+import { createStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { shallow } from 'zustand/shallow'
 
 type CounterState = {
   count: number
@@ -333,8 +366,10 @@ const getOrCreateCounterStoreByKey =
 
 export default function App() {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
-  const counterState = useStore(
+  const counterState = useStoreWithEqualityFn(
     getOrCreateCounterStoreByKey(`tab-${currentTabIndex}`),
+    (state) => state,
+    shallow,
   )
 
   return (
@@ -446,7 +481,7 @@ function usePositionStore<U>(selector: (state: PositionStore) => U) {
     )
   }
 
-  return useStore(store, selector)
+  return useStoreWithEqualityFn(store, selector, shallow)
 }
 ```
 
@@ -514,7 +549,9 @@ Here is what the code should look like:
 
 ```tsx
 import { type ReactNode, useState, createContext, useContext } from 'react'
-import { createStore, useStore } from 'zustand'
+import { createStore } from 'zustand'
+import { useStoreWithEqualityFn } from 'zustand/traditional'
+import { shallow } from 'zustand/shallow'
 
 type PositionStoreState = { position: { x: number; y: number } }
 
@@ -553,7 +590,7 @@ function usePositionStore<U>(selector: (state: PositionStore) => U) {
     )
   }
 
-  return useStore(store, selector)
+  return useStoreWithEqualityFn(store, selector, shallow)
 }
 
 function MovingDot({ color }: { color: string }) {
@@ -613,8 +650,6 @@ First, we'll create a factory function that generates a store for managing the c
 Each tab will have its own instance of this store.
 
 ```ts
-import { createStore } from 'zustand'
-
 type CounterState = {
   count: number
 }
@@ -672,8 +707,8 @@ Now, we’ll create a custom hook, `useCounterStore`, that lets us access the co
 given tab.
 
 ```tsx
-const useCounterStore = <U>(
-  currentTabIndex: number,
+const useCounterStore = <U,>(
+  key: string,
   selector: (state: CounterStore) => U,
 ) => {
   const stores = useContext(CounterStoresContext)
@@ -683,11 +718,11 @@ const useCounterStore = <U>(
   }
 
   const getOrCreateCounterStoreByKey = useCallback(
-    () => createCounterStoreFactory(stores),
+    (key: string) => createCounterStoreFactory(stores!)(key),
     [stores],
   )
 
-  return useStore(getOrCreateCounterStoreByKey(`tab-${currentTabIndex}`))
+  return useStore(getOrCreateCounterStoreByKey(key), selector)
 }
 ```
 

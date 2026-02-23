@@ -1,23 +1,18 @@
 ---
-title: createWithEqualityFn ⚛️
-description: How to create efficient stores
-nav: 25
+title: create
+description: How to create stores
+tag: react
+nav: 26
 ---
 
-`createWithEqualityFn` lets you create a React Hook with API utilities attached, just like `create`.
-However, it offers a way to define a custom equality check. This allows for more granular control
-over when components re-render, improving performance and responsiveness.
-
-> [!IMPORTANT]
-> In order to use `createWithEqualityFn` from `zustand/traditional` you need to install
-> `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
+`create` lets you create a React Hook with API utilities attached.
 
 ```js
-const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
+const useSomeStore = create(stateCreatorFn)
 ```
 
 - [Types](#types)
-  - [Signature](#createwithequalityfn-signature)
+  - [Signature](#create-signature)
 - [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
@@ -34,25 +29,23 @@ const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ### Signature
 
 ```ts
-createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
+create<T>()(stateCreatorFn: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 ```
 
 ## Reference
 
-### `createWithEqualityFn(stateCreatorFn)`
+### `create(stateCreatorFn)`
 
 #### Parameters
 
 - `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
-- **optional** `equalityFn`: Defaults to `Object.is`. A function that lets you skip re-renders.
 
 #### Returns
 
-`createWithEqualityFn` returns a React Hook with API utilities attached, just like `create`. It
-lets you return data that is based on current state, using a selector function, and lets you skip
-re-renders using an equality function. It should take a selector function, and an equality function
-as arguments.
+`create` returns a React Hook with API utilities, `setState`, `getState`, `getInitialState` and
+`subscribe`, attached. It lets you return data that is based on current state, using a selector
+function. It should take a selector function as its only argument.
 
 ## Usage
 
@@ -64,8 +57,7 @@ about that [here](https://react.dev/learn/queueing-a-series-of-state-updates).
 This example shows how you can support **updater functions** within **actions**.
 
 ```tsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
 type AgeStoreState = { age: number }
 
@@ -79,16 +71,14 @@ type AgeStoreActions = {
 
 type AgeStore = AgeStoreState & AgeStoreActions
 
-const useAgeStore = createWithEqualityFn<AgeStore>()(
-  (set) => ({
-    age: 42,
-    setAge: (nextAge) =>
-      set((state) => ({
-        age: typeof nextAge === 'function' ? nextAge(state.age) : nextAge,
-      })),
-  }),
-  shallow,
-)
+const useAgeStore = create<AgeStore>()((set) => ({
+  age: 42,
+  setAge: (nextAge) => {
+    set((state) => ({
+      age: typeof nextAge === 'function' ? nextAge(state.age) : nextAge,
+    }))
+  },
+}))
 
 export default function App() {
   const age = useAgeStore((state) => state.age)
@@ -102,7 +92,6 @@ export default function App() {
     <>
       <h1>Your age: {age}</h1>
       <button
-        type="button"
         onClick={() => {
           increment()
           increment()
@@ -112,7 +101,6 @@ export default function App() {
         +3
       </button>
       <button
-        type="button"
         onClick={() => {
           increment()
         }}
@@ -131,16 +119,15 @@ numbers, strings, booleans, etc. you should directly assign new values to ensure
 correctly, and avoid unexpected behaviors.
 
 > [!NOTE]
-> By default, `set` function performs a shallow merge. If you need to completely replace
-> the state with a new one, use the `replace` parameter set to `true`
+> By default, `set` function performs a shallow merge. If you need to completely replace the state
+> with a new one, use the `replace` parameter set to `true`
 
 ```tsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
 type XStore = number
 
-const useXStore = createWithEqualityFn<XStore>()(() => 0, shallow)
+const useXStore = create<XStore>()(() => 0)
 
 export default function MovingDot() {
   const x = useXStore()
@@ -189,8 +176,7 @@ replace the state with a new one, use the `replace` parameter set to `true` with
 discards any existing nested data within the state.
 
 ```tsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
 type PositionStoreState = { position: { x: number; y: number } }
 
@@ -200,13 +186,10 @@ type PositionStoreActions = {
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
-const usePositionStore = createWithEqualityFn<PositionStore>()(
-  (set) => ({
-    position: { x: 0, y: 0 },
-    setPosition: (position) => set({ position }),
-  }),
-  shallow,
-)
+const usePositionStore = create<PositionStore>()((set) => ({
+  position: { x: 0, y: 0 },
+  setPosition: (nextPosition) => set({ position: nextPosition }),
+}))
 
 export default function MovingDot() {
   const position = usePositionStore((state) => state.position)
@@ -260,22 +243,18 @@ replace the state with a new one, use the `replace` parameter set to `true`.
 > `shift(...)`, `splice(...)`, `reverse(...)`, and `sort(...)`.
 
 ```tsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
 type PositionStore = [number, number]
 
-const usePositionStore = createWithEqualityFn<PositionStore>()(
-  () => [0, 0],
-  shallow,
-)
+const usePositionStore = create<PositionStore>()(() => [0, 0])
 
 export default function MovingDot() {
   const [x, y] = usePositionStore()
-  const position = { x, y }
   const setPosition: typeof usePositionStore.setState = (nextPosition) => {
     usePositionStore.setState(nextPosition, true)
   }
+  const position = { x, y }
 
   return (
     <div
@@ -315,13 +294,12 @@ require a hook to call an action, and it facilitates code splitting.
 > located together with your state).
 
 ```tsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
-const usePositionStore = createWithEqualityFn<{
+const usePositionStore = create<{
   x: number
   y: number
-}>()(() => ({ x: 0, y: 0 }), shallow)
+}>()(() => ({ x: 0, y: 0 }))
 
 const setPosition: typeof usePositionStore.setState = (nextPosition) => {
   usePositionStore.setState(nextPosition)
@@ -372,8 +350,7 @@ updates. We can use `subscribe` for external state management.
 
 ```tsx
 import { useEffect } from 'react'
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
 type PositionStoreState = { position: { x: number; y: number } }
 
@@ -383,13 +360,10 @@ type PositionStoreActions = {
 
 type PositionStore = PositionStoreState & PositionStoreActions
 
-const usePositionStore = createWithEqualityFn<PositionStore>()(
-  (set) => ({
-    position: { x: 0, y: 0 },
-    setPosition: (nextPosition) => set({ position: nextPosition }),
-  }),
-  shallow,
-)
+const usePositionStore = create<PositionStore>()((set) => ({
+  position: { x: 0, y: 0 },
+  setPosition: (nextPosition) => set({ position: nextPosition }),
+}))
 
 export default function MovingDot() {
   const position = usePositionStore((state) => state.position)
@@ -454,33 +428,29 @@ values for all other fields.
 These input fields don’t work because the `onChange` handlers mutate the state:
 
 ```tsx
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+import { create } from 'zustand'
 
 type PersonStoreState = {
-  person: { firstName: string; lastName: string; email: string }
+  firstName: string
+  lastName: string
+  email: string
 }
 
 type PersonStoreActions = {
-  setPerson: (nextPerson: PersonStoreState['person']) => void
+  setPerson: (nextPerson: Partial<PersonStoreState>) => void
 }
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
-const usePersonStore = createWithEqualityFn<PersonStore>()(
-  (set) => ({
-    person: {
-      firstName: 'Barbara',
-      lastName: 'Hepworth',
-      email: 'bhepworth@sculpture.com',
-    },
-    setPerson: (person) => set({ person }),
-  }),
-  shallow,
-)
+const usePersonStore = create<PersonStore>()((set) => ({
+  firstName: 'Barbara',
+  lastName: 'Hepworth',
+  email: 'bhepworth@sculpture.com',
+  setPerson: (nextPerson) => set(nextPerson),
+}))
 
 export default function Form() {
-  const person = usePersonStore((state) => state.person)
+  const person = usePersonStore((state) => state)
   const setPerson = usePersonStore((state) => state.setPerson)
 
   function handleFirstNameChange(e: ChangeEvent<HTMLInputElement>) {
@@ -540,10 +510,8 @@ Now the form works!
 Notice how you didn’t declare a separate state variable for each input field. For large forms,
 keeping all data grouped in an object is very convenient—as long as you update it correctly!
 
-```tsx {32,36,40}
-import { type ChangeEvent } from 'react'
-import { createWithEqualityFn } from 'zustand/traditional'
-import { shallow } from 'zustand/vanilla/shallow'
+```tsx {27,31,35}
+import { create } from 'zustand'
 
 type PersonStoreState = {
   person: { firstName: string; lastName: string; email: string }
@@ -555,17 +523,14 @@ type PersonStoreActions = {
 
 type PersonStore = PersonStoreState & PersonStoreActions
 
-const usePersonStore = createWithEqualityFn<PersonStore>()(
-  (set) => ({
-    person: {
-      firstName: 'Barbara',
-      lastName: 'Hepworth',
-      email: 'bhepworth@sculpture.com',
-    },
-    setPerson: (nextPerson) => set({ person: nextPerson }),
-  }),
-  shallow,
-)
+const usePersonStore = create<PersonStore>()((set) => ({
+  person: {
+    firstName: 'Barbara',
+    lastName: 'Hepworth',
+    email: 'bhepworth@sculpture.com',
+  },
+  setPerson: (nextPerson) => set(nextPerson),
+}))
 
 export default function Form() {
   const person = usePersonStore((state) => state.person)
