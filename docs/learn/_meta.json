@@ -1,0 +1,138 @@
+[
+    {
+        "type": "custom-link",
+        "label": "Start here",
+        "items": [
+            {
+                "type": "custom-link",
+                "label": "Introduction",
+                "link": "/learn/getting-started/introduction"
+            },
+            {
+                "type": "custom-link",
+                "label": "Comparison with other tools",
+                "link": "/learn/getting-started/comparison"
+            },
+            {
+                "type": "custom-link",
+                "label": "Tutorial: Tic Tac Toe",
+                "link": "/learn/guides/tutorial-tic-tac-toe"
+            }
+        ]
+    },
+    {
+        "type": "custom-link",
+        "label": "State management basics",
+        "items": [
+            {
+                "type": "custom-link",
+                "label": "Updating state",
+                "link": "/learn/guides/updating-state"
+            },
+            {
+                "type": "custom-link",
+                "label": "Practice with no store actions",
+                "link": "/learn/guides/practice-with-no-store-actions"
+            },
+            {
+                "type": "custom-link",
+                "label": "Slices pattern",
+                "link": "/learn/guides/slices-pattern"
+            },
+            {
+                "type": "custom-link",
+                "label": "Immutable state and merging",
+                "link": "/learn/guides/immutable-state-and-merging"
+            },
+            {
+                "type": "custom-link",
+                "label": "Maps and sets usage",
+                "link": "/learn/guides/maps-and-sets-usage"
+            }
+        ]
+    },
+    {
+        "type": "custom-link",
+        "label": "Performance and rendering",
+        "items": [
+            {
+                "type": "custom-link",
+                "label": "Prevent rerenders with useShallow",
+                "link": "/learn/guides/prevent-rerenders-with-use-shallow"
+            },
+            {
+                "type": "custom-link",
+                "label": "Connect to state with URL hash",
+                "link": "/learn/guides/connect-to-state-with-url-hash"
+            },
+            {
+                "type": "custom-link",
+                "label": "Event handler in pre React 18",
+                "link": "/learn/guides/event-handler-in-pre-react-18"
+            }
+        ]
+    },
+    {
+        "type": "custom-link",
+        "label": "TypeScript path",
+        "items": [
+            {
+                "type": "custom-link",
+                "label": "Beginner TypeScript",
+                "link": "/learn/guides/beginner-typescript"
+            },
+            {
+                "type": "custom-link",
+                "label": "Advanced TypeScript",
+                "link": "/learn/guides/advanced-typescript"
+            },
+            {
+                "type": "custom-link",
+                "label": "Auto-generating selectors",
+                "link": "/learn/guides/auto-generating-selectors"
+            }
+        ]
+    },
+    {
+        "type": "custom-link",
+        "label": "Frameworks and platforms",
+        "items": [
+            {
+                "type": "custom-link",
+                "label": "Next.js",
+                "link": "/learn/guides/nextjs"
+            },
+            {
+                "type": "custom-link",
+                "label": "SSR and hydration",
+                "link": "/learn/guides/ssr-and-hydration"
+            },
+            {
+                "type": "custom-link",
+                "label": "Initialize state with props",
+                "link": "/learn/guides/initialize-state-with-props"
+            }
+        ]
+    },
+    {
+        "type": "custom-link",
+        "label": "Testing and quality",
+        "items": [
+            {
+                "type": "custom-link",
+                "label": "Testing stores and components",
+                "link": "/learn/guides/testing"
+            },
+            {
+                "type": "custom-link",
+                "label": "Flux-inspired practice",
+                "link": "/learn/guides/flux-inspired-practice"
+            },
+            {
+                "type": "custom-link",
+                "label": "How to reset state",
+                "link": "/learn/guides/how-to-reset-state"
+            }
+        ]
+    }
+]
