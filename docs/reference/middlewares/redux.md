@@ -30,11 +30,9 @@ redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreato
 
 ### Mutator
 
-<!-- prettier-ignore-start -->
 ```ts
 ['zustand/redux', A]
 ```
-<!-- prettier-ignore-end -->
 
 ## Reference
 

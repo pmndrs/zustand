@@ -36,11 +36,9 @@ persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistO
 
 ### Mutator
 
-<!-- prettier-ignore-start -->
 ```ts
 ['zustand/persist', U]
 ```
-<!-- prettier-ignore-end -->
 
 ## Reference
 

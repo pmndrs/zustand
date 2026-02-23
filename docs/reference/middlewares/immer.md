@@ -33,11 +33,9 @@ immer<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [['zustand/im
 
 ### Mutator
 
-<!-- prettier-ignore-start -->
 ```ts
 ['zustand/immer', never]
 ```
-<!-- prettier-ignore-end -->
 
 ## Reference
 

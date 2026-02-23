@@ -29,11 +29,9 @@ subscribeWithSelector<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<
 
 ### Mutator
 
-<!-- prettier-ignore-start -->
 ```ts
 ['zustand/subscribeWithSelector', never]
 ```
-<!-- prettier-ignore-end -->
 
 ## Reference
 

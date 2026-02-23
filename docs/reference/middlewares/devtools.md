@@ -40,11 +40,9 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
 
 ### Mutator
 
-<!-- prettier-ignore-start -->
 ```ts
 ['zustand/devtools', never]
 ```
-<!-- prettier-ignore-end -->
 
 ## Reference
 
