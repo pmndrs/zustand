@@ -31,7 +31,7 @@ redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreato
 ### Mutator
 
 ```ts
-['zustand/redux', A]
+;['zustand/redux', A]
 ```
 
 ## Reference

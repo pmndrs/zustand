@@ -34,7 +34,7 @@ immer<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [['zustand/im
 ### Mutator
 
 ```ts
-['zustand/immer', never]
+;['zustand/immer', never]
 ```
 
 ## Reference

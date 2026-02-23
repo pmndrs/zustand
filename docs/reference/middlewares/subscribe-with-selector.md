@@ -30,7 +30,7 @@ subscribeWithSelector<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<
 ### Mutator
 
 ```ts
-['zustand/subscribeWithSelector', never]
+;['zustand/subscribeWithSelector', never]
 ```
 
 ## Reference

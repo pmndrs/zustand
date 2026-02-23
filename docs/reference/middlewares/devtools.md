@@ -41,7 +41,7 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
 ### Mutator
 
 ```ts
-['zustand/devtools', never]
+;['zustand/devtools', never]
 ```
 
 ## Reference

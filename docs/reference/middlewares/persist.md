@@ -37,7 +37,7 @@ persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistO
 ### Mutator
 
 ```ts
-['zustand/persist', U]
+;['zustand/persist', U]
 ```
 
 ## Reference
