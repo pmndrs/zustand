@@ -37,4 +37,4 @@ jobs:
 
     steps:
       - id: deployment
-        uses: actions/deploy-pages@4a352b5f17c6ff6b381c1a3abcc8b016e8a1c5c2 # v4.0.0
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
