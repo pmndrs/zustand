@@ -16,9 +16,9 @@ jobs:
     with:
       mdx: 'docs'
       libname: 'Zustand'
-      home_redirect: '/getting-started/introduction'
-      icon: '/favicon.ico'
-      logo: '/bear.jpg'
+      home_redirect: '/learn/getting-started/introduction'
+      icon: '/public/favicon.ico'
+      logo: '/public/bear.jpg'
       github: 'https://github.com/pmndrs/zustand'
 
   deploy:
