@@ -1,6 +1,6 @@
 ---
 title: Prevent rerenders with useShallow
-nav: 15
+nav: 9
 ---
 
 When you need to subscribe to a computed state from a store, the recommended way is to

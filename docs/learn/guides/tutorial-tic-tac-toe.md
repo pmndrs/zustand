@@ -1,7 +1,7 @@
 ---
 title: 'Tutorial: Tic-Tac-Toe'
 description: Building a game
-nav: 1
+nav: 3
 ---
 
 # Tutorial: Tic-Tac-Toe

@@ -1,6 +1,6 @@
 ---
 title: Auto Generating Selectors
-nav: 5
+nav: 14
 ---
 
 We recommend using selectors when using either the properties or actions from the store. You can access values from the store like so:

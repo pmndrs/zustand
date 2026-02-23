@@ -1,6 +1,6 @@
 ---
 title: How to reset state
-nav: 12
+nav: 20
 ---
 
 The following pattern can be used to reset the state to its initial value.

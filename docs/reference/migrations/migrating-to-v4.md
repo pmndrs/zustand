@@ -1,6 +1,6 @@
 ---
 title: Migrating to v4
-nav: 22
+nav: 38
 ---
 
 The only breaking changes are in types.

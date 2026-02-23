@@ -1,6 +1,6 @@
 ---
 title: Slices Pattern
-nav: 14
+nav: 6
 ---
 
 ## Slicing the store into smaller stores

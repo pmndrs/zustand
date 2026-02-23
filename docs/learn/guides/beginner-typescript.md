@@ -1,6 +1,6 @@
 ---
 title: Beginner TypeScript Guide
-nav: 7
+nav: 12
 ---
 
 Zustand is a lightweight state manager, particularly used with React. Zustand avoids reducers, context, and boilerplate.

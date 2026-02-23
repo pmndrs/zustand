@@ -1,6 +1,6 @@
 ---
 title: Map and Set Usage
-nav: 10
+nav: 8
 ---
 
 # Map and Set in Zustand

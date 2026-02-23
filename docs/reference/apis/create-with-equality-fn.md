@@ -2,7 +2,7 @@
 title: createWithEqualityFn
 description: How to create efficient stores
 tag: react
-nav: 25
+nav: 23
 ---
 
 `createWithEqualityFn` lets you create a React Hook with API utilities attached, just like `create`.

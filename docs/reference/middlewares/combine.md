@@ -1,7 +1,7 @@
 ---
 title: combine
 description: How to create a store and get types automatically inferred
-nav: 201
+nav: 32
 ---
 
 # combine

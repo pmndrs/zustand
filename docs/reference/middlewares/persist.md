@@ -1,7 +1,7 @@
 ---
 title: persist
 description: How to persist a store
-nav: 207
+nav: 28
 ---
 
 # persist
