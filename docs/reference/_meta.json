@@ -1,32 +1,32 @@
 [
-	{
-		"type": "dir",
-		"name": "apis",
-		"label": "APIs"
-	},
-	{
-		"type": "dir",
-		"name": "hooks",
-		"label": "Hooks"
-	},
-	{
-		"type": "dir",
-		"name": "middlewares",
-		"label": "Middlewares"
-	},
-	{
-		"type": "dir",
-		"name": "integrations",
-		"label": "Integrations"
-	},
-	{
-		"type": "dir",
-		"name": "migrations",
-		"label": "Migrations"
-	},
-	{
-		"type": "dir",
-		"name": "previous-versions",
-		"label": "Previous Versions"
-	}
+  {
+    "type": "dir",
+    "name": "apis",
+    "label": "APIs"
+  },
+  {
+    "type": "dir",
+    "name": "hooks",
+    "label": "Hooks"
+  },
+  {
+    "type": "dir",
+    "name": "middlewares",
+    "label": "Middlewares"
+  },
+  {
+    "type": "dir",
+    "name": "integrations",
+    "label": "Integrations"
+  },
+  {
+    "type": "dir",
+    "name": "migrations",
+    "label": "Migrations"
+  },
+  {
+    "type": "dir",
+    "name": "previous-versions",
+    "label": "Previous Versions"
+  }
 ]

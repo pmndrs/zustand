@@ -1,12 +1,12 @@
 [
-	{
-		"text": "Learn",
-		"link": "/learn/",
-		"activeMatch": "/learn/"
-	},
-	{
-		"text": "Reference",
-		"link": "/reference/",
-		"activeMatch": "/reference/"
-	}
+  {
+    "text": "Learn",
+    "link": "/learn/",
+    "activeMatch": "/learn/"
+  },
+  {
+    "text": "Reference",
+    "link": "/reference/",
+    "activeMatch": "/reference/"
+  }
 ]
