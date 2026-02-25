@@ -311,7 +311,7 @@ const useFishStore = create(
 )
 ```
 
-[See the full documentation for this middleware.](./docs/integrations/persisting-store-data.md)
+[See the full documentation for this middleware.](./docs/reference/integrations/persisting-store-data.md)
 
 ## Immer middleware
 
