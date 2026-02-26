@@ -7,7 +7,7 @@ hero:
   actions:
     - theme: brand
       text: Introduction
-      link: /getting-started/introduction
+      link: /learn/getting-started/introduction
     - theme: alt
       text: Quick Start
       link: /learn/
