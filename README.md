@@ -509,4 +509,4 @@ Some users may want to extend Zustand's feature set which can be done using thir
 
 ## Comparison with other libraries
 
-- [Difference between zustand and other state management libraries for React](https://zustand.docs.pmnd.rs/getting-started/comparison)
+- [Difference between zustand and other state management libraries for React](https://zustand.docs.pmnd.rs/learn/getting-started/comparison)
