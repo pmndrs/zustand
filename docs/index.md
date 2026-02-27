@@ -4,13 +4,13 @@ pageType: home
 hero:
   text: Bear necessities for React state
   tagline: A tiny, predictable store with hooks-first ergonomics and escape hatches that stay out of your way.
-      actions:
-        - theme: brand
-          text: Introduction
-          link: ./learn/getting-started/introduction.md
-        - theme: alt
-          text: Quick Start
-          link: ./learn/index.md
+  actions:
+    - theme: brand
+      text: Introduction
+      link: ./learn/getting-started/introduction.md
+    - theme: alt
+      text: Quick Start
+      link: ./learn/index.md
 features:
   - title: Minimal API, fast adoption
     details: Create a store with a single hook, subscribe with selectors, and avoid boilerplate or providers.
