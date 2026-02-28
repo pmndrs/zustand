@@ -12,11 +12,11 @@ concurrency:
 
 jobs:
   build:
-    uses: pmndrs/docs/.github/workflows/build.yml@v2 # v2.20.4
+    uses: pmndrs/docs/.github/workflows/build.yml@v3
     with:
       mdx: 'docs'
       libname: 'Zustand'
-      home_redirect: '/getting-started/introduction'
+      home_redirect: '/learn/getting-started/introduction'
       icon: '/favicon.ico'
       logo: '/bear.jpg'
       github: 'https://github.com/pmndrs/zustand'

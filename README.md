@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/bear.jpg" />
+  <img src="./docs/bear.jpg" />
 </p>
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pmndrs/zustand/test.yml?branch=main&style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/zustand/actions?query=workflow%3ATest)
@@ -311,7 +311,7 @@ const useFishStore = create(
 )
 ```
 
-[See the full documentation for this middleware.](./docs/integrations/persisting-store-data.md)
+[See the full documentation for this middleware.](./docs/reference/integrations/persisting-store-data.md)
 
 ## Immer middleware
 
@@ -497,16 +497,16 @@ A more detailed TypeScript guide is [here](docs/guides/beginner-typescript.md) a
 
 ## Best practices
 
-- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/guides/slices-pattern.md).
-- Recommended usage for this unopinionated library: [Flux inspired practice](./docs/guides/flux-inspired-practice.md).
-- [Calling actions outside a React event handler in pre-React 18](./docs/guides/event-handler-in-pre-react-18.md).
-- [Testing](./docs/guides/testing.md)
-- For more, have a look [in the docs folder](./docs/)
+- You may wonder how to organize your code for better maintenance: [Splitting the store into separate slices](./docs/learn/guides/slices-pattern.md).
+- Recommended usage for this unopinionated library: [Flux inspired practice](./docs/learn/guides/flux-inspired-practice.md).
+- [Calling actions outside a React event handler in pre-React 18](./docs/learn/guides/event-handler-in-pre-react-18.md).
+- [Testing](./docs/learn/guides/testing.md)
+- For more, have a look [in the docs folder](./docs/index.md)
 
 ## Third-Party Libraries
 
-Some users may want to extend Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/integrations/third-party-libraries.md).
+Some users may want to extend Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/reference/integrations/third-party-libraries.md).
 
 ## Comparison with other libraries
 
-- [Difference between zustand and other state management libraries for React](https://zustand.docs.pmnd.rs/getting-started/comparison)
+- [Difference between zustand and other state management libraries for React](https://zustand.docs.pmnd.rs/learn/getting-started/comparison)
