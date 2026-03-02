@@ -81,7 +81,7 @@ import { StateStorage } from 'zustand/middleware'
 
 > Default: `createJSONStorage(() => localStorage)`
 
-Enables you to use your own storage. Simply pass a function that returns the storage you want to use. It's recommended to use the [`createJSONStorage`](#createjsonstorage) helper function to create a `storage` object that is compliant with the `StateStorage` interface.
+Enables you to use your own storage. Simply pass a function that returns the storage you want to use. It's recommended to use the [`createJSONStorage`](#`createjsonstorage`) helper function to create a `storage` object that is compliant with the `StateStorage` interface.
 
 Example:
 
@@ -191,7 +191,7 @@ If you want to introduce a breaking change in your storage
 By default, if the version in the storage
 does not match the version in the code,
 the stored value won't be used.
-You can use the [migrate](#migrate) function (see below)
+You can use the [migrate](#`migrate`) function (see below)
 to handle breaking changes in order to persist previously stored data.
 
 ### `migrate`
@@ -376,7 +376,7 @@ useBoundStore.persist.setOptions({
 
 > Type: `() => void`
 
-Clears everything stored under the [name](#name) key.
+Clears everything stored under the [name](#`name`) key.
 
 ```ts
 useBoundStore.persist.clearStorage()
@@ -399,7 +399,7 @@ await useBoundStore.persist.rehydrate()
 
 This is a non-reactive getter to check
 if the storage has been hydrated
-(note that it updates when calling [`rehydrate`](#rehydrate)).
+(note that it updates when calling [`rehydrate`](#`rehydrate`)).
 
 ```ts
 useBoundStore.persist.hasHydrated()
@@ -445,7 +445,7 @@ unsub()
 
 > Returns: `PersistStorage`
 
-This helper function enables you to create a [`storage`](#storage) object which is useful when you want to use a custom storage engine.
+This helper function enables you to create a [`storage`](#`storage`) object which is useful when you want to use a custom storage engine.
 
 `getStorage` is a function that returns the storage engine with the properties `getItem`, `setItem`, and `removeItem`.
 
@@ -583,7 +583,7 @@ Credits: [This reply to an issue](https://github.com/pmndrs/zustand/issues/938#i
 
 There are a few different ways to do this.
 
-You can use the [`onRehydrateStorage`](#onrehydratestorage)
+You can use the [`onRehydrateStorage`](#`onrehydratestorage`)
 listener function to update a field in the store:
 
 ```ts

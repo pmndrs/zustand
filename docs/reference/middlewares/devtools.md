@@ -28,7 +28,7 @@ const nextStateCreatorFn = devtools(stateCreatorFn, devtoolsOptions)
   - [Cleanup](#cleanup)
 - [Troubleshooting](#troubleshooting)
   - [Only one store is displayed](#only-one-store-is-displayed)
-  - [Action names are labeled as 'anonymous'](#all-action-names-are-labeled-as-anonymous)
+  - [Action names are labeled as 'anonymous'](#all-action-names-are-labeled-as-'anonymous')
 
 ## Types
 

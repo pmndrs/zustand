@@ -24,7 +24,7 @@ const equal = shallow(a, b)
   - [Comparing Sets](#comparing-sets)
   - [Comparing Maps](#comparing-maps)
 - [Troubleshooting](#troubleshooting)
-  - [Comparing objects returns `false` even if they are identical.](#comparing-objects-returns-false-even-if-they-are-identical)
+  - [Comparing objects returns `false` even if they are identical.](#comparing-objects-returns-`false`-even-if-they-are-identical.)
   - [Comparing objects with different prototypes](#comparing-objects-with-different-prototypes)
 
 ## Types
