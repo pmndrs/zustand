@@ -18,6 +18,8 @@ const memoizedSelector = useShallow(selector)
   - [Writing a memoized selector](#writing-a-memoized-selector)
 - [Troubleshooting](#troubleshooting)
 
+## Types
+
 ### Signature
 
 ```ts

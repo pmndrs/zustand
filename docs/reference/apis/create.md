@@ -12,7 +12,7 @@ const useSomeStore = create(stateCreatorFn)
 ```
 
 - [Types](#types)
-  - [Signature](#create-signature)
+  - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)

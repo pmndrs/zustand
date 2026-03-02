@@ -27,6 +27,8 @@ const someState = useStoreWithEqualityFn(store, selectorFn, equalityFn)
   - [Using dynamic scoped (non-global) vanilla stores in React](#using-dynamic-scoped-non-global-vanilla-stores-in-react)
 - [Troubleshooting](#troubleshooting)
 
+## Types
+
 ### Signature
 
 ```ts

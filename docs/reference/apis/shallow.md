@@ -16,7 +16,7 @@ const equal = shallow(a, b)
 ```
 
 - [Types](#types)
-  - [Signature](#shallow-signature)
+  - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
   - [Comparing Primitives](#comparing-primitives)

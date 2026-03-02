@@ -18,7 +18,7 @@ const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ```
 
 - [Types](#types)
-  - [Signature](#createwithequalityfn-signature)
+  - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
