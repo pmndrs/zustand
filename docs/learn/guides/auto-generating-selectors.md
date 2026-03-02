@@ -11,7 +11,7 @@ const bears = useBearStore((state) => state.bears)
 
 However, writing these could be tedious. If that is the case for you, you can auto-generate your selectors.
 
-## Create the following function: `createSelectors`
+<h2 id="create-the-following-function-createselectors">Create the following function: <code>createSelectors</code></h2>
 
 ```typescript
 import { StoreApi, UseBoundStore } from 'zustand'

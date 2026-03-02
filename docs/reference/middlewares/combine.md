@@ -35,7 +35,7 @@ combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [],
 
 ## Reference
 
-### `combine(initialState, additionalStateCreatorFn)`
+<h3 id="combineinitialstate-additionalstatecreatorfn"><code>combine(initialState, additionalStateCreatorFn)</code></h3>
 
 #### Parameters
 

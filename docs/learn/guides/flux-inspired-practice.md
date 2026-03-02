@@ -19,7 +19,7 @@ Your applications global state should be located in a single Zustand store.
 
 If you have a large application, Zustand supports [splitting the store into slices](./slices-pattern.md).
 
-### Use `set` / `setState` to update the store
+<h3 id="use-set-setstate-to-update-the-store">Use <code>set</code> / <code>setState</code> to update the store</h3>
 
 Always use `set` (or `setState`) to perform updates to your store.
 `set` (and `setState`) ensures the described update is correctly merged and listeners are appropriately notified.

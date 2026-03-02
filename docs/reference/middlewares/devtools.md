@@ -46,7 +46,7 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
 
 ## Reference
 
-### `devtools(stateCreatorFn, devtoolsOptions)`
+<h3 id="devtoolsstatecreatorfn-devtoolsoptions"><code>devtools(stateCreatorFn, devtoolsOptions)</code></h3>
 
 #### Parameters
 

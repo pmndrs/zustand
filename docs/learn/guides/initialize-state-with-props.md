@@ -5,7 +5,7 @@ nav: 17
 
 In cases where [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) is needed, such as when a store should be initialized with props from a component, the recommended approach is to use a vanilla store with React.context.
 
-## Store creator with `createStore`
+<h2 id="store-creator-with-createstore">Store creator with <code>createStore</code></h2>
 
 ```ts
 import { createStore } from 'zustand'
@@ -32,7 +32,7 @@ const createBearStore = (initProps?: Partial<BearProps>) => {
 }
 ```
 
-## Creating a context with `React.createContext`
+<h2 id="creating-a-context-with-reactcreatecontext">Creating a context with <code>React.createContext</code></h2>
 
 ```ts
 import { createContext } from 'react'

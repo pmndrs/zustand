@@ -247,7 +247,7 @@ For a usual statically typed language, this is impossible. But thanks to TypeScr
 
 If you are eager to know what the answer is to this particular problem then you can [see it here](#middleware-that-changes-the-store-type).
 
-### Handling Dynamic `replace` Flag
+<h3 id="handling-dynamic-replace-flag">Handling Dynamic <code>replace</code> Flag</h3>
 
 If the value of the `replace` flag is not known at compile time and is determined dynamically, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with the parameters of the `setState` function:
 
@@ -259,7 +259,7 @@ const args = [{ bears: 5 }, replaceFlag] as Parameters<
 store.setState(...args)
 ```
 
-#### Example with `as Parameters` Workaround
+<h4 id="example-with-as-parameters-workaround">Example with <code>as Parameters</code> Workaround</h4>
 
 ```ts
 import { create } from 'zustand'
@@ -386,7 +386,7 @@ const useBearStore = create(foo(() => ({ bears: 0 }), 'hello'))
 console.log(useBearStore.foo.toUpperCase())
 ```
 
-### `create` without curried workaround
+<h3 id="create-without-curried-workaround"><code>create</code> without curried workaround</h3>
 
 The recommended way to use `create` is using the curried workaround like so: `create<T>()(...)`. This is because it enables you to infer the store type. But if for some reason you do not want to use the workaround, you can pass the type parameters like the following. Note that in some cases, this acts as an assertion instead of annotation, so we don't recommend it.
 
@@ -479,7 +479,7 @@ A detailed explanation on the slices pattern can be found [here](./slices-patter
 
 If you have some middlewares then replace `StateCreator<MyState, [], [], MySlice>` with `StateCreator<MyState, Mutators, [], MySlice>`. For example, if you are using `devtools` then it will be `StateCreator<MyState, [["zustand/devtools", never]], [], MySlice>`. See the ["Middlewares and their mutators reference"](#middlewares-and-their-mutators-reference) section for a list of all mutators.
 
-### Bounded `useStore` hook for vanilla stores
+<h3 id="bounded-usestore-hook-for-vanilla-stores">Bounded <code>useStore</code> hook for vanilla stores</h3>
 
 ```ts
 import { useStore } from 'zustand'

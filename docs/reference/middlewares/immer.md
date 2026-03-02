@@ -39,7 +39,7 @@ immer<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<T, [['zustand/im
 
 ## Reference
 
-### `immer(stateCreatorFn)`
+<h3 id="immerstatecreatorfn"><code>immer(stateCreatorFn)</code></h3>
 
 #### Parameters
 

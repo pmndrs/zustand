@@ -34,7 +34,7 @@ create<T>()(stateCreatorFn: StateCreator<T, [], []>): UseBoundStore<StoreApi<T>>
 
 ## Reference
 
-### `create(stateCreatorFn)`
+<h3 id="createstatecreatorfn"><code>create(stateCreatorFn)</code></h3>
 
 #### Parameters
 
