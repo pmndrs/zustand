@@ -32,7 +32,7 @@ createStore<T>()(stateCreatorFn: StateCreator<T, [], []>): StoreApi<T>
 
 ## Reference
 
-<h3 id="createstorestatecreatorfn"><code>createStore(stateCreatorFn)</code></h3>
+### `createStore(stateCreatorFn)`
 
 #### Parameters
 

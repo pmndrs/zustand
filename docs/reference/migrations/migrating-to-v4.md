@@ -18,7 +18,7 @@ you can also check the
 [diff](https://github.com/pmndrs/zustand/compare/v3.7.2...v4.0.0?short_path=37e5b4c#diff-c21e24854115b390eccde717da83f91feb2d5927a76c1485e5f0fdd0135c2afa)
 of the test files in the Zustand repository from v3 to v4.
 
-<h2 id="create"><code>create</code></h2>
+## `create`
 
 **Applicable imports**
 
@@ -53,7 +53,7 @@ remove all type parameters from `create`.
 
 Else, replace `create<T, ...>(...)` with `create<T>()(...)`.
 
-<h2 id="statecreator"><code>StateCreator</code></h2>
+## `StateCreator`
 
 **Applicable imports**
 
@@ -91,7 +91,7 @@ For that check the
 and [Common recipes](../../learn/guides/advanced-typescript.md#common-recipes)
 sections of the TypeScript Guide.
 
-<h2 id="partialstate"><code>PartialState</code></h2>
+## `PartialState`
 
 **Applicable imports**
 
@@ -135,7 +135,7 @@ We're no longer using the trick to disallow `{ foo: undefined }`
 to be assigned to `Partial<{ foo: string }>`.
 Instead, we're relying on the users to turn on `exactOptionalPropertyTypes`.
 
-<h2 id="usestore"><code>useStore</code></h2>
+## `useStore`
 
 **Applicable imports**
 
@@ -173,7 +173,7 @@ If you are,
 it's recommended to remove all the type parameters,
 or pass the **store** type instead of the **state** type as the first parameter.
 
-<h2 id="useboundstore"><code>UseBoundStore</code></h2>
+## `UseBoundStore`
 
 **Applicable imports**
 
@@ -210,7 +210,7 @@ import type { UseBoundStore } from 'zustand/react'
 Replace `UseBoundStore<T>` with `UseBoundStore<StoreApi<T>>`,
 and `UseBoundStore<T, S>` with `UseBoundStore<S>`
 
-<h2 id="usecontextstore"><code>UseContextStore</code></h2>
+## `UseContextStore`
 
 **Applicable imports**
 
@@ -228,7 +228,7 @@ import type { UseContextStore } from 'zustand/context'
 
 Use `typeof MyContext.useStore` instead
 
-<h2 id="createcontext"><code>createContext</code></h2>
+## `createContext`
 
 **Applicable imports**
 
@@ -249,7 +249,7 @@ import createContext from 'zustand/context'
 Replace `createContext<T>()` with `createContext<StoreApi<T>>()`,
 and `createContext<T, S>()` with `createContext<S>()`.
 
-<h2 id="combine-devtools-subscribewithselector"><code>combine</code>, <code>devtools</code>, <code>subscribeWithSelector</code></h2>
+## `combine`, `devtools`, `subscribeWithSelector`
 
 **Applicable imports**
 
@@ -288,7 +288,7 @@ If you are,
 remove all the type parameters,
 as they are inferred automatically.
 
-<h2 id="persist"><code>persist</code></h2>
+## `persist`
 
 **Applicable imports**
 
@@ -333,7 +333,7 @@ you should not encounter any bugs.
 The runtime behavior has not changed,
 only the types are now correct.
 
-<h2 id="redux"><code>redux</code></h2>
+## `redux`
 
 **Applicable imports**
 

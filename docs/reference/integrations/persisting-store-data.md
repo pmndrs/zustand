@@ -62,14 +62,14 @@ export const useBearStore = create<BearStore>()(
 
 ## Options
 
-<h3 id="name"><code>name</code></h3>
+### `name`
 
 This is the only required option.
 The given name is going to be the key
 used to store your Zustand state in the storage,
 so it must be unique.
 
-<h3 id="storage"><code>storage</code></h3>
+### `storage`
 
 > Type: `() => StateStorage`
 
@@ -101,7 +101,7 @@ export const useBoundStore = create(
 )
 ```
 
-<h3 id="partialize"><code>partialize</code></h3>
+### `partialize`
 
 > Type: `(state: Object) => Object`
 
@@ -146,7 +146,7 @@ export const useBoundStore = create(
 )
 ```
 
-<h3 id="onrehydratestorage"><code>onRehydrateStorage</code></h3>
+### `onRehydrateStorage`
 
 > Type: `(state: Object) => ((state?: Object, error?: Error) => void) | void`
 
@@ -180,7 +180,7 @@ export const useBoundStore = create(
 )
 ```
 
-<h3 id="version"><code>version</code></h3>
+### `version`
 
 > Type: `number`
 
@@ -194,7 +194,7 @@ the stored value won't be used.
 You can use the [migrate](#migrate) function (see below)
 to handle breaking changes in order to persist previously stored data.
 
-<h3 id="migrate"><code>migrate</code></h3>
+### `migrate`
 
 > Type: `(persistedState: Object, version: number) => Object | Promise<Object>`
 
@@ -231,7 +231,7 @@ export const useBoundStore = create(
 )
 ```
 
-<h3 id="merge"><code>merge</code></h3>
+### `merge`
 
 > Type: `(persistedState: Object, currentState: Object) => Object`
 
@@ -285,7 +285,7 @@ export const useBoundStore = create(
 )
 ```
 
-<h3 id="skiphydration"><code>skipHydration</code></h3>
+### `skipHydration`
 
 > Type: `boolean | undefined`
 
@@ -337,7 +337,7 @@ The Persist API enables you to do a number of interactions
 with the Persist middleware
 from inside or outside of a React component.
 
-<h3 id="getoptions"><code>getOptions</code></h3>
+### `getOptions`
 
 > Type: `() => Partial<PersistOptions>`
 
@@ -349,7 +349,7 @@ For example, it can be used to obtain the storage name:
 useBoundStore.persist.getOptions().name
 ```
 
-<h3 id="setoptions"><code>setOptions</code></h3>
+### `setOptions`
 
 > Type: `(newOptions: Partial<PersistOptions>) => void`
 
@@ -372,7 +372,7 @@ useBoundStore.persist.setOptions({
 })
 ```
 
-<h3 id="clearstorage"><code>clearStorage</code></h3>
+### `clearStorage`
 
 > Type: `() => void`
 
@@ -382,7 +382,7 @@ Clears everything stored under the [name](#name) key.
 useBoundStore.persist.clearStorage()
 ```
 
-<h3 id="rehydrate"><code>rehydrate</code></h3>
+### `rehydrate`
 
 > Type: `() => Promise<void>`
 
@@ -393,7 +393,7 @@ This can be done by calling the `rehydrate` method.
 await useBoundStore.persist.rehydrate()
 ```
 
-<h3 id="hashydrated"><code>hasHydrated</code></h3>
+### `hasHydrated`
 
 > Type: `() => boolean`
 
@@ -405,7 +405,7 @@ if the storage has been hydrated
 useBoundStore.persist.hasHydrated()
 ```
 
-<h3 id="onhydrate"><code>onHydrate</code></h3>
+### `onHydrate`
 
 > Type: `(listener: (state) => void) => () => void`
 
@@ -422,7 +422,7 @@ const unsub = useBoundStore.persist.onHydrate((state) => {
 unsub()
 ```
 
-<h3 id="onfinishhydration"><code>onFinishHydration</code></h3>
+### `onFinishHydration`
 
 > Type: `(listener: (state) => void) => () => void`
 
@@ -439,7 +439,7 @@ const unsub = useBoundStore.persist.onFinishHydration((state) => {
 unsub()
 ```
 
-<h3 id="createjsonstorage"><code>createJSONStorage</code></h3>
+### `createJSONStorage`
 
 > Type: `(getStorage: () => StateStorage, options?: JsonStorageOptions) => StateStorage`
 

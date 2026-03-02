@@ -40,7 +40,7 @@ createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: 
 
 ## Reference
 
-<h3 id="createwithequalityfnstatecreatorfn"><code>createWithEqualityFn(stateCreatorFn)</code></h3>
+### `createWithEqualityFn(stateCreatorFn)`
 
 #### Parameters
 

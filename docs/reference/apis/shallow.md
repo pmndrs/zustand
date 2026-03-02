@@ -37,7 +37,7 @@ shallow<T>(a: T, b: T): boolean
 
 ## Reference
 
-<h3 id="shallowa-b"><code>shallow(a, b)</code></h3>
+### `shallow(a, b)`
 
 #### Parameters
 
@@ -155,7 +155,7 @@ shallow(mapLeft, mapRight) // -> true
 
 ## Troubleshooting
 
-<h3 id="comparing-objects-returns-false-even-if-they-are-identical">Comparing objects returns <code>false</code> even if they are identical.</h3>
+### Comparing objects returns `false` even if they are identical.
 
 The `shallow` function performs a shallow comparison. A shallow comparison checks if the top-level
 properties of two objects are equal. It does not check nested objects or deeply nested properties.

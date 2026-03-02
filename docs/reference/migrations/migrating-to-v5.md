@@ -23,7 +23,7 @@ We highly recommend to update to the latest version of v4, before migrating to v
 
 ## Migration Guide
 
-<h3 id="using-custom-equality-functions-such-as-shallow">Using custom equality functions such as <code>shallow</code></h3>
+### Using custom equality functions such as `shallow`
 
 The `create` function in v5 does not support customizing equality function.
 
@@ -178,7 +178,7 @@ store.setState({ key: 'value' }, true)
 store.setState({}, true) // Error
 ```
 
-<h4 id="handling-dynamic-replace-flag">Handling Dynamic <code>replace</code> Flag</h4>
+#### Handling Dynamic `replace` Flag
 
 If the value of the `replace` flag is dynamic and determined at runtime, you might face issues. To handle this, you can use a workaround by annotating the `replace` parameter with the parameters of the `setState` function:
 

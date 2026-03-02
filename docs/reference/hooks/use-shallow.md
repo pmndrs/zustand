@@ -28,7 +28,7 @@ useShallow<T, U = T>(selectorFn: (state: T) => U): (state: T) => U
 
 ## Reference
 
-<h3 id="useshallowselectorfn"><code>useShallow(selectorFn)</code></h3>
+### `useShallow(selectorFn)`
 
 #### Parameters
 

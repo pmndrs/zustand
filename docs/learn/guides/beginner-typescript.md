@@ -204,7 +204,7 @@ function TotalFood() {
 
 ### Middlewares
 
-<h4 id="combine-middleware"><code>combine</code> middleware</h4>
+#### `combine` middleware
 
 This middleware separates initial state and actions, making the code cleaner.
 TS automatically infers types from the state and actions, no interface needed.
@@ -228,7 +228,7 @@ export const useBearStore = create<BearState>()(
 )
 ```
 
-<h4 id="devtools-middleware"><code>devtools</code> middleware</h4>
+#### `devtools` middleware
 
 This middleware connects Zustand to Redux DevTools. You can inspect changes, time-travel, and debug state.
 It’s extremely useful in development. TS ensures your actions and state remain type-checked even here.
@@ -251,7 +251,7 @@ export const useBearStore = create<BearState>()(
 )
 ```
 
-<h4 id="persist-middleware"><code>persist</code> middleware</h4>
+#### `persist` middleware
 
 This middleware keeps your store in `localStorage` (or another storage). This means your bears survive a page refresh.
 Great for apps where persistence matters. In TS, the state type stays consistent, so no runtime surprises.
@@ -305,7 +305,7 @@ export const useBearStore = create<BearState>()((set) => ({
 }))
 ```
 
-<h3 id="createwithequalityfn"><code>createWithEqualityFn</code></h3>
+### `createWithEqualityFn`
 
 Variant of `create` with equality built-in. Useful if you always want custom equality checks.
 Not common, but shows Zustand’s flexibility. TS still keeps full type inference.

@@ -36,7 +36,7 @@ redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreato
 
 ## Reference
 
-<h3 id="reduxreducerfn-initialstate"><code>redux(reducerFn, initialState)</code></h3>
+### `redux(reducerFn, initialState)`
 
 #### Parameters
 

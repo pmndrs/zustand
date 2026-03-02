@@ -37,7 +37,7 @@ useStoreWithEqualityFn<T, U = T>(store: StoreApi<T>, selectorFn: (state: T) => U
 
 ## Reference
 
-<h3 id="usestorewithequalityfnstore-selectorfn-equalityfn"><code>useStoreWithEqualityFn(store, selectorFn, equalityFn)</code></h3>
+### `useStoreWithEqualityFn(store, selectorFn, equalityFn)`
 
 #### Parameters
 

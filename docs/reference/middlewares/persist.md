@@ -42,7 +42,7 @@ persist<T, U>(stateCreatorFn: StateCreator<T, [], []>, persistOptions?: PersistO
 
 ## Reference
 
-<h3 id="persiststatecreatorfn"><code>persist(stateCreatorFn)</code></h3>
+### `persist(stateCreatorFn)`
 
 #### Parameters
 

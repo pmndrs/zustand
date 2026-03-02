@@ -31,7 +31,7 @@ useStore<StoreApi<T>, U = T>(store: StoreApi<T>, selectorFn?: (state: T) => U) =
 
 ## Reference
 
-<h3 id="usestorestore-selectorfn"><code>useStore(store, selectorFn)</code></h3>
+### `useStore(store, selectorFn)`
 
 #### Parameters
 

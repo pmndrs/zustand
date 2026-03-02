@@ -35,7 +35,7 @@ subscribeWithSelector<T>(stateCreatorFn: StateCreator<T, [], []>): StateCreator<
 
 ## Reference
 
-<h3 id="subscribewithselectorstatecreatorfn"><code>subscribeWithSelector(stateCreatorFn)</code></h3>
+### `subscribeWithSelector(stateCreatorFn)`
 
 #### Parameters
 
