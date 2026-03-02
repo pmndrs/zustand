@@ -16,7 +16,7 @@ const equal = shallow(a, b)
 ```
 
 - [Types](#types)
-  - [Signature](#shallow-signature)
+  - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
   - [Comparing Primitives](#comparing-primitives)
@@ -24,7 +24,7 @@ const equal = shallow(a, b)
   - [Comparing Sets](#comparing-sets)
   - [Comparing Maps](#comparing-maps)
 - [Troubleshooting](#troubleshooting)
-  - [Comparing objects returns `false` even if they are identical.](#comparing-objects-returns-false-even-if-they-are-identical)
+  - [Comparing objects returns `false` even if they are identical](#comparing-objects-returns-false-even-if-they-are-identical)
   - [Comparing objects with different prototypes](#comparing-objects-with-different-prototypes)
 
 ## Types
@@ -155,7 +155,7 @@ shallow(mapLeft, mapRight) // -> true
 
 ## Troubleshooting
 
-### Comparing objects returns `false` even if they are identical.
+### Comparing objects returns `false` even if they are identical
 
 The `shallow` function performs a shallow comparison. A shallow comparison checks if the top-level
 properties of two objects are equal. It does not check nested objects or deeply nested properties.

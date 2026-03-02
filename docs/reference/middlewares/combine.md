@@ -19,10 +19,10 @@ const nextStateCreatorFn = combine(initialState, additionalStateCreatorFn)
 ```
 
 - [Types](#types)
-  - [Signature](#combine-signature)
+  - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
-  - [Creating a state with inferred types](#creating-a-state-wit-inferred-types)
+  - [Creating a store with inferred types](#creating-a-store-with-inferred-types)
 - [Troubleshooting](#troubleshooting)
 
 ## Types
