@@ -9,7 +9,7 @@ import type {
 type Config = Parameters<
   (Window extends { __REDUX_DEVTOOLS_EXTENSION__?: infer T }
     ? T
-    : { connect: (param: object) => object })['connect']
+    : { connect: (param: any) => unknown })['connect']
 >[0]
 
 declare module '../vanilla' {
