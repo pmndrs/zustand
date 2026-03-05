@@ -12,7 +12,7 @@ const useSomeStore = create(stateCreatorFn)
 ```
 
 - [Types](#types)
-  - [Signature](#create-signature)
+  - [Signature](#signature)
 - [Reference](#reference)
 - [Usage](#usage)
   - [Updating state based on previous state](#updating-state-based-on-previous-state)
@@ -22,7 +22,7 @@ const useSomeStore = create(stateCreatorFn)
   - [Updating state with no store actions](#updating-state-with-no-store-actions)
   - [Subscribing to state updates](#subscribing-to-state-updates)
 - [Troubleshooting](#troubleshooting)
-  - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
+  - [I’ve updated the state, but the screen doesn’t update](#i’ve-updated-the-state,-but-the-screen-doesn’t-update)
 
 ## Types
 
