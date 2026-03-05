@@ -314,7 +314,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         if (currentVersion !== hydrationVersion) {
           return
         }
-        postRehydrationCallback?.(get() ?? stateFromStorage, undefined)
+        postRehydrationCallback?.(get(), undefined)
 
         // It's possible that 'postRehydrationCallback' updated the state. To ensure
         // that isn't overwritten when returning 'stateFromStorage' below
