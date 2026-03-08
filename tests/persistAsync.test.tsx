@@ -756,6 +756,60 @@ describe('persist middleware with async configuration', () => {
     expect(useBoundStore.getState().count).toEqual(2)
   })
 
+  it('passes latest state to post-rehydration callback after hydration-triggered updates', async () => {
+    const onRehydrateStorageSpy = vi.fn()
+    const storage = {
+      getItem: async () => {
+        await sleep(10)
+        return JSON.stringify({
+          state: { count: 1, bumped: false },
+          version: 0,
+        })
+      },
+      setItem: () => {},
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0, bumped: false }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+        onRehydrateStorage: () => onRehydrateStorageSpy,
+      }),
+    )
+
+    let patchedDuringHydration = false
+    const unsubscribe = useBoundStore.subscribe((state) => {
+      if (!patchedDuringHydration && state.count === 1 && !state.bumped) {
+        patchedDuringHydration = true
+        useBoundStore.setState({ bumped: true })
+      }
+    })
+
+    function Counter() {
+      const { count, bumped } = useBoundStore()
+      return (
+        <div>
+          count: {count}, bumped: {String(bumped)}
+        </div>
+      )
+    }
+
+    render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>,
+    )
+
+    await act(() => vi.advanceTimersByTimeAsync(10))
+    expect(screen.getByText('count: 1, bumped: true')).toBeInTheDocument()
+    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(
+      { count: 1, bumped: true },
+      undefined,
+    )
+    unsubscribe()
+  })
+
   it('can rehydrate state with custom deserialized Map', async () => {
     const onRehydrateStorageSpy = vi.fn()
     const storage = {
