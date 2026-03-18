@@ -13,8 +13,20 @@ const compareEntries = (
   valueA: { entries(): Iterable<[unknown, unknown]> },
   valueB: { entries(): Iterable<[unknown, unknown]> },
 ) => {
-  const mapA = valueA instanceof Map ? valueA : new Map(valueA.entries())
-  const mapB = valueB instanceof Map ? valueB : new Map(valueB.entries())
+  if (valueA instanceof Map && valueB instanceof Map) {
+    if (valueA.size !== valueB.size) {
+      return false
+    }
+    for (const [key, value] of valueA) {
+      if (!valueB.has(key) || !Object.is(value, valueB.get(key))) {
+        return false
+      }
+    }
+    return true
+  }
+
+  const mapA = new Map(valueA.entries())
+  const mapB = new Map(valueB.entries())
   if (mapA.size !== mapB.size) {
     return false
   }
