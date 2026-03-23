@@ -9,28 +9,34 @@ const learnSidebar = [
   {
     text: 'Start here',
     items: [
-      { text: 'Introduction', link: '/getting-started/introduction' },
+      { text: 'Introduction', link: '/learn/getting-started/introduction' },
       {
         text: 'Comparison with other tools',
-        link: '/getting-started/comparison',
+        link: '/learn/getting-started/comparison',
       },
-      { text: 'Tutorial: Tic Tac Toe', link: '/guides/tutorial-tic-tac-toe' },
+      {
+        text: 'Tutorial: Tic Tac Toe',
+        link: '/learn/guides/tutorial-tic-tac-toe',
+      },
     ],
   },
   {
     text: 'State management basics',
     items: [
-      { text: 'Updating state', link: '/guides/updating-state' },
+      { text: 'Updating state', link: '/learn/guides/updating-state' },
       {
         text: 'Practice with no store actions',
-        link: '/guides/practice-with-no-store-actions',
+        link: '/learn/guides/practice-with-no-store-actions',
       },
-      { text: 'Slices pattern', link: '/guides/slices-pattern' },
+      { text: 'Slices pattern', link: '/learn/guides/slices-pattern' },
       {
         text: 'Immutable state and merging',
-        link: '/guides/immutable-state-and-merging',
+        link: '/learn/guides/immutable-state-and-merging',
       },
-      { text: 'Maps and sets usage', link: '/guides/maps-and-sets-usage' },
+      {
+        text: 'Maps and sets usage',
+        link: '/learn/guides/maps-and-sets-usage',
+      },
     ],
   },
   {
@@ -38,66 +44,78 @@ const learnSidebar = [
     items: [
       {
         text: 'Prevent rerenders with useShallow',
-        link: '/guides/prevent-rerenders-with-use-shallow',
+        link: '/learn/guides/prevent-rerenders-with-use-shallow',
       },
       {
         text: 'Connect to state with URL hash',
-        link: '/guides/connect-to-state-with-url-hash',
+        link: '/learn/guides/connect-to-state-with-url-hash',
       },
       {
         text: 'Event handler in pre React 18',
-        link: '/guides/event-handler-in-pre-react-18',
+        link: '/learn/guides/event-handler-in-pre-react-18',
       },
     ],
   },
   {
     text: 'TypeScript path',
     items: [
-      { text: 'Beginner TypeScript', link: '/guides/beginner-typescript' },
-      { text: 'Advanced TypeScript', link: '/guides/advanced-typescript' },
+      {
+        text: 'Beginner TypeScript',
+        link: '/learn/guides/beginner-typescript',
+      },
+      {
+        text: 'Advanced TypeScript',
+        link: '/learn/guides/advanced-typescript',
+      },
       {
         text: 'Auto-generating selectors',
-        link: '/guides/auto-generating-selectors',
+        link: '/learn/guides/auto-generating-selectors',
       },
     ],
   },
   {
     text: 'Frameworks and platforms',
     items: [
-      { text: 'Next.js', link: '/guides/nextjs' },
-      { text: 'SSR and hydration', link: '/guides/ssr-and-hydration' },
+      { text: 'Next.js', link: '/learn/guides/nextjs' },
+      { text: 'SSR and hydration', link: '/learn/guides/ssr-and-hydration' },
       {
         text: 'Initialize state with props',
-        link: '/guides/initialize-state-with-props',
+        link: '/learn/guides/initialize-state-with-props',
       },
     ],
   },
   {
     text: 'Testing and quality',
     items: [
-      { text: 'Testing stores and components', link: '/guides/testing' },
+      {
+        text: 'Testing stores and components',
+        link: '/learn/guides/testing',
+      },
       {
         text: 'Flux-inspired practice',
-        link: '/guides/flux-inspired-practice',
+        link: '/learn/guides/flux-inspired-practice',
       },
-      { text: 'How to reset state', link: '/guides/how-to-reset-state' },
+      { text: 'How to reset state', link: '/learn/guides/how-to-reset-state' },
     ],
   },
   {
     text: 'Hands-on tutorials',
     items: [
-      { text: 'Build Tic Tac Toe', link: '/guides/tutorial-tic-tac-toe' },
+      {
+        text: 'Build Tic Tac Toe',
+        link: '/learn/guides/tutorial-tic-tac-toe',
+      },
       {
         text: 'Persist state to storage',
-        link: '/integrations/persisting-store-data',
+        link: '/reference/integrations/persisting-store-data',
       },
       {
         text: 'Initialize state from props',
-        link: '/guides/initialize-state-with-props',
+        link: '/learn/guides/initialize-state-with-props',
       },
       {
         text: 'Hydrate on the server and client',
-        link: '/guides/ssr-and-hydration',
+        link: '/learn/guides/ssr-and-hydration',
       },
     ],
   },
@@ -106,30 +124,33 @@ const learnSidebar = [
     items: [
       {
         text: 'Prevent rerenders with useShallow',
-        link: '/guides/prevent-rerenders-with-use-shallow',
+        link: '/learn/guides/prevent-rerenders-with-use-shallow',
       },
       {
         text: 'Connect to state with URL hash',
-        link: '/guides/connect-to-state-with-url-hash',
+        link: '/learn/guides/connect-to-state-with-url-hash',
       },
     ],
   },
   {
     text: 'Tutorials: testing and fixes',
     items: [
-      { text: 'Test stores and components', link: '/guides/testing' },
+      { text: 'Test stores and components', link: '/learn/guides/testing' },
       {
         text: 'Flux-inspired practice',
-        link: '/guides/flux-inspired-practice',
+        link: '/learn/guides/flux-inspired-practice',
       },
-      { text: 'How to reset state', link: '/guides/how-to-reset-state' },
+      {
+        text: 'How to reset state',
+        link: '/learn/guides/how-to-reset-state',
+      },
       {
         text: 'Event handler in pre React 18',
-        link: '/guides/event-handler-in-pre-react-18',
+        link: '/learn/guides/event-handler-in-pre-react-18',
       },
       {
         text: 'Practice with no store actions',
-        link: '/guides/practice-with-no-store-actions',
+        link: '/learn/guides/practice-with-no-store-actions',
       },
     ],
   },
@@ -139,39 +160,43 @@ const referenceSidebar = [
   {
     text: 'APIs',
     items: [
-      { text: 'create', link: '/apis/create', tag: 'react' },
-      { text: 'createStore', link: '/apis/create-store' },
+      { text: 'create', link: '/reference/apis/create', tag: 'react' },
+      { text: 'createStore', link: '/reference/apis/create-store' },
       {
         text: 'createWithEqualityFn',
-        link: '/apis/create-with-equality-fn',
+        link: '/reference/apis/create-with-equality-fn',
         tag: 'react',
       },
-      { text: 'shallow', link: '/apis/shallow' },
+      { text: 'shallow', link: '/reference/apis/shallow' },
     ],
   },
   {
     text: 'Hooks',
     items: [
-      { text: 'useStore', link: '/hooks/use-store', tag: 'react' },
+      { text: 'useStore', link: '/reference/hooks/use-store', tag: 'react' },
       {
         text: 'useStoreWithEqualityFn',
-        link: '/hooks/use-store-with-equality-fn',
+        link: '/reference/hooks/use-store-with-equality-fn',
         tag: 'react',
       },
-      { text: 'useShallow', link: '/hooks/use-shallow', tag: 'react' },
+      {
+        text: 'useShallow',
+        link: '/reference/hooks/use-shallow',
+        tag: 'react',
+      },
     ],
   },
   {
     text: 'Middlewares',
     items: [
-      { text: 'persist', link: '/middlewares/persist' },
-      { text: 'devtools', link: '/middlewares/devtools' },
-      { text: 'redux', link: '/middlewares/redux' },
-      { text: 'immer', link: '/middlewares/immer' },
-      { text: 'combine', link: '/middlewares/combine' },
+      { text: 'persist', link: '/reference/middlewares/persist' },
+      { text: 'devtools', link: '/reference/middlewares/devtools' },
+      { text: 'redux', link: '/reference/middlewares/redux' },
+      { text: 'immer', link: '/reference/middlewares/immer' },
+      { text: 'combine', link: '/reference/middlewares/combine' },
       {
         text: 'subscribeWithSelector',
-        link: '/middlewares/subscribe-with-selector',
+        link: '/reference/middlewares/subscribe-with-selector',
       },
     ],
   },
@@ -180,32 +205,50 @@ const referenceSidebar = [
     items: [
       {
         text: 'Persisting store data',
-        link: '/integrations/persisting-store-data',
+        link: '/reference/integrations/persisting-store-data',
       },
-      { text: 'Immer middleware', link: '/integrations/immer-middleware' },
+      {
+        text: 'Immer middleware',
+        link: '/reference/integrations/immer-middleware',
+      },
       {
         text: 'Third-party libraries',
-        link: '/integrations/third-party-libraries',
+        link: '/reference/integrations/third-party-libraries',
       },
     ],
   },
   {
     text: 'Patterns and guides',
     items: [
-      { text: 'Slices pattern', link: '/guides/slices-pattern' },
-      { text: 'SSR and hydration', link: '/guides/ssr-and-hydration' },
+      { text: 'Slices pattern', link: '/learn/guides/slices-pattern' },
+      { text: 'SSR and hydration', link: '/learn/guides/ssr-and-hydration' },
       {
         text: 'Prevent rerenders with useShallow',
-        link: '/guides/prevent-rerenders-with-use-shallow',
+        link: '/learn/guides/prevent-rerenders-with-use-shallow',
       },
-      { text: 'Testing', link: '/guides/testing' },
+      { text: 'Testing', link: '/learn/guides/testing' },
     ],
   },
   {
     text: 'Migrations',
     items: [
-      { text: 'Migrating to v5', link: '/migrations/migrating-to-v5' },
-      { text: 'Migrating to v4', link: '/migrations/migrating-to-v4' },
+      {
+        text: 'Migrating to v5',
+        link: '/reference/migrations/migrating-to-v5',
+      },
+      {
+        text: 'Migrating to v4',
+        link: '/reference/migrations/migrating-to-v4',
+      },
+    ],
+  },
+  {
+    text: 'Previous versions',
+    items: [
+      {
+        text: 'createContext (v3)',
+        link: '/reference/previous-versions/zustand-v3-create-context',
+      },
     ],
   },
 ];
@@ -243,14 +286,7 @@ export default defineConfig({
     ],
     sidebar: {
       '/learn/': learnSidebar,
-      '/getting-started/': learnSidebar,
-      '/guides/': learnSidebar,
       '/reference/': referenceSidebar,
-      '/apis/': referenceSidebar,
-      '/hooks/': referenceSidebar,
-      '/middlewares/': referenceSidebar,
-      '/integrations/': referenceSidebar,
-      '/migrations/': referenceSidebar,
     },
     socialLinks: [
       {
