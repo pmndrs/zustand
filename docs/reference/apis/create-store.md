@@ -20,7 +20,7 @@ const someStore = createStore(stateCreatorFn)
   - [Updating Arrays in State](#updating-arrays-in-state)
   - [Subscribing to state updates](#subscribing-to-state-updates)
 - [Troubleshooting](#troubleshooting)
-  - [I’ve updated the state, but the screen doesn’t update](#i’ve-updated-the-state,-but-the-screen-doesn’t-update)
+  - [I’ve updated the state, but the screen doesn’t update](#ive-updated-the-state-but-the-screen-doesnt-update)
 
 ## Types
 
