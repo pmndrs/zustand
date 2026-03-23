@@ -13,6 +13,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@rspress/core": "^2.0.5",
+    "@rspress/plugin-client-redirects": "^2.0.5",
     "@rspress/plugin-llms": "^2.0.5",
     "@rspress/plugin-playground": "2.0.5",
     "@rspress/plugin-preview": "^2.0.5",

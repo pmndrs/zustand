@@ -134,6 +134,9 @@ importers:
       '@rspress/core':
         specifier: ^2.0.5
         version: 2.0.5(@types/mdast@4.0.4)(@types/react@19.2.14)(core-js@3.38.1)(micromark-util-types@2.0.2)(micromark@4.0.2)
+      '@rspress/plugin-client-redirects':
+        specifier: ^2.0.5
+        version: 2.0.5(@rspress/core@2.0.5(@types/mdast@4.0.4)(@types/react@19.2.14)(core-js@3.38.1)(micromark-util-types@2.0.2)(micromark@4.0.2))
       '@rspress/plugin-llms':
         specifier: ^2.0.5
         version: 2.0.5(@rspress/core@2.0.5(@types/mdast@4.0.4)(@types/react@19.2.14)(core-js@3.38.1)(micromark-util-types@2.0.2)(micromark@4.0.2))
@@ -998,6 +1001,12 @@ packages:
     resolution: {integrity: sha512-2ezGmANmIrWmhsUrvlRb9Df4xsun1BDgEertDc890aQqtKcNrbu+TBRsOoO+E/N6ioavun7JGGe1wWjvxubCHw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
+
+  '@rspress/plugin-client-redirects@2.0.5':
+    resolution: {integrity: sha512-sxwWzwHPefSPWUyV6/AA/hBlQUeNFntL8dBQi/vZCQiZHM6ShvKbqa3s5Xu2yI7DeFKHH3jb0VGbjufu8M3Ypw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      '@rspress/core': ^2.0.5
 
   '@rspress/plugin-llms@2.0.5':
     resolution: {integrity: sha512-qOqeInHXhHoBnMSwQdXJuMDOdHO48pfHW/euzA1AZrlvA2jzbII33we+2AbQfkWm98NAKUO4koU1GKUV2hhJ4g==}
@@ -4498,6 +4507,10 @@ snapshots:
       - micromark-util-types
       - supports-color
       - webpack-hot-middleware
+
+  '@rspress/plugin-client-redirects@2.0.5(@rspress/core@2.0.5(@types/mdast@4.0.4)(@types/react@19.2.14)(core-js@3.38.1)(micromark-util-types@2.0.2)(micromark@4.0.2))':
+    dependencies:
+      '@rspress/core': 2.0.5(@types/mdast@4.0.4)(@types/react@19.2.14)(core-js@3.38.1)(micromark-util-types@2.0.2)(micromark@4.0.2)
 
   '@rspress/plugin-llms@2.0.5(@rspress/core@2.0.5(@types/mdast@4.0.4)(@types/react@19.2.14)(core-js@3.38.1)(micromark-util-types@2.0.2)(micromark@4.0.2))':
     dependencies:
