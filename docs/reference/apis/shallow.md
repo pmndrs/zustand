@@ -8,7 +8,7 @@ nav: 24
 **top-level** properties when you're working with data structures that don't have nested objects or
 arrays within them.
 
-> [!NOTE]
+> [!WARNING]
 > Shallow lets you perform quick comparisons, but keep its limitations in mind.
 
 ```js

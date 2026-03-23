@@ -8,7 +8,7 @@ nav: 31
 
 `immer` middleware lets you perform immutable updates.
 
-> [!NOTE]
+> [!INFO]
 > In order to use `immer` from `zustand/middleware/immer` you need to install
 > `immer` library.
 

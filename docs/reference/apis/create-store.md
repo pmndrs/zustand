@@ -120,7 +120,7 @@ State can hold any kind of JavaScript value. When you want to update built-in pr
 numbers, strings, booleans, etc. you should directly assign new values to ensure updates are applied
 correctly, and avoid unexpected behaviors.
 
-> [!NOTE]
+> [!INFO]
 > By default, `set` function performs a shallow merge. If you need to completely replace
 > the state with a new one, use the `replace` parameter set to `true`
 
@@ -231,7 +231,7 @@ By default, `set` function performs a shallow merge. To update array values we s
 values to ensure updates are applied correctly, and avoid unexpected behaviors. To completely
 replace the state with a new one, use the `replace` parameter set to `true`.
 
-> [!NOTE]
+> [!TIP]
 > We should prefer immutable operations like: `[...array]`, `concat(...)`, `filter(...)`,
 > `slice(...)`, `map(...)`, `toSpliced(...)`, `toSorted(...)`, and `toReversed(...)`, and avoid
 > mutable operations like `array[arrayIndex] = ...`, `push(...)`, `unshift(...)`, `pop(...)`,
@@ -440,7 +440,7 @@ personStore.getState().setPerson({
 })
 ```
 
-> [!NOTE]
+> [!TIP]
 > We don’t need to copy every property separately due to `set` function performing shallow merge by
 > default.
 

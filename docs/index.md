@@ -7,10 +7,10 @@ hero:
   actions:
     - theme: brand
       text: Introduction
-      link: ./learn/getting-started/introduction.md
+      link: ./learn/getting-started/introduction
     - theme: alt
       text: Quick Start
-      link: ./learn/index.md
+      link: ./learn
 features:
   - title: Minimal API, fast adoption
     details: Create a store with a single hook, subscribe with selectors, and avoid boilerplate or providers.
