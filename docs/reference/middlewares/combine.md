@@ -11,8 +11,8 @@ creator function that adds new state slices and actions. This is really helpful 
 infers types, so there’s no need for explicit type definitions.
 
 > [!TIP]
-> This makes state management more straightforward and efficient by making curried version of
-> `create` and `createStore` not necessary for middleware usage.
+> This makes state management more straightforward and efficient by making curried version
+> of `create` and `createStore` not necessary for middleware usage.
 
 ```js
 const nextStateCreatorFn = combine(initialState, additionalStateCreatorFn)

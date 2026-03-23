@@ -9,7 +9,7 @@ nav: 26
 `useStore`. However, it offers a way to define a custom equality check. This allows for more
 granular control over when components re-render, improving performance and responsiveness.
 
-> [!IMPORTANT]
+> [!NOTE]
 > In order to use `useStoreWithEqualityFn` from `zustand/traditional` you need to install
 > `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
 

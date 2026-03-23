@@ -9,7 +9,7 @@ nav: 23
 However, it offers a way to define a custom equality check. This allows for more granular control
 over when components re-render, improving performance and responsiveness.
 
-> [!IMPORTANT]
+> [!NOTE]
 > In order to use `createWithEqualityFn` from `zustand/traditional` you need to install
 > `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
 
@@ -254,7 +254,7 @@ By default, `set` function performs a shallow merge. To update array values we s
 values to ensure updates are applied correctly, and avoid unexpected behaviors. To completely
 replace the state with a new one, use the `replace` parameter set to `true`.
 
-> [!IMPORTANT]
+> [!NOTE]
 > We should prefer immutable operations like: `[...array]`, `concat(...)`, `filter(...)`,
 > `slice(...)`, `map(...)`, `toSpliced(...)`, `toSorted(...)`, and `toReversed(...)`, and avoid
 > mutable operations like `array[arrayIndex] = ...`, `push(...)`, `unshift(...)`, `pop(...)`,

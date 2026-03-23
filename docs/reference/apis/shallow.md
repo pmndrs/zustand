@@ -235,7 +235,7 @@ are referentially different, shallow will return `false`. This comparison is don
 Object.getPrototypeOf(a) === Object.getPrototypeOf(b)
 ```
 
-> [!IMPORTANT]
+> [!NOTE]
 > Objects created with the object initializer (`{}`) or with `new Object()` inherit from
 > `Object.prototype` by default. However, objects created with `Object.create(proto)` inherit from
 > the proto you pass in—which may not be `Object.prototype.`
