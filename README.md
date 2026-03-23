@@ -311,7 +311,7 @@ const useFishStore = create(
 )
 ```
 
-[See the full documentation for this middleware.](./docs/reference/integrations/persisting-store-data.md)
+[See the full documentation for this middleware.](./docs/learn/integrations/persisting-store-data.md)
 
 ## Immer middleware
 
@@ -505,7 +505,7 @@ A more detailed TypeScript guide is [here](docs/guides/beginner-typescript.md) a
 
 ## Third-Party Libraries
 
-Some users may want to extend Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/reference/integrations/third-party-libraries.md).
+Some users may want to extend Zustand's feature set which can be done using third-party libraries made by the community. For information regarding third-party libraries with Zustand, visit [the doc](./docs/learn/integrations/third-party-libraries.md).
 
 ## Comparison with other libraries
 

@@ -45,6 +45,14 @@ Using Zustand in server-rendered and framework-specific environments.
 - [SSR and hydration](./guides/ssr-and-hydration.md) — Avoid hydration mismatches when rendering on the server.
 - [Initialize state with props](./guides/initialize-state-with-props.md) — Seed a store's initial state from React component props.
 
+## Integrations
+
+In-depth guides for combining Zustand with middleware and ecosystem tools.
+
+- [Persisting store data](./integrations/persisting-store-data.md) — Persist and rehydrate state using storage adapters.
+- [Immer middleware](./integrations/immer-middleware.md) — Write immutable updates with concise mutable syntax.
+- [Third-party libraries](./integrations/third-party-libraries.md) — Explore community packages that extend Zustand.
+
 ## Testing and quality
 
 Best practices for writing reliable, maintainable code with Zustand.

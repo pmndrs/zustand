@@ -1,6 +1,6 @@
 ---
 title: Reference
-description: API-first reference for stores, hooks, middlewares, and integrations.
+description: API-first reference for stores, hooks, and middlewares.
 ---
 
 ## APIs
@@ -31,13 +31,12 @@ Composable middleware functions for extending store behavior.
 - [`combine`](./middlewares/combine.md) — Combine separate state slices into a single store with inferred types.
 - [`subscribeWithSelector`](./middlewares/subscribe-with-selector.md) — Subscribe to a slice of state with selector and equality support.
 
-## Integrations
+## Learn guides
 
-In-depth guides for using Zustand alongside third-party libraries.
+Practical guides and integration-focused tutorials now live in the Learn section.
 
-- [Persisting store data](./integrations/persisting-store-data.md) — Detailed guide to the `persist` middleware and storage adapters.
-- [Immer middleware](./integrations/immer-middleware.md) — Detailed guide to the `immer` middleware.
-- [Third-party libraries](./integrations/third-party-libraries.md) — Using Zustand with other libraries in the ecosystem.
+- [Integrations](../learn/index.md#integrations)
+- [State management patterns](../learn/index.md#core-concepts)
 
 ## Migrations
 

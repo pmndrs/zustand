@@ -85,6 +85,23 @@ const learnSidebar = [
     ],
   },
   {
+    text: 'Integrations',
+    items: [
+      {
+        text: 'Persisting store data',
+        link: '/learn/integrations/persisting-store-data',
+      },
+      {
+        text: 'Immer middleware',
+        link: '/learn/integrations/immer-middleware',
+      },
+      {
+        text: 'Third-party libraries',
+        link: '/learn/integrations/third-party-libraries',
+      },
+    ],
+  },
+  {
     text: 'Testing and quality',
     items: [
       {
@@ -107,7 +124,7 @@ const learnSidebar = [
       },
       {
         text: 'Persist state to storage',
-        link: '/reference/integrations/persisting-store-data',
+        link: '/learn/integrations/persisting-store-data',
       },
       {
         text: 'Initialize state from props',
@@ -198,35 +215,6 @@ const referenceSidebar = [
         text: 'subscribeWithSelector',
         link: '/reference/middlewares/subscribe-with-selector',
       },
-    ],
-  },
-  {
-    text: 'Integrations',
-    items: [
-      {
-        text: 'Persisting store data',
-        link: '/reference/integrations/persisting-store-data',
-      },
-      {
-        text: 'Immer middleware',
-        link: '/reference/integrations/immer-middleware',
-      },
-      {
-        text: 'Third-party libraries',
-        link: '/reference/integrations/third-party-libraries',
-      },
-    ],
-  },
-  {
-    text: 'Patterns and guides',
-    items: [
-      { text: 'Slices pattern', link: '/learn/guides/slices-pattern' },
-      { text: 'SSR and hydration', link: '/learn/guides/ssr-and-hydration' },
-      {
-        text: 'Prevent rerenders with useShallow',
-        link: '/learn/guides/prevent-rerenders-with-use-shallow',
-      },
-      { text: 'Testing', link: '/learn/guides/testing' },
     ],
   },
   {
