@@ -7,6 +7,7 @@
 [![Version](https://img.shields.io/npm/v/zustand?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Downloads](https://img.shields.io/npm/dt/zustand.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/zustand)
 [![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/poimandres)
+[![Stack Health](https://indiestack.ai/api/badge/health/pmndrs/zustand.svg)](https://indiestack.ai/audit?repo=pmndrs/zustand)
 
 <a href="https://dai-shi.github.io/zustand-banner-sponsorship/sponsors/" target="_blank" rel="noopener">
   <p align="center">
