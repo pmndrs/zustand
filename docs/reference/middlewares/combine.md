@@ -100,4 +100,31 @@ Here's the `html` code
 
 ## Troubleshooting
 
-TBD
+### TypeScript can't infer the state type inside actions
+
+When using `combine`, TypeScript infers the state type from the initial state object. If you
+reference properties that don't exist on the initial state inside your creator function, you'll
+get a type error. Make sure all state properties are declared in the initial state:
+
+```ts
+// Wrong - `text` is not in initial state, so `get().text` is a type error
+const useStore = create(
+  combine({ count: 0 }, (set, get) => ({
+    text: 'hello',
+    getText: () => get().text, // Error: Property 'text' does not exist
+  })),
+)
+
+// Correct - all state properties in initial state
+const useStore = create(
+  combine({ count: 0, text: 'hello' }, (set, get) => ({
+    getText: () => get().text,
+  })),
+)
+```
+
+### Actions overwrite initial state properties
+
+If the creator function returns an object with the same keys as the initial state, the creator's
+values take precedence because `combine` uses `Object.assign`. Keep state and actions separate
+to avoid unintentional overrides.

@@ -167,4 +167,39 @@ Here's the `html` code
 
 ## Troubleshooting
 
-TBD
+### Dispatched actions don't update the state
+
+Make sure your reducer returns a new state object for the matched action type. If the reducer
+returns the same reference, subscribers won't be notified:
+
+```ts
+// Wrong - mutates and returns the same reference
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      state.count++ // Mutating the original
+      return state // Same reference - no update!
+  }
+}
+
+// Correct - return a new object
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { ...state, count: state.count + 1 }
+  }
+  return state
+}
+```
+
+### Actions don't appear in Redux DevTools
+
+The `redux` middleware sets the `dispatchFromDevtools` flag automatically, but you need to
+wrap it with `devtools` middleware for actions to appear in Redux DevTools:
+
+```ts
+import { create } from 'zustand'
+import { devtools, redux } from 'zustand/middleware'
+
+const useStore = create(devtools(redux(reducer, initialState)))
+```

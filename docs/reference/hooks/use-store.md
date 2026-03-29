@@ -920,4 +920,20 @@ export default function App() {
 
 ## Troubleshooting
 
-TBD
+### My component re-renders too often
+
+If your component re-renders on every state change, you may be selecting the entire state object.
+Use a selector to pick only the values your component needs:
+
+```tsx
+// Wrong - re-renders on ANY state change
+const state = useStore()
+
+// Correct - only re-renders when `count` changes
+const count = useStore((state) => state.count)
+```
+
+### I'm getting "could not find zustand store" error
+
+This error occurs when `useStore` is used outside of a store provider context. Make sure your
+component is wrapped in the corresponding provider that supplies the store via React context.

@@ -956,4 +956,27 @@ export default function App() {
 
 ## Troubleshooting
 
-TBD
+### My equality function is never called
+
+Make sure you are passing both a selector and an equality function. The equality function is the
+second argument to the hook:
+
+```tsx
+import { shallow } from 'zustand/shallow'
+
+// Wrong - shallow is not being used as an equality function
+const state = useStoreWithEqualityFn(shallow)
+
+// Correct - selector first, then equality function
+const { x, y } = useStoreWithEqualityFn(
+  (state) => ({ x: state.x, y: state.y }),
+  shallow,
+)
+```
+
+### Component re-renders even though the equality function returns `true`
+
+The equality function only compares the selected slice, not the entire state. If your selector
+returns a new reference each time (e.g., a new object or array), make sure your equality function
+handles this correctly. `shallow` from `zustand/shallow` works for flat objects; for deeper
+structures, you may need a deep equality function.

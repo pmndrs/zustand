@@ -266,4 +266,23 @@ re-renders when necessary, which improves overall performance.
 
 ## Troubleshooting
 
-TBD
+### My component still re-renders even with `useShallow`
+
+`useShallow` performs a shallow comparison, meaning it checks if each top-level property is the
+same by reference. If a property is a new object or array on every render (e.g., created inside
+the selector), `useShallow` will still detect a change:
+
+```tsx
+// Still re-renders because `filter` creates a new array each time
+const items = useStore(
+  useShallow((state) => state.items.filter((item) => item.active)),
+)
+```
+
+Consider memoizing the derived value or restructuring your state so that the selected slice is
+stable across renders.
+
+### `useShallow` vs custom equality function
+
+`useShallow` is a convenience wrapper for common cases. If you need deeper comparison or custom
+logic, use `createWithEqualityFn` with your own equality function instead.

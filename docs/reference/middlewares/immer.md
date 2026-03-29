@@ -234,4 +234,46 @@ personStore.subscribe(render)
 
 ## Troubleshooting
 
-TBD
+### I'm getting "An immer producer returned a new value AND modified its draft" error
+
+This happens when you both mutate the draft and return a new value in the same updater. With the
+`immer` middleware, you should either mutate the draft directly or return a new state, but not both:
+
+```ts
+// Wrong - mutates AND returns
+set((state) => {
+  state.count++
+  return { count: state.count } // Don't do this
+})
+
+// Correct - just mutate
+set((state) => {
+  state.count++
+})
+
+// Also correct - just return (same as without immer)
+set((state) => ({ count: state.count + 1 }))
+```
+
+### TypeScript errors when using immer with other middleware
+
+When combining `immer` with other middleware like `devtools` or `persist`, the order matters. The
+`immer` middleware should be the innermost (closest to the state creator):
+
+```ts
+// Correct order
+const useStore = create<MyState>()(
+  devtools(
+    persist(
+      immer((set) => ({
+        count: 0,
+        inc: () =>
+          set((state) => {
+            state.count++
+          }),
+      })),
+      { name: 'my-store' },
+    ),
+  ),
+)
+```

@@ -116,4 +116,45 @@ Here's the `html` code
 
 ## Troubleshooting
 
-TBD
+### My listener fires on every state change even with a selector
+
+Make sure you are passing the selector as the first argument and the listener as the second. If
+you pass only one argument, it behaves like a regular `subscribe` without selector filtering:
+
+```ts
+// Wrong - no selector, fires on every change
+subscribe((state) => {
+  console.log(state.count) // Fires even if `count` didn't change
+})
+
+// Correct - selector + listener
+subscribe(
+  (state) => state.count,
+  (count) => {
+    console.log(count) // Only fires when `count` changes
+  },
+)
+```
+
+### Listener fires for changes that should be equal
+
+By default, `subscribeWithSelector` uses `Object.is` to compare the previous and next slice. If
+your selector returns a new object each time (e.g., `{ a, b }`), it will always be considered
+different. Use a custom `equalityFn` or select a primitive value:
+
+```ts
+// Fires every time because a new object is created each call
+subscribe(
+  (state) => ({ x: state.x, y: state.y }),
+  (pos) => console.log(pos),
+)
+
+// Fix: use shallow equality
+import { shallow } from 'zustand/shallow'
+
+subscribe(
+  (state) => ({ x: state.x, y: state.y }),
+  (pos) => console.log(pos),
+  { equalityFn: shallow },
+)
+```

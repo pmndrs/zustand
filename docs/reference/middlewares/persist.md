@@ -983,4 +983,60 @@ Here's the `html` code
 
 ## Troubleshooting
 
-TBD
+### My state is not persisted on page reload
+
+Make sure you are passing a unique `name` option to `persist`. If two stores share the same name,
+they will overwrite each other's data.
+
+Also verify that your storage is available. In some environments (e.g., server-side rendering or
+private browsing mode), `localStorage` may not be accessible. You can check by wrapping the storage
+in a try-catch with `createJSONStorage`:
+
+```ts
+const useStore = create(
+  persist((set) => ({ count: 0 }), {
+    name: 'my-store',
+    storage: createJSONStorage(() => localStorage),
+  }),
+)
+```
+
+### My components flash with old state before showing persisted state
+
+This happens because hydration is asynchronous. The store initializes with default state, then
+rehydrates from storage. Use `onRehydrateStorage` to track when hydration is complete, or use
+`skipHydration` to manually control the timing:
+
+```ts
+const useStore = create(
+  persist((set) => ({ count: 0 }), {
+    name: 'my-store',
+    skipHydration: true,
+  }),
+)
+
+// Later, when ready:
+useStore.persist.rehydrate()
+```
+
+### State migration fails silently after changing the store shape
+
+If you change your store's shape, you need to increment the `version` and provide a `migrate`
+function. Without it, the old persisted state will be merged with the new initial state, which may
+produce unexpected results:
+
+```ts
+const useStore = create(
+  persist((set) => ({ count: 0, name: 'default' }), {
+    name: 'my-store',
+    version: 1,
+    migrate: (persistedState, version) => {
+      if (version === 0) {
+        // migrate from v0 to v1
+        return { ...(persistedState as any), name: 'default' }
+      }
+      return persistedState as any
+    },
+  }),
+)
+```
