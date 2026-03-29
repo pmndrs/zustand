@@ -757,4 +757,78 @@ describe('persist middleware with sync configuration', () => {
     expect(useBoundStore.persist.hasHydrated()).toBe(true)
     expect(setItem).toBeCalledTimes(0)
   })
+
+  it('should not throw when setItem throws on api.setState', () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const error = new DOMException(
+      'The quota has been exceeded.',
+      'QuotaExceededError',
+    )
+    const storage = {
+      getItem: () => null,
+      setItem: () => {
+        throw error
+      },
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: createJSONStorage(() => storage),
+      }),
+    )
+
+    expect(() => {
+      useBoundStore.setState({ count: 1 })
+    }).not.toThrow()
+    expect(useBoundStore.getState().count).toBe(1)
+    expect(consoleWarn).toHaveBeenCalledWith(
+      expect.stringContaining('Unable to update item'),
+      error,
+    )
+    consoleWarn.mockRestore()
+  })
+
+  it('should not throw when setItem throws on set from initializer', () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    let shouldThrow = false
+    const error = new DOMException(
+      'The quota has been exceeded.',
+      'QuotaExceededError',
+    )
+    const storage = {
+      getItem: () => null,
+      setItem: () => {
+        if (shouldThrow) {
+          throw error
+        }
+      },
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create<{ count: number; inc: () => void }>()(
+      persist(
+        (set) => ({
+          count: 0,
+          inc: () => set((s) => ({ count: s.count + 1 })),
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage(() => storage),
+        },
+      ),
+    )
+
+    shouldThrow = true
+    expect(() => {
+      useBoundStore.getState().inc()
+    }).not.toThrow()
+    expect(useBoundStore.getState().count).toBe(1)
+    expect(consoleWarn).toHaveBeenCalledWith(
+      expect.stringContaining('Unable to update item'),
+      error,
+    )
+    consoleWarn.mockRestore()
+  })
 })

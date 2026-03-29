@@ -230,13 +230,27 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   api.setState = (state, replace) => {
     savedSetState(state, replace as any)
-    return setItem()
+    try {
+      return setItem()
+    } catch (e) {
+      console.warn(
+        `[zustand persist middleware] Unable to update item '${options.name}', the given storage threw an error.`,
+        e,
+      )
+    }
   }
 
   const configResult = config(
     (...args) => {
       set(...(args as Parameters<typeof set>))
-      return setItem()
+      try {
+        return setItem()
+      } catch (e) {
+        console.warn(
+          `[zustand persist middleware] Unable to update item '${options.name}', the given storage threw an error.`,
+          e,
+        )
+      }
     },
     get,
     api,
