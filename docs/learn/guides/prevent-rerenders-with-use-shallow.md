@@ -21,7 +21,7 @@ import { create } from 'zustand'
 const useMeals = create(() => ({
   papaBear: 'large porridge-pot',
   mamaBear: 'middle-size porridge pot',
-  littleBear: 'A little, small, wee pot',
+  littleBear: 'A little, small, we pot',
 }))
 
 export const BearNames = () => {
@@ -50,7 +50,7 @@ import { useShallow } from 'zustand/react/shallow'
 const useMeals = create(() => ({
   papaBear: 'large porridge-pot',
   mamaBear: 'middle-size porridge pot',
-  littleBear: 'A little, small, wee pot',
+  littleBear: 'A little, small, we pot',
 }))
 
 export const BearNames = () => {
