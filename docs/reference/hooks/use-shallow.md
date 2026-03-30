@@ -57,7 +57,7 @@ type BearFamilyMealsStore = {
 const useBearFamilyMealsStore = create<BearFamilyMealsStore>()(() => ({
   papaBear: 'large porridge-pot',
   mamaBear: 'middle-size porridge pot',
-  babyBear: 'A little, small, wee pot',
+  babyBear: 'A little, small, we pot',
 }))
 ```
 
@@ -77,16 +77,16 @@ choice.
 
 ```tsx
 const meals = [
-  'A tiny, little, wee bowl',
+  'A tiny, little, we bowl',
   'A small, petite, tiny pot',
-  'A wee, itty-bitty, small bowl',
+  'A we, itty-bitty, small bowl',
   'A little, petite, tiny dish',
-  'A tiny, small, wee vessel',
-  'A small, little, wee cauldron',
+  'A tiny, small, we vessel',
+  'A small, little, we cauldron',
   'A little, tiny, small cup',
-  'A wee, small, little jar',
-  'A tiny, wee, small pan',
-  'A small, wee, little crock',
+  'A we, small, little jar',
+  'A tiny, we, small pan',
+  'A small, we, little crock',
 ]
 
 function UpdateBabyBearMeal() {
@@ -132,20 +132,20 @@ type BearFamilyMealsStore = {
 const useBearFamilyMealsStore = create<BearFamilyMealsStore>()(() => ({
   papaBear: 'large porridge-pot',
   mamaBear: 'middle-size porridge pot',
-  babyBear: 'A little, small, wee pot',
+  babyBear: 'A little, small, we pot',
 }))
 
 const meals = [
-  'A tiny, little, wee bowl',
+  'A tiny, little, we bowl',
   'A small, petite, tiny pot',
-  'A wee, itty-bitty, small bowl',
+  'A we, itty-bitty, small bowl',
   'A little, petite, tiny dish',
-  'A tiny, small, wee vessel',
-  'A small, little, wee cauldron',
+  'A tiny, small, we vessel',
+  'A small, little, we cauldron',
   'A little, tiny, small cup',
-  'A wee, small, little jar',
-  'A tiny, wee, small pan',
-  'A small, wee, little crock',
+  'A we, small, little jar',
+  'A tiny, we, small pan',
+  'A small, we, little crock',
 ]
 
 function UpdateBabyBearMeal() {
@@ -211,20 +211,20 @@ type BearFamilyMealsStore = {
 const useBearFamilyMealsStore = create<BearFamilyMealsStore>()(() => ({
   papaBear: 'large porridge-pot',
   mamaBear: 'middle-size porridge pot',
-  babyBear: 'A little, small, wee pot',
+  babyBear: 'A little, small, we pot',
 }))
 
 const meals = [
-  'A tiny, little, wee bowl',
+  'A tiny, little, we bowl',
   'A small, petite, tiny pot',
-  'A wee, itty-bitty, small bowl',
+  'A we, itty-bitty, small bowl',
   'A little, petite, tiny dish',
-  'A tiny, small, wee vessel',
-  'A small, little, wee cauldron',
+  'A tiny, small, we vessel',
+  'A small, little, we cauldron',
   'A little, tiny, small cup',
-  'A wee, small, little jar',
-  'A tiny, wee, small pan',
-  'A small, wee, little crock',
+  'A we, small, little jar',
+  'A tiny, we, small pan',
+  'A small, we, little crock',
 ]
 
 function UpdateBabyBearMeal() {
