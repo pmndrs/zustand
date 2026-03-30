@@ -98,13 +98,6 @@ type Devtools = <
   devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs]>
 
-declare module '../vanilla' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface StoreMutators<S, A> {
-    'zustand/devtools': WithDevtools<S>
-  }
-}
-
 type DevtoolsImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
   devtoolsOptions?: DevtoolsOptions,
