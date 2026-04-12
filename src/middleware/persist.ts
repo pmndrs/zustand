@@ -209,7 +209,9 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     return config(
       (...args) => {
         console.warn(
-          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`,
+          '[zustand persist middleware] Unable to update item \'' +
+            options.name +
+            '\', the given storage is currently unavailable.',
         )
         set(...(args as Parameters<typeof set>))
       },
