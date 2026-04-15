@@ -1,0 +1,49 @@
+---
+description: Governance rules for zustand — quality gates, security, conventions
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+alwaysApply: true
+---
+
+# Governance — zustand
+
+> Generated from governance.md by crag. Regenerate: `crag compile --target cursor`
+
+**Stack:** node, typescript
+
+## Quality Gates
+
+Run these checks in order before committing:
+### Lint
+- `npx eslint . --max-warnings 0`
+- `npx tsc --noEmit`
+
+### Test
+- `npm run test`
+
+### Build
+- `npm run build`
+
+### Ci (inferred from workflow)
+- `pnpm run test:spec`
+- `sed -i~ 's/"isolatedDeclarations": true,//' tsconfig.json`
+- `sed -i~ 's/"verbatimModuleSyntax": true,//' tsconfig.json`
+- `sed -i~ 's/"moduleResolution": "bundler",/"moduleResolution": "node",/' tsconfig.json`
+- `sed -i~ 's/"allowImportingTsExtensions": true,//' tsconfig.json`
+- `sed -i~ 's/"zustand": \["\.\/src\/index\.ts"\],/"zustand": [".\/dist\/index.d.ts"],/' tsconfig.json`
+- `sed -i~ 's/"zustand\/\*": \["\.\/src\/\*\.ts"\]/"zustand\/*": [".\/dist\/*.d.ts"]/' tsconfig.json`
+
+### Contributor docs (advisory — confirm before enforcing)
+- `pnpm run fix:format  # from CONTRIBUTING.md`
+- `pnpm run build-watch  # from CONTRIBUTING.md`
+## Security
+
+- No hardcoded secrets — grep for sk_live, AKIA, password= before commit
+
+## Conventions
+
+- Follow project commit conventions
+- Runtimes: node
