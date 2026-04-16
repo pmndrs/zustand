@@ -3,6 +3,7 @@ import type { Mock } from 'vitest'
 import { devtools, redux } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 import type { StoreApi } from 'zustand/vanilla'
+import { findCallerName } from '../src/middleware/devtools'
 
 type TupleOfEqualLengthH<
   Arr extends unknown[],
@@ -221,6 +222,14 @@ describe('When state changes with automatic setter inferring...', () => {
       { type: expect.stringMatching(/^(Object\.setCount|anonymous)$/) },
       { count: 10, setCount: expect.any(Function) },
     )
+  })
+
+  it('infers caller name from Firefox/SpiderMonkey stack format', () => {
+    const geckoStack = [
+      'api.setState@http://localhost/devtools.ts:200:5',
+      'setCount@http://localhost/app.ts:10:5',
+    ].join('\n')
+    expect(findCallerName(geckoStack)).toBe('setCount')
   })
 })
 
