@@ -3,7 +3,6 @@ import type { Mock } from 'vitest'
 import { devtools, redux } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 import type { StoreApi } from 'zustand/vanilla'
-import { findCallerName } from '../src/middleware/devtools'
 
 type TupleOfEqualLengthH<
   Arr extends unknown[],
@@ -229,7 +228,52 @@ describe('When state changes with automatic setter inferring...', () => {
       'api.setState@http://localhost/devtools.ts:200:5',
       'setCount@http://localhost/app.ts:10:5',
     ].join('\n')
-    expect(findCallerName(geckoStack)).toBe('setCount')
+
+    const OriginalError = Error
+    function ErrorWithGeckoStack(
+      ...args: ConstructorParameters<typeof OriginalError>
+    ) {
+      const err = new OriginalError(...args)
+      Object.defineProperty(err, 'stack', {
+        value: geckoStack,
+        configurable: true,
+        writable: true,
+      })
+      return err
+    }
+    ErrorWithGeckoStack.prototype = OriginalError.prototype
+    globalThis.Error = ErrorWithGeckoStack as unknown as typeof Error
+
+    try {
+      const options = {
+        name: 'testOptionsName',
+        enabled: true,
+      }
+
+      const api = createStore<{
+        count: number
+        setCount: (count: number) => void
+      }>()(
+        devtools(
+          (set) => ({
+            count: 0,
+            setCount: (newCount: number) => {
+              set({ count: newCount })
+            },
+          }),
+          options,
+        ),
+      )
+
+      api.getState().setCount(10)
+      const [connection] = getNamedConnectionApis(options.name)
+      expect(connection.send).toHaveBeenLastCalledWith(
+        { type: 'setCount' },
+        { count: 10, setCount: expect.any(Function) },
+      )
+    } finally {
+      globalThis.Error = OriginalError
+    }
   })
 })
 
