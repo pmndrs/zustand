@@ -26,6 +26,30 @@ const compareEntries = (
   return true
 }
 
+const compareURLSearchParams = (
+  valueA: URLSearchParams,
+  valueB: URLSearchParams,
+) => {
+  const sortEntries = ([keyA, valueA]: [string, string], [keyB, valueB]: [
+    string,
+    string,
+  ]) => (keyA === keyB ? valueA.localeCompare(valueB) : keyA.localeCompare(keyB))
+  const entriesA = Array.from(valueA.entries()).sort(sortEntries)
+  const entriesB = Array.from(valueB.entries()).sort(sortEntries)
+  if (entriesA.length !== entriesB.length) {
+    return false
+  }
+  for (let index = 0; index < entriesA.length; index++) {
+    if (
+      entriesA[index][0] !== entriesB[index][0] ||
+      entriesA[index][1] !== entriesB[index][1]
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
 // Ordered iterables
 const compareIterables = (
   valueA: Iterable<unknown>,
@@ -61,6 +85,9 @@ export function shallow<T>(valueA: T, valueB: T): boolean {
     return false
   }
   if (isIterable(valueA) && isIterable(valueB)) {
+    if (valueA instanceof URLSearchParams && valueB instanceof URLSearchParams) {
+      return compareURLSearchParams(valueA, valueB)
+    }
     if (hasIterableEntries(valueA) && hasIterableEntries(valueB)) {
       return compareEntries(valueA, valueB)
     }

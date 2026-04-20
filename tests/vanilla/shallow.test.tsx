@@ -164,6 +164,15 @@ describe('shallow', () => {
         new URLSearchParams({ a: 'a', b: 'b' }),
       ),
     ).toBe(true)
+    expect(
+      shallow(
+        new URLSearchParams('a=1&a=2&b=3'),
+        new URLSearchParams('b=3&a=2&a=1'),
+      ),
+    ).toBe(true)
+    expect(
+      shallow(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=2')),
+    ).toBe(false)
   })
 
   it('should work with nested arrays (#2794)', () => {
