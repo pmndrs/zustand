@@ -20,7 +20,7 @@ describe('immer middleware', () => {
     expect(useBoundStore.getState().count).toBe(1)
   })
 
-  it('should merge state when given a non-function updater', () => {
+  it('should not apply produce when updater is not a function', () => {
     type State = { count: number; name: string }
     const useBoundStore = create<State>()(
       immer(() => ({ count: 0, name: 'zustand' })),
