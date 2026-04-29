@@ -2,8 +2,42 @@ import { useState } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
-import { shallow, useShallow } from 'zustand/shallow'
+import { comparePlainObjects, shallow, useShallow } from 'zustand/shallow'
 import { createWithEqualityFn } from 'zustand/traditional'
+
+describe('comparePlainObjects', () => {
+  it('returns true for equal objects', () => {
+    expect(comparePlainObjects({ a: 1, b: 2 }, { a: 1, b: 2 })).toBe(true)
+  })
+
+  it('returns false when a value differs', () => {
+    expect(comparePlainObjects({ a: 1, b: 2 }, { a: 1, b: 3 })).toBe(false)
+  })
+
+  it('returns false when key count differs', () => {
+    expect(comparePlainObjects({ a: 1 }, { a: 1, b: 2 })).toBe(false)
+  })
+
+  it('returns false when keys differ with same count', () => {
+    expect(comparePlainObjects({ a: 1 }, { b: 1 })).toBe(false)
+  })
+
+  it('distinguishes {x: undefined} from {}', () => {
+    expect(comparePlainObjects({ x: undefined }, {})).toBe(false)
+  })
+
+  it('returns true for empty objects', () => {
+    expect(comparePlainObjects({}, {})).toBe(true)
+  })
+
+  it('uses Object.is semantics (NaN === NaN)', () => {
+    expect(comparePlainObjects({ a: NaN }, { a: NaN })).toBe(true)
+  })
+
+  it('take into account Object.is egde case (+0 !== -0)', () => {
+    expect(comparePlainObjects({ a: +0 }, { a: -0 })).toBe(false)
+  })
+})
 
 describe('types', () => {
   it('works with useBoundStore and array selector (#1107)', () => {

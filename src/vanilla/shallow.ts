@@ -45,6 +45,20 @@ const compareIterables = (
   return !!nextA.done && !!nextB.done
 }
 
+export const comparePlainObjects = (
+  objA: Record<string, unknown>,
+  objB: Record<string, unknown>,
+): boolean => {
+  const keysA = Object.keys(objA)
+  if (keysA.length !== Object.keys(objB).length) return false
+  for (const key of keysA) {
+    if (!Object.hasOwn(objB, key) || !Object.is(objA[key], objB[key])) {
+      return false
+    }
+  }
+  return true
+}
+
 export function shallow<T>(valueA: T, valueB: T): boolean {
   if (Object.is(valueA, valueB)) {
     return true
@@ -66,9 +80,8 @@ export function shallow<T>(valueA: T, valueB: T): boolean {
     }
     return compareIterables(valueA, valueB)
   }
-  // assume plain objects
-  return compareEntries(
-    { entries: () => Object.entries(valueA) },
-    { entries: () => Object.entries(valueB) },
+  return comparePlainObjects(
+    valueA as Record<string, unknown>,
+    valueB as Record<string, unknown>,
   )
 }
