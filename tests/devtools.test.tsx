@@ -1474,8 +1474,8 @@ describe('when create devtools was called multiple times with `name` option unde
         subscribers.forEach((sub) => sub(action))
 
         expect(api1.getState()).toStrictEqual(initialState1)
-        expect(api1.getState()).toStrictEqual(initialState1)
-        expect(api1.getState()).toStrictEqual(initialState1)
+        expect(api2.getState()).toStrictEqual(initialState2)
+        expect(api3.getState()).toStrictEqual(initialState3)
         expect(connection1.init).toHaveBeenLastCalledWith(initialState1)
         expect(connection2.init).toHaveBeenLastCalledWith(initialState2)
         expect(connection3.init).toHaveBeenLastCalledWith(initialState3)
