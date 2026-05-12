@@ -6,6 +6,9 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+permissions:
+  contents: read
+
 jobs:
   test_old_typescript:
     runs-on: ubuntu-latest
@@ -59,6 +62,8 @@ jobs:
           pnpm add -D @types/node@18.13.0
           pnpm add -D vitest@3.2.4 @vitest/coverage-v8@3.2.4 @vitest/ui@3.2.4
       - name: Install old TypeScript
-        run: pnpm add -D typescript@${{ matrix.typescript }}
+        run: pnpm add -D typescript@$TS_VER
+        env:
+          TS_VER: ${{ matrix.typescript }}
       - name: Test ${{ matrix.typescript }}
         run: pnpm run test:types
