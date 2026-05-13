@@ -102,7 +102,7 @@ const storageOptions = {
   storage: createJSONStorage<LocalAndUrlStore>(() => persistentStorage),
 }
 
-const useLocalAndUrlStore = create()(
+const useLocalAndUrlStore = create<LocalAndUrlStore>()(
   persist<LocalAndUrlStore>(
     (set) => ({
       typesOfFish: [],
