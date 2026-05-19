@@ -17,26 +17,23 @@ const useSomeStore = create<State & Actions>()((set, get, store) => ({
 Resetting multiple stores at once
 
 ```ts
-import type { StateCreator } from 'zustand'
-import { create: actualCreate } from 'zustand'
+import { StateCreator, create as actualCreate } from 'zustand'
 
 const storeResetFns = new Set<() => void>()
 
-const resetAllStores = () => {
+export const resetAllStores = () => {
   storeResetFns.forEach((resetFn) => {
     resetFn()
   })
 }
 
-export const create = (<T>() => {
-  return (stateCreator: StateCreator<T>) => {
-    const store = actualCreate(stateCreator)
-    storeResetFns.add(() => {
-      store.setState(store.getInitialState(), true)
-    })
-    return store
-  }
-}) as typeof actualCreate
+export const create = <T>(stateCreator: StateCreator<T>) => {
+  const store = actualCreate(stateCreator)
+  storeResetFns.add(() => {
+    store.setState(store.getInitialState(), true)
+  })
+  return store
+}
 ```
 
 ## Demo
