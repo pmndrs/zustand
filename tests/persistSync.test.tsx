@@ -421,6 +421,106 @@ describe('persist middleware with sync configuration', () => {
     )
   })
 
+  it('can skip persisting unchanged partialized values with equalityFn', () => {
+    const setItemSpy = vi.fn()
+
+    const storage = {
+      getItem: () => null,
+      setItem: setItemSpy,
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(
+        () => ({
+          count: 0,
+          transient: 0,
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage<{ count: number }>(() => storage),
+          partialize: (state) => ({ count: state.count }),
+          equalityFn: (prev: { count: number }, next: { count: number }) =>
+            prev.count === next.count,
+        },
+      ),
+    )
+
+    useBoundStore.setState({ transient: 1 })
+    useBoundStore.setState({ transient: 2 })
+    useBoundStore.setState({ count: 1 })
+
+    expect(setItemSpy).toHaveBeenCalledTimes(2)
+    expect(setItemSpy).toHaveBeenNthCalledWith(
+      1,
+      'test-storage',
+      JSON.stringify({
+        state: {
+          count: 0,
+        },
+        version: 0,
+      }),
+    )
+    expect(setItemSpy).toHaveBeenNthCalledWith(
+      2,
+      'test-storage',
+      JSON.stringify({
+        state: {
+          count: 1,
+        },
+        version: 0,
+      }),
+    )
+  })
+
+  it('does not treat merged hydration state as already persisted with equalityFn', () => {
+    const setItemSpy = vi.fn()
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          state: { count: 1 },
+          version: 0,
+        }),
+      setItem: setItemSpy,
+      removeItem: () => {},
+    }
+
+    const useBoundStore = create(
+      persist(
+        () => ({
+          count: 0,
+          extra: true,
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage<{ count: number; extra: boolean }>(
+            () => storage,
+          ),
+          equalityFn: (
+            prev: { count: number; extra: boolean },
+            next: { count: number; extra: boolean },
+          ) => prev.count === next.count && prev.extra === next.extra,
+        },
+      ),
+    )
+
+    expect(useBoundStore.getState()).toEqual({ count: 1, extra: true })
+
+    useBoundStore.setState({})
+
+    expect(setItemSpy).toHaveBeenCalledTimes(1)
+    expect(setItemSpy).toHaveBeenCalledWith(
+      'test-storage',
+      JSON.stringify({
+        state: {
+          count: 1,
+          extra: true,
+        },
+        version: 0,
+      }),
+    )
+  })
+
   it('can access the options through the api', () => {
     const storage = {
       getItem: () => null,

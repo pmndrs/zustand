@@ -83,6 +83,14 @@ export interface PersistOptions<
    */
   partialize?: (state: S) => PersistedState
   /**
+   * Optional comparison function that lets you skip persisting unchanged values.
+   *
+   * The comparison receives the partialized state from the previous successful
+   * write and the current partialized state. When it returns `true`, the
+   * current write is skipped.
+   */
+  equalityFn?: (prevState: PersistedState, nextState: PersistedState) => boolean
+  /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
    * The returned function will be called after the state rehydration or when an error occurred.
@@ -196,6 +204,11 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
     }),
     ...baseOptions,
   }
+  type PersistedState = ReturnType<typeof options.partialize>
+  type PersistWriteCache = {
+    state: PersistedState
+    writeVersion: number
+  }
 
   let hasHydrated = false
   // Counter to track hydration versions and prevent race conditions
@@ -204,6 +217,18 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   const hydrationListeners = new Set<PersistListener<S>>()
   const finishHydrationListeners = new Set<PersistListener<S>>()
   let storage = options.storage
+  let persistedStateCache: PersistWriteCache | undefined
+  let pendingPersistedStateCache: PersistWriteCache | undefined
+  let scheduledWriteVersion = 0
+  let persistCacheVersion = 0
+  let lastSetItemResult: unknown
+
+  const clearPersistedStateCache = () => {
+    persistedStateCache = undefined
+    pendingPersistedStateCache = undefined
+    scheduledWriteVersion = 0
+    persistCacheVersion += 1
+  }
 
   if (!storage) {
     return config(
@@ -220,10 +245,85 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   const setItem = () => {
     const state = options.partialize({ ...get() })
-    return (storage as PersistStorage<S, unknown>).setItem(options.name, {
-      state,
-      version: options.version,
-    })
+    const equalityFn = options.equalityFn as
+      | ((prevState: PersistedState, nextState: PersistedState) => boolean)
+      | undefined
+
+    if (equalityFn) {
+      if (
+        pendingPersistedStateCache &&
+        equalityFn(pendingPersistedStateCache.state, state)
+      ) {
+        return lastSetItemResult
+      }
+      if (
+        !pendingPersistedStateCache &&
+        persistedStateCache &&
+        equalityFn(persistedStateCache.state, state)
+      ) {
+        return lastSetItemResult
+      }
+    }
+
+    const writeVersion = ++scheduledWriteVersion
+    const cacheVersion = persistCacheVersion
+    pendingPersistedStateCache = { state, writeVersion }
+
+    const setItemResult = (storage as PersistStorage<S, unknown>).setItem(
+      options.name,
+      {
+        state,
+        version: options.version,
+      },
+    )
+
+    const persistWriteCache = { state, writeVersion }
+    const finalizeWrite = () => {
+      if (cacheVersion !== persistCacheVersion) {
+        return
+      }
+      if (
+        !persistedStateCache ||
+        writeVersion > persistedStateCache.writeVersion
+      ) {
+        persistedStateCache = persistWriteCache
+      }
+      if (pendingPersistedStateCache?.writeVersion === writeVersion) {
+        pendingPersistedStateCache = undefined
+      }
+    }
+    const discardPendingWrite = () => {
+      if (cacheVersion !== persistCacheVersion) {
+        return
+      }
+      if (pendingPersistedStateCache?.writeVersion === writeVersion) {
+        pendingPersistedStateCache = undefined
+      }
+    }
+
+    if (
+      typeof setItemResult === 'object' &&
+      setItemResult !== null &&
+      'then' in setItemResult &&
+      typeof setItemResult.then === 'function'
+    ) {
+      const trackedSetItemResult = setItemResult.then(
+        (result: unknown) => {
+          finalizeWrite()
+          return result
+        },
+        (error: unknown) => {
+          discardPendingWrite()
+          throw error
+        },
+      )
+      lastSetItemResult = trackedSetItemResult
+      return trackedSetItemResult
+    }
+
+    finalizeWrite()
+    lastSetItemResult = setItemResult
+    return setItemResult
   }
 
   const savedSetState = api.setState
@@ -260,6 +360,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
     // Increment version to invalidate any in-flight hydration
     const currentVersion = ++hydrationVersion
+    clearPersistedStateCache()
     hasHydrated = false
     hydrationListeners.forEach((cb) => cb(get() ?? configResult))
 
@@ -288,6 +389,10 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
               `State loaded from storage couldn't be migrated since no migrate function was provided`,
             )
           } else {
+            persistedStateCache = {
+              state: deserializedStorageValue.state as PersistedState,
+              writeVersion: 0,
+            }
             return [false, deserializedStorageValue.state] as const
           }
         }
@@ -336,6 +441,13 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
   ;(api as StoreApi<S> & StorePersist<StoreApi<S>, S, unknown>).persist = {
     setOptions: (newOptions) => {
+      const shouldResetPersistedStateCache =
+        'name' in newOptions ||
+        'storage' in newOptions ||
+        'partialize' in newOptions ||
+        'version' in newOptions ||
+        'equalityFn' in newOptions
+
       options = {
         ...options,
         ...newOptions,
@@ -344,8 +456,12 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       if (newOptions.storage) {
         storage = newOptions.storage
       }
+      if (shouldResetPersistedStateCache) {
+        clearPersistedStateCache()
+      }
     },
     clearStorage: () => {
+      clearPersistedStateCache()
       storage?.removeItem(options.name)
     },
     getOptions: () => options,

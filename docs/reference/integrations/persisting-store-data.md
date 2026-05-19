@@ -146,6 +146,34 @@ export const useBoundStore = create(
 )
 ```
 
+### `equalityFn`
+
+> Type: `(previousState: Object, nextState: Object) => boolean`
+
+Use `equalityFn` to skip redundant storage writes when the partialized state hasn't changed.
+
+This is especially useful when your store mixes fast-changing transient state with a smaller
+persisted slice, or when your storage backend is asynchronous and expensive to write to.
+
+```ts
+export const useBoundStore = create(
+  persist(
+    (set) => ({
+      count: 0,
+      transient: 0,
+      increment: () => set((state) => ({ count: state.count + 1 })),
+      bumpTransient: () => set((state) => ({ transient: state.transient + 1 })),
+    }),
+    {
+      name: 'counter-storage',
+      partialize: (state) => ({ count: state.count }),
+      equalityFn: (previousState, nextState) =>
+        previousState.count === nextState.count,
+    },
+  ),
+)
+```
+
 ### `onRehydrateStorage`
 
 > Type: `(state: Object) => ((state?: Object, error?: Error) => void) | void`

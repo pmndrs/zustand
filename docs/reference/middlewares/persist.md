@@ -52,6 +52,8 @@ persist<T, U = T>(stateCreatorFn: StateCreator<T, [], []>, persistOptions: Persi
   - `name`: A unique name of the item for your store in the storage.
   - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`.
   - **optional** `partialize`: A function to filter state fields before persisting it.
+  - **optional** `equalityFn`: A function to skip storage writes when the partialized state hasn't
+    changed.
   - **optional** `onRehydrateStorage`: A function or function returning a function that allows
     custom logic before and after state rehydration.
   - **optional** `version`: A version number for the persisted state. If the stored state version

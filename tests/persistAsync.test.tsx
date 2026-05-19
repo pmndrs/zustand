@@ -608,6 +608,80 @@ describe('persist middleware with async configuration', () => {
     })
   })
 
+  it('can skip duplicate async writes for unchanged partialized values with equalityFn', async () => {
+    const { storage, setItemSpy } = createPersistantStore(null)
+
+    const useBoundStore = create(
+      persist(
+        () => ({
+          count: 0,
+          transient: 0,
+        }),
+        {
+          name: 'test-storage',
+          storage: createJSONStorage<{ count: number }>(() => storage),
+          partialize: (state) => ({ count: state.count }),
+          equalityFn: (prev: { count: number }, next: { count: number }) =>
+            prev.count === next.count,
+        },
+      ),
+    )
+
+    function Counter() {
+      const { count, transient } = useBoundStore()
+      return (
+        <div>
+          count: {count}, transient: {transient}
+        </div>
+      )
+    }
+
+    render(
+      <StrictMode>
+        <Counter />
+      </StrictMode>,
+    )
+
+    await act(() => vi.advanceTimersByTimeAsync(10))
+
+    act(() => {
+      useBoundStore.setState({ transient: 1 })
+      useBoundStore.setState({ transient: 2 })
+      useBoundStore.setState({ transient: 3 })
+    })
+
+    expect(setItemSpy).toHaveBeenCalledTimes(1)
+    expect(setItemSpy).toHaveBeenNthCalledWith(
+      1,
+      'test-storage',
+      JSON.stringify({
+        state: {
+          count: 0,
+        },
+        version: 0,
+      }),
+    )
+
+    await act(() => vi.advanceTimersByTimeAsync(10))
+
+    act(() => {
+      useBoundStore.setState({ count: 1 })
+      useBoundStore.setState({ transient: 4 })
+    })
+
+    expect(setItemSpy).toHaveBeenCalledTimes(2)
+    expect(setItemSpy).toHaveBeenNthCalledWith(
+      2,
+      'test-storage',
+      JSON.stringify({
+        state: {
+          count: 1,
+        },
+        version: 0,
+      }),
+    )
+  })
+
   it('can manually rehydrate through the api', async () => {
     const storageValue = '{"state":{"count":1},"version":0}'
 
