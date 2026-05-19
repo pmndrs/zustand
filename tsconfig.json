@@ -15,7 +15,6 @@
     "isolatedDeclarations": true,
     "types": ["@testing-library/jest-dom/vitest"],
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
       "zustand": ["./src/index.ts"],
       "zustand/*": ["./src/*.ts"]

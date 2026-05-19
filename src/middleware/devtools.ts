@@ -98,13 +98,6 @@ type Devtools = <
   devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs]>
 
-declare module '../vanilla' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface StoreMutators<S, A> {
-    'zustand/devtools': WithDevtools<S>
-  }
-}
-
 type DevtoolsImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
   devtoolsOptions?: DevtoolsOptions,
@@ -173,7 +166,12 @@ const removeStoreFromTrackedConnections = (
   }
 }
 
-const findCallerName = (stack: string | undefined) => {
+// V8 (Chrome/Edge/Node): "at <name> (<source>)"
+const v8StackLineRe = /.+ (.+) .+/
+// SpiderMonkey (Firefox) / JavaScriptCore (Safari): "<name>@<source>"
+const geckoStackLineRe = /^([^@]+)@/
+
+function findCallerName(stack: string | undefined) {
   if (!stack) return undefined
   const traceLines = stack.split('\n')
   const apiSetStateLineIndex = traceLines.findIndex((traceLine) =>
@@ -181,7 +179,10 @@ const findCallerName = (stack: string | undefined) => {
   )
   if (apiSetStateLineIndex < 0) return undefined
   const callerLine = traceLines[apiSetStateLineIndex + 1]?.trim() || ''
-  return /.+ (.+) .+/.exec(callerLine)?.[1]
+  return (
+    v8StackLineRe.exec(callerLine)?.[1] ||
+    geckoStackLineRe.exec(callerLine)?.[1]
+  )
 }
 
 const devtoolsImpl: DevtoolsImpl =

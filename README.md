@@ -493,7 +493,7 @@ const useBearStore = create<BearState>()(
 )
 ```
 
-A more detailed TypeScript guide is [here](docs/guides/beginner-typescript.md) and [there](docs/guides/advanced-typescript.md).
+A more detailed TypeScript guide is [here](docs/learn/guides/beginner-typescript.md) and [there](docs/learn/guides/advanced-typescript.md).
 
 ## Best practices
 

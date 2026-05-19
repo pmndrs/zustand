@@ -222,6 +222,59 @@ describe('When state changes with automatic setter inferring...', () => {
       { count: 10, setCount: expect.any(Function) },
     )
   })
+
+  it('infers caller name from Firefox/SpiderMonkey stack format', () => {
+    const geckoStack = [
+      'api.setState@http://localhost/devtools.ts:200:5',
+      'setCount@http://localhost/app.ts:10:5',
+    ].join('\n')
+
+    const OriginalError = Error
+    function ErrorWithGeckoStack(
+      ...args: ConstructorParameters<typeof OriginalError>
+    ) {
+      const err = new OriginalError(...args)
+      Object.defineProperty(err, 'stack', {
+        value: geckoStack,
+        configurable: true,
+        writable: true,
+      })
+      return err
+    }
+    ErrorWithGeckoStack.prototype = OriginalError.prototype
+    globalThis.Error = ErrorWithGeckoStack as unknown as typeof Error
+
+    try {
+      const options = {
+        name: 'testOptionsName',
+        enabled: true,
+      }
+
+      const api = createStore<{
+        count: number
+        setCount: (count: number) => void
+      }>()(
+        devtools(
+          (set) => ({
+            count: 0,
+            setCount: (newCount: number) => {
+              set({ count: newCount })
+            },
+          }),
+          options,
+        ),
+      )
+
+      api.getState().setCount(10)
+      const [connection] = getNamedConnectionApis(options.name)
+      expect(connection.send).toHaveBeenLastCalledWith(
+        { type: 'setCount' },
+        { count: 10, setCount: expect.any(Function) },
+      )
+    } finally {
+      globalThis.Error = OriginalError
+    }
+  })
 })
 
 describe('when it receives a message of type...', () => {
@@ -1474,8 +1527,8 @@ describe('when create devtools was called multiple times with `name` option unde
         subscribers.forEach((sub) => sub(action))
 
         expect(api1.getState()).toStrictEqual(initialState1)
-        expect(api1.getState()).toStrictEqual(initialState1)
-        expect(api1.getState()).toStrictEqual(initialState1)
+        expect(api2.getState()).toStrictEqual(initialState2)
+        expect(api3.getState()).toStrictEqual(initialState3)
         expect(connection1.init).toHaveBeenLastCalledWith(initialState1)
         expect(connection2.init).toHaveBeenLastCalledWith(initialState2)
         expect(connection3.init).toHaveBeenLastCalledWith(initialState3)
