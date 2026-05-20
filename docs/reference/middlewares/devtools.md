@@ -302,6 +302,7 @@ Here's the fixed previous example
 
 ```ts
 import { create, StateCreator } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 type BearSlice = {
   bears: number
