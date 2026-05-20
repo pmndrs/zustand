@@ -23,7 +23,7 @@ type Action = {
 }
 
 // Create your store, which includes both state and (optionally) actions
-const usePersonStore = create<State & Action>((set) => ({
+const usePersonStore = create<State & Action>()((set) => ({
   firstName: '',
   lastName: '',
   updateFirstName: (firstName) => set(() => ({ firstName: firstName })),
