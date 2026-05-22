@@ -30,7 +30,7 @@ const nextStateCreatorFn = combine(initialState, additionalStateCreatorFn)
 ### Signature
 
 ```ts
-combine<T, U>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [], U>): StateCreator<Omit<T, keyof U> & U, [], []>
+combine<T extends object, U extends object>(initialState: T, additionalStateCreatorFn: StateCreator<T, [], [], U>): StateCreator<Omit<T, keyof U> & U, [], []>
 ```
 
 ## Reference
