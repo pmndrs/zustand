@@ -95,7 +95,7 @@ type Devtools = <
   U = T,
 >(
   initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs, U>,
-  options?: DevtoolsOptions,
+  devtoolsOptions?: DevtoolsOptions,
 ) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs], U>
 
 type DevtoolsImpl = <T>(
