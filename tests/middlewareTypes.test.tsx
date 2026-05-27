@@ -210,7 +210,7 @@ describe('counter state spec (single middleware)', () => {
         inc: () => {
           set({ count: get().count + 1 }, false, 'inc')
           // @ts-expect-error `get` should be inferred as `MyState`.
-          get().foo
+          ;(() => get().foo)()
           // @ts-expect-error `set` should enforce `count` as number.
           set({ count: '1' })
         },
