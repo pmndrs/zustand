@@ -92,21 +92,11 @@ type Devtools = <
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  InferredT extends object = object,
+  U = T,
 >(
-  initializer: StateCreator<
-    [T] extends [never] ? InferredT : NoInfer<T>,
-    [...Mps, ['zustand/devtools', never]],
-    Mcs,
-    [T] extends [never] ? InferredT : NoInfer<T>
-  >,
+  initializer: StateCreator<T, [...Mps, ['zustand/devtools', never]], Mcs, U>,
   options?: DevtoolsOptions,
-) => StateCreator<
-  [T] extends [never] ? InferredT : T,
-  Mps,
-  [['zustand/devtools', never], ...Mcs],
-  [T] extends [never] ? InferredT : T
->
+) => StateCreator<T, Mps, [['zustand/devtools', never], ...Mcs], U>
 
 type DevtoolsImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
