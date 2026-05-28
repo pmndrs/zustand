@@ -14,7 +14,7 @@ over when components re-render, improving performance and responsiveness.
 > `use-sync-external-store` library due to `zustand/traditional` relies on `useSyncExternalStoreWithSelector`.
 
 ```js
-const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
+const useSomeStore = createWithEqualityFn(stateCreatorFn, defaultEqualityFn)
 ```
 
 - [Types](#types)
@@ -35,18 +35,18 @@ const useSomeStore = createWithEqualityFn(stateCreatorFn, equalityFn)
 ### Signature
 
 ```ts
-createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, equalityFn?: (a: T, b: T) => boolean): UseBoundStore<StoreApi<T>>
+createWithEqualityFn<T>()(stateCreatorFn: StateCreator<T, [], []>, defaultEqualityFn?: <U>(a: U, b: U) => boolean): UseBoundStore<StoreApi<T>>
 ```
 
 ## Reference
 
-### `createWithEqualityFn(stateCreatorFn)`
+### `createWithEqualityFn(stateCreatorFn, defaultEqualityFn)`
 
 #### Parameters
 
 - `stateCreatorFn`: A function that takes `set` function, `get` function and `store` as arguments.
   Usually, you will return an object with the methods you want to expose.
-- **optional** `equalityFn`: Defaults to `Object.is`. A function that lets you skip re-renders.
+- **optional** `defaultEqualityFn`: Defaults to `Object.is`. A function that lets you skip re-renders.
 
 #### Returns
 

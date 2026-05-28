@@ -66,9 +66,9 @@ type PersonStoreState = {
 
 type PersonStoreActions = {
   setPerson: (
-    nextPerson: (
-      person: PersonStoreState['person'],
-    ) => PersonStoreState['person'] | PersonStoreState['person'],
+    nextPerson:
+      | PersonStoreState['person']
+      | ((person: PersonStoreState['person']) => PersonStoreState['person']),
   ) => void
 }
 
@@ -165,9 +165,9 @@ type PersonStoreState = {
 
 type PersonStoreActions = {
   setPerson: (
-    nextPerson: (
-      person: PersonStoreState['person'],
-    ) => PersonStoreState['person'] | PersonStoreState['person'],
+    nextPerson:
+      | PersonStoreState['person']
+      | ((person: PersonStoreState['person']) => PersonStoreState['person']),
   ) => void
 }
 

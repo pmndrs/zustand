@@ -32,7 +32,7 @@ const someState = useStoreWithEqualityFn(store, selectorFn, equalityFn)
 ### Signature
 
 ```ts
-useStoreWithEqualityFn<T, U = T>(store: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: T, b: T) => boolean): U
+useStoreWithEqualityFn<T, U = T>(store: StoreApi<T>, selectorFn: (state: T) => U, equalityFn?: (a: U, b: U) => boolean): U
 ```
 
 ## Reference

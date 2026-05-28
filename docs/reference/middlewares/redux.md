@@ -25,7 +25,7 @@ const nextStateCreatorFn = redux(reducerFn, initialState)
 ### Signature
 
 ```ts
-redux<T, A>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreator<T & { dispatch: (action: A) => A }, [['zustand/redux', A]], []>
+redux<T, A extends { type: string }>(reducerFn: (state: T, action: A) => T, initialState: T): StateCreator<T & { dispatch: (action: A) => A }, [['zustand/redux', A]], []>
 ```
 
 ### Mutator

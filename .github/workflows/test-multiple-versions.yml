@@ -37,5 +37,7 @@ jobs:
       - run: pnpm install
       - name: Test ${{ matrix.react }} ${{ matrix.devtools-skip }}
         run: |
-          pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
+          pnpm add -D react@$REACT_VER react-dom@$REACT_VER
           pnpm run test:spec
+        env:
+          REACT_VER: ${{ matrix.react }}
