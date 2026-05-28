@@ -7,9 +7,6 @@ on:
 permissions:
   contents: read
 
-permissions:
-  contents: read
-
 jobs:
   compressed_size:
     runs-on: ubuntu-latest
