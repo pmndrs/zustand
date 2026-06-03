@@ -266,4 +266,35 @@ re-renders when necessary, which improves overall performance.
 
 ## Troubleshooting
 
-TBD
+### I get "Maximum update depth exceeded" when reading multiple values from the store
+
+Since v5, selectors that return a new reference on every render can trigger infinite update loops because the default equality check is `Object.is`. The most common case is bundling multiple values into a single object inside the selector. The following triggers the error:
+
+```tsx
+const { searchValue, setSearchValue } = useStore((state) => ({
+  searchValue: state.searchValue,
+  setSearchValue: state.setSearchValue,
+}))
+```
+
+The wrapper object is recreated on every render, so each comparison fails and the component re-subscribes in a loop.
+
+Wrap the selector with `useShallow` so the wrapper's properties are compared by reference instead of the wrapper itself:
+
+```tsx
+const { searchValue, setSearchValue } = useStore(
+  useShallow((state) => ({
+    searchValue: state.searchValue,
+    setSearchValue: state.setSearchValue,
+  })),
+)
+```
+
+Alternatively, subscribe to each value with its own selector — there is no wrapper object to recreate:
+
+```tsx
+const searchValue = useStore((state) => state.searchValue)
+const setSearchValue = useStore((state) => state.setSearchValue)
+```
+
+See [Requiring stable selector outputs](../migrations/migrating-to-v5.md#requiring-stable-selector-outputs) in the v5 migration guide for the underlying behavior change.
