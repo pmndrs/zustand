@@ -287,7 +287,7 @@ const clearForest = useLushStore((state) => state.clearForest)
 clearForest()
 ```
 
-[Alternatively, there are some other solutions.](./docs/guides/updating-state.md#with-immer)
+[Alternatively, there are some other solutions.](./docs/learn/guides/updating-state.md#with-immer)
 
 ## Persist middleware
 
