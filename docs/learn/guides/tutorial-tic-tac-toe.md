@@ -464,7 +464,7 @@ Each time a player moves, `xIsNext` (a boolean) will be flipped to determine whi
 and the game's state will be saved. You'll update the Board's `handleClick` function to flip the
 value of `xIsNext`:
 
-```jsx {2-3,6,11}
+```jsx {2-3,6,11,13}
 export default function Board() {
   const xIsNext = useGameStore((state) => state.xIsNext)
   const setXIsNext = useGameStore((state) => state.setXIsNext)
