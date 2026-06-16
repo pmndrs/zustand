@@ -567,7 +567,7 @@ To let the players know when the game is over, you can display text such as `'Wi
 display the winner or draw if the game is over and if the game is ongoing you'll display which
 player's turn is next:
 
-```jsx {6-7,9,21}
+```jsx {6-7,9,20-21,40}
 export default function Board() {
   const xIsNext = useGameStore((state) => state.xIsNext)
   const setXIsNext = useGameStore((state) => state.setXIsNext)
@@ -946,7 +946,7 @@ Let's make the `Board` component fully controlled by the props it receives. To d
 the `Board` component to accept three props: `xIsNext`, `squares`, and a new `onPlay` function that
 the `Board` component can call with the updated squares array when a player makes a move.
 
-```jsx {1}
+```jsx {1,11}
 function Board({ xIsNext, squares, onPlay }) {
   const winner = calculateWinner(squares)
   const turns = calculateTurns(squares)
@@ -1172,7 +1172,7 @@ You'll use `map` to transform your `history` of moves into React elements repres
 screen, and display a list of buttons to **jump** to past moves. Let's `map` over the `history` in
 the `Game` component:
 
-```jsx {29-44}
+```jsx {13-15,29-44}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
@@ -1294,7 +1294,7 @@ function handlePlay(nextSquares) {
 Finally, you will modify the `Game` component to render the currently selected move, instead of
 always rendering the final move:
 
-```jsx {2-8}
+```jsx {4-5,8}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
@@ -1360,7 +1360,7 @@ There's no need to store `xIsNext` separately in the state. It’s better to avo
 because it can reduce bugs and make your code easier to understand. Instead, you can calculate
 `xIsNext` based on `currentMove`:
 
-```jsx {2-5,13,17}
+```jsx {6,13,17}
 export default function Game() {
   const history = useGameStore((state) => state.history)
   const setHistory = useGameStore((state) => state.setHistory)
