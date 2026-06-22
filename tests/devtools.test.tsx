@@ -223,6 +223,82 @@ describe('When state changes with automatic setter inferring...', () => {
     )
   })
 
+  it.each([
+    {
+      label: 'webpack namespace with space',
+      stack: [
+        '    at api.setState (webpack://devtools.ts:200:5)',
+        '    at Object.increment (webpack://my app/./src/store.js:10:5)',
+      ].join('\n'),
+      expected: 'Object.increment',
+    },
+    {
+      label: 'Windows path with space',
+      stack: [
+        '    at api.setState (C:\\app\\devtools.ts:200:5)',
+        '    at increment (C:\\Program Files\\app\\store.js:10:5)',
+      ].join('\n'),
+      expected: 'increment',
+    },
+    {
+      label: 'space-free path (regression)',
+      stack: [
+        '    at api.setState (http://localhost/devtools.ts:200:5)',
+        '    at Object.setCount (http://localhost/app.ts:10:5)',
+      ].join('\n'),
+      expected: 'Object.setCount',
+    },
+  ])(
+    'infers caller name from V8 stack format — $label',
+    ({ stack, expected }) => {
+      const OriginalError = Error
+      function ErrorWithV8Stack(
+        ...args: ConstructorParameters<typeof OriginalError>
+      ) {
+        const err = new OriginalError(...args)
+        Object.defineProperty(err, 'stack', {
+          value: stack,
+          configurable: true,
+          writable: true,
+        })
+        return err
+      }
+      ErrorWithV8Stack.prototype = OriginalError.prototype
+      globalThis.Error = ErrorWithV8Stack as unknown as typeof Error
+
+      try {
+        const options = {
+          name: 'testOptionsName',
+          enabled: true,
+        }
+
+        const api = createStore<{
+          count: number
+          setCount: (count: number) => void
+        }>()(
+          devtools(
+            (set) => ({
+              count: 0,
+              setCount: (newCount: number) => {
+                set({ count: newCount })
+              },
+            }),
+            options,
+          ),
+        )
+
+        api.getState().setCount(10)
+        const [connection] = getNamedConnectionApis(options.name)
+        expect(connection.send).toHaveBeenLastCalledWith(
+          { type: expected },
+          { count: 10, setCount: expect.any(Function) },
+        )
+      } finally {
+        globalThis.Error = OriginalError
+      }
+    },
+  )
+
   it('infers caller name from Firefox/SpiderMonkey stack format', () => {
     const geckoStack = [
       'api.setState@http://localhost/devtools.ts:200:5',
