@@ -132,7 +132,7 @@
     "@vitest/eslint-plugin": "^1.6.18",
     "@vitest/ui": "^4.1.7",
     "esbuild": "^0.28.0",
-    "eslint": "9.39.4",
+    "eslint": "10.6.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest-dom": "^5.5.0",
