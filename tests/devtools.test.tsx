@@ -248,6 +248,22 @@ describe('When state changes with automatic setter inferring...', () => {
       ].join('\n'),
       expected: 'Object.setCount',
     },
+    {
+      label: 'async function — strips async keyword',
+      stack: [
+        '    at api.setState (file.js:200:5)',
+        '    at async Object.increment (file.js:10:5)',
+      ].join('\n'),
+      expected: 'Object.increment',
+    },
+    {
+      label: 'constructor — strips new keyword',
+      stack: [
+        '    at api.setState (file.js:200:5)',
+        '    at new Foo (file.js:10:5)',
+      ].join('\n'),
+      expected: 'Foo',
+    },
   ])(
     'infers caller name from V8 stack format — $label',
     ({ stack, expected }) => {
