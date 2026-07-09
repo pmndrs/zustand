@@ -28,7 +28,7 @@ npm install zustand
 
 ## First create a store
 
-Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/guides/immutable-state-and-merging.md) to help it.
+Your store is a hook! You can put anything in it: primitives, objects, functions. State has to be updated immutably and the `set` function [merges state](./docs/learn/guides/immutable-state-and-merging.md) to help it.
 
 ```jsx
 import { create } from 'zustand'
@@ -90,7 +90,7 @@ const nuts = useBearStore((state) => state.nuts)
 const honey = useBearStore((state) => state.honey)
 ```
 
-If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can use [useShallow](./docs/guides/prevent-rerenders-with-use-shallow.md) to prevent unnecessary rerenders when the selector output does not change according to shallow equal.
+If you want to construct a single object with multiple state-picks inside, similar to redux's mapStateToProps, you can use [useShallow](./docs/learn/guides/prevent-rerenders-with-use-shallow.md) to prevent unnecessary rerenders when the selector output does not change according to shallow equal.
 
 ```jsx
 import { create } from 'zustand'
