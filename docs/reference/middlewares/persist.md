@@ -50,7 +50,11 @@ persist<T, U = T>(stateCreatorFn: StateCreator<T, [], []>, persistOptions: Persi
   Usually, you will return an object with the methods you want to expose.
 - `persistOptions`: An object to define storage options.
   - `name`: A unique name of the item for your store in the storage.
-  - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`.
+  - **optional** `storage`: A `PersistStorage` object used to read and write the persisted state.
+    Defaults to `createJSONStorage(() => localStorage)`. The getter function passed to
+    `createJSONStorage` is evaluated lazily (only when the storage is first accessed), which
+    prevents errors in environments where storage APIs like `localStorage` are unavailable at
+    module evaluation time — for example, during server-side rendering (SSR).
   - **optional** `partialize`: A function to filter state fields before persisting it.
   - **optional** `onRehydrateStorage`: A function or function returning a function that allows
     custom logic before and after state rehydration.
