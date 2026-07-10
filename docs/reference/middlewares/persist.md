@@ -50,7 +50,17 @@ persist<T, U = T>(stateCreatorFn: StateCreator<T, [], []>, persistOptions: Persi
   Usually, you will return an object with the methods you want to expose.
 - `persistOptions`: An object to define storage options.
   - `name`: A unique name of the item for your store in the storage.
-  - **optional** `storage`: Defaults to `createJSONStorage(() => localStorage)`.
+  - **optional** `storage`: A `PersistStorage` object used to read and write the persisted state.
+    Defaults to `createJSONStorage(() => localStorage)`. The getter function passed to
+    `createJSONStorage` is evaluated lazily (only when the storage is first accessed), which
+    prevents errors in environments where storage APIs like `localStorage` are unavailable at
+    module evaluation time — for example, during server-side rendering (SSR).
+    > **Warning:** `createJSONStorage` relies on `JSON.parse` and `JSON.stringify` and does not
+    > perform any runtime validation. The value read from storage is cast directly to your state
+    > type without checking its shape, so corrupt, stale, or tampered data will not be caught at
+    > runtime. For production use, implement a custom `PersistStorage` that validates the
+    > deserialized value — for example with a schema validation library such as
+    > [Zod](https://zod.dev).
   - **optional** `partialize`: A function to filter state fields before persisting it.
   - **optional** `onRehydrateStorage`: A function or function returning a function that allows
     custom logic before and after state rehydration.
@@ -337,7 +347,13 @@ Here's the `html` code
 
 ### Persisting a state with custom storage
 
-In this mini tutorial, we’ll create a simple position-tracking system using vanilla store, where
+> **Note:** `createJSONStorage` is a convenience helper suited for quick prototyping. It uses
+> `JSON.parse`/`JSON.stringify` without runtime validation, so unexpected or corrupted data in
+> storage is not caught. For production applications, implement a custom `PersistStorage` that
+> validates the persisted value, for example using a schema validation library like
+> [Zod](https://zod.dev).
+
+In this mini tutorial, we'll create a simple position-tracking system using vanilla store, where
 the position state is persisted in the URL's search parameters. This approach allows state
 persistence directly in the browser's URL, which can be useful for maintaining state across page
 reloads or sharing links with state embedded.
