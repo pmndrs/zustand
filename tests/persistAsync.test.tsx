@@ -4,8 +4,8 @@ import { StrictMode, useEffect } from 'react'
 import { act, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { create } from 'zustand'
-import { createStore } from 'zustand/vanilla'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { createStore } from 'zustand/vanilla'
 import { replacer, reviver, sleep } from './test-utils'
 
 const createPersistantStore = (initialValue: string | null) => {
