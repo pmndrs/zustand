@@ -346,6 +346,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       }
     },
     clearStorage: () => {
+      ++hydrationVersion
       storage?.removeItem(options.name)
     },
     getOptions: () => options,
