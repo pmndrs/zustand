@@ -50,6 +50,7 @@ This can be done using third-party libraries created by the community.
 - [zustand-constate](https://github.com/ntvinhit/zustand-constate) — Context-based state management based on Zustand and taking ideas from Constate.
 - [zustand-context](https://github.com/fredericoo/zustand-context) — Create a zustand store in React Context, containing an initial value, or use it in your components with isolated, mockable instances.
 - [zustand-create-setter-fn](https://www.npmjs.com/package/zustand-create-setter-fn) — A fully type safe utility for Zustand that allows you to easily update state using React style `setState` functions (framework agnostic, doesn't require React).
+- [zustand-devtools-bridge](https://github.com/KubaOpoczka/zustand-devtools) — Bridge for a dedicated Chrome DevTools panel with registered-store inspection, searchable action timelines, safe time travel, path-level diffs, and redacted Trace Session export.
 - [zustand-di](https://github.com/charkour/zustand-di) — use react props to init zustand stores
 - [zustand-forms](https://github.com/Conduct/zustand-forms) — Fast, type safe form states as Zustand stores.
 - [zustand-hash-storage](https://github.com/MartinGamesCZ/zustand-hash-storage) — Zustand middleware for saving state into URL hash, b64 encoded (can be configured) and debounce timer.
