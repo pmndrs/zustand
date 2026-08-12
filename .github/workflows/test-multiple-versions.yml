@@ -23,8 +23,8 @@ jobs:
           - 19.0.0
           - 19.1.0
           - 19.2.0
-          - 19.3.0-canary-f4e0d4ed-20260429
-          - 0.0.0-experimental-f4e0d4ed-20260429
+          - 19.3.0-canary-bfb7a768-20260811
+          - 0.0.0-experimental-bfb7a768-20260811
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
