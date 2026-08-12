@@ -166,8 +166,8 @@ const removeStoreFromTrackedConnections = (
   }
 }
 
-// V8 (Chrome/Edge/Node): "at <name> (<source>)"
-const v8StackLineRe = /.+ (.+) .+/
+// V8 (Chrome/Edge/Node): "at [async|new] <name> (<source>)"
+const v8StackLineRe = /^at (?:new |async )?(.+?) \(/
 // SpiderMonkey (Firefox) / JavaScriptCore (Safari): "<name>@<source>"
 const geckoStackLineRe = /^([^@]+)@/
 
