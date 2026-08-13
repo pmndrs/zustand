@@ -71,8 +71,7 @@ it('can use exposed types', () => {
   function checkAllTypes(
     _getState: StoreApi<ExampleState>['getState'],
     _partialState:
-      | Partial<ExampleState>
-      | ((s: ExampleState) => Partial<ExampleState>),
+      Partial<ExampleState> | ((s: ExampleState) => Partial<ExampleState>),
     _setState: StoreApi<ExampleState>['setState'],
     _state: object,
     _stateListener: (state: ExampleState, previousState: ExampleState) => void,

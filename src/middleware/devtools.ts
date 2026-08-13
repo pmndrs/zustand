@@ -196,8 +196,7 @@ const devtoolsImpl: DevtoolsImpl =
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
     let extensionConnector:
-      | (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
-      | false
+      (typeof window)['__REDUX_DEVTOOLS_EXTENSION__'] | false
     try {
       extensionConnector =
         (enabled ?? import.meta.env?.MODE !== 'production') &&

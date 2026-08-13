@@ -58,8 +58,7 @@ type StoreImmer<S> = S extends {
         ): Sr1
         setState(
           nextStateOrUpdater:
-            | SetStateType<A2>
-            | ((state: Draft<SetStateType<A2>>) => void),
+            SetStateType<A2> | ((state: Draft<SetStateType<A2>>) => void),
           shouldReplace: true,
           ...args: SkipTwo<A2>
         ): Sr2

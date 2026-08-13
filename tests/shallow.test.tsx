@@ -120,9 +120,11 @@ describe('useShallow', () => {
 
   it('only re-renders if selector output has changed according to shallow', () => {
     let countRenders = 0
-    const useMyStore = create(
-      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }),
-    )
+    const useMyStore = create((): Record<string, unknown> => ({
+      a: 1,
+      b: 2,
+      c: 3,
+    }))
     const TestShallow = ({
       selector = (state) => Object.keys(state).sort(),
     }: {
@@ -156,9 +158,11 @@ describe('useShallow', () => {
   })
 
   it('does not cause stale closure issues', () => {
-    const useMyStore = create(
-      (): Record<string, unknown> => ({ a: 1, b: 2, c: 3 }),
-    )
+    const useMyStore = create((): Record<string, unknown> => ({
+      a: 1,
+      b: 2,
+      c: 3,
+    }))
     const TestShallowWithState = () => {
       const [count, setCount] = useState(0)
       const output = useMyStore(
