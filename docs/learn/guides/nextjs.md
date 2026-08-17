@@ -86,7 +86,7 @@ export type CounterActions = {
   incrementCount: () => void
 }
 
-export type CounterStore = CounterState & CounterActions
+export type CounterStore = CounterState | CounterActions
 
 export const defaultInitState: CounterState = {
   count: 0,
