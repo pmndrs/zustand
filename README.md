@@ -117,7 +117,7 @@ const [nuts, honey] = useBearStore(
 const treats = useBearStore(useShallow((state) => Object.keys(state.treats)))
 ```
 
-For more control over re-rendering, you may provide any custom equality function (this example requires the use of [`createWithEqualityFn`](./docs/migrations/migrating-to-v5.md#using-custom-equality-functions-such-as-shallow)).
+For more control over re-rendering, you may provide any custom equality function (this example requires the use of [`createWithEqualityFn`](./docs/reference/migrations/migrating-to-v5.md#using-custom-equality-functions-such-as-shallow)).
 
 ```jsx
 const treats = useBearStore(
