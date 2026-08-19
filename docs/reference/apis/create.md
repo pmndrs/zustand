@@ -23,6 +23,7 @@ const useSomeStore = create(stateCreatorFn)
   - [Subscribing to state updates](#subscribing-to-state-updates)
 - [Troubleshooting](#troubleshooting)
   - [I’ve updated the state, but the screen doesn’t update](#i’ve-updated-the-state,-but-the-screen-doesn’t-update)
+  - [Reading the state inside the state creator function throws or returns undefined](#reading-the-state-inside-the-state-creator-function-throws-or-returns-undefined)
 
 ## Types
 
@@ -569,3 +570,44 @@ export default function Form() {
   )
 }
 ```
+
+### Reading the state inside the state creator function throws or returns undefined
+
+The `store` argument is handed to the state creator function before the store has finished
+initializing, so it cannot be used to read state while that function is still running:
+
+```ts
+import { create } from 'zustand'
+
+type CountStore = {
+  count: number
+  initialCount: number
+}
+
+const useCountStore = create<CountStore>()((set, get, store) => ({
+  count: 0,
+  // `get()` and `store.getState()` return `undefined` here, and
+  // `store.getInitialState()` throws:
+  // ReferenceError: Cannot access 'initialState' before initialization
+  initialCount: store.getInitialState().count,
+}))
+```
+
+Reading state during initialization is not supported. `set`, `get` and `store` are meant to be
+called later, from actions or from code that runs after `create` has returned.
+
+Keep the initial values as plain values instead, and read the state only once the store exists:
+
+```ts
+const initialCount = 0
+
+const useCountStore = create<CountStore>()(() => ({
+  count: initialCount,
+  initialCount,
+}))
+
+useCountStore.getInitialState() // { count: 0, initialCount: 0 }
+```
+
+The same limitation applies to writes: calling `set` while the state creator function is still
+running has no effect, because the object that function returns replaces the state that was set.
