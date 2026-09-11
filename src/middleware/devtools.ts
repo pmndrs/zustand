@@ -243,15 +243,22 @@ const devtoolsImpl: DevtoolsImpl =
       )
       return r
     }) as NamedSet<S>
+    let unsubscribeFromStore: (() => void) | undefined
+    let isCleanedUp = false
     ;(api as StoreApi<S> & StoreDevtools<S>).devtools = {
       cleanup: () => {
+        if (isCleanedUp) return
+        isCleanedUp = true
+        unsubscribeFromStore?.()
+        unsubscribeFromStore = undefined
+        removeStoreFromTrackedConnections(options.name, store)
         if (
+          (store === undefined || !trackedConnections.has(options.name)) &&
           connection &&
           typeof (connection as any).unsubscribe === 'function'
         ) {
           ;(connection as any).unsubscribe()
         }
-        removeStoreFromTrackedConnections(options.name, store)
       },
     }
 
@@ -298,7 +305,7 @@ const devtoolsImpl: DevtoolsImpl =
       }
     }
 
-    ;(
+    unsubscribeFromStore = (
       connection as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
         subscribe: (
