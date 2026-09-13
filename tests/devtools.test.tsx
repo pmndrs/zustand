@@ -2687,8 +2687,8 @@ describe('cleanup', () => {
     const replacement = createStore(
       devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
     )
-    store1.devtools.cleanup()
     const [subscriber] = getNamedConnectionSubscribers(name)
+    store1.devtools.cleanup()
     subscriber({
       type: 'DISPATCH',
       payload: { type: 'JUMP_TO_STATE' },
@@ -2696,7 +2696,43 @@ describe('cleanup', () => {
     })
 
     expect(replacement.getState()).toEqual({ count: 30 })
+    const connectCalls = extensionConnector.connect.mock.calls.length
+    const sibling = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'second', enabled: true }),
+    )
+    expect(extensionConnector.connect).toHaveBeenCalledTimes(connectCalls)
+
+    sibling.devtools.cleanup()
     replacement.devtools.cleanup()
+  })
+
+  it('should close an untracked connection while a tracked connection uses the same name', () => {
+    const name = 'mixed-connection-cleanup'
+    const options = { name, testStore: 'untracked', enabled: true }
+    const untrackedStore = createStore(devtools(() => ({ count: 0 }), options))
+    const trackedStore = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'tracked', enabled: true }),
+    )
+    const [untrackedConnection, trackedConnection] = getNamedConnectionApis(
+      `${name}|untracked`,
+      name,
+    )
+
+    untrackedStore.devtools.cleanup()
+
+    expect(untrackedConnection.unsubscribe).toHaveBeenCalledTimes(1)
+    expect(trackedConnection.unsubscribe).not.toHaveBeenCalled()
+    const [subscriber] = getNamedConnectionSubscribers(name)
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ tracked: { count: 20 } }),
+    })
+    expect(trackedStore.getState()).toEqual({ count: 20 })
+    expect(untrackedStore.getState()).toEqual({ count: 0 })
+
+    trackedStore.devtools.cleanup()
+    expect(trackedConnection.unsubscribe).toHaveBeenCalledTimes(1)
   })
 
   it('should unsubscribe from devtools when cleanup is called', async () => {

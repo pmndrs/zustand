@@ -247,7 +247,9 @@ const devtoolsImpl: DevtoolsImpl =
     let isCleanedUp = false
     ;(api as StoreApi<S> & StoreDevtools<S>).devtools = {
       cleanup: () => {
-        if (isCleanedUp) return
+        if (isCleanedUp) {
+          return
+        }
         isCleanedUp = true
         unsubscribeFromStore?.()
         unsubscribeFromStore = undefined
