@@ -2633,6 +2633,34 @@ describe('when create devtools was called multiple times with `name` and `store`
 })
 
 describe('cleanup', () => {
+  it('should preserve a replacement store when the original store is cleaned up', () => {
+    const options = {
+      name: 'replacement-before-cleanup',
+      store: 'shared',
+      enabled: true,
+    }
+    const original = createStore(devtools(() => ({ count: 0 }), options))
+    const replacement = createStore(devtools(() => ({ count: 0 }), options))
+    const [connection] = getNamedConnectionApis(options.name)
+
+    original.devtools.cleanup()
+
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    const [subscriber] = getNamedConnectionSubscribers(options.name)
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ shared: { count: 20 } }),
+    })
+    expect(replacement.getState()).toEqual({ count: 20 })
+    expect(original.getState()).toEqual({ count: 0 })
+
+    original.devtools.cleanup()
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    replacement.devtools.cleanup()
+    expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
   it.each([1, 2])(
     'should preserve other stores on a shared connection after %i cleanup calls',
     (cleanupCalls) => {

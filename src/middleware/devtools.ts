@@ -156,10 +156,11 @@ const extractConnectionInformation = (
 const removeStoreFromTrackedConnections = (
   name: string | undefined,
   store: string | undefined,
+  api: StoreInformation,
 ) => {
   if (store === undefined) return
   const connectionInfo = trackedConnections.get(name)
-  if (!connectionInfo) return
+  if (connectionInfo?.stores[store] !== api) return
   delete connectionInfo.stores[store]
   if (Object.keys(connectionInfo.stores).length === 0) {
     trackedConnections.delete(name)
@@ -244,16 +245,11 @@ const devtoolsImpl: DevtoolsImpl =
       return r
     }) as NamedSet<S>
     let unsubscribeFromStore: (() => void) | undefined
-    let isCleanedUp = false
     ;(api as StoreApi<S> & StoreDevtools<S>).devtools = {
       cleanup: () => {
-        if (isCleanedUp) {
-          return
-        }
-        isCleanedUp = true
         unsubscribeFromStore?.()
         unsubscribeFromStore = undefined
-        removeStoreFromTrackedConnections(options.name, store)
+        removeStoreFromTrackedConnections(options.name, store, api)
         if (
           (store === undefined || !trackedConnections.has(options.name)) &&
           connection &&
