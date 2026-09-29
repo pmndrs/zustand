@@ -48,7 +48,7 @@ export function createJSONStorage<S, R = unknown>(
         return JSON.parse(str, options?.reviver) as StorageValue<S>
       }
       const str = storage.getItem(name) ?? null
-      if (str instanceof Promise) {
+      if (isPromiseLike(str)) {
         return str.then(parse)
       }
       return parse(str)
@@ -146,41 +146,72 @@ type StorePersist<S, Ps, Pr> = S extends {
   : never
 
 type Thenable<Value> = {
-  then<V>(
-    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>,
-  ): Thenable<V>
-  catch<V>(
-    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>,
-  ): Thenable<V>
+  then<Fulfilled = Value, Rejected = never>(
+    onFulfilled?: ((value: Value) => Fulfilled | PromiseLike<Fulfilled>) | null,
+    onRejected?: ((reason: unknown) => Rejected | PromiseLike<Rejected>) | null,
+  ): Thenable<Fulfilled | Rejected>
+  catch<Rejected = never>(
+    onRejected?: ((reason: unknown) => Rejected | PromiseLike<Rejected>) | null,
+  ): Thenable<Value | Rejected>
+  finally(onFinally?: (() => unknown) | null): Thenable<Value>
 }
+
+const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
+  typeof (value as PromiseLike<unknown>)?.then === 'function'
 
 const toThenable =
   <Result, Input>(
-    fn: (input: Input) => Result | Promise<Result> | Thenable<Result>,
+    fn: (input: Input) => Result | PromiseLike<Result>,
+    acceptPromiseLike = true,
   ) =>
   (input: Input): Thenable<Result> => {
+    let result: Result | PromiseLike<Result>
+    let failed = false
+    let error: unknown
+    let promiseLike = false
     try {
-      const result = fn(input)
+      result = fn(input)
       if (result instanceof Promise) {
         return result as Thenable<Result>
       }
-      return {
-        then(onFulfilled) {
-          return toThenable(onFulfilled)(result as Result)
-        },
-        catch(_onRejected) {
-          return this as Thenable<any>
-        },
-      }
-    } catch (e: any) {
-      return {
-        then(_onFulfilled) {
-          return this as Thenable<any>
-        },
-        catch(onRejected) {
-          return toThenable(onRejected)(e)
-        },
-      }
+      promiseLike = acceptPromiseLike && isPromiseLike(result)
+    } catch (e) {
+      failed = true
+      error = e
+    }
+    return {
+      then<Fulfilled = Result, Rejected = never>(
+        onFulfilled?:
+          ((value: Result) => Fulfilled | PromiseLike<Fulfilled>) | null,
+        onRejected?:
+          ((reason: unknown) => Rejected | PromiseLike<Rejected>) | null,
+      ): Thenable<Fulfilled | Rejected> {
+        return toThenable(() => {
+          if (failed) {
+            if (typeof onRejected === 'function') return onRejected(error)
+            throw error
+          }
+          if (promiseLike) {
+            return (result as PromiseLike<Result>).then(onFulfilled, onRejected)
+          }
+          return typeof onFulfilled === 'function'
+            ? onFulfilled(result as Result)
+            : (result as Fulfilled)
+        })(undefined)
+      },
+      catch(onRejected) {
+        return this.then(undefined, onRejected)
+      },
+      finally(onFinally) {
+        if (typeof onFinally !== 'function') return this.then()
+        return this.then(
+          (value) => toThenable(() => onFinally())(undefined).then(() => value),
+          (reason) =>
+            toThenable(() => onFinally())(undefined).then(() => {
+              throw reason
+            }),
+        )
+      },
     }
   }
 
@@ -279,7 +310,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
                 deserializedStorageValue.state,
                 deserializedStorageValue.version,
               )
-              if (migration instanceof Promise) {
+              if (isPromiseLike(migration)) {
                 return migration.then((result) => [true, result] as const)
               }
               return [true, migration] as const
@@ -306,7 +337,17 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
         set(stateFromStorage as S, true)
         if (migrated) {
-          return setItem()
+          const writeResult = setItem()
+          if (
+            writeResult === null ||
+            (typeof writeResult !== 'object' &&
+              typeof writeResult !== 'function')
+          ) {
+            return writeResult
+          }
+          // Keep non-native write returns as values, including older internal
+          // Thenables. Asynchronous chains still adopt the returned value.
+          return toThenable(() => writeResult, false)(undefined)
         }
       })
       .then(() => {
@@ -325,7 +366,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         hasHydrated = true
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
-      .catch((e: Error) => {
+      .then(undefined, (e: unknown) => {
         // Abort if a newer hydration has started
         if (currentVersion !== hydrationVersion) {
           return
