@@ -96,9 +96,12 @@ const extensionConnector = {
     const api: Connection['api'] = {
       subscribe: vi.fn((f: (m: unknown) => void) => {
         subscribers.push(f)
-        return () => {}
+        return () => {
+          subscribers.splice(subscribers.indexOf(f), 1)
+        }
       }),
       unsubscribe: vi.fn(() => {
+        subscribers.splice(0)
         connectionMap.delete(
           areNameUndefinedMapsNeeded ? options.testConnectionId : key,
         )
@@ -2630,6 +2633,136 @@ describe('when create devtools was called multiple times with `name` and `store`
 })
 
 describe('cleanup', () => {
+  it('should preserve a replacement store when the original store is cleaned up', () => {
+    const options = {
+      name: 'replacement-before-cleanup',
+      store: 'shared',
+      enabled: true,
+    }
+    const original = createStore(devtools(() => ({ count: 0 }), options))
+    const replacement = createStore(devtools(() => ({ count: 0 }), options))
+    const [connection] = getNamedConnectionApis(options.name)
+
+    original.devtools.cleanup()
+
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    const [subscriber] = getNamedConnectionSubscribers(options.name)
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ shared: { count: 20 } }),
+    })
+    expect(replacement.getState()).toEqual({ count: 20 })
+    expect(original.getState()).toEqual({ count: 0 })
+
+    original.devtools.cleanup()
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    replacement.devtools.cleanup()
+    expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([1, 2])(
+    'should preserve other stores on a shared connection after %i cleanup calls',
+    (cleanupCalls) => {
+      const name = `shared-cleanup-${cleanupCalls}`
+      const store1 = createStore(
+        devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
+      )
+      const store2 = createStore(
+        devtools(() => ({ count: 0 }), {
+          name,
+          store: 'second',
+          enabled: true,
+        }),
+      )
+      const subscribers = namedConnections.get(name)!.subscribers
+
+      for (let i = 0; i < cleanupCalls; i++) {
+        store1.devtools.cleanup()
+      }
+      subscribers.forEach((subscriber) =>
+        subscriber({
+          type: 'DISPATCH',
+          payload: { type: 'JUMP_TO_STATE' },
+          state: JSON.stringify({
+            first: { count: 10 },
+            second: { count: 20 },
+          }),
+        }),
+      )
+
+      expect(store1.getState()).toEqual({ count: 0 })
+      expect(store2.getState()).toEqual({ count: 20 })
+      store2.devtools.cleanup()
+    },
+  )
+
+  it('should close a shared connection only after its last store is cleaned up', () => {
+    const name = 'last-store-cleanup'
+    const store1 = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
+    )
+    const store2 = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'second', enabled: true }),
+    )
+    const [connection] = getNamedConnectionApis(name)
+
+    store1.devtools.cleanup()
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    store2.devtools.cleanup()
+    expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+
+    const replacement = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
+    )
+    const [subscriber] = getNamedConnectionSubscribers(name)
+    store1.devtools.cleanup()
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ first: { count: 30 } }),
+    })
+
+    expect(replacement.getState()).toEqual({ count: 30 })
+    const connectCalls = extensionConnector.connect.mock.calls.length
+    const sibling = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'second', enabled: true }),
+    )
+    expect(extensionConnector.connect).toHaveBeenCalledTimes(connectCalls)
+
+    sibling.devtools.cleanup()
+    replacement.devtools.cleanup()
+  })
+
+  it('should close an untracked connection while a tracked connection uses the same name', () => {
+    const name = 'mixed-connection-cleanup'
+    const options = { name, testStore: 'untracked', enabled: true }
+    const untrackedStore = createStore(devtools(() => ({ count: 0 }), options))
+    const trackedStore = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'tracked', enabled: true }),
+    )
+    const [untrackedConnection, trackedConnection] = getNamedConnectionApis(
+      `${name}|untracked`,
+      name,
+    )
+
+    untrackedStore.devtools.cleanup()
+
+    expect(untrackedConnection.unsubscribe).toHaveBeenCalledTimes(1)
+    expect(trackedConnection.unsubscribe).not.toHaveBeenCalled()
+    const [subscriber] = getNamedConnectionSubscribers(name)
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ tracked: { count: 20 } }),
+    })
+    expect(trackedStore.getState()).toEqual({ count: 20 })
+    expect(untrackedStore.getState()).toEqual({ count: 0 })
+
+    trackedStore.devtools.cleanup()
+    expect(trackedConnection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
   it('should unsubscribe from devtools when cleanup is called', async () => {
     const options = { name: 'test' }
     const store = createStore(devtools(() => ({ count: 0 }), options))
