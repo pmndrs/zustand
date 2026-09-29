@@ -306,6 +306,10 @@ const devtoolsImpl: DevtoolsImpl =
         ) => (() => void) | undefined
       }
     ).subscribe((message) => {
+      const reviver =
+        typeof options.serialize === 'object'
+          ? options.serialize.reviver
+          : undefined
       switch (message.type) {
         case 'ACTION':
           if (typeof message.payload !== 'string') {
@@ -316,6 +320,7 @@ const devtoolsImpl: DevtoolsImpl =
           }
           return parseJsonThen<{ type: unknown; state?: PartialState }>(
             message.payload,
+            reviver,
             (action) => {
               if (action.type === '__setState') {
                 if (store === undefined) {
@@ -370,7 +375,7 @@ const devtoolsImpl: DevtoolsImpl =
               return connection?.init(getTrackedConnectionState(options.name))
 
             case 'ROLLBACK':
-              return parseJsonThen<S>(message.state, (state) => {
+              return parseJsonThen<S>(message.state, reviver, (state) => {
                 if (store === undefined) {
                   setStateFromDevtools(state)
                   connection?.init(api.getState())
@@ -382,7 +387,7 @@ const devtoolsImpl: DevtoolsImpl =
 
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
-              return parseJsonThen<S>(message.state, (state) => {
+              return parseJsonThen<S>(message.state, reviver, (state) => {
                 if (store === undefined) {
                   setStateFromDevtools(state)
                   return
@@ -423,10 +428,14 @@ const devtoolsImpl: DevtoolsImpl =
   }
 export const devtools = devtoolsImpl as unknown as Devtools
 
-const parseJsonThen = <T>(stringified: string, fn: (parsed: T) => void) => {
+const parseJsonThen = <T>(
+  stringified: string,
+  reviver: ((key: string, value: unknown) => unknown) | undefined,
+  fn: (parsed: T) => void,
+) => {
   let parsed: T | undefined
   try {
-    parsed = JSON.parse(stringified)
+    parsed = JSON.parse(stringified, reviver)
   } catch (e) {
     console.error(
       '[zustand devtools middleware] Could not parse the received json',
