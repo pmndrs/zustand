@@ -51,7 +51,7 @@ If you would like to contribute by fixing an open issue or developing a new feat
 3. Follow the [Core](#Core) and/or the [Documentation](#Documentation) guide below and come back to this once done.
 4. Run `pnpm run fix:format` to format the code.
 5. Git stage your required changes and commit (review the commit guidelines below).
-6. Submit the PR for review.
+6. Start or continue the relevant discussion, share your fork branch, and wait for maintainer guidance. We don't accept direct PRs, but a maintainer may open a PR from your fork branch for review.
 
 ##### Core
 
@@ -65,9 +65,11 @@ If you would like to contribute by fixing an open issue or developing a new feat
 
 ### Pull Requests
 
-Please try to keep your pull request focused in scope and avoid including unrelated commits.
+We don't accept direct pull requests from contributors. Please use a discussion to report bugs, ask questions, or propose features, and share a branch from your fork when a maintainer asks for code.
 
-After you have submitted your pull request, we'll try to get back to you as soon as possible. We may suggest some changes or request improvements, therefore, please check ✅ ["Allow edits from maintainers"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) on your PR.
+If a maintainer opens a pull request from your fork branch, please try to keep it focused in scope and avoid including unrelated commits.
+
+When a pull request is opened from your fork branch, we'll try to get back to you as soon as possible. We may suggest some changes or request improvements, therefore, please check ✅ ["Allow edits from maintainers"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) on your PR.
 
 ## Zustand-specific Guideline
 
