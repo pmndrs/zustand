@@ -6,7 +6,7 @@ import { createPromiseLike } from './test-utils'
 
 type State = { drafts: string[] }
 type Deferred<T> = {
-  promise: Promise<T>
+  promise: PromiseLike<T>
   resolve: (value: T) => void
   reject: (error: Error) => void
 }
@@ -28,7 +28,7 @@ const deferred = <T>(kind: string): Deferred<T> => {
   return {
     promise:
       kind === 'PromiseLike without catch'
-        ? (createPromiseLike(promise) as Promise<T>)
+        ? createPromiseLike(promise)
         : kind === 'compatible implementation'
           ? {
               then: promise.then.bind(promise),

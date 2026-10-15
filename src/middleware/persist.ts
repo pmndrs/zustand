@@ -5,7 +5,7 @@ import type {
 } from '../vanilla.ts'
 
 export interface StateStorage<R = unknown> {
-  getItem: (name: string) => string | null | Promise<string | null>
+  getItem: (name: string) => string | null | PromiseLike<string | null>
   setItem: (name: string, value: string) => R
   removeItem: (name: string) => R
 }
@@ -18,7 +18,7 @@ export type StorageValue<S> = {
 export interface PersistStorage<S, R = unknown> {
   getItem: (
     name: string,
-  ) => StorageValue<S> | null | Promise<StorageValue<S> | null>
+  ) => StorageValue<S> | null | PromiseLike<StorageValue<S> | null>
   setItem: (name: string, value: StorageValue<S>) => R
   removeItem: (name: string) => R
 }
@@ -102,7 +102,7 @@ export interface PersistOptions<
   migrate?: (
     persistedState: unknown,
     version: number,
-  ) => PersistedState | Promise<PersistedState>
+  ) => PersistedState | PromiseLike<PersistedState>
   /**
    * A function to perform custom hydration merges when combining the stored state with the current one.
    * By default, this function does a shallow merge.
@@ -136,7 +136,7 @@ type StorePersist<S, Ps, Pr> = S extends {
       persist: {
         setOptions: (options: Partial<PersistOptions<T, Ps, Pr>>) => void
         clearStorage: () => void
-        rehydrate: () => Promise<void> | void
+        rehydrate: () => Promise<void>
         hasHydrated: () => boolean
         onHydrate: (fn: PersistListener<T>) => () => void
         onFinishHydration: (fn: PersistListener<T>) => () => void
@@ -145,75 +145,34 @@ type StorePersist<S, Ps, Pr> = S extends {
     }
   : never
 
-type Thenable<Value> = {
-  then<Fulfilled = Value, Rejected = never>(
-    onFulfilled?: ((value: Value) => Fulfilled | PromiseLike<Fulfilled>) | null,
-    onRejected?: ((reason: unknown) => Rejected | PromiseLike<Rejected>) | null,
-  ): Thenable<Fulfilled | Rejected>
-  catch<Rejected = never>(
-    onRejected?: ((reason: unknown) => Rejected | PromiseLike<Rejected>) | null,
-  ): Thenable<Value | Rejected>
-  finally(onFinally?: (() => unknown) | null): Thenable<Value>
-}
-
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
   typeof (value as PromiseLike<unknown>)?.then === 'function'
 
-const toThenable =
-  <Result, Input>(
-    fn: (input: Input) => Result | PromiseLike<Result>,
-    acceptPromiseLike = true,
-  ) =>
-  (input: Input): Thenable<Result> => {
-    let result: Result | PromiseLike<Result>
-    let failed = false
-    let error: unknown
-    let promiseLike = false
-    try {
-      result = fn(input)
-      if (result instanceof Promise) {
-        return result as Thenable<Result>
-      }
-      promiseLike = acceptPromiseLike && isPromiseLike(result)
-    } catch (e) {
-      failed = true
-      error = e
-    }
+const toSyncThenable = <Value>(value: Value): PromiseLike<Value> => ({
+  then(onFulfilled) {
+    return onFulfilled
+      ? toThenable(onFulfilled, value)
+      : (this as PromiseLike<any>)
+  },
+})
+
+const toThenable = <Result, Input>(
+  fn: (input: Input) => Result | PromiseLike<Result>,
+  input: Input,
+): PromiseLike<Result> => {
+  try {
+    const result = fn(input)
+    return isPromiseLike(result) ? result : toSyncThenable(result as Result)
+  } catch (error) {
     return {
-      then<Fulfilled = Result, Rejected = never>(
-        onFulfilled?:
-          ((value: Result) => Fulfilled | PromiseLike<Fulfilled>) | null,
-        onRejected?:
-          ((reason: unknown) => Rejected | PromiseLike<Rejected>) | null,
-      ): Thenable<Fulfilled | Rejected> {
-        return toThenable(() => {
-          if (failed) {
-            if (typeof onRejected === 'function') return onRejected(error)
-            throw error
-          }
-          if (promiseLike) {
-            return (result as PromiseLike<Result>).then(onFulfilled, onRejected)
-          }
-          return typeof onFulfilled === 'function'
-            ? onFulfilled(result as Result)
-            : (result as Fulfilled)
-        })(undefined)
-      },
-      catch(onRejected) {
-        return this.then(undefined, onRejected)
-      },
-      finally(onFinally) {
-        if (typeof onFinally !== 'function') return this.then()
-        return this.then(
-          (value) => toThenable(() => onFinally())(undefined).then(() => value),
-          (reason) =>
-            toThenable(() => onFinally())(undefined).then(() => {
-              throw reason
-            }),
-        )
+      then(_onFulfilled, onRejected) {
+        return onRejected
+          ? toThenable(onRejected, error)
+          : (this as PromiseLike<any>)
       },
     }
   }
+}
 
 const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   type S = ReturnType<typeof config>
@@ -298,32 +257,36 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       options.onRehydrateStorage?.(get() ?? configResult) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
-    return toThenable(storage.getItem.bind(storage))(options.name)
-      .then((deserializedStorageValue) => {
-        if (deserializedStorageValue) {
-          if (
-            typeof deserializedStorageValue.version === 'number' &&
-            deserializedStorageValue.version !== options.version
-          ) {
-            if (options.migrate) {
-              const migration = options.migrate(
-                deserializedStorageValue.state,
-                deserializedStorageValue.version,
-              )
-              if (isPromiseLike(migration)) {
-                return migration.then((result) => [true, result] as const)
-              }
-              return [true, migration] as const
-            }
-            console.error(
-              `State loaded from storage couldn't be migrated since no migrate function was provided`,
+    const hydration = toThenable(
+      storage.getItem.bind(storage),
+      options.name,
+    ).then((deserializedStorageValue) => {
+      if (deserializedStorageValue) {
+        if (
+          typeof deserializedStorageValue.version === 'number' &&
+          deserializedStorageValue.version !== options.version
+        ) {
+          if (options.migrate) {
+            const migration = options.migrate(
+              deserializedStorageValue.state,
+              deserializedStorageValue.version,
             )
-          } else {
-            return [false, deserializedStorageValue.state] as const
+            if (isPromiseLike(migration)) {
+              return migration.then((result) => [true, result] as const)
+            }
+            return [true, migration] as const
           }
+          console.error(
+            `State loaded from storage couldn't be migrated since no migrate function was provided`,
+          )
+        } else {
+          return [false, deserializedStorageValue.state] as const
         }
-        return [false, undefined] as const
-      })
+      }
+      return [false, undefined] as const
+    })
+
+    return hydration
       .then((migrationResult) => {
         // Abort if a newer hydration has started
         if (currentVersion !== hydrationVersion) {
@@ -338,16 +301,19 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         set(stateFromStorage as S, true)
         if (migrated) {
           const writeResult = setItem()
+          // Native chains already adopt write results without an extra wrapper.
           if (
+            hydration instanceof Promise ||
             writeResult === null ||
             (typeof writeResult !== 'object' &&
-              typeof writeResult !== 'function')
+              typeof writeResult !== 'function') ||
+            writeResult instanceof Promise
           ) {
             return writeResult
           }
-          // Keep non-native write returns as values, including older internal
-          // Thenables. Asynchronous chains still adopt the returned value.
-          return toThenable(() => writeResult, false)(undefined)
+          // Keep non-native write returns as values for synchronous chains,
+          // including older internal Thenables.
+          return toSyncThenable(writeResult)
         }
       })
       .then(() => {
@@ -391,7 +357,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       storage?.removeItem(options.name)
     },
     getOptions: () => options,
-    rehydrate: () => hydrate() as Promise<void>,
+    rehydrate: () => Promise.resolve(hydrate()),
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
       hydrationListeners.add(cb)

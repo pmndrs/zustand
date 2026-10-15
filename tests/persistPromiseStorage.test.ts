@@ -7,7 +7,7 @@ import { createPromiseLike } from './test-utils'
 
 type State = { drafts: string[] }
 type Deferred<T> = {
-  promise: Promise<T>
+  promise: PromiseLike<T>
   resolve: (value: T) => void
   reject: (error: Error) => void
 }
@@ -29,7 +29,7 @@ const deferred = <T>(kind: string): Deferred<T> => {
   return {
     promise:
       kind === 'PromiseLike without catch'
-        ? (createPromiseLike(promise) as Promise<T>)
+        ? createPromiseLike(promise)
         : promise,
     resolve,
     reject,
@@ -44,12 +44,12 @@ const setup = (kind: string, json: boolean) => {
   const completed = vi.fn()
   const storage = json
     ? createJSONStorage<State>(() => ({
-        getItem: () => read.promise as Promise<string | null>,
+        getItem: () => read.promise as PromiseLike<string | null>,
         setItem,
         removeItem: () => {},
       }))!
     : {
-        getItem: () => read.promise as Promise<StorageValue<State> | null>,
+        getItem: () => read.promise as PromiseLike<StorageValue<State> | null>,
         setItem,
         removeItem: () => {},
       }
@@ -215,12 +215,12 @@ it.each(['native', 'another realm'])(
 )
 
 it.each(['native', 'another realm', 'PromiseLike without catch'])(
-  'returns a Promise supporting finally for an asynchronous %s hydration',
+  'returns a native Promise for an asynchronous %s hydration',
   async (kind) => {
     const { read, store } = setup(kind, false)
     const finished = vi.fn()
     const hydration = store.persist.rehydrate()
-    if (!hydration) throw new Error('Expected asynchronous hydration')
+    expect(hydration).toBeInstanceOf(Promise)
     const completion = hydration.finally(finished)
     read.resolve({ state: { drafts: ['saved draft'] }, version: 0 })
     await completion

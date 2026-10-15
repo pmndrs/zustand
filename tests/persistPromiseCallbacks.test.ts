@@ -1,6 +1,5 @@
-import { expect, it, vi } from 'vitest'
+import { expect, expectTypeOf, it, vi } from 'vitest'
 import { persist } from 'zustand/middleware'
-import type { StorageValue } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 import { createPromiseLike } from './test-utils'
 
@@ -13,7 +12,7 @@ const startHydration = (callback = () => {}) => {
         getItem: () =>
           createPromiseLike(
             Promise.resolve({ state: { count: 42 }, version: 0 }),
-          ) as Promise<StorageValue<{ count: number }>>,
+          ),
         setItem: () => {},
         removeItem: () => {},
       },
@@ -21,7 +20,8 @@ const startHydration = (callback = () => {}) => {
     }),
   )
   const hydration = store.persist.rehydrate()
-  if (!hydration) throw new Error('Expected hydration result')
+  expectTypeOf(hydration).toEqualTypeOf<Promise<void>>()
+  expect(hydration).toBeInstanceOf(Promise)
   return hydration
 }
 
@@ -33,7 +33,7 @@ it('passes fulfillment errors to the next rejection handler', async () => {
     .then(() => {
       throw error
     }, sameStep)
-    .catch(nextStep)
+    .then(undefined, nextStep)
   expect(sameStep).not.toHaveBeenCalled()
   expect(nextStep).toHaveBeenCalledExactlyOnceWith(error)
   expect(result).toBe('recovered')
@@ -44,8 +44,7 @@ it('passes values and errors through omitted callbacks', async () => {
     .then(() => 42)
     .then(null)
     .then(undefined)
-    .catch()
-    .finally(null)
+    .then(undefined, null)
   expect(value).toBe(42)
 
   const error = new Error('callback failed')
@@ -54,49 +53,48 @@ it('passes values and errors through omitted callbacks', async () => {
     throw error
   })
     .then(null, null)
-    .catch(undefined)
-    .finally(undefined)
-    .catch(rejected)
+    .then(undefined, undefined)
+    .then(undefined, rejected)
   expect(rejected).toHaveBeenCalledExactlyOnceWith(error)
 })
 
-it('waits for a catchless finally result without changing the original value', async () => {
-  let completeCleanup!: () => void
-  const cleanup = new Promise<void>((resolve) => {
-    completeCleanup = resolve
+it('waits for a catchless result returned by a fulfillment handler', async () => {
+  let resolveResult!: (value: number) => void
+  const pending = new Promise<number>((resolve) => {
+    resolveResult = resolve
   })
-  const hydration = startHydration().then(() => 42)
-  const finallyCallback = vi.fn(() => createPromiseLike(cleanup))
+  const hydration = startHydration()
+  const onFulfilled = vi.fn(() => createPromiseLike(pending))
   const completed = vi.fn()
-  const result = hydration.finally(finallyCallback).then(completed)
+  const result = hydration.then(onFulfilled).then(completed)
   await hydration
-  expect(finallyCallback).toHaveBeenCalledExactlyOnceWith()
+  expect(onFulfilled).toHaveBeenCalledExactlyOnceWith(undefined)
   expect(completed).not.toHaveBeenCalled()
-  completeCleanup()
+  resolveResult(42)
   await result
   expect(completed).toHaveBeenCalledExactlyOnceWith(42)
 })
 
 it.each([false, true])(
-  'preserves or replaces rejection when finally settles (cleanup rejects = %s)',
-  async (cleanupRejects) => {
+  'adopts a catchless result returned by a rejection handler (rejects = %s)',
+  async (rejects) => {
     const original = new Error('hydration failed')
-    const cleanupError = new Error('cleanup failed')
-    const onFinally = vi.fn(() =>
+    const recoveryError = new Error('recovery failed')
+    const recover = vi.fn(() =>
       createPromiseLike(
-        cleanupRejects ? Promise.reject(cleanupError) : Promise.resolve(),
+        rejects ? Promise.reject(recoveryError) : Promise.resolve(42),
       ),
     )
+    const onFulfilled = vi.fn()
     const onRejected = vi.fn()
     await startHydration(() => {
       throw original
     })
-      .finally(onFinally)
-      .catch(onRejected)
-    expect(onFinally).toHaveBeenCalledExactlyOnceWith()
-    expect(onRejected).toHaveBeenCalledExactlyOnceWith(
-      cleanupRejects ? cleanupError : original,
-    )
+      .then(undefined, recover)
+      .then(onFulfilled, onRejected)
+    expect(recover).toHaveBeenCalledExactlyOnceWith(original)
+    expect(onFulfilled.mock.calls).toEqual(rejects ? [] : [[42]])
+    expect(onRejected.mock.calls).toEqual(rejects ? [[recoveryError]] : [])
   },
 )
 
@@ -119,7 +117,7 @@ it('does not inspect catch or finally on an external pending PromiseLike', () =>
     persist(() => ({ count: 0 }), {
       name: 'pending-promise',
       storage: {
-        getItem: () => pending as Promise<never>,
+        getItem: () => pending,
         setItem: () => {},
         removeItem: () => {},
       },
@@ -130,4 +128,121 @@ it('does not inspect catch or finally on an external pending PromiseLike', () =>
   expect(completed).not.toHaveBeenCalled()
   expect(catchAccess).not.toHaveBeenCalled()
   expect(finallyAccess).not.toHaveBeenCalled()
+
+  store.persist.rehydrate()
+  expect(store.persist.hasHydrated()).toBe(false)
+  expect(catchAccess).not.toHaveBeenCalled()
+  expect(finallyAccess).not.toHaveBeenCalled()
 })
+
+const startSyncHydration = () => {
+  const store = createStore(
+    persist(() => ({ count: 0 }), {
+      name: 'synchronous-result',
+      skipHydration: true,
+      storage: {
+        getItem: () => ({ state: { count: 42 }, version: 0 }),
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    }),
+  )
+  const hydration = store.persist.rehydrate()
+  expectTypeOf(hydration).toEqualTypeOf<Promise<void>>()
+  expect(hydration).toBeInstanceOf(Promise)
+  expect(store.persist.hasHydrated()).toBe(true)
+  return hydration
+}
+
+it('restores state synchronously and runs public Promise callbacks asynchronously', async () => {
+  const events: string[] = []
+  const error = new Error('consumer failed')
+  const recovered = vi.fn(() => {
+    events.push('recovered')
+    return 42
+  })
+  const completed = vi.fn(() => {
+    events.push('completed')
+  })
+  const hydration = startSyncHydration()
+  const result = hydration
+    .then(() => {
+      events.push('fulfilled')
+      throw error
+    })
+    .catch(recovered)
+    .then(completed)
+  events.push('returned')
+  expect(events).toEqual(['returned'])
+  expect(recovered).not.toHaveBeenCalled()
+  expect(completed).not.toHaveBeenCalled()
+
+  await result
+  expect(recovered).toHaveBeenCalledExactlyOnceWith(error)
+  expect(completed).toHaveBeenCalledExactlyOnceWith(42)
+  expect(events).toEqual(['returned', 'fulfilled', 'recovered', 'completed'])
+})
+
+it.each([false, true])(
+  'awaits a catchless callback result after synchronous hydration (rejects = %s)',
+  async (rejects) => {
+    let resolve!: (value: number) => void
+    let reject!: (error: Error) => void
+    const pending = new Promise<number>((ok, bad) => {
+      resolve = ok
+      reject = bad
+    })
+    const error = new Error('consumer result failed')
+    const completed = vi.fn()
+    const recovered = vi.fn(() => 7)
+    const result = startSyncHydration()
+      .then(() => createPromiseLike(pending))
+      .then(undefined, recovered)
+      .then(completed)
+    expect(completed).not.toHaveBeenCalled()
+
+    if (rejects) reject(error)
+    else resolve(42)
+    await result
+
+    expect(recovered.mock.calls).toEqual(rejects ? [[error]] : [])
+    expect(completed).toHaveBeenCalledExactlyOnceWith(rejects ? 7 : 42)
+  },
+)
+
+it.each([false, true])(
+  'waits for catchless cleanup returned from finally (rejects = %s)',
+  async (rejects) => {
+    let resolve!: () => void
+    let reject!: (error: Error) => void
+    const cleanup = new Promise<void>((ok, bad) => {
+      resolve = ok
+      reject = bad
+    })
+    let started!: () => void
+    const cleanupStarted = new Promise<void>((done) => {
+      started = done
+    })
+    const fulfilled = vi.fn()
+    const rejected = vi.fn()
+    const result = startSyncHydration()
+      .then(() => 42)
+      .finally(() => {
+        started()
+        return createPromiseLike(cleanup)
+      })
+      .then(fulfilled, rejected)
+
+    await cleanupStarted
+    expect(fulfilled).not.toHaveBeenCalled()
+    expect(rejected).not.toHaveBeenCalled()
+
+    const error = new Error('cleanup failed')
+    if (rejects) reject(error)
+    else resolve()
+    await result
+
+    expect(fulfilled.mock.calls).toEqual(rejects ? [] : [[42]])
+    expect(rejected.mock.calls).toEqual(rejects ? [[error]] : [])
+  },
+)

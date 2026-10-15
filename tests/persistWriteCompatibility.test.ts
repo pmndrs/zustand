@@ -75,7 +75,7 @@ describe.each(['read', 'migration'])(
 )
 
 it.each([false, true])(
-  'preserves catch on synchronous hydration results (callback throws = %s)',
+  'handles synchronous hydration rejection through catch (callback throws = %s)',
   async (throws) => {
     const error = new Error('hydration callback failed')
     const store = createStore(
@@ -93,7 +93,6 @@ it.each([false, true])(
       }),
     )
     const hydration = store.persist.rehydrate()
-    if (!hydration) throw new Error('Expected a hydration result')
     const rejected = vi.fn()
     await hydration.catch(rejected)
     expect(rejected.mock.calls).toEqual(throws ? [[error]] : [])
@@ -103,7 +102,7 @@ it.each([false, true])(
 describe.each(['read', 'migration'])(
   'completion order after an asynchronous %s',
   (asynchronous) => {
-    it.each([undefined, null, false, 0, 'saved'])(
+    it.each([undefined, null, false, 0, 'saved', { saved: true }, () => {}])(
       'does not defer completion for a synchronous write returning %s',
       async (writeResult) => {
         const events: string[] = []
@@ -137,5 +136,39 @@ describe.each(['read', 'migration'])(
         expect(events).toEqual(['hydration completed', 'other callback'])
       },
     )
+  },
+)
+
+it.each([false, true])(
+  'does not inspect then accessors on a synchronous write value (throws = %s)',
+  async (throws) => {
+    const getter = vi.fn(() => {
+      if (throws) throw new Error('then accessor failed')
+      return undefined
+    })
+    const writeResult = {
+      get then() {
+        return getter()
+      },
+    }
+    const completed = vi.fn()
+    const store = createStore(
+      persist(() => ({ count: 0 }), {
+        name: 'write-value-getter',
+        version: 1,
+        skipHydration: true,
+        storage: {
+          getItem: () => ({ state: { count: 42 }, version: 0 }),
+          setItem: () => writeResult,
+          removeItem: () => {},
+        },
+        migrate: (state) => state as { count: number },
+        onRehydrateStorage: () => completed,
+      }),
+    )
+    await store.persist.rehydrate()
+    expect(getter).not.toHaveBeenCalled()
+    expect(store.persist.hasHydrated()).toBe(true)
+    expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
   },
 )

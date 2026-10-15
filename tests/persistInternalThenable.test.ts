@@ -4,8 +4,8 @@ import { createStore } from 'zustand/vanilla'
 import { legacyThenable } from './legacyThenable.test-utils'
 
 it.each([false, true])(
-  'finishes nested synchronous hydration before returning (manual = %s)',
-  (manual) => {
+  'restores nested state synchronously and awaits its public Promise (manual = %s)',
+  async (manual) => {
     const other = createStore(
       persist(() => ({ count: 0 }), {
         name: 'other',
@@ -34,20 +34,30 @@ it.each([false, true])(
       }),
     )
     const finished = vi.fn()
-    store.persist.onFinishHydration(finished)
-    if (manual) {
-      store.persist.rehydrate()
-    }
-    expect(finished.mock.calls).toEqual(manual ? [[{ count: 42 }]] : [])
+    const done = new Promise<void>((resolve) => {
+      store.persist.onFinishHydration((state) => {
+        finished(state)
+        resolve()
+      })
+    })
+    const hydration = manual ? store.persist.rehydrate() : undefined
     expect(store.getState()).toEqual({ count: 42 })
     expect(other.getState()).toEqual({ count: 7 })
+    expect(other.persist.hasHydrated()).toBe(true)
     expect(setItem).toHaveBeenCalledOnce()
+    expect(store.persist.hasHydrated()).toBe(false)
+    expect(completed).not.toHaveBeenCalled()
+    expect(finished).not.toHaveBeenCalled()
+
+    await done
+    await hydration
     expect(store.persist.hasHydrated()).toBe(true)
     expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
+    expect(finished).toHaveBeenCalledExactlyOnceWith({ count: 42 })
   },
 )
 
-it('preserves synchronous hydration across separately loaded middleware instances', async () => {
+it('awaits the public hydration Promise of a separately loaded middleware instance', async () => {
   vi.resetModules()
   const { persist: otherPersist } = await import('zustand/middleware')
   expect(otherPersist).not.toBe(persist)
@@ -76,6 +86,15 @@ it('preserves synchronous hydration across separately loaded middleware instance
       onRehydrateStorage: () => completed,
     }),
   )
+  expect(store.getState()).toEqual({ count: 42 })
+  expect(other.getState()).toEqual({ count: 7 })
+  expect(other.persist.hasHydrated()).toBe(true)
+  expect(store.persist.hasHydrated()).toBe(false)
+  expect(completed).not.toHaveBeenCalled()
+
+  await new Promise<void>((resolve) => {
+    store.persist.onFinishHydration(() => resolve())
+  })
   expect(store.persist.hasHydrated()).toBe(true)
   expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
 })

@@ -7,7 +7,7 @@ it.each(['constructor', 'then accessor'])(
   async (kind) => {
     const saved = { count: 42 }
     const error = new Error('normalization failed')
-    let migration: Promise<typeof saved>
+    let migration: PromiseLike<typeof saved>
     if (kind === 'constructor') {
       migration = Promise.resolve(saved)
       Object.defineProperty(migration, 'constructor', {
@@ -23,7 +23,7 @@ it.each(['constructor', 'then accessor'])(
           if (++reads === 2) throw error
           return promise.then.bind(promise)
         },
-      } as Promise<typeof saved>
+      }
     }
     const completed = vi.fn()
     const setItem = vi.fn()
