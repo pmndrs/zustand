@@ -208,6 +208,10 @@ to the latest version (the version in the code), either directly or through a
 `PromiseLike`. A promise-like result must provide a chainable `then` method;
 it does not need `catch` or `finally` methods.
 
+A migration result with a callable `then` property is treated as a thenable,
+even if it is a plain state object. Avoid returning a synchronous state object
+with an action named `then`; use a different action name instead.
+
 For instance, if you want to rename a field, you can use the following:
 
 ```ts
