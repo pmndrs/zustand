@@ -357,7 +357,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       storage?.removeItem(options.name)
     },
     getOptions: () => options,
-    rehydrate: () => Promise.resolve(hydrate()),
+    rehydrate: async () => hydrate(),
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
       hydrationListeners.add(cb)

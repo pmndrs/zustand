@@ -25,6 +25,42 @@ const startHydration = (callback = () => {}) => {
   return hydration
 }
 
+it.each(['onHydrate', 'onRehydrateStorage'])(
+  'rejects rehydrate when %s throws before reading storage',
+  async (hook) => {
+    const error = new Error('hydration start failed')
+    const onHydrationStart = vi.fn(() => {
+      throw error
+    })
+    const getItem = vi.fn(() => ({ state: { count: 42 }, version: 0 }))
+    const store = createStore(
+      persist(() => ({ count: 0 }), {
+        name: 'hydration-start-error',
+        skipHydration: true,
+        storage: {
+          getItem,
+          setItem: () => {},
+          removeItem: () => {},
+        },
+      }),
+    )
+    if (hook === 'onHydrate') {
+      store.persist.onHydrate(onHydrationStart)
+    } else {
+      store.persist.setOptions({ onRehydrateStorage: onHydrationStart })
+    }
+
+    const hydration = store.persist.rehydrate()
+
+    expect(hydration).toBeInstanceOf(Promise)
+    await expect(hydration).rejects.toBe(error)
+    expect(onHydrationStart).toHaveBeenCalledExactlyOnceWith({ count: 0 })
+    expect(getItem).not.toHaveBeenCalled()
+    expect(store.getState()).toEqual({ count: 0 })
+    expect(store.persist.hasHydrated()).toBe(false)
+  },
+)
+
 it('passes fulfillment errors to the next rejection handler', async () => {
   const error = new Error('fulfillment failed')
   const sameStep = vi.fn()
@@ -150,6 +186,7 @@ const startSyncHydration = () => {
   const hydration = store.persist.rehydrate()
   expectTypeOf(hydration).toEqualTypeOf<Promise<void>>()
   expect(hydration).toBeInstanceOf(Promise)
+  expect(store.getState()).toEqual({ count: 42 })
   expect(store.persist.hasHydrated()).toBe(true)
   return hydration
 }
