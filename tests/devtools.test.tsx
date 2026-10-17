@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import { devtools, redux } from 'zustand/middleware'
+import { devtools, persist, redux } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 import type { StoreApi } from 'zustand/vanilla'
 
@@ -191,6 +191,55 @@ describe('When state changes...', () => {
       { count: 5, foo: 'baz' },
     )
   })
+})
+
+it('preserves external action names and payloads with persist', () => {
+  const setItem = vi.fn(() => 'stored')
+  const api = createStore(
+    devtools(
+      persist(() => ({ count: 0, foo: 'bar' }), {
+        name: 'test-storage',
+        storage: { getItem: () => null, setItem, removeItem: () => {} },
+        skipHydration: true,
+      }),
+      { name: 'persist-test', store: 'test-store', enabled: true },
+    ),
+  )
+  const [connection] = getNamedConnectionApis('persist-test')
+
+  expect(api.setState({ count: 10 }, undefined, 'increment')).toBe('stored')
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'test-store/increment' },
+    { 'test-store': { count: 10, foo: 'bar' } },
+  )
+  expect(setItem).toHaveBeenLastCalledWith('test-storage', {
+    state: { count: 10, foo: 'bar' },
+    version: 0,
+  })
+
+  api.setState((state) => ({ count: state.count + 1 }), false, {
+    type: 'increment',
+    payload: 1,
+  })
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'test-store/increment', payload: 1 },
+    { 'test-store': { count: 11, foo: 'bar' } },
+  )
+  expect(setItem).toHaveBeenLastCalledWith('test-storage', {
+    state: { count: 11, foo: 'bar' },
+    version: 0,
+  })
+
+  api.setState({ count: 0, foo: 'baz' }, true, 'reset')
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'test-store/reset' },
+    { 'test-store': { count: 0, foo: 'baz' } },
+  )
+  expect(setItem).toHaveBeenLastCalledWith('test-storage', {
+    state: { count: 0, foo: 'baz' },
+    version: 0,
+  })
+  api.devtools.cleanup()
 })
 
 describe('When state changes with automatic setter inferring...', () => {
