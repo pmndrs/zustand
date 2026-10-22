@@ -156,10 +156,11 @@ const extractConnectionInformation = (
 const removeStoreFromTrackedConnections = (
   name: string | undefined,
   store: string | undefined,
+  api: StoreInformation,
 ) => {
   if (store === undefined) return
   const connectionInfo = trackedConnections.get(name)
-  if (!connectionInfo) return
+  if (connectionInfo?.stores[store] !== api) return
   delete connectionInfo.stores[store]
   if (Object.keys(connectionInfo.stores).length === 0) {
     trackedConnections.delete(name)
@@ -243,15 +244,19 @@ const devtoolsImpl: DevtoolsImpl =
       )
       return r
     }) as NamedSet<S>
+    let unsubscribeFromStore: (() => void) | undefined
     ;(api as StoreApi<S> & StoreDevtools<S>).devtools = {
       cleanup: () => {
+        unsubscribeFromStore?.()
+        unsubscribeFromStore = undefined
+        removeStoreFromTrackedConnections(options.name, store, api)
         if (
+          (store === undefined || !trackedConnections.has(options.name)) &&
           connection &&
           typeof (connection as any).unsubscribe === 'function'
         ) {
           ;(connection as any).unsubscribe()
         }
-        removeStoreFromTrackedConnections(options.name, store)
       },
     }
 
@@ -298,7 +303,7 @@ const devtoolsImpl: DevtoolsImpl =
       }
     }
 
-    ;(
+    unsubscribeFromStore = (
       connection as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
         subscribe: (
