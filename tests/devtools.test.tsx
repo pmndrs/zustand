@@ -736,6 +736,63 @@ describe('when it receives a message of type...', () => {
       )
     })
   })
+
+  describe('serialize.reviver option...', () => {
+    const reviver = (key: string, value: unknown) =>
+      key === 'count' ? Number(value) * 10 : value
+
+    it('applies reviver to ACTION `__setState` payload', async () => {
+      const initialState = { count: 0 }
+      const api = createStore(
+        devtools(() => initialState, { enabled: true, serialize: { reviver } }),
+      )
+
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
+        type: 'ACTION',
+        payload: '{ "type": "__setState", "state": { "count": 5 } }',
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, count: 50 })
+    })
+
+    it('applies reviver to `message.state` on JUMP_TO_STATE', async () => {
+      const initialState = { count: 0 }
+      const api = createStore(
+        devtools(() => initialState, { enabled: true, serialize: { reviver } }),
+      )
+      const newState = { count: 5 }
+
+      const [connection] = getNamedConnectionApis(undefined)
+      connection.send.mockClear()
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
+        type: 'DISPATCH',
+        payload: { type: 'JUMP_TO_STATE' },
+        state: JSON.stringify(newState),
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, count: 50 })
+      expect(connection.send).not.toBeCalled()
+    })
+
+    it('applies reviver to `message.state` on ROLLBACK', async () => {
+      const initialState = { count: 0 }
+      const api = createStore(
+        devtools(() => initialState, { enabled: true, serialize: { reviver } }),
+      )
+      const newState = { count: 5 }
+
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
+        type: 'DISPATCH',
+        payload: { type: 'ROLLBACK' },
+        state: JSON.stringify(newState),
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, count: 50 })
+    })
+  })
 })
 
 describe('with redux middleware', () => {
