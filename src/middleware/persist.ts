@@ -148,14 +148,12 @@ type StorePersist<S, Ps, Pr> = S extends {
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
   typeof (value as PromiseLike<unknown>)?.then === 'function'
 
-const sync = Symbol('sync')
-
-type SyncThenableOrPromiseLike<V> = PromiseLike<V> & { [sync]?: true }
+type SyncThenableOrPromiseLike<V> = PromiseLike<V> & { sync?: true }
 
 const toSyncThenable = <Value>(
   value: Value,
 ): SyncThenableOrPromiseLike<Value> => ({
-  [sync]: true,
+  sync: true,
   then(onFulfilled) {
     return onFulfilled
       ? toThenable(onFulfilled, value)
@@ -172,7 +170,7 @@ const toThenable = <Result, Input>(
     return isPromiseLike(result) ? result : toSyncThenable(result as Result)
   } catch (error) {
     return {
-      [sync]: true,
+      sync: true,
       then(_onFulfilled, onRejected) {
         return onRejected
           ? toThenable(onRejected, error)
@@ -311,7 +309,11 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
           const writeResult = setItem()
           // Synchronous hydration only awaited native Promise writes before
           // PromiseLike support.
-          if (!hydration[sync] || writeResult instanceof Promise) {
+          if (
+            hydration instanceof Promise ||
+            !hydration.sync ||
+            writeResult instanceof Promise
+          ) {
             return writeResult
           }
         }
