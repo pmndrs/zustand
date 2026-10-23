@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import { devtools, redux } from 'zustand/middleware'
+import { devtools, persist, redux } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
 import type { StoreApi } from 'zustand/vanilla'
 
@@ -96,9 +96,12 @@ const extensionConnector = {
     const api: Connection['api'] = {
       subscribe: vi.fn((f: (m: unknown) => void) => {
         subscribers.push(f)
-        return () => {}
+        return () => {
+          subscribers.splice(subscribers.indexOf(f), 1)
+        }
       }),
       unsubscribe: vi.fn(() => {
+        subscribers.splice(0)
         connectionMap.delete(
           areNameUndefinedMapsNeeded ? options.testConnectionId : key,
         )
@@ -191,6 +194,55 @@ describe('When state changes...', () => {
       { count: 5, foo: 'baz' },
     )
   })
+})
+
+it('preserves external action names and payloads with persist', () => {
+  const setItem = vi.fn(() => 'stored')
+  const api = createStore(
+    devtools(
+      persist(() => ({ count: 0, foo: 'bar' }), {
+        name: 'test-storage',
+        storage: { getItem: () => null, setItem, removeItem: () => {} },
+        skipHydration: true,
+      }),
+      { name: 'persist-test', store: 'test-store', enabled: true },
+    ),
+  )
+  const [connection] = getNamedConnectionApis('persist-test')
+
+  expect(api.setState({ count: 10 }, undefined, 'increment')).toBe('stored')
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'test-store/increment' },
+    { 'test-store': { count: 10, foo: 'bar' } },
+  )
+  expect(setItem).toHaveBeenLastCalledWith('test-storage', {
+    state: { count: 10, foo: 'bar' },
+    version: 0,
+  })
+
+  api.setState((state) => ({ count: state.count + 1 }), false, {
+    type: 'increment',
+    payload: 1,
+  })
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'test-store/increment', payload: 1 },
+    { 'test-store': { count: 11, foo: 'bar' } },
+  )
+  expect(setItem).toHaveBeenLastCalledWith('test-storage', {
+    state: { count: 11, foo: 'bar' },
+    version: 0,
+  })
+
+  api.setState({ count: 0, foo: 'baz' }, true, 'reset')
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'test-store/reset' },
+    { 'test-store': { count: 0, foo: 'baz' } },
+  )
+  expect(setItem).toHaveBeenLastCalledWith('test-storage', {
+    state: { count: 0, foo: 'baz' },
+    version: 0,
+  })
+  api.devtools.cleanup()
 })
 
 describe('When state changes with automatic setter inferring...', () => {
@@ -734,6 +786,63 @@ describe('when it receives a message of type...', () => {
         { type: 'increment' },
         { count: 3 },
       )
+    })
+  })
+
+  describe('serialize.reviver option...', () => {
+    const reviver = (key: string, value: unknown) =>
+      key === 'count' ? Number(value) * 10 : value
+
+    it('applies reviver to ACTION `__setState` payload', async () => {
+      const initialState = { count: 0 }
+      const api = createStore(
+        devtools(() => initialState, { enabled: true, serialize: { reviver } }),
+      )
+
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
+        type: 'ACTION',
+        payload: '{ "type": "__setState", "state": { "count": 5 } }',
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, count: 50 })
+    })
+
+    it('applies reviver to `message.state` on JUMP_TO_STATE', async () => {
+      const initialState = { count: 0 }
+      const api = createStore(
+        devtools(() => initialState, { enabled: true, serialize: { reviver } }),
+      )
+      const newState = { count: 5 }
+
+      const [connection] = getNamedConnectionApis(undefined)
+      connection.send.mockClear()
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
+        type: 'DISPATCH',
+        payload: { type: 'JUMP_TO_STATE' },
+        state: JSON.stringify(newState),
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, count: 50 })
+      expect(connection.send).not.toBeCalled()
+    })
+
+    it('applies reviver to `message.state` on ROLLBACK', async () => {
+      const initialState = { count: 0 }
+      const api = createStore(
+        devtools(() => initialState, { enabled: true, serialize: { reviver } }),
+      )
+      const newState = { count: 5 }
+
+      const [connectionSubscriber] = getNamedConnectionSubscribers(undefined)
+      connectionSubscriber({
+        type: 'DISPATCH',
+        payload: { type: 'ROLLBACK' },
+        state: JSON.stringify(newState),
+      })
+
+      expect(api.getState()).toStrictEqual({ ...initialState, count: 50 })
     })
   })
 })
@@ -2630,6 +2739,136 @@ describe('when create devtools was called multiple times with `name` and `store`
 })
 
 describe('cleanup', () => {
+  it('should preserve a replacement store when the original store is cleaned up', () => {
+    const options = {
+      name: 'replacement-before-cleanup',
+      store: 'shared',
+      enabled: true,
+    }
+    const original = createStore(devtools(() => ({ count: 0 }), options))
+    const replacement = createStore(devtools(() => ({ count: 0 }), options))
+    const [connection] = getNamedConnectionApis(options.name)
+
+    original.devtools.cleanup()
+
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    const [subscriber] = getNamedConnectionSubscribers(options.name)
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ shared: { count: 20 } }),
+    })
+    expect(replacement.getState()).toEqual({ count: 20 })
+    expect(original.getState()).toEqual({ count: 0 })
+
+    original.devtools.cleanup()
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    replacement.devtools.cleanup()
+    expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([1, 2])(
+    'should preserve other stores on a shared connection after %i cleanup calls',
+    (cleanupCalls) => {
+      const name = `shared-cleanup-${cleanupCalls}`
+      const store1 = createStore(
+        devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
+      )
+      const store2 = createStore(
+        devtools(() => ({ count: 0 }), {
+          name,
+          store: 'second',
+          enabled: true,
+        }),
+      )
+      const subscribers = namedConnections.get(name)!.subscribers
+
+      for (let i = 0; i < cleanupCalls; i++) {
+        store1.devtools.cleanup()
+      }
+      subscribers.forEach((subscriber) =>
+        subscriber({
+          type: 'DISPATCH',
+          payload: { type: 'JUMP_TO_STATE' },
+          state: JSON.stringify({
+            first: { count: 10 },
+            second: { count: 20 },
+          }),
+        }),
+      )
+
+      expect(store1.getState()).toEqual({ count: 0 })
+      expect(store2.getState()).toEqual({ count: 20 })
+      store2.devtools.cleanup()
+    },
+  )
+
+  it('should close a shared connection only after its last store is cleaned up', () => {
+    const name = 'last-store-cleanup'
+    const store1 = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
+    )
+    const store2 = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'second', enabled: true }),
+    )
+    const [connection] = getNamedConnectionApis(name)
+
+    store1.devtools.cleanup()
+    expect(connection.unsubscribe).not.toHaveBeenCalled()
+    store2.devtools.cleanup()
+    expect(connection.unsubscribe).toHaveBeenCalledTimes(1)
+
+    const replacement = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'first', enabled: true }),
+    )
+    const [subscriber] = getNamedConnectionSubscribers(name)
+    store1.devtools.cleanup()
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ first: { count: 30 } }),
+    })
+
+    expect(replacement.getState()).toEqual({ count: 30 })
+    const connectCalls = extensionConnector.connect.mock.calls.length
+    const sibling = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'second', enabled: true }),
+    )
+    expect(extensionConnector.connect).toHaveBeenCalledTimes(connectCalls)
+
+    sibling.devtools.cleanup()
+    replacement.devtools.cleanup()
+  })
+
+  it('should close an untracked connection while a tracked connection uses the same name', () => {
+    const name = 'mixed-connection-cleanup'
+    const options = { name, testStore: 'untracked', enabled: true }
+    const untrackedStore = createStore(devtools(() => ({ count: 0 }), options))
+    const trackedStore = createStore(
+      devtools(() => ({ count: 0 }), { name, store: 'tracked', enabled: true }),
+    )
+    const [untrackedConnection, trackedConnection] = getNamedConnectionApis(
+      `${name}|untracked`,
+      name,
+    )
+
+    untrackedStore.devtools.cleanup()
+
+    expect(untrackedConnection.unsubscribe).toHaveBeenCalledTimes(1)
+    expect(trackedConnection.unsubscribe).not.toHaveBeenCalled()
+    const [subscriber] = getNamedConnectionSubscribers(name)
+    subscriber({
+      type: 'DISPATCH',
+      payload: { type: 'JUMP_TO_STATE' },
+      state: JSON.stringify({ tracked: { count: 20 } }),
+    })
+    expect(trackedStore.getState()).toEqual({ count: 20 })
+    expect(untrackedStore.getState()).toEqual({ count: 0 })
+
+    trackedStore.devtools.cleanup()
+    expect(trackedConnection.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
   it('should unsubscribe from devtools when cleanup is called', async () => {
     const options = { name: 'test' }
     const store = createStore(devtools(() => ({ count: 0 }), options))
