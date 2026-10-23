@@ -119,7 +119,7 @@ it('keeps callable then fields inside stored state without invoking them', () =>
 
 it.each([false, true])(
   'finishes synchronously with a write result from the previous implementation (manual = %s)',
-  (manual) => {
+  async (manual) => {
     const completed = vi.fn()
     const store = createStore(
       persist(() => ({ count: 0 }), {
@@ -135,17 +135,18 @@ it.each([false, true])(
         onRehydrateStorage: () => completed,
       }),
     )
-    if (manual) store.persist.rehydrate()
+    const hydration = manual ? store.persist.rehydrate() : undefined
 
     expect(store.getState()).toEqual({ count: 42 })
     expect(store.persist.hasHydrated()).toBe(true)
     expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
+    await hydration
   },
 )
 
 it.each([false, true])(
   'does not leave hydration pending for a rejected legacy wrapper (manual = %s)',
-  (manual) => {
+  async (manual) => {
     const completed = vi.fn()
     const store = createStore(
       persist(() => ({ count: 0 }), {
@@ -164,11 +165,97 @@ it.each([false, true])(
         onRehydrateStorage: () => completed,
       }),
     )
-    if (manual) store.persist.rehydrate()
+    const hydration = manual ? store.persist.rehydrate() : undefined
 
     // Preserve the base implementation's completion behavior. Propagating
     // errors from legacy write results is a separate, existing limitation.
     expect(store.persist.hasHydrated()).toBe(true)
     expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
+    await hydration
   },
 )
+
+it('keeps synchronous write handling for a later hydration while an older read is pending', async () => {
+  type Stored = { state: { count: number }; version: number }
+  let resolve!: (value: Stored) => void
+  const pendingRead = new Promise<Stored>((done) => {
+    resolve = done
+  })
+  const completed = vi.fn()
+  const setItem = vi.fn(() =>
+    legacyThenable(() => {
+      throw new Error('legacy write error')
+    })(undefined),
+  )
+  let reads = 0
+  const store = createStore(
+    persist(() => ({ count: 0 }), {
+      name: 'repeated-hydration',
+      version: 1,
+      skipHydration: true,
+      storage: {
+        getItem: () =>
+          ++reads === 1 ? pendingRead : { state: { count: 42 }, version: 0 },
+        setItem,
+        removeItem: () => {},
+      },
+      migrate: (state) => state as { count: number },
+      onRehydrateStorage: () => completed,
+    }),
+  )
+
+  const older = store.persist.rehydrate()
+  const newer = store.persist.rehydrate()
+  expect(store.getState()).toEqual({ count: 42 })
+  expect(store.persist.hasHydrated()).toBe(true)
+  expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
+  await newer
+
+  resolve({ state: { count: 7 }, version: 0 })
+  await older
+  expect(store.getState()).toEqual({ count: 42 })
+  expect(setItem).toHaveBeenCalledOnce()
+  expect(completed).toHaveBeenCalledOnce()
+})
+
+it('keeps the outer synchronous write handling after a nested hydration returns', async () => {
+  const other = createStore(
+    persist(() => ({ count: 0 }), {
+      name: 'nested-sync',
+      skipHydration: true,
+      storage: {
+        getItem: () => ({ state: { count: 7 }, version: 0 }),
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    }),
+  )
+  let nested!: Promise<void>
+  const completed = vi.fn()
+  const store = createStore(
+    persist(() => ({ count: 0 }), {
+      name: 'outer-sync',
+      version: 1,
+      skipHydration: true,
+      storage: {
+        getItem: () => ({ state: { count: 42 }, version: 0 }),
+        setItem: () => {
+          nested = other.persist.rehydrate()
+          return legacyThenable(() => {
+            throw new Error('legacy write error')
+          })(undefined)
+        },
+        removeItem: () => {},
+      },
+      migrate: (state) => state as { count: number },
+      onRehydrateStorage: () => completed,
+    }),
+  )
+
+  const hydration = store.persist.rehydrate()
+  expect(other.getState()).toEqual({ count: 7 })
+  expect(store.getState()).toEqual({ count: 42 })
+  expect(store.persist.hasHydrated()).toBe(true)
+  expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
+  await Promise.all([hydration, nested])
+})

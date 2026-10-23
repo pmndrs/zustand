@@ -148,7 +148,14 @@ type StorePersist<S, Ps, Pr> = S extends {
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
   typeof (value as PromiseLike<unknown>)?.then === 'function'
 
-const toSyncThenable = <Value>(value: Value): PromiseLike<Value> => ({
+const sync = Symbol('sync')
+
+type SyncThenableOrPromiseLike<V> = PromiseLike<V> & { [sync]?: true }
+
+const toSyncThenable = <Value>(
+  value: Value,
+): SyncThenableOrPromiseLike<Value> => ({
+  [sync]: true,
   then(onFulfilled) {
     return onFulfilled
       ? toThenable(onFulfilled, value)
@@ -159,12 +166,13 @@ const toSyncThenable = <Value>(value: Value): PromiseLike<Value> => ({
 const toThenable = <Result, Input>(
   fn: (input: Input) => Result | PromiseLike<Result>,
   input: Input,
-): PromiseLike<Result> => {
+): SyncThenableOrPromiseLike<Result> => {
   try {
     const result = fn(input)
     return isPromiseLike(result) ? result : toSyncThenable(result as Result)
   } catch (error) {
     return {
+      [sync]: true,
       then(_onFulfilled, onRejected) {
         return onRejected
           ? toThenable(onRejected, error)
@@ -257,34 +265,34 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       options.onRehydrateStorage?.(get() ?? configResult) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
-    const hydration = toThenable(
-      storage.getItem.bind(storage),
-      options.name,
-    ).then((deserializedStorageValue) => {
-      if (deserializedStorageValue) {
-        if (
-          typeof deserializedStorageValue.version === 'number' &&
-          deserializedStorageValue.version !== options.version
-        ) {
-          if (options.migrate) {
-            const migration = options.migrate(
-              deserializedStorageValue.state,
-              deserializedStorageValue.version,
-            )
-            if (isPromiseLike(migration)) {
-              return migration.then((result) => [true, result] as const)
+    const hydration: SyncThenableOrPromiseLike<readonly [boolean, unknown]> =
+      toThenable(storage.getItem.bind(storage), options.name).then(
+        (deserializedStorageValue) => {
+          if (deserializedStorageValue) {
+            if (
+              typeof deserializedStorageValue.version === 'number' &&
+              deserializedStorageValue.version !== options.version
+            ) {
+              if (options.migrate) {
+                const migration = options.migrate(
+                  deserializedStorageValue.state,
+                  deserializedStorageValue.version,
+                )
+                if (isPromiseLike(migration)) {
+                  return migration.then((result) => [true, result] as const)
+                }
+                return [true, migration] as const
+              }
+              console.error(
+                `State loaded from storage couldn't be migrated since no migrate function was provided`,
+              )
+            } else {
+              return [false, deserializedStorageValue.state] as const
             }
-            return [true, migration] as const
           }
-          console.error(
-            `State loaded from storage couldn't be migrated since no migrate function was provided`,
-          )
-        } else {
-          return [false, deserializedStorageValue.state] as const
-        }
-      }
-      return [false, undefined] as const
-    })
+          return [false, undefined] as const
+        },
+      )
 
     return hydration
       .then((migrationResult) => {
@@ -301,19 +309,11 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         set(stateFromStorage as S, true)
         if (migrated) {
           const writeResult = setItem()
-          // Native chains already adopt write results without an extra wrapper.
-          if (
-            hydration instanceof Promise ||
-            writeResult === null ||
-            (typeof writeResult !== 'object' &&
-              typeof writeResult !== 'function') ||
-            writeResult instanceof Promise
-          ) {
+          // Synchronous hydration only awaited native Promise writes before
+          // PromiseLike support.
+          if (!hydration[sync] || writeResult instanceof Promise) {
             return writeResult
           }
-          // Keep non-native write returns as values for synchronous chains,
-          // including older internal Thenables.
-          return toSyncThenable(writeResult)
         }
       })
       .then(() => {
@@ -357,7 +357,13 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       storage?.removeItem(options.name)
     },
     getOptions: () => options,
-    rehydrate: async () => hydrate(),
+    rehydrate: () => {
+      try {
+        return Promise.resolve(hydrate())
+      } catch (error) {
+        return Promise.reject(error)
+      }
+    },
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
       hydrationListeners.add(cb)
