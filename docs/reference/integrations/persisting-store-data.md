@@ -406,7 +406,11 @@ the returned Promise always run asynchronously.
 
 If a storage `setItem` returns a native Promise, such as another store's
 `rehydrate()` result in the same realm, hydration completion waits for that
-Promise to settle.
+Promise to settle. If both stores otherwise hydrate synchronously, their state
+is restored immediately, but the outer store's completion callbacks and
+`hasHydrated()` update asynchronously. Older versions returned an internal
+synchronous Thenable in this case, allowing the outer store to finish
+synchronously.
 
 ### `hasHydrated`
 
