@@ -1,6 +1,5 @@
 import type {} from '@redux-devtools/extension'
-import type { ActionCreatorObject } from '@redux-devtools/utils';
-
+import type { ActionCreatorObject } from '@redux-devtools/utils'
 import type {
   StateCreator,
   StoreApi,
@@ -82,44 +81,43 @@ type StoreDevtools<S> = S extends {
     }
   : never
 
-type Join<Prefix extends string, K extends string> = Prefix extends ""
+type Join<Prefix extends string, K extends string> = Prefix extends ''
   ? K
-  : `${Prefix}${K}`;
+  : `${Prefix}${K}`
 
-type NextPrefix<Prefix extends string, K extends string> = Prefix extends ""
+type NextPrefix<Prefix extends string, K extends string> = Prefix extends ''
   ? `${K}.`
-  : `${Prefix}${K}.`;
+  : `${Prefix}${K}.`
 
-type FunctionPaths<T, Prefix extends string = ""> = {
+type FunctionPaths<T, Prefix extends string = ''> = {
   [K in keyof T & string]: T[K] extends (...args: any[]) => any
     ? Join<Prefix, K>
     : T[K] extends Record<string, any>
       ? FunctionPaths<T[K], NextPrefix<Prefix, K>> extends infer P
         ? P extends string
-          ?
-            | P
-            | `${Prefix}${K}.*`
-            | `${Prefix}${K}.**`
+          ? P | `${Prefix}${K}.*` | `${Prefix}${K}.**`
           : never
         : never
-      : never;
-}[keyof T & string];
+      : never
+}[keyof T & string]
 
 type ActionCreatorsMask<T extends Record<string, any>> = {
-  [K in FunctionPaths<T> | '*' | '**' | (string & {})]?: boolean | (
+  [K in FunctionPaths<T> | '*' | '**' | (string & {})]?:
+    | boolean
     // Allow overriding leafs
-    K extends '*' | '**' | `${string}.*` | `${string}.**`
-      ? never
-      : (...args: any[]) => void
-  );
-};
+    | (K extends '*' | '**' | `${string}.*` | `${string}.**`
+        ? never
+        : (...args: any[]) => void)
+}
 
-export interface DevtoolsOptions<T extends Record<string, unknown> = {}> extends Omit<Config, 'actionCreators'> {
+export interface DevtoolsOptions<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> extends Omit<Config, 'actionCreators'> {
   name?: string
   enabled?: boolean
   anonymousActionType?: string
   store?: string
-  actionCreators?: ActionCreatorsMask<T>;
+  actionCreators?: ActionCreatorsMask<T>
 }
 
 type Devtools = <
@@ -167,7 +165,10 @@ const extractConnectionInformation = (
   extensionConnector: NonNullable<
     (typeof window)['__REDUX_DEVTOOLS_EXTENSION__']
   >,
-  options: Omit<DevtoolsOptions, 'enabled' | 'anonymousActionType' | 'store' | 'actionCreators'>,
+  options: Omit<
+    DevtoolsOptions,
+    'enabled' | 'anonymousActionType' | 'store' | 'actionCreators'
+  >,
 ) => {
   if (store === undefined) {
     return {
@@ -299,56 +300,77 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
-    let actionCreators: ActionCreatorObject[] = [];
-    let evalAction: (action: string, _actionCreators: ActionCreatorObject[]) => void | undefined;
+    let actionCreators: ActionCreatorObject[] = []
+    let evalAction: (
+      action: string,
+      _actionCreators: ActionCreatorObject[],
+    ) => void | undefined
 
     if (options.actionCreators) {
       try {
-        evalAction = require('@redux-devtools/utils').evalAction;
+        // @redux-devtools/utils is an optional peer dependency
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        evalAction = require('@redux-devtools/utils').evalAction
         actionCreators = getActionsArray(
           initialState as Record<string, unknown>,
-          options.actionCreators as ActionCreatorsMask<{}>
-        );
+          options.actionCreators as ActionCreatorsMask<Record<string, unknown>>,
+        )
         // override to pass it to the extension connector, any is ok, we dont care about the type anymore
-        options.actionCreators = actionCreators as any;
+        options.actionCreators = actionCreators as any
       } catch {
-        console.warn('[zustand devtools middleware] Please install @redux-devtools/utils to use actionCreators in devtools middleware');
+        console.warn(
+          '[zustand devtools middleware] Please install @redux-devtools/utils to use actionCreators in devtools middleware',
+        )
       }
     }
-    
+
     const usingReduxMiddleware =
-      (api as any).dispatchFromDevtools && typeof (api as any).dispatch === 'function';
+      (api as any).dispatchFromDevtools &&
+      typeof (api as any).dispatch === 'function'
     if (!usingReduxMiddleware) {
-      (api as any).__dispatch = (payload: {
-        type: string,
+      ;(api as any).__dispatch = (payload: {
+        type: string
         args: unknown[] | Record<string, unknown>
       }) => {
         if (!evalAction) {
-          console.warn('[zustand devtools middleware] Please install @redux-devtools/utils to use the action dropdown in the devtools');
-          return;
+          console.warn(
+            '[zustand devtools middleware] Please install @redux-devtools/utils to use the action dropdown in the devtools',
+          )
+          return
         }
 
         if (!('type' in payload)) {
-          console.error('[zustand devtools middleware] Payload must have a "type" property which should match an action creator');
-          return;
+          console.error(
+            '[zustand devtools middleware] Payload must have a "type" property which should match an action creator',
+          )
+          return
         }
 
-        const action = actionCreators.find((action) => action.name === payload.type);
+        const action = actionCreators.find(
+          (action) => action.name === payload.type,
+        )
         if (!action) {
-          console.error(`[zustand devtools middleware] Action type "${payload.type}" not found in actionCreators`);
-          return;
+          console.error(
+            `[zustand devtools middleware] Action type "${payload.type}" not found in actionCreators`,
+          )
+          return
         }
 
-        if(Array.isArray(payload.args)) {
-          return action.func(...payload.args);
+        if (Array.isArray(payload.args)) {
+          return action.func(...payload.args)
         }
-        
-        return action.func(...action.args.map((arg) => (payload.args as Record<string, unknown> ?? {})[arg]));
+
+        return action.func(
+          ...action.args.map(
+            (arg) => ((payload.args as Record<string, unknown>) ?? {})[arg],
+          ),
+        )
       }
     }
 
     // We connect after extracting action creators from the initial state
-    const { connection, ...connectionInformation } = extractConnectionInformation(store, extensionConnector, options);
+    const { connection, ...connectionInformation } =
+      extractConnectionInformation(store, extensionConnector, options)
 
     if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
@@ -402,42 +424,51 @@ const devtoolsImpl: DevtoolsImpl =
           // When using the action dropdown we get an object with the selected action
           if (typeof message.payload !== 'string') {
             if (!evalAction) {
-              console.warn('[zustand devtools middleware] Please install @redux-devtools/utils to use the action dropdown in the devtools');
-              return;
+              console.warn(
+                '[zustand devtools middleware] Please install @redux-devtools/utils to use the action dropdown in the devtools',
+              )
+              return
             }
 
             if (usingReduxMiddleware) {
               // When using the redux plugin, we dispatch the action ourselves.
-              const action = evalAction(message.payload, actionCreators as any[]);
-              return (api as any).dispatch(action);
-            } 
+              const action = evalAction(
+                message.payload,
+                actionCreators as any[],
+              )
+              return (api as any).dispatch(action)
+            }
 
             // When not using the `redux` middleware, action creators are expected
             // to cause the state change themselves.
-            return evalAction(message.payload, actionCreators as any[]);
+            return evalAction(message.payload, actionCreators as any[])
           }
 
-          let action: { type: string, state?: PartialState, [key: string]: unknown };
+          let action: {
+            type: string
+            state?: PartialState
+            [key: string]: unknown
+          }
           try {
-            action = JSON.parse(message.payload, reviver);
+            action = JSON.parse(message.payload, reviver)
           } catch {
             let errorMessage = `[zustand devtools middleware] Malformed JSON. When dispatching custom actions, please format the payload as a JSON string.
-              Examples:`;
+              Examples:`
             if (usingReduxMiddleware) {
               errorMessage += `
               - { "type": "increment", "amount": 1 }
               - { "type": "reset" }
-              `;
+              `
             } else {
               errorMessage += `
               - { "type": "increment" }
               - { "type": "increment", "args": [1] }
               If you have args with default values or want to be \`undefined\`, prefer using the object syntax so you can omit them.
               - { "type": "increment", "args": { "amount": 1 } }
-              `;
+              `
             }
-            console.error(errorMessage.replace(/\n\s+/g, '\n'));
-            return;
+            console.error(errorMessage.replace(/\n\s+/g, '\n'))
+            return
           }
 
           if (action.type === '__setState') {
@@ -449,8 +480,8 @@ const devtoolsImpl: DevtoolsImpl =
                   This may not be what you intended, you should explicitly set the state you want to set.
                   Example: { "type": "__setState", "state": { "foo": "bar" } }
                   `.replace(/\n\s+/g, '\n'),
-                );
-                return;
+                )
+                return
               }
               setStateFromDevtools(action.state as PartialState)
               return
@@ -465,10 +496,7 @@ const devtoolsImpl: DevtoolsImpl =
               )
             }
             const stateFromDevtools = (action.state as S)[store]
-            if (
-              stateFromDevtools === undefined ||
-              stateFromDevtools === null
-            ) {
+            if (stateFromDevtools === undefined || stateFromDevtools === null) {
               return
             }
             if (
@@ -480,8 +508,8 @@ const devtoolsImpl: DevtoolsImpl =
             return
           }
 
-          if (!usingReduxMiddleware) return (api as any).__dispatch(action);
-          return (api as any).dispatch(action);
+          if (!usingReduxMiddleware) return (api as any).__dispatch(action)
+          return (api as any).dispatch(action)
         }
         case 'DISPATCH':
           switch (message.payload.type) {
@@ -571,20 +599,25 @@ const parseJsonThen = <T>(
 }
 
 function maskToRegex(mask: string): RegExp {
-  const escaped = mask
-    .replace(/\./g, '\\.')
-    .replace(/\*\*|\*/g, '.*');
+  const escaped = mask.replace(/\./g, '\\.').replace(/\*\*|\*/g, '.*')
 
-  return new RegExp(`^${escaped}$`);
+  return new RegExp(`^${escaped}$`)
 }
 
-function getActionsArray<T extends Record<string, any>>(actionCreators: T, mask: ActionCreatorsMask<T>): ActionCreatorObject[] {
-  const getActions = require('@redux-devtools/utils').getActionsArray;
-  const flat = getActions(actionCreators);
-  const actions = new Map<string, ActionCreatorObject>();
+function getActionsArray<T extends Record<string, any>>(
+  actionCreators: T,
+  mask: ActionCreatorsMask<T>,
+): ActionCreatorObject[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const getActions = require('@redux-devtools/utils').getActionsArray
+  const flat = getActions(actionCreators)
+  const actions = new Map<string, ActionCreatorObject>()
   const customActions = new Map<string, ActionCreatorObject>(
-    getActions(mask).map((action: ActionCreatorObject) => [action.name, action])
-  );
+    getActions(mask).map((action: ActionCreatorObject) => [
+      action.name,
+      action,
+    ]),
+  )
 
   // Sort matchers by specificity
   const matchers = Object.entries(mask ?? {})
@@ -592,42 +625,46 @@ function getActionsArray<T extends Record<string, any>>(actionCreators: T, mask:
       matcher: maskToRegex(key),
       picked,
       key,
-    })).toSorted((a, b) => {
-      const aIsDoubleWildcard = a.key.includes('**');
-      const bIsDoubleWildcard = b.key.includes('**');
+    }))
+    .toSorted((a, b) => {
+      const aIsDoubleWildcard = a.key.includes('**')
+      const bIsDoubleWildcard = b.key.includes('**')
       if (aIsDoubleWildcard !== bIsDoubleWildcard) {
-        return aIsDoubleWildcard ? -1 : 1;
+        return aIsDoubleWildcard ? -1 : 1
       }
-      
-      const aIsSingleWildcard = a.key.includes('*') && !aIsDoubleWildcard;
-      const bIsSingleWildcard = b.key.includes('*') && !bIsDoubleWildcard;
+
+      const aIsSingleWildcard = a.key.includes('*') && !aIsDoubleWildcard
+      const bIsSingleWildcard = b.key.includes('*') && !bIsDoubleWildcard
       if (aIsSingleWildcard !== bIsSingleWildcard) {
-        return aIsSingleWildcard ? -1 : 1;
+        return aIsSingleWildcard ? -1 : 1
       }
-      
-      return a.key.length - b.key.length;
-    });
+
+      return a.key.length - b.key.length
+    })
 
   for (const action of flat) {
     for (const { matcher, picked } of matchers) {
       if (matcher.test(action.name)) {
         if (picked === false) {
-          actions.delete(action.name);
-          continue;
+          actions.delete(action.name)
+          continue
         }
 
-        actions.set(action.name, customActions.get(action.name) ?? {
-          name: action.name,
-          func: typeof picked === 'function' ? picked : action.func,
-          args: action.args,
-        });
+        actions.set(
+          action.name,
+          customActions.get(action.name) ?? {
+            name: action.name,
+            func: typeof picked === 'function' ? picked : action.func,
+            args: action.args,
+          },
+        )
       }
     }
   }
 
   for (const [name, action] of customActions.entries()) {
-    actions.set(name, action);
+    actions.set(name, action)
   }
 
-  return Array.from(actions.values());
+  return Array.from(actions.values())
 }
