@@ -324,9 +324,6 @@ const devtoolsImpl: DevtoolsImpl =
       }
     }
 
-    const usingReduxMiddleware =
-      (api as any).dispatchFromDevtools &&
-      typeof (api as any).dispatch === 'function'
     // We connect after extracting action creators from the initial state
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
@@ -382,25 +379,21 @@ const devtoolsImpl: DevtoolsImpl =
         case 'ACTION': {
           // When using the action dropdown we get an object with the selected action
           if (typeof message.payload !== 'string') {
-            if (!evalAction) {
-              console.warn(
-                '[zustand devtools middleware] Please install @redux-devtools/utils to use the action dropdown in the devtools',
+            if (shouldDispatchFromDevtools(api)) {
+              console.error(
+                '[zustand devtools middleware] The action dropdown is not supported with the redux middleware. ' +
+                  'Dispatch a custom action in JSON format instead, e.g. { "type": "increment" }',
               )
               return
             }
-
-            if (usingReduxMiddleware) {
-              // When using the redux plugin, we dispatch the action ourselves.
-              const action = evalAction(
-                message.payload,
-                actionCreators as any[],
+            if (!evalAction) {
+              console.error(
+                '[zustand devtools middleware] Unsupported action format',
               )
-              return (api as any).dispatch(action)
+              return
             }
-
-            // When not using the `redux` middleware, action creators are expected
-            // to cause the state change themselves.
-            return evalAction(message.payload, actionCreators as any[])
+            // Action creators are expected to cause the state change themselves.
+            return evalAction(message.payload, actionCreators)
           }
 
           let action: {
@@ -413,7 +406,7 @@ const devtoolsImpl: DevtoolsImpl =
           } catch {
             let errorMessage = `[zustand devtools middleware] Malformed JSON. When dispatching custom actions, please format the payload as a JSON string.
               Examples:`
-            if (usingReduxMiddleware) {
+            if (shouldDispatchFromDevtools(api)) {
               errorMessage += `
               - { "type": "increment", "amount": 1 }
               - { "type": "reset" }
@@ -467,8 +460,9 @@ const devtoolsImpl: DevtoolsImpl =
             return
           }
 
-          if (usingReduxMiddleware) {
-            return (api as any).dispatch(action)
+          if (shouldDispatchFromDevtools(api)) {
+            api.dispatch(action)
+            return
           }
 
           const actionCreator = actionCreators.find(
