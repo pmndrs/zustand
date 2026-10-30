@@ -245,6 +245,16 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
+    const actionCreatorsMask = options.actionCreators
+    const actionCreators: ActionCreatorObject[] = []
+    if (actionCreatorsMask) {
+      // The extension reads this list on `init`, it is filled in below once
+      // the initial state exists
+      options.actionCreators = actionCreators as any
+    }
+    const { connection, ...connectionInformation } =
+      extractConnectionInformation(store, extensionConnector, options)
+
     let isRecording = true
     api.setState = ((state, replace, nameOrAction: Action) => {
       const r = set(state, replace as any)
@@ -300,33 +310,26 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
-    let actionCreators: ActionCreatorObject[] = []
-    let evalAction: (
-      action: string,
-      _actionCreators: ActionCreatorObject[],
-    ) => void | undefined
+    let evalAction:
+      typeof import('@redux-devtools/utils').evalAction | undefined
 
-    if (options.actionCreators) {
+    if (actionCreatorsMask) {
       try {
         // @redux-devtools/utils is an optional peer dependency
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         evalAction = require('@redux-devtools/utils').evalAction
-        actionCreators = getActionsArray(
-          initialState as Record<string, unknown>,
-          options.actionCreators as ActionCreatorsMask<Record<string, unknown>>,
+        actionCreators.push(
+          ...getActionsArray(
+            initialState as Record<string, unknown>,
+            actionCreatorsMask as ActionCreatorsMask<Record<string, unknown>>,
+          ),
         )
-        // override to pass it to the extension connector, any is ok, we dont care about the type anymore
-        options.actionCreators = actionCreators as any
       } catch {
         console.warn(
           '[zustand devtools middleware] Please install @redux-devtools/utils to use actionCreators in devtools middleware',
         )
       }
     }
-
-    // We connect after extracting action creators from the initial state
-    const { connection, ...connectionInformation } =
-      extractConnectionInformation(store, extensionConnector, options)
 
     if (connectionInformation.type === 'untracked') {
       connection?.init(initialState)
@@ -469,7 +472,7 @@ const devtoolsImpl: DevtoolsImpl =
             ({ name }) => name === action.type,
           )
           if (!actionCreator) {
-            if (options.actionCreators) {
+            if (actionCreatorsMask) {
               console.error(
                 `[zustand devtools middleware] Action type "${action.type}" not found in actionCreators`,
               )
