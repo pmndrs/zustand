@@ -327,47 +327,6 @@ const devtoolsImpl: DevtoolsImpl =
     const usingReduxMiddleware =
       (api as any).dispatchFromDevtools &&
       typeof (api as any).dispatch === 'function'
-    if (!usingReduxMiddleware) {
-      ;(api as any).__dispatch = (payload: {
-        type: string
-        args: unknown[] | Record<string, unknown>
-      }) => {
-        if (!evalAction) {
-          console.warn(
-            '[zustand devtools middleware] Please install @redux-devtools/utils to use the action dropdown in the devtools',
-          )
-          return
-        }
-
-        if (!('type' in payload)) {
-          console.error(
-            '[zustand devtools middleware] Payload must have a "type" property which should match an action creator',
-          )
-          return
-        }
-
-        const action = actionCreators.find(
-          (action) => action.name === payload.type,
-        )
-        if (!action) {
-          console.error(
-            `[zustand devtools middleware] Action type "${payload.type}" not found in actionCreators`,
-          )
-          return
-        }
-
-        if (Array.isArray(payload.args)) {
-          return action.func(...payload.args)
-        }
-
-        return action.func(
-          ...action.args.map(
-            (arg) => ((payload.args as Record<string, unknown>) ?? {})[arg],
-          ),
-        )
-      }
-    }
-
     // We connect after extracting action creators from the initial state
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
@@ -508,8 +467,27 @@ const devtoolsImpl: DevtoolsImpl =
             return
           }
 
-          if (!usingReduxMiddleware) return (api as any).__dispatch(action)
-          return (api as any).dispatch(action)
+          if (usingReduxMiddleware) {
+            return (api as any).dispatch(action)
+          }
+
+          const actionCreator = actionCreators.find(
+            ({ name }) => name === action.type,
+          )
+          if (!actionCreator) {
+            if (options.actionCreators) {
+              console.error(
+                `[zustand devtools middleware] Action type "${action.type}" not found in actionCreators`,
+              )
+            }
+            return
+          }
+          const args = action.args as unknown[] | Record<string, unknown>
+          return actionCreator.func(
+            ...(Array.isArray(args)
+              ? args
+              : actionCreator.args.map((name) => args?.[name])),
+          )
         }
         case 'DISPATCH':
           switch (message.payload.type) {
