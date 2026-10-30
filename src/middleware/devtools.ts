@@ -574,10 +574,35 @@ const parseJsonThen = <T>(
 }
 
 function maskToRegex(mask: string): RegExp {
-  const escaped = mask.replace(/\./g, '\\.').replace(/\*\*|\*/g, '.*')
+  const escaped = mask
+    .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+    // `*` matches one level, `**` matches any depth
+    .replace(/\*\*|\*/g, (wildcard) => (wildcard === '**' ? '.*' : '[^.]*'))
 
   return new RegExp(`^${escaped}$`)
 }
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' &&
+  value !== null &&
+  Object.getPrototypeOf(value) === Object.prototype
+
+// Functions in the state keyed by their dot notation path
+const getStateFunctions = (
+  state: Record<string, unknown>,
+  prefix = '',
+): Record<string, unknown> =>
+  Object.entries(state).reduce<Record<string, unknown>>(
+    (functions, [key, value]) => {
+      if (typeof value === 'function') {
+        functions[prefix + key] = value
+      } else if (isPlainObject(value)) {
+        Object.assign(functions, getStateFunctions(value, `${prefix}${key}.`))
+      }
+      return functions
+    },
+    {},
+  )
 
 function getActionsArray<T extends Record<string, any>>(
   actionCreators: T,
@@ -585,7 +610,7 @@ function getActionsArray<T extends Record<string, any>>(
 ): ActionCreatorObject[] {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const getActions = require('@redux-devtools/utils').getActionsArray
-  const flat = getActions(actionCreators)
+  const flat = getActions(getStateFunctions(actionCreators))
   const actions = new Map<string, ActionCreatorObject>()
   const customActions = new Map<string, ActionCreatorObject>(
     getActions(mask).map((action: ActionCreatorObject) => [
@@ -601,7 +626,7 @@ function getActionsArray<T extends Record<string, any>>(
       picked,
       key,
     }))
-    .toSorted((a, b) => {
+    .sort((a, b) => {
       const aIsDoubleWildcard = a.key.includes('**')
       const bIsDoubleWildcard = b.key.includes('**')
       if (aIsDoubleWildcard !== bIsDoubleWildcard) {
