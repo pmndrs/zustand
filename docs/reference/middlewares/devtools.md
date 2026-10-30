@@ -25,6 +25,7 @@ const nextStateCreatorFn = devtools(stateCreatorFn, devtoolsOptions)
   - [Debugging a store](#debugging-a-store)
   - [Debugging a Slices pattern based store](#debugging-a-slices-pattern-based-store)
   - [Filtering actions with actionsDenylist](#filtering-actions-with-actionsdenylist)
+  - [Dispatching actions from the devtools](#dispatching-actions-from-the-devtools)
   - [Cleanup](#cleanup)
 - [Troubleshooting](#troubleshooting)
   - [Only one store is displayed](#only-one-store-is-displayed)
@@ -63,6 +64,10 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
   - **optional** `actionsDenylist`: A string or array of strings (regex patterns) that specify which
     actions should be filtered out from Redux DevTools. This option is passed directly to Redux DevTools
     for filtering. For example, `['secret.*']` will filter out all actions starting with "secret".
+  - **optional** `actionCreators`: An object that picks the functions in the state that can be
+    dispatched from the action dropdown in Redux DevTools. Keys are dot notation paths, where `*`
+    matches one level and `**` matches any depth. Values are `true`, `false` to leave a function
+    out, or a function to use instead. Requires `@redux-devtools/utils` to be installed.
 
 #### Returns
 
@@ -213,6 +218,57 @@ const useStore = create<Store>()(
 > [!NOTE]
 > The `actionsDenylist` option uses regex pattern matching and is handled directly by Redux DevTools Extension.
 > All actions are still sent to DevTools, but matching actions are filtered from the display.
+
+### Dispatching actions from the devtools
+
+With the `actionCreators` option, functions in your state show up in the action dropdown of
+Redux DevTools and can be dispatched from there. This needs the `@redux-devtools/utils` package.
+
+```ts
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+
+type Store = {
+  count: number
+  actions: {
+    increment: (by: number) => void
+    reset: () => void
+  }
+}
+
+const useStore = create<Store>()(
+  devtools(
+    (set) => ({
+      count: 0,
+      actions: {
+        increment: (by) =>
+          set((state) => ({ count: state.count + by }), undefined, 'increment'),
+        reset: () => set({ count: 0 }, undefined, 'reset'),
+      },
+    }),
+    {
+      name: 'CounterStore',
+      // All functions in `actions` except `reset`
+      actionCreators: { 'actions.*': true, 'actions.reset': false },
+    },
+  ),
+)
+```
+
+The same functions can be called with a custom action in JSON format, passing the arguments as
+an array or by name:
+
+```json
+{ "type": "actions.increment", "args": [5] }
+```
+
+```json
+{ "type": "actions.increment", "args": { "by": 5 } }
+```
+
+> [!NOTE]
+> The action dropdown is not supported with the `redux` middleware. Dispatch a custom action in
+> JSON format instead, like `{ "type": "increment" }`.
 
 ### Cleanup
 
