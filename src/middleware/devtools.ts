@@ -224,7 +224,8 @@ function findCallerName(stack: string | undefined) {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
+    const { enabled, anonymousActionType, store, actionCreators, ...options } =
+      devtoolsOptions
 
     type S = ReturnType<typeof fn> & {
       [store: string]: ReturnType<typeof fn>
@@ -245,15 +246,13 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const actionCreators = options.actionCreators
+    // Filled in once the initial state exists, the extension reads it on `init`
     const actionCreatorObjects: ActionCreatorObject[] = []
-    if (actionCreators) {
-      // The extension reads this list on `init`, it is filled in below once
-      // the initial state exists
-      options.actionCreators = actionCreatorObjects as any
-    }
+    const connectOptions = actionCreators
+      ? { ...options, actionCreators: actionCreatorObjects }
+      : options
     const { connection, ...connectionInformation } =
-      extractConnectionInformation(store, extensionConnector, options)
+      extractConnectionInformation(store, extensionConnector, connectOptions)
 
     let isRecording = true
     api.setState = ((state, replace, nameOrAction: Action) => {
