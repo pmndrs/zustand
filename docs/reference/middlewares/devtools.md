@@ -271,6 +271,11 @@ an array or by name:
 > The action dropdown is not supported with the `redux` middleware. Dispatch a custom action in
 > JSON format instead, like `{ "type": "increment" }`.
 
+> [!NOTE]
+> With the `store` option, only the first store's functions reach the action dropdown, because
+> later stores reuse its connection. Their functions can still be called with a custom action in
+> JSON format.
+
 ### Cleanup
 
 When a store is no longer needed, you can clean up the Redux DevTools connection by calling the `cleanup` method on the store:
