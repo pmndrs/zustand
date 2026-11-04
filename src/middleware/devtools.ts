@@ -324,10 +324,7 @@ const devtoolsImpl: DevtoolsImpl =
 
     if (actionCreators) {
       actionCreatorObjects.push(
-        ...getActionCreatorObjects(
-          initialState as Record<string, unknown>,
-          actionCreators,
-        ),
+        ...getActionCreatorObjects(initialState, actionCreators),
       )
     }
 
@@ -594,22 +591,34 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   value !== null &&
   Object.getPrototypeOf(value) === Object.prototype
 
-// Functions in the state keyed by their dot notation path
+type StateFunction = [path: string, func: ActionCreatorObject['func']]
+
+// Functions in the state with their dot notation paths. Each object is walked
+// once and counts as empty during its own walk, which stops circular references.
+// An object shared between paths is still found under each of them.
 const getStateFunctions = (
-  state: Record<string, unknown>,
-  prefix = '',
-): Record<string, ActionCreatorObject['func']> =>
-  Object.entries(state).reduce<Record<string, ActionCreatorObject['func']>>(
-    (functions, [key, value]) => {
-      if (typeof value === 'function') {
-        functions[prefix + key] = value as ActionCreatorObject['func']
-      } else if (isPlainObject(value)) {
-        Object.assign(functions, getStateFunctions(value, `${prefix}${key}.`))
+  state: unknown,
+  walked = new Map<unknown, StateFunction[]>(),
+): StateFunction[] => {
+  if (!isPlainObject(state)) return []
+  const known = walked.get(state)
+  if (known) return known
+  walked.set(state, [])
+  const functions: StateFunction[] = []
+  for (const key of Object.keys(state)) {
+    // Getters are skipped, as they may need a state that does not exist yet
+    const value = Object.getOwnPropertyDescriptor(state, key)?.value
+    if (typeof value === 'function') {
+      functions.push([key, value])
+    } else {
+      for (const [path, func] of getStateFunctions(value, walked)) {
+        functions.push([`${key}.${path}`, func])
       }
-      return functions
-    },
-    {},
-  )
+    }
+  }
+  walked.set(state, functions)
+  return functions
+}
 
 // Parameter names of a function, for the inputs of the action dropdown and for
 // custom actions passing `args` by name. Only its source has them.
@@ -649,7 +658,7 @@ const createActionCreatorObject = (
 ): ActionCreatorObject => ({ name, func, args: getParamNames(func) })
 
 function getActionCreatorObjects(
-  state: Record<string, unknown>,
+  state: unknown,
   actionCreators: ActionCreators<Record<string, unknown>>,
 ): ActionCreatorObject[] {
   const actions = new Map<string, ActionCreatorObject>()
@@ -677,7 +686,7 @@ function getActionCreatorObjects(
       return a.key.length - b.key.length
     })
 
-  for (const [name, func] of Object.entries(getStateFunctions(state))) {
+  for (const [name, func] of getStateFunctions(state)) {
     for (const { matcher, picked } of matchers) {
       if (matcher.test(name)) {
         if (picked === false) {

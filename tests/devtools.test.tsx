@@ -3104,6 +3104,110 @@ describe('actionCreators', () => {
     expect(api.getState().count).toBe(1)
   })
 
+  describe('while looking for functions in the state', () => {
+    let savedConsoleWarn: any
+    beforeEach(() => {
+      savedConsoleWarn = console.warn
+      console.warn = vi.fn()
+    })
+    afterEach(() => {
+      console.warn = savedConsoleWarn
+    })
+
+    const getListedNames = () => {
+      const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+      return actionCreators.map(({ name }: { name: string }) => name)
+    }
+
+    it('stops at circular references', () => {
+      const state: any = { increment: () => {}, actions: { reset: () => {} } }
+      state.self = state
+      state.actions.back = state
+      state.actions.nested = { back: state.actions }
+
+      expect(() => {
+        createStore(
+          devtools(() => state, {
+            enabled: true,
+            actionCreators: { '**': true },
+          }),
+        )
+      }).not.toThrow()
+
+      expect(getListedNames()).toEqual(['increment', 'actions.reset'])
+      expect(console.warn).not.toHaveBeenCalled()
+    })
+
+    it('finds an object that is shared between paths under each of them', () => {
+      const shared = { ping: () => {} }
+
+      createStore(
+        devtools(() => ({ first: shared, second: { shared } }), {
+          enabled: true,
+          actionCreators: { '**': true },
+        }),
+      )
+
+      expect(getListedNames()).toEqual(['first.ping', 'second.shared.ping'])
+    })
+
+    it('walks an object once however many paths lead to it', () => {
+      let node = {}
+      for (let i = 0; i < 64; i++) {
+        node = { left: node, right: node }
+      }
+
+      createStore(
+        devtools(() => ({ node, increment: () => {} }), {
+          enabled: true,
+          actionCreators: { '**': true },
+        }),
+      )
+
+      expect(getListedNames()).toEqual(['increment'])
+    })
+
+    it('does not run getters', () => {
+      const api = createStore<{
+        count: number
+        increment: () => void
+        readonly double: number
+      }>()(
+        devtools(
+          (_set, get) => ({
+            count: 1,
+            increment: () => {},
+            // `get()` has no state yet while the store is being created
+            get double() {
+              return get().count * 2
+            },
+          }),
+          { enabled: true, actionCreators: { '*': true } },
+        ),
+      )
+
+      expect(getListedNames()).toEqual(['increment'])
+      expect(api.getState().double).toBe(2)
+      expect(console.warn).not.toHaveBeenCalled()
+    })
+
+    it('accepts a state that is not an object', () => {
+      const log = () => {}
+
+      expect(() => {
+        createStore(
+          devtools(() => null, {
+            enabled: true,
+            actionCreators: { '*': true, log } as any,
+          }),
+        )
+      }).not.toThrow()
+
+      expect(getListedNames()).toEqual(['log'])
+      expect(console.warn).not.toHaveBeenCalled()
+    })
+  })
+
   it('logs an error for the dropdown without the option', () => {
     createStore(devtools(() => ({ count: 0 }), { enabled: true }))
 
