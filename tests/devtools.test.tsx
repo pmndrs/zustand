@@ -3103,4 +3103,251 @@ describe('actionCreators', () => {
     subscriber({ type: 'ACTION', payload: '{ "type": "INCREMENT" }' })
     expect(api.getState().count).toBe(1)
   })
+
+  it('logs an error for the dropdown without the option', () => {
+    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({
+      type: 'ACTION',
+      payload: { name: 'increment', selected: 0, args: [], rest: '[]' },
+    })
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] Unsupported action format',
+    )
+  })
+
+  it('has the list ready by the time the extension reads it on init', () => {
+    let listed: unknown
+    extensionConnector.connect.mockImplementationOnce((options) => {
+      const api = {
+        subscribe: vi.fn(),
+        unsubscribe: vi.fn(),
+        send: vi.fn(),
+        // The extension serializes the list like this on `init`
+        init: vi.fn(() => {
+          listed = JSON.parse(JSON.stringify(options.actionCreators))
+        }),
+        error: vi.fn(),
+      }
+      return api as any
+    })
+    createStore(
+      devtools(() => ({ count: 0, increment: (by: number) => by }), {
+        enabled: true,
+        actionCreators: { increment: true },
+      }),
+    )
+
+    expect(listed).toEqual([{ name: 'increment', args: ['by'] }])
+  })
+
+  it('picks by specificity and takes functions from the option', () => {
+    const decrement = (by: number) => by
+    const log = (message: string) => message
+    createStore(
+      devtools(
+        () => ({
+          increment: () => {},
+          reset: () => {},
+          decrement: () => {},
+          nested: { a: { b: () => {} } },
+        }),
+        {
+          enabled: true,
+          actionCreators: { '**': true, reset: false, decrement, log },
+        },
+      ),
+    )
+
+    const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+    expect(actionCreators).toEqual([
+      { name: 'increment', func: expect.any(Function), args: [] },
+      { name: 'decrement', func: decrement, args: ['by'] },
+      { name: 'nested.a.b', func: expect.any(Function), args: [] },
+      { name: 'log', func: log, args: ['message'] },
+    ])
+  })
+
+  it.each<[source: string, args: string[]]>([
+    ['() => {}', []],
+    ['(a, b) => a', ['a', 'b']],
+    ['a => a', ['a']],
+    ['async a => a', ['a']],
+    ['async (a, b) => a', ['a', 'b']],
+    ['function (a, b) { return a }', ['a', 'b']],
+    ['function named(a, b) { return a }', ['a', 'b']],
+    ['async function* named(a) {}', ['a']],
+    ['method(a, b) { return a }', ['a', 'b']],
+    ['(a = 1, b = [1, 2], c = fn(1, 2)) => a', ['a', 'b', 'c']],
+    ['(a = (x) => x, b) => a', ['a', 'b']],
+    ['(a = x => x, b) => a', ['a', 'b']],
+    ['({ a, b }, [c, d]) => a', ['{ a, b }', '[c, d]']],
+    ['({ a = 1, b } = {}, c) => a', ['{ a = 1, b }', 'c']],
+    ['(a, ...rest) => a', ['a']],
+    ['(a /* first */, // second\n b) => a', ['a', 'b']],
+    ['(\n  a,\n  b,\n) => a', ['a', 'b']],
+    ['function () { [native code] }', []],
+  ])('lists the arguments of %s', (source, args) => {
+    const func = () => {}
+    func.toString = () => source
+    createStore(
+      devtools(() => ({ func }), {
+        enabled: true,
+        actionCreators: { func: true },
+      }),
+    )
+
+    const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+    expect(actionCreators[0].args).toEqual(args)
+  })
+
+  describe('with arguments from the dropdown', () => {
+    const setup = (options: object = {}) => {
+      const received = vi.fn()
+      createStore(
+        devtools(
+          () => ({
+            action: (...args: unknown[]) => received(...args),
+          }),
+          { enabled: true, actionCreators: { action: true }, ...options },
+        ),
+      )
+      const [subscriber] = getNamedConnectionSubscribers(undefined)
+      const dispatch = (payload: object) =>
+        subscriber({
+          type: 'ACTION',
+          payload: { name: 'action', selected: 0, ...payload },
+        })
+      return { received, dispatch }
+    }
+
+    it('parses them as JSON', () => {
+      const { received, dispatch } = setup()
+
+      dispatch({
+        args: ['5', '"foo"', '{ "by": 5 }', '[1, 2]', 'true', 'null'],
+        rest: '[7, 8]',
+      })
+
+      expect(received).toHaveBeenLastCalledWith(
+        5,
+        'foo',
+        { by: 5 },
+        [1, 2],
+        true,
+        null,
+        7,
+        8,
+      )
+    })
+
+    it('passes undefined for the ones left empty', () => {
+      const { received, dispatch } = setup()
+
+      // `undefined` in an array becomes `null` when the extension relays it
+      dispatch({ args: [null, '5', undefined, '6'], rest: '[]' })
+
+      expect(received).toHaveBeenLastCalledWith(undefined, 5, undefined, 6)
+    })
+
+    it('uses the reviver of the serialize option', () => {
+      const { received, dispatch } = setup({
+        serialize: {
+          reviver: (_key: string, value: unknown) =>
+            typeof value === 'number' ? value * 2 : value,
+        },
+      })
+
+      dispatch({ args: ['{ "by": 5 }'], rest: '[1]' })
+
+      expect(received).toHaveBeenLastCalledWith({ by: 10 }, 2)
+    })
+
+    it('does not evaluate them', () => {
+      const { received, dispatch } = setup()
+
+      expect(() => {
+        dispatch({ args: ['(globalThis.wasEvaluated = true)'], rest: '[]' })
+      }).not.toThrow()
+
+      expect((globalThis as any).wasEvaluated).toBeUndefined()
+      expect(received).not.toHaveBeenCalled()
+      expect(console.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Could not parse the arguments'),
+        expect.any(SyntaxError),
+      )
+    })
+
+    it('logs an error if rest is not an array', () => {
+      const { received, dispatch } = setup()
+
+      expect(() => {
+        dispatch({ args: [], rest: '5' })
+      }).not.toThrow()
+
+      expect(received).not.toHaveBeenCalled()
+      expect(console.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Could not parse the arguments'),
+        expect.any(Error),
+      )
+    })
+  })
+
+  it('logs an error for an unknown action from the dropdown', () => {
+    createStore(
+      devtools(() => ({ increment: () => {} }), {
+        enabled: true,
+        actionCreators: { increment: true },
+      }),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    expect(() => {
+      subscriber({
+        type: 'ACTION',
+        payload: { name: 'decrement', selected: 5, args: [], rest: '[]' },
+      })
+    }).not.toThrow()
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] Action type "decrement" not found in actionCreators',
+    )
+  })
+
+  it('only calls the function selected in the dropdown on a shared connection', () => {
+    const name = 'actionCreatorsSharedConnection'
+    const incrementA = vi.fn()
+    const incrementB = vi.fn()
+    const apiA = createStore(
+      devtools(() => ({ incrementA: () => incrementA() }), {
+        enabled: true,
+        name,
+        store: 'a',
+        actionCreators: { incrementA: true },
+      }),
+    )
+    const apiB = createStore(
+      devtools(() => ({ incrementB: () => incrementB() }), {
+        enabled: true,
+        name,
+        store: 'b',
+        actionCreators: { incrementB: true },
+      }),
+    )
+
+    namedConnections.get(name)!.subscribers.forEach((subscriber) => {
+      subscriber({
+        type: 'ACTION',
+        payload: { name: 'incrementA', selected: 0, args: [], rest: '[]' },
+      })
+    })
+
+    expect(incrementA).toHaveBeenCalledTimes(1)
+    expect(incrementB).not.toHaveBeenCalled()
+
+    apiA.devtools.cleanup()
+    apiB.devtools.cleanup()
+  })
 })

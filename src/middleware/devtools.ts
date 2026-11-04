@@ -1,5 +1,4 @@
 import type {} from '@redux-devtools/extension'
-import type { ActionCreatorObject } from '@redux-devtools/utils'
 import type {
   StateCreator,
   StoreApi,
@@ -108,6 +107,19 @@ type ActionCreators<T extends Record<string, any>> = {
     | (K extends '*' | '**' | `${string}.*` | `${string}.**`
         ? never
         : (...args: any[]) => void)
+}
+
+type ActionCreatorObject = {
+  name: string
+  func: (...args: any[]) => unknown
+  args: string[]
+}
+
+// What the action dropdown sends, `args` and `rest` hold the text that was typed
+type DropdownAction = {
+  name: string
+  args: (string | null | undefined)[]
+  rest: string
 }
 
 export interface DevtoolsOptions<
@@ -309,25 +321,26 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
-    let evalAction:
-      typeof import('@redux-devtools/utils').evalAction | undefined
 
     if (actionCreators) {
-      try {
-        // @redux-devtools/utils is an optional peer dependency
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        evalAction = require('@redux-devtools/utils').evalAction
-        actionCreatorObjects.push(
-          ...getActionsArray(
-            initialState as Record<string, unknown>,
-            actionCreators as ActionCreators<Record<string, unknown>>,
-          ),
-        )
-      } catch {
-        console.warn(
-          '[zustand devtools middleware] Please install @redux-devtools/utils to use actionCreators in devtools middleware',
+      actionCreatorObjects.push(
+        ...getActionCreatorObjects(
+          initialState as Record<string, unknown>,
+          actionCreators,
+        ),
+      )
+    }
+
+    const findActionCreator = (name: string) => {
+      const actionCreator = actionCreatorObjects.find(
+        (candidate) => candidate.name === name,
+      )
+      if (!actionCreator && actionCreators) {
+        console.error(
+          `[zustand devtools middleware] Action type "${name}" not found in actionCreators`,
         )
       }
+      return actionCreator
     }
 
     if (connectionInformation.type === 'untracked') {
@@ -388,14 +401,18 @@ const devtoolsImpl: DevtoolsImpl =
               )
               return
             }
-            if (!evalAction) {
+            if (!actionCreators) {
               console.error(
                 '[zustand devtools middleware] Unsupported action format',
               )
               return
             }
+            const actionCreator = findActionCreator(message.payload.name)
+            if (!actionCreator) return
+            const args = parseDropdownArgs(message.payload, reviver)
+            if (!args) return
             // Action creators are expected to cause the state change themselves.
-            return evalAction(message.payload, actionCreatorObjects)
+            return actionCreator.func(...args)
           }
 
           let action: {
@@ -467,17 +484,8 @@ const devtoolsImpl: DevtoolsImpl =
             return
           }
 
-          const actionCreator = actionCreatorObjects.find(
-            ({ name }) => name === action.type,
-          )
-          if (!actionCreator) {
-            if (actionCreators) {
-              console.error(
-                `[zustand devtools middleware] Action type "${action.type}" not found in actionCreators`,
-              )
-            }
-            return
-          }
+          const actionCreator = findActionCreator(action.type)
+          if (!actionCreator) return
           const args = action.args as unknown[] | Record<string, unknown>
           return actionCreator.func(
             ...(Array.isArray(args)
@@ -590,11 +598,11 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
 const getStateFunctions = (
   state: Record<string, unknown>,
   prefix = '',
-): Record<string, unknown> =>
-  Object.entries(state).reduce<Record<string, unknown>>(
+): Record<string, ActionCreatorObject['func']> =>
+  Object.entries(state).reduce<Record<string, ActionCreatorObject['func']>>(
     (functions, [key, value]) => {
       if (typeof value === 'function') {
-        functions[prefix + key] = value
+        functions[prefix + key] = value as ActionCreatorObject['func']
       } else if (isPlainObject(value)) {
         Object.assign(functions, getStateFunctions(value, `${prefix}${key}.`))
       }
@@ -603,23 +611,51 @@ const getStateFunctions = (
     {},
   )
 
-function getActionsArray<T extends Record<string, any>>(
-  actionCreators: T,
-  mask: ActionCreators<T>,
-): ActionCreatorObject[] {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const getActions = require('@redux-devtools/utils').getActionsArray
-  const flat = getActions(getStateFunctions(actionCreators))
-  const actions = new Map<string, ActionCreatorObject>()
-  const customActions = new Map<string, ActionCreatorObject>(
-    getActions(mask).map((action: ActionCreatorObject) => [
-      action.name,
-      action,
-    ]),
+// Parameter names of a function, for the inputs of the action dropdown and for
+// custom actions passing `args` by name. Only its source has them.
+const getParamNames = (func: ActionCreatorObject['func']): string[] => {
+  const source = func.toString().replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
+  const arrowParam = /^(?:async\s+)?([^\s(=]+)\s*=>/.exec(source)?.[1]
+  if (arrowParam) return [arrowParam]
+
+  const params = ['']
+  let depth = 0
+  let inDefaultValue = false
+  for (const char of source.slice(source.indexOf('(') + 1)) {
+    if (depth === 0) {
+      if (char === ')') break
+      if (char === ',') {
+        params.push('')
+        inDefaultValue = false
+        continue
+      }
+      if (char === '=') inDefaultValue = true
+    }
+    if ('([{'.includes(char)) depth++
+    if (')]}'.includes(char)) depth--
+    if (!inDefaultValue) params[params.length - 1] += char
+  }
+  return (
+    params
+      .map((param) => param.trim())
+      // The action dropdown has its own input for `...rest`
+      .filter((param) => param && !param.startsWith('...'))
   )
+}
+
+const createActionCreatorObject = (
+  name: string,
+  func: ActionCreatorObject['func'],
+): ActionCreatorObject => ({ name, func, args: getParamNames(func) })
+
+function getActionCreatorObjects(
+  state: Record<string, unknown>,
+  actionCreators: ActionCreators<Record<string, unknown>>,
+): ActionCreatorObject[] {
+  const actions = new Map<string, ActionCreatorObject>()
 
   // Sort matchers by specificity
-  const matchers = Object.entries(mask ?? {})
+  const matchers = Object.entries(actionCreators)
     .map(([key, picked]) => ({
       matcher: maskToRegex(key),
       picked,
@@ -641,29 +677,47 @@ function getActionsArray<T extends Record<string, any>>(
       return a.key.length - b.key.length
     })
 
-  for (const action of flat) {
+  for (const [name, func] of Object.entries(getStateFunctions(state))) {
     for (const { matcher, picked } of matchers) {
-      if (matcher.test(action.name)) {
+      if (matcher.test(name)) {
         if (picked === false) {
-          actions.delete(action.name)
+          actions.delete(name)
           continue
         }
 
-        actions.set(
-          action.name,
-          customActions.get(action.name) ?? {
-            name: action.name,
-            func: typeof picked === 'function' ? picked : action.func,
-            args: action.args,
-          },
-        )
+        actions.set(name, createActionCreatorObject(name, func))
       }
     }
   }
 
-  for (const [name, action] of customActions.entries()) {
-    actions.set(name, action)
+  // Functions in the option replace the ones in the state or add new ones
+  for (const [name, picked] of Object.entries(actionCreators)) {
+    if (typeof picked === 'function') {
+      actions.set(name, createActionCreatorObject(name, picked))
+    }
   }
 
   return Array.from(actions.values())
+}
+
+// An argument left empty arrives as `undefined`, or as `null` if it went through
+// JSON on the way from the extension
+const parseDropdownArgs = (
+  { args, rest }: DropdownAction,
+  reviver: ((key: string, value: unknown) => unknown) | undefined,
+): unknown[] | undefined => {
+  const parse = (arg: string | null | undefined): unknown =>
+    arg ? JSON.parse(arg, reviver) : undefined
+  try {
+    const restArgs = parse(rest) ?? []
+    if (!Array.isArray(restArgs)) throw new Error('...rest is not an array')
+    return [...args.map(parse), ...restArgs]
+  } catch (e) {
+    console.error(
+      '[zustand devtools middleware] Could not parse the arguments from the action dropdown. ' +
+        'Each one must be JSON, e.g. 5, "foo" or { "by": 5 }, and ...rest a JSON array.',
+      e,
+    )
+    return undefined
+  }
 }
