@@ -101,7 +101,7 @@ type FunctionPaths<T, Prefix extends string = ''> = {
       : never
 }[keyof T & string]
 
-type ActionCreatorsMask<T extends Record<string, any>> = {
+type ActionCreators<T extends Record<string, any>> = {
   [K in FunctionPaths<T> | '*' | '**' | (string & {})]?:
     | boolean
     // Allow overriding leafs
@@ -117,7 +117,7 @@ export interface DevtoolsOptions<
   enabled?: boolean
   anonymousActionType?: string
   store?: string
-  actionCreators?: ActionCreatorsMask<T>
+  actionCreators?: ActionCreators<T>
 }
 
 type Devtools = <
@@ -245,12 +245,12 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const actionCreatorsMask = options.actionCreators
-    const actionCreators: ActionCreatorObject[] = []
-    if (actionCreatorsMask) {
+    const actionCreators = options.actionCreators
+    const actionCreatorObjects: ActionCreatorObject[] = []
+    if (actionCreators) {
       // The extension reads this list on `init`, it is filled in below once
       // the initial state exists
-      options.actionCreators = actionCreators as any
+      options.actionCreators = actionCreatorObjects as any
     }
     const { connection, ...connectionInformation } =
       extractConnectionInformation(store, extensionConnector, options)
@@ -313,15 +313,15 @@ const devtoolsImpl: DevtoolsImpl =
     let evalAction:
       typeof import('@redux-devtools/utils').evalAction | undefined
 
-    if (actionCreatorsMask) {
+    if (actionCreators) {
       try {
         // @redux-devtools/utils is an optional peer dependency
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         evalAction = require('@redux-devtools/utils').evalAction
-        actionCreators.push(
+        actionCreatorObjects.push(
           ...getActionsArray(
             initialState as Record<string, unknown>,
-            actionCreatorsMask as ActionCreatorsMask<Record<string, unknown>>,
+            actionCreators as ActionCreators<Record<string, unknown>>,
           ),
         )
       } catch {
@@ -396,7 +396,7 @@ const devtoolsImpl: DevtoolsImpl =
               return
             }
             // Action creators are expected to cause the state change themselves.
-            return evalAction(message.payload, actionCreators)
+            return evalAction(message.payload, actionCreatorObjects)
           }
 
           let action: {
@@ -468,11 +468,11 @@ const devtoolsImpl: DevtoolsImpl =
             return
           }
 
-          const actionCreator = actionCreators.find(
+          const actionCreator = actionCreatorObjects.find(
             ({ name }) => name === action.type,
           )
           if (!actionCreator) {
-            if (actionCreatorsMask) {
+            if (actionCreators) {
               console.error(
                 `[zustand devtools middleware] Action type "${action.type}" not found in actionCreators`,
               )
@@ -606,7 +606,7 @@ const getStateFunctions = (
 
 function getActionsArray<T extends Record<string, any>>(
   actionCreators: T,
-  mask: ActionCreatorsMask<T>,
+  mask: ActionCreators<T>,
 ): ActionCreatorObject[] {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const getActions = require('@redux-devtools/utils').getActionsArray
