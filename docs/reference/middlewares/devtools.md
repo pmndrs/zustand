@@ -67,7 +67,7 @@ devtools<T>(stateCreatorFn: StateCreator<T, [], []>, devtoolsOptions?: DevtoolsO
   - **optional** `actionCreators`: An object that picks the functions in the state that can be
     dispatched from the action dropdown in Redux DevTools. Keys are dot notation paths, where `*`
     matches one level and `**` matches any depth. Values are `true`, `false` to leave a function
-    out, or a function to use instead. Requires `@redux-devtools/utils` to be installed.
+    out, or a function to use instead.
 
 #### Returns
 
@@ -222,7 +222,8 @@ const useStore = create<Store>()(
 ### Dispatching actions from the devtools
 
 With the `actionCreators` option, functions in your state show up in the action dropdown of
-Redux DevTools and can be dispatched from there. This needs the `@redux-devtools/utils` package.
+Redux DevTools and can be dispatched from there. Type each argument as JSON, like `5`, `"foo"` or
+`{ "by": 5 }`, and leave it empty for `undefined`.
 
 ```ts
 import { create } from 'zustand'
