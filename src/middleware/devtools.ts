@@ -332,7 +332,8 @@ const devtoolsImpl: DevtoolsImpl =
       const actionCreator = actionCreatorObjects?.find(
         (candidate) => candidate.name === name,
       )
-      if (!actionCreator && actionCreators) {
+      // With the `store` option, it may be the function of another store
+      if (!actionCreator && actionCreators && store === undefined) {
         console.error(
           `[zustand devtools middleware] Action type "${name}" not found in actionCreators`,
         )

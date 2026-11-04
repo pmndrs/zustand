@@ -3466,6 +3466,47 @@ describe('actionCreators', () => {
 
     expect(incrementA).toHaveBeenCalledTimes(1)
     expect(incrementB).not.toHaveBeenCalled()
+    expect(console.error).not.toHaveBeenCalled()
+
+    apiA.devtools.cleanup()
+    apiB.devtools.cleanup()
+  })
+
+  it('only lists the first store on a shared connection, the others take custom actions', () => {
+    const name = 'actionCreatorsFirstStoreOnly'
+    const incrementB = vi.fn()
+    const apiA = createStore(
+      devtools(() => ({ incrementA: () => {} }), {
+        enabled: true,
+        name,
+        store: 'a',
+        actionCreators: { incrementA: true },
+      }),
+    )
+    const apiB = createStore(
+      devtools(() => ({ incrementB: (by: number) => incrementB(by) }), {
+        enabled: true,
+        name,
+        store: 'b',
+        actionCreators: { incrementB: true },
+      }),
+    )
+
+    expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
+    const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+    expect(actionCreators.map(({ name }: { name: string }) => name)).toEqual([
+      'incrementA',
+    ])
+
+    namedConnections.get(name)!.subscribers.forEach((subscriber) => {
+      subscriber({
+        type: 'ACTION',
+        payload: JSON.stringify({ type: 'incrementB', args: [5] }),
+      })
+    })
+
+    expect(incrementB).toHaveBeenCalledWith(5)
+    expect(console.error).not.toHaveBeenCalled()
 
     apiA.devtools.cleanup()
     apiB.devtools.cleanup()
