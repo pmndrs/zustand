@@ -262,6 +262,31 @@ it('rehydrates persist with a synchronous storage', () => {
 
   expect(api.persist.hasHydrated()).toBe(true)
   expect(api.getState()).toEqual({ count: 5 })
+  const [connection] = getNamedConnectionApis(undefined)
+  expect(connection.init).toHaveBeenLastCalledWith({ count: 5 })
+})
+
+it('does not send a setState from the initializer', () => {
+  const api = createStore(
+    devtools(
+      (set) => {
+        set({ count: 1 })
+        return { count: 2 }
+      },
+      { enabled: true },
+    ),
+  )
+
+  expect(api.getState()).toEqual({ count: 2 })
+  const [connection] = getNamedConnectionApis(undefined)
+  expect(connection.send).not.toHaveBeenCalled()
+  expect(connection.init).toHaveBeenLastCalledWith({ count: 2 })
+
+  api.setState({ count: 3 }, undefined, 'increment')
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'increment' },
+    { count: 3 },
+  )
 })
 
 describe('When state changes with automatic setter inferring...', () => {
@@ -3222,20 +3247,11 @@ describe('actionCreators', () => {
     )
   })
 
-  it('has the list ready by the time the extension reads it on init', () => {
+  it('has the list ready when connecting', () => {
     let listed: unknown
     extensionConnector.connect.mockImplementationOnce((options) => {
-      const api = {
-        subscribe: vi.fn(),
-        unsubscribe: vi.fn(),
-        send: vi.fn(),
-        // The extension serializes the list like this on `init`
-        init: vi.fn(() => {
-          listed = JSON.parse(JSON.stringify(options.actionCreators))
-        }),
-        error: vi.fn(),
-      }
-      return api as any
+      listed = JSON.parse(JSON.stringify(options.actionCreators))
+      return { subscribe: vi.fn(), init: vi.fn() } as any
     })
     createStore(
       devtools(() => ({ count: 0, increment: (by: number) => by }), {

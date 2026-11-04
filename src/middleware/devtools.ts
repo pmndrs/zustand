@@ -258,13 +258,9 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    // Filled in once the initial state exists, the extension reads it on `init`
-    const actionCreatorObjects: ActionCreatorObject[] = []
-    const connectOptions = actionCreators
-      ? { ...options, actionCreators: actionCreatorObjects }
-      : options
-    const { connection, ...connectionInformation } =
-      extractConnectionInformation(store, extensionConnector, connectOptions)
+    // Set once the initial state exists, as the action creators are in it. A
+    // `setState` in the initializer is not sent, `init` would discard it anyway.
+    let connection: Connection | undefined = undefined
 
     let isRecording = true
     api.setState = ((state, replace, nameOrAction: Action) => {
@@ -322,14 +318,18 @@ const devtoolsImpl: DevtoolsImpl =
 
     const initialState = fn(api.setState, get, api)
 
-    if (actionCreators) {
-      actionCreatorObjects.push(
-        ...getActionCreatorObjects(initialState, actionCreators),
-      )
-    }
+    const actionCreatorObjects =
+      actionCreators && getActionCreatorObjects(initialState, actionCreators)
+    const connectOptions = { ...options, actionCreators: actionCreatorObjects }
+    const connectionInformation = extractConnectionInformation(
+      store,
+      extensionConnector,
+      connectOptions,
+    )
+    connection = connectionInformation.connection
 
     const findActionCreator = (name: string) => {
-      const actionCreator = actionCreatorObjects.find(
+      const actionCreator = actionCreatorObjects?.find(
         (candidate) => candidate.name === name,
       )
       if (!actionCreator && actionCreators) {
