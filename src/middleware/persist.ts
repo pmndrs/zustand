@@ -148,12 +148,7 @@ type StorePersist<S, Ps, Pr> = S extends {
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
   typeof (value as PromiseLike<unknown>)?.then === 'function'
 
-type SyncThenableOrPromiseLike<V> = PromiseLike<V> & { sync?: true }
-
-const toSyncThenable = <Value>(
-  value: Value,
-): SyncThenableOrPromiseLike<Value> => ({
-  sync: true,
+const toSyncThenable = <Value>(value: Value): PromiseLike<Value> => ({
   then(onFulfilled) {
     return onFulfilled
       ? toThenable(onFulfilled, value)
@@ -164,13 +159,12 @@ const toSyncThenable = <Value>(
 const toThenable = <Result, Input>(
   fn: (input: Input) => Result | PromiseLike<Result>,
   input: Input,
-): SyncThenableOrPromiseLike<Result> => {
+): PromiseLike<Result> => {
   try {
     const result = fn(input)
     return isPromiseLike(result) ? result : toSyncThenable(result as Result)
   } catch (error) {
     return {
-      sync: true,
       then(_onFulfilled, onRejected) {
         return onRejected
           ? toThenable(onRejected, error)
@@ -263,36 +257,32 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       options.onRehydrateStorage?.(get() ?? configResult) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
-    const hydration: SyncThenableOrPromiseLike<readonly [boolean, unknown]> =
-      toThenable(storage.getItem.bind(storage), options.name).then(
-        (deserializedStorageValue) => {
-          if (deserializedStorageValue) {
-            if (
-              typeof deserializedStorageValue.version === 'number' &&
-              deserializedStorageValue.version !== options.version
-            ) {
-              if (options.migrate) {
-                const migration = options.migrate(
-                  deserializedStorageValue.state,
-                  deserializedStorageValue.version,
-                )
-                if (isPromiseLike(migration)) {
-                  return migration.then((result) => [true, result] as const)
-                }
-                return [true, migration] as const
-              }
-              console.error(
-                `State loaded from storage couldn't be migrated since no migrate function was provided`,
+    return toThenable(storage.getItem.bind(storage), options.name)
+      .then((deserializedStorageValue) => {
+        if (deserializedStorageValue) {
+          if (
+            typeof deserializedStorageValue.version === 'number' &&
+            deserializedStorageValue.version !== options.version
+          ) {
+            if (options.migrate) {
+              const migration = options.migrate(
+                deserializedStorageValue.state,
+                deserializedStorageValue.version,
               )
-            } else {
-              return [false, deserializedStorageValue.state] as const
+              if (isPromiseLike(migration)) {
+                return migration.then((result) => [true, result] as const)
+              }
+              return [true, migration] as const
             }
+            console.error(
+              `State loaded from storage couldn't be migrated since no migrate function was provided`,
+            )
+          } else {
+            return [false, deserializedStorageValue.state] as const
           }
-          return [false, undefined] as const
-        },
-      )
-
-    return hydration
+        }
+        return [false, undefined] as const
+      })
       .then((migrationResult) => {
         // Abort if a newer hydration has started
         if (currentVersion !== hydrationVersion) {
@@ -306,16 +296,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
 
         set(stateFromStorage as S, true)
         if (migrated) {
-          const writeResult = setItem()
-          // Synchronous hydration only awaited native Promise writes before
-          // PromiseLike support.
-          if (
-            hydration instanceof Promise ||
-            !hydration.sync ||
-            writeResult instanceof Promise
-          ) {
-            return writeResult
-          }
+          return setItem()
         }
       })
       .then(() => {
@@ -334,13 +315,17 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         hasHydrated = true
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
-      .then(undefined, (e: unknown) => {
-        // Abort if a newer hydration has started
-        if (currentVersion !== hydrationVersion) {
-          return
-        }
-        postRehydrationCallback?.(undefined, e)
-      })
+      .then(
+        // Fulfilled Thenables from older Zustand versions expect a callback.
+        () => undefined,
+        (e: unknown) => {
+          // Abort if a newer hydration has started
+          if (currentVersion !== hydrationVersion) {
+            return
+          }
+          postRehydrationCallback?.(undefined, e)
+        },
+      )
   }
 
   ;(api as StoreApi<S> & StorePersist<StoreApi<S>, S, unknown>).persist = {

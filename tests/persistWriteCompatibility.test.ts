@@ -5,93 +5,89 @@ import { createStore } from 'zustand/vanilla'
 import { createPromiseLike } from './test-utils'
 
 describe.each([
+  ['synchronous', 'plain values'],
   ['read', 'native Promise'],
   ['migration', 'native Promise'],
   ['read', 'another realm'],
   ['migration', 'another realm'],
   ['read', 'PromiseLike without catch'],
   ['migration', 'PromiseLike without catch'],
-])(
-  'write completion after an asynchronous %s using %s',
-  (asynchronous, inputKind) => {
-    const createInputPromise = <T>(value: T): PromiseLike<T> => {
-      if (inputKind === 'another realm') {
-        return runInNewContext('Promise.resolve(value)', { value })
-      }
-      const promise = Promise.resolve(value)
-      return inputKind === 'native Promise'
-        ? promise
-        : createPromiseLike(promise)
+])('write completion with %s inputs using %s', (asynchronous, inputKind) => {
+  const createInputPromise = <T>(value: T): PromiseLike<T> => {
+    if (inputKind === 'another realm') {
+      return runInNewContext('Promise.resolve(value)', { value })
     }
+    const promise = Promise.resolve(value)
+    return inputKind === 'native Promise' ? promise : createPromiseLike(promise)
+  }
 
-    describe.each(['another realm', 'PromiseLike without catch'])(
-      'write returns %s',
-      (kind) => {
-        it.each([false, true])(
-          'waits for the write and reports its result (rejects = %s)',
-          async (rejects) => {
-            let resolve!: () => void
-            let reject!: (error: Error) => void
-            const native = new Promise<void>((ok, bad) => {
-              resolve = ok
-              reject = bad
-            })
-            const write: PromiseLike<void> =
-              kind === 'another realm'
-                ? runInNewContext(
-                    'new Promise((resolve, reject) => native.then(resolve, reject))',
-                    { native },
-                  )
-                : createPromiseLike(native)
-            // Handle ignored inputs as well, so a failing implementation does
-            // not leave an unhandled rejection behind during this regression test.
-            write.then(undefined, () => {})
-            const saved = { count: 42 }
-            const completed = vi.fn()
-            const setItem = vi.fn(() => write)
-            const store = createStore(
-              persist(() => ({ count: 0 }), {
-                name: 'write-compatibility',
-                version: 1,
-                skipHydration: true,
-                storage: {
-                  getItem: () =>
-                    asynchronous === 'read'
-                      ? createInputPromise({ state: saved, version: 0 })
-                      : { state: saved, version: 0 },
-                  setItem,
-                  removeItem: () => {},
-                },
-                migrate: () =>
-                  asynchronous === 'migration'
-                    ? createInputPromise(saved)
-                    : saved,
-                onRehydrateStorage: () => completed,
-              }),
-            )
-            const hydration = store.persist.rehydrate()
-            await new Promise((done) => setTimeout(done, 0))
-            const premature = store.persist.hasHydrated()
-            const earlyCalls = completed.mock.calls.length
-            const error = new Error('write failed')
-            if (rejects) reject(error)
-            else resolve()
-            await hydration
+  describe.each(['another realm', 'PromiseLike without catch'])(
+    'write returns %s',
+    (kind) => {
+      it.each([false, true])(
+        'waits for the write and reports its result (rejects = %s)',
+        async (rejects) => {
+          let resolve!: () => void
+          let reject!: (error: Error) => void
+          const native = new Promise<void>((ok, bad) => {
+            resolve = ok
+            reject = bad
+          })
+          const write: PromiseLike<void> =
+            kind === 'another realm'
+              ? runInNewContext(
+                  'new Promise((resolve, reject) => native.then(resolve, reject))',
+                  { native },
+                )
+              : createPromiseLike(native)
+          // Handle ignored inputs as well, so a failing implementation does
+          // not leave an unhandled rejection behind during this regression test.
+          write.then(undefined, () => {})
+          const saved = { count: 42 }
+          const completed = vi.fn()
+          const setItem = vi.fn(() => write)
+          const store = createStore(
+            persist(() => ({ count: 0 }), {
+              name: 'write-compatibility',
+              version: 1,
+              skipHydration: true,
+              storage: {
+                getItem: () =>
+                  asynchronous === 'read'
+                    ? createInputPromise({ state: saved, version: 0 })
+                    : { state: saved, version: 0 },
+                setItem,
+                removeItem: () => {},
+              },
+              migrate: () =>
+                asynchronous === 'migration'
+                  ? createInputPromise(saved)
+                  : saved,
+              onRehydrateStorage: () => completed,
+            }),
+          )
+          const hydration = store.persist.rehydrate()
+          await new Promise((done) => setTimeout(done, 0))
+          const premature = store.persist.hasHydrated()
+          const earlyCalls = completed.mock.calls.length
+          const error = new Error('write failed')
+          if (rejects) reject(error)
+          else resolve()
+          await hydration
 
-            expect(setItem).toHaveBeenCalledOnce()
-            expect(premature).toBe(false)
-            expect(earlyCalls).toBe(0)
-            expect(store.persist.hasHydrated()).toBe(!rejects)
-            expect(completed).toHaveBeenCalledExactlyOnceWith(
-              rejects ? undefined : saved,
-              rejects ? error : undefined,
-            )
-          },
-        )
-      },
-    )
-  },
-)
+          expect(setItem).toHaveBeenCalledOnce()
+          expect(premature).toBe(false)
+          expect(earlyCalls).toBe(0)
+          expect(store.persist.hasHydrated()).toBe(!rejects)
+          expect(completed).toHaveBeenCalledExactlyOnceWith(
+            rejects ? undefined : saved,
+            rejects ? error : undefined,
+          )
+        },
+      )
+    },
+  )
+})
 
 it.each([false, true])(
   'handles synchronous hydration rejection through catch (callback throws = %s)',
@@ -159,10 +155,11 @@ describe.each(['read', 'migration'])(
 )
 
 it.each([false, true])(
-  'does not inspect then accessors on a synchronous write value (throws = %s)',
+  'checks synchronous write results for then and reports accessor errors (throws = %s)',
   async (throws) => {
+    const error = new Error('then accessor failed')
     const getter = vi.fn(() => {
-      if (throws) throw new Error('then accessor failed')
+      if (throws) throw error
       return undefined
     })
     const writeResult = {
@@ -186,9 +183,12 @@ it.each([false, true])(
       }),
     )
     await store.persist.rehydrate()
-    expect(getter).not.toHaveBeenCalled()
-    expect(store.persist.hasHydrated()).toBe(true)
-    expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
+    expect(getter).toHaveBeenCalledOnce()
+    expect(store.persist.hasHydrated()).toBe(!throws)
+    expect(completed).toHaveBeenCalledExactlyOnceWith(
+      throws ? undefined : { count: 42 },
+      throws ? error : undefined,
+    )
   },
 )
 
