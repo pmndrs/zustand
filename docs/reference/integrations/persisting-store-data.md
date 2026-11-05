@@ -205,8 +205,9 @@ The migrate function takes the persisted state
 and the version number as arguments.
 It must return a state that is compliant
 to the latest version (the version in the code), either directly or through a
-`PromiseLike`. A promise-like result must provide a chainable `then` method;
-it does not need `catch` or `finally` methods.
+`PromiseLike`. A promise-like result must provide a chainable
+`then(onFulfilled, onRejected)` method and support omitted handlers; it does not
+need `catch` or `finally` methods.
 
 A migration result with a callable `then` property is treated as a thenable,
 even if it is a plain state object. Avoid returning a synchronous state object
@@ -404,13 +405,34 @@ The result is a native `Promise`, supporting `await`, `.then()`, `.catch()`, and
 notify hydration listeners before `rehydrate()` returns. Callbacks attached to
 the returned Promise always run asynchronously.
 
-If a storage `setItem` returns a native Promise, such as another store's
-`rehydrate()` result in the same realm, hydration completion waits for that
-Promise to settle. If both stores otherwise hydrate synchronously, their state
-is restored immediately, but the outer store's completion callbacks and
-`hasHydrated()` update asynchronously. Older versions returned an internal
-synchronous Thenable in this case, allowing the outer store to finish
-synchronously.
+Migration writes also adopt promise-like `setItem` results, even when reading
+and migration are synchronous. Hydration completion callbacks and `hasHydrated()`
+may therefore update after the write settles rather than immediately. Use
+`await store.persist.rehydrate()` before relying on hydration completion.
+
+Write failures are passed to the callback returned by `onRehydrateStorage`,
+and `hasHydrated()` remains `false`. Awaiting `rehydrate()` does not itself throw
+these storage errors unless the callback throws.
+
+When combining Zustand versions, `setItem` may return the result of an older
+store's `rehydrate()`. If that result is a rejected internal synchronous
+Thenable, the outer hydration can stay pending, even when `getItem` and
+`migrate` are synchronous. The older Thenable reports rejection through
+`.catch()` and ignores the rejection handler passed to `.then()`.
+
+To handle this case, wrap the older store's result in a native Promise.
+
+```ts
+setItem: () =>
+  new Promise<void>((resolve, reject) => {
+    const result = legacyStore.persist.rehydrate()
+    if (result) {
+      result.then(resolve).catch(reject)
+    } else {
+      resolve()
+    }
+  })
+```
 
 ### `hasHydrated`
 
