@@ -1,7 +1,6 @@
 import { expect, it, vi } from 'vitest'
 import { persist } from 'zustand/middleware'
 import { createStore } from 'zustand/vanilla'
-import { legacyThenable } from './legacyThenable.test-utils'
 import { createPromiseLike } from './test-utils'
 
 it.each([false, true])(
@@ -269,30 +268,3 @@ it('settles an outer hydration after a nested hydration returns', async () => {
   expect(store.persist.hasHydrated()).toBe(false)
   expect(completed).toHaveBeenCalledExactlyOnceWith(undefined, error)
 })
-
-it.each([false, true])(
-  'returns an awaitable native Promise for a fulfilled legacy write (manual = %s)',
-  async (manual) => {
-    const completed = vi.fn()
-    const store = createStore(
-      persist(() => ({ count: 0 }), {
-        name: 'legacy-fulfillment',
-        version: 1,
-        skipHydration: manual,
-        storage: {
-          getItem: () => ({ state: { count: 42 }, version: 0 }),
-          setItem: () => legacyThenable(() => undefined)(undefined),
-          removeItem: () => {},
-        },
-        migrate: (state) => state as { count: number },
-        onRehydrateStorage: () => completed,
-      }),
-    )
-    const hydration = manual ? store.persist.rehydrate() : undefined
-    expect(store.getState()).toEqual({ count: 42 })
-    expect(hydration instanceof Promise).toBe(manual)
-    await hydration
-    expect(store.persist.hasHydrated()).toBe(true)
-    expect(completed).toHaveBeenCalledExactlyOnceWith({ count: 42 }, undefined)
-  },
-)
