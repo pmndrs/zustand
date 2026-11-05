@@ -151,28 +151,27 @@ const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
 const toSyncThenable = <Value>(value: Value): PromiseLike<Value> => ({
   then(onFulfilled) {
     return onFulfilled
-      ? toThenable(onFulfilled, value)
+      ? toThenable(onFulfilled)(value)
       : (this as PromiseLike<any>)
   },
 })
 
-const toThenable = <Result, Input>(
-  fn: (input: Input) => Result | PromiseLike<Result>,
-  input: Input,
-): PromiseLike<Result> => {
-  try {
-    const result = fn(input)
-    return isPromiseLike(result) ? result : toSyncThenable(result as Result)
-  } catch (error) {
-    return {
-      then(_onFulfilled, onRejected) {
-        return onRejected
-          ? toThenable(onRejected, error)
-          : (this as PromiseLike<any>)
-      },
+const toThenable =
+  <Result, Input>(fn: (input: Input) => Result | PromiseLike<Result>) =>
+  (input: Input): PromiseLike<Result> => {
+    try {
+      const result = fn(input)
+      return isPromiseLike(result) ? result : toSyncThenable(result as Result)
+    } catch (error) {
+      return {
+        then(_onFulfilled, onRejected) {
+          return onRejected
+            ? toThenable(onRejected)(error)
+            : (this as PromiseLike<any>)
+        },
+      }
     }
   }
-}
 
 const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   type S = ReturnType<typeof config>
@@ -257,7 +256,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       options.onRehydrateStorage?.(get() ?? configResult) || undefined
 
     // bind is used to avoid `TypeError: Illegal invocation` error
-    return toThenable(storage.getItem.bind(storage), options.name)
+    return toThenable(storage.getItem.bind(storage))(options.name)
       .then((deserializedStorageValue) => {
         if (deserializedStorageValue) {
           if (
