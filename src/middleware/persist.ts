@@ -5,7 +5,7 @@ import type {
 } from '../vanilla.ts'
 
 export interface StateStorage<R = unknown> {
-  getItem: (name: string) => string | null | Promise<string | null>
+  getItem: (name: string) => string | null | PromiseLike<string | null>
   setItem: (name: string, value: string) => R
   removeItem: (name: string) => R
 }
@@ -18,7 +18,7 @@ export type StorageValue<S> = {
 export interface PersistStorage<S, R = unknown> {
   getItem: (
     name: string,
-  ) => StorageValue<S> | null | Promise<StorageValue<S> | null>
+  ) => StorageValue<S> | null | PromiseLike<StorageValue<S> | null>
   setItem: (name: string, value: StorageValue<S>) => R
   removeItem: (name: string) => R
 }
@@ -48,7 +48,7 @@ export function createJSONStorage<S, R = unknown>(
         return JSON.parse(str, options?.reviver) as StorageValue<S>
       }
       const str = storage.getItem(name) ?? null
-      if (str instanceof Promise) {
+      if (isPromiseLike(str)) {
         return str.then(parse)
       }
       return parse(str)
@@ -102,7 +102,7 @@ export interface PersistOptions<
   migrate?: (
     persistedState: unknown,
     version: number,
-  ) => PersistedState | Promise<PersistedState>
+  ) => PersistedState | PromiseLike<PersistedState>
   /**
    * A function to perform custom hydration merges when combining the stored state with the current one.
    * By default, this function does a shallow merge.
@@ -136,7 +136,7 @@ type StorePersist<S, Ps, Pr> = S extends {
       persist: {
         setOptions: (options: Partial<PersistOptions<T, Ps, Pr>>) => void
         clearStorage: () => void
-        rehydrate: () => Promise<void> | void
+        rehydrate: () => Promise<void>
         hasHydrated: () => boolean
         onHydrate: (fn: PersistListener<T>) => () => void
         onFinishHydration: (fn: PersistListener<T>) => () => void
@@ -145,40 +145,29 @@ type StorePersist<S, Ps, Pr> = S extends {
     }
   : never
 
-type Thenable<Value> = {
-  then<V>(
-    onFulfilled: (value: Value) => V | Promise<V> | Thenable<V>,
-  ): Thenable<V>
-  catch<V>(
-    onRejected: (reason: Error) => V | Promise<V> | Thenable<V>,
-  ): Thenable<V>
-}
+const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
+  typeof (value as PromiseLike<unknown>)?.then === 'function'
+
+const toSyncThenable = <Value>(value: Value): PromiseLike<Value> => ({
+  then(onFulfilled) {
+    return onFulfilled
+      ? toThenable(onFulfilled)(value)
+      : (this as PromiseLike<any>)
+  },
+})
 
 const toThenable =
-  <Result, Input>(
-    fn: (input: Input) => Result | Promise<Result> | Thenable<Result>,
-  ) =>
-  (input: Input): Thenable<Result> => {
+  <Result, Input>(fn: (input: Input) => Result | PromiseLike<Result>) =>
+  (input: Input): PromiseLike<Result> => {
     try {
       const result = fn(input)
-      if (result instanceof Promise) {
-        return result as Thenable<Result>
-      }
+      return isPromiseLike(result) ? result : toSyncThenable(result as Result)
+    } catch (error) {
       return {
-        then(onFulfilled) {
-          return toThenable(onFulfilled)(result as Result)
-        },
-        catch(_onRejected) {
-          return this as Thenable<any>
-        },
-      }
-    } catch (e: any) {
-      return {
-        then(_onFulfilled) {
-          return this as Thenable<any>
-        },
-        catch(onRejected) {
-          return toThenable(onRejected)(e)
+        then(_onFulfilled, onRejected) {
+          return onRejected
+            ? toThenable(onRejected)(error)
+            : (this as PromiseLike<any>)
         },
       }
     }
@@ -279,7 +268,7 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
                 deserializedStorageValue.state,
                 deserializedStorageValue.version,
               )
-              if (migration instanceof Promise) {
+              if (isPromiseLike(migration)) {
                 return migration.then((result) => [true, result] as const)
               }
               return [true, migration] as const
@@ -325,13 +314,16 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         hasHydrated = true
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
-      .catch((e: Error) => {
-        // Abort if a newer hydration has started
-        if (currentVersion !== hydrationVersion) {
-          return
-        }
-        postRehydrationCallback?.(undefined, e)
-      })
+      .then(
+        () => undefined,
+        (e: unknown) => {
+          // Abort if a newer hydration has started
+          if (currentVersion !== hydrationVersion) {
+            return
+          }
+          postRehydrationCallback?.(undefined, e)
+        },
+      )
   }
 
   ;(api as StoreApi<S> & StorePersist<StoreApi<S>, S, unknown>).persist = {
@@ -350,7 +342,13 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
       storage?.removeItem(options.name)
     },
     getOptions: () => options,
-    rehydrate: () => hydrate() as Promise<void>,
+    rehydrate: () => {
+      try {
+        return Promise.resolve(hydrate())
+      } catch (error) {
+        return Promise.reject(error)
+      }
+    },
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
       hydrationListeners.add(cb)
