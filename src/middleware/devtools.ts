@@ -109,6 +109,7 @@ type ActionCreators<T extends Record<string, any>> = {
         : (...args: any[]) => void)
 }
 
+// What the extension reads, though its `Config` type only knows functions
 type ActionCreatorObject = {
   name: string
   func: (...args: any[]) => unknown
@@ -180,12 +181,12 @@ const extractConnectionInformation = (
   options: Omit<
     DevtoolsOptions,
     'enabled' | 'anonymousActionType' | 'store' | 'actionCreators'
-  >,
+  > & { actionCreators: ActionCreatorObject[] | undefined },
 ) => {
   if (store === undefined) {
     return {
       type: 'untracked' as const,
-      connection: extensionConnector.connect(options),
+      connection: extensionConnector.connect(options as never),
     }
   }
   const existingConnection = trackedConnections.get(options.name)
@@ -193,7 +194,7 @@ const extractConnectionInformation = (
     return { type: 'tracked' as const, store, ...existingConnection }
   }
   const newConnection: ConnectionInformation = {
-    connection: extensionConnector.connect(options),
+    connection: extensionConnector.connect(options as never),
     stores: {},
   }
   trackedConnections.set(options.name, newConnection)
@@ -323,7 +324,7 @@ const devtoolsImpl: DevtoolsImpl =
     const connectionInformation = extractConnectionInformation(
       store,
       extensionConnector,
-      { ...options, actionCreators: actionCreatorObjects } as typeof options,
+      { ...options, actionCreators: actionCreatorObjects },
     )
     connection = connectionInformation.connection
 
