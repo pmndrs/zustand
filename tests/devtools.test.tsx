@@ -245,6 +245,50 @@ it('preserves external action names and payloads with persist', () => {
   api.devtools.cleanup()
 })
 
+it('rehydrates persist with a synchronous storage', () => {
+  const api = createStore(
+    devtools(
+      persist(() => ({ count: 0 }), {
+        name: 'test-storage',
+        storage: {
+          getItem: () => ({ state: { count: 5 }, version: 0 }),
+          setItem: () => {},
+          removeItem: () => {},
+        },
+      }),
+      { enabled: true },
+    ),
+  )
+
+  expect(api.persist.hasHydrated()).toBe(true)
+  expect(api.getState()).toEqual({ count: 5 })
+  const [connection] = getNamedConnectionApis(undefined)
+  expect(connection.init).toHaveBeenLastCalledWith({ count: 5 })
+})
+
+it('does not send a setState from the initializer', () => {
+  const api = createStore(
+    devtools(
+      (set) => {
+        set({ count: 1 })
+        return { count: 2 }
+      },
+      { enabled: true },
+    ),
+  )
+
+  expect(api.getState()).toEqual({ count: 2 })
+  const [connection] = getNamedConnectionApis(undefined)
+  expect(connection.send).not.toHaveBeenCalled()
+  expect(connection.init).toHaveBeenLastCalledWith({ count: 2 })
+
+  api.setState({ count: 3 }, undefined, 'increment')
+  expect(connection.send).toHaveBeenLastCalledWith(
+    { type: 'increment' },
+    { count: 3 },
+  )
+})
+
 describe('When state changes with automatic setter inferring...', () => {
   it("sends { type: setStateName || 'setCount`, ...rest } as the action with current state", async () => {
     const options = {
@@ -506,14 +550,9 @@ describe('when it receives a message of type...', () => {
       }).not.toThrow()
 
       expect(console.error).toHaveBeenLastCalledWith(
-        '[zustand devtools middleware] Could not parse the received json',
-        (() => {
-          try {
-            JSON.parse('this.increment()')
-          } catch (e) {
-            return e
-          }
-        })(),
+        expect.stringContaining(
+          '[zustand devtools middleware] Malformed JSON.',
+        ),
       )
 
       expect(() => {
@@ -524,7 +563,8 @@ describe('when it receives a message of type...', () => {
       }).not.toThrow()
 
       expect(console.error).toHaveBeenLastCalledWith(
-        '[zustand devtools middleware] Unsupported action format',
+        '[zustand devtools middleware] The action dropdown is not supported with the redux middleware. ' +
+          'Dispatch a custom action in JSON format instead, e.g. { "type": "increment" }',
       )
 
       expect(api.getState()).toBe(initialState)
@@ -1597,14 +1637,9 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           1,
-          '[zustand devtools middleware] Could not parse the received json',
-          (() => {
-            try {
-              JSON.parse('this.increment1()')
-            } catch (e) {
-              return e
-            }
-          })(),
+          expect.stringContaining(
+            '[zustand devtools middleware] Malformed JSON.',
+          ),
         )
 
         expect(() => {
@@ -1615,14 +1650,9 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           2,
-          '[zustand devtools middleware] Could not parse the received json',
-          (() => {
-            try {
-              JSON.parse('this.increment2()')
-            } catch (e) {
-              return e
-            }
-          })(),
+          expect.stringContaining(
+            '[zustand devtools middleware] Malformed JSON.',
+          ),
         )
 
         expect(() => {
@@ -1633,14 +1663,9 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           3,
-          '[zustand devtools middleware] Could not parse the received json',
-          (() => {
-            try {
-              JSON.parse('this.increment3()')
-            } catch (e) {
-              return e
-            }
-          })(),
+          expect.stringContaining(
+            '[zustand devtools middleware] Malformed JSON.',
+          ),
         )
 
         expect(() => {
@@ -1651,7 +1676,8 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           4,
-          '[zustand devtools middleware] Unsupported action format',
+          '[zustand devtools middleware] The action dropdown is not supported with the redux middleware. ' +
+            'Dispatch a custom action in JSON format instead, e.g. { "type": "increment" }',
         )
         expect(() => {
           connectionSubscriber2({
@@ -1661,7 +1687,8 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           5,
-          '[zustand devtools middleware] Unsupported action format',
+          '[zustand devtools middleware] The action dropdown is not supported with the redux middleware. ' +
+            'Dispatch a custom action in JSON format instead, e.g. { "type": "increment" }',
         )
         expect(() => {
           connectionSubscriber3({
@@ -1671,7 +1698,8 @@ describe('when create devtools was called multiple times with `name` option unde
         }).not.toThrow()
         expect(console.error).toHaveBeenNthCalledWith(
           6,
-          '[zustand devtools middleware] Unsupported action format',
+          '[zustand devtools middleware] The action dropdown is not supported with the redux middleware. ' +
+            'Dispatch a custom action in JSON format instead, e.g. { "type": "increment" }',
         )
 
         expect(api1.getState()).toBe(initialState1)
@@ -2922,5 +2950,571 @@ describe('actionsDenylist', () => {
         actionsDenylist: ['secret.*'],
       }),
     )
+  })
+})
+
+describe('actionCreators', () => {
+  let savedConsoleError: any
+  beforeEach(() => {
+    savedConsoleError = console.error
+    console.error = vi.fn()
+  })
+  afterEach(() => {
+    console.error = savedConsoleError
+  })
+
+  it('passes the picked functions to the extension', () => {
+    createStore(
+      devtools(
+        () => ({
+          count: 0,
+          user: null,
+          increment: (by: number) => by,
+          reset: () => {},
+          actions: {
+            incBar: (amount: number) => amount,
+            nested: { incBaz: () => {} },
+          },
+        }),
+        {
+          enabled: true,
+          actionCreators: { '*': true, reset: false, 'actions.*': true },
+        },
+      ),
+    )
+
+    expect(extensionConnector.connect).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        actionCreators: [
+          expect.objectContaining({ name: 'increment', args: ['by'] }),
+          expect.objectContaining({ name: 'actions.incBar', args: ['amount'] }),
+        ],
+      }),
+    )
+  })
+
+  it('calls the action creator selected in the dropdown', () => {
+    const api = createStore<{
+      count: number
+      increment: (by: number) => void
+    }>()(
+      devtools(
+        (set) => ({
+          count: 0,
+          increment: (by) => set((state) => ({ count: state.count + by })),
+        }),
+        { enabled: true, actionCreators: { increment: true } },
+      ),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({
+      type: 'ACTION',
+      payload: { name: 'increment', selected: 0, args: ['5'], rest: '' },
+    })
+
+    expect(api.getState().count).toBe(5)
+  })
+
+  it('calls nested action creators from the dropdown and custom actions', () => {
+    const api = createStore<{
+      bar: number
+      baz: number
+      actions: {
+        incBar: (amount: number) => void
+        incBaz: (amount: number) => void
+      }
+    }>()(
+      devtools(
+        (set) => ({
+          bar: 1,
+          baz: 2,
+          actions: {
+            incBar: (amount) => set((state) => ({ bar: state.bar + amount })),
+            incBaz: (amount) => set((state) => ({ baz: state.baz + amount })),
+          },
+        }),
+        { enabled: true, actionCreators: { 'actions.*': true } },
+      ),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({
+      type: 'ACTION',
+      payload: {
+        name: 'actions.incBar',
+        selected: 0,
+        args: ['999'],
+        rest: '[]',
+      },
+    })
+    expect(api.getState().bar).toBe(1000)
+
+    subscriber({
+      type: 'ACTION',
+      payload: '{ "type": "actions.incBaz", "args": [3] }',
+    })
+    expect(api.getState().baz).toBe(5)
+
+    subscriber({
+      type: 'ACTION',
+      payload: '{ "type": "actions.incBaz", "args": { "amount": 5 } }',
+    })
+    expect(api.getState().baz).toBe(10)
+  })
+
+  it('logs an error for an unknown action type', () => {
+    const initialState = { count: 0, increment: () => {} }
+    const api = createStore(
+      devtools(() => initialState, {
+        enabled: true,
+        actionCreators: { increment: true },
+      }),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({ type: 'ACTION', payload: '{ "type": "decrement" }' })
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] Action type "decrement" not found in actionCreators',
+    )
+    expect(api.getState()).toBe(initialState)
+  })
+
+  it('logs an error for a custom action that is not JSON', () => {
+    createStore(
+      devtools(() => ({ count: 0, increment: () => {} }), {
+        enabled: true,
+        actionCreators: { increment: true },
+      }),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({ type: 'ACTION', payload: '{ type: "increment" }' })
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      expect.stringContaining('[zustand devtools middleware] Malformed JSON.'),
+    )
+  })
+
+  it('does not support the dropdown with the redux middleware', () => {
+    const api = createStore(
+      devtools(
+        redux(
+          ({ count }, { type }: { type: 'INCREMENT' }) => ({
+            count: type === 'INCREMENT' ? count + 1 : count,
+          }),
+          { count: 0 },
+        ),
+        {
+          enabled: true,
+          actionCreators: { increment: () => ({ type: 'INCREMENT' }) },
+        },
+      ),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({
+      type: 'ACTION',
+      payload: { name: 'increment', selected: 0, args: [], rest: '' },
+    })
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] The action dropdown is not supported with the redux middleware. ' +
+        'Dispatch a custom action in JSON format instead, e.g. { "type": "increment" }',
+    )
+    expect(api.getState().count).toBe(0)
+
+    subscriber({ type: 'ACTION', payload: '{ "type": "INCREMENT" }' })
+    expect(api.getState().count).toBe(1)
+  })
+
+  describe('while looking for functions in the state', () => {
+    let savedConsoleWarn: any
+    beforeEach(() => {
+      savedConsoleWarn = console.warn
+      console.warn = vi.fn()
+    })
+    afterEach(() => {
+      console.warn = savedConsoleWarn
+    })
+
+    const getListedNames = () => {
+      const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+      return actionCreators.map(({ name }: { name: string }) => name)
+    }
+
+    it('stops at circular references', () => {
+      const state: any = { increment: () => {}, actions: { reset: () => {} } }
+      state.self = state
+      state.actions.back = state
+      state.actions.nested = { back: state.actions }
+
+      expect(() => {
+        createStore(
+          devtools(() => state, {
+            enabled: true,
+            actionCreators: { '**': true },
+          }),
+        )
+      }).not.toThrow()
+
+      expect(getListedNames()).toEqual(['increment', 'actions.reset'])
+      expect(console.warn).not.toHaveBeenCalled()
+    })
+
+    it('finds an object that is shared between paths under each of them', () => {
+      const shared = { ping: () => {} }
+
+      createStore(
+        devtools(() => ({ first: shared, second: { shared } }), {
+          enabled: true,
+          actionCreators: { '**': true },
+        }),
+      )
+
+      expect(getListedNames()).toEqual(['first.ping', 'second.shared.ping'])
+    })
+
+    it('walks an object once however many paths lead to it', () => {
+      let node = {}
+      for (let i = 0; i < 64; i++) {
+        node = { left: node, right: node }
+      }
+
+      createStore(
+        devtools(() => ({ node, increment: () => {} }), {
+          enabled: true,
+          actionCreators: { '**': true },
+        }),
+      )
+
+      expect(getListedNames()).toEqual(['increment'])
+    })
+
+    it('does not run getters', () => {
+      const api = createStore<{
+        count: number
+        increment: () => void
+        readonly double: number
+      }>()(
+        devtools(
+          (_set, get) => ({
+            count: 1,
+            increment: () => {},
+            // `get()` has no state yet while the store is being created
+            get double() {
+              return get().count * 2
+            },
+          }),
+          { enabled: true, actionCreators: { '*': true } },
+        ),
+      )
+
+      expect(getListedNames()).toEqual(['increment'])
+      expect(api.getState().double).toBe(2)
+      expect(console.warn).not.toHaveBeenCalled()
+    })
+
+    it('accepts a state that is not an object', () => {
+      const log = () => {}
+
+      expect(() => {
+        createStore(
+          devtools(() => null, {
+            enabled: true,
+            actionCreators: { '*': true, log } as any,
+          }),
+        )
+      }).not.toThrow()
+
+      expect(getListedNames()).toEqual(['log'])
+      expect(console.warn).not.toHaveBeenCalled()
+    })
+  })
+
+  it('logs an error for the dropdown without the option', () => {
+    createStore(devtools(() => ({ count: 0 }), { enabled: true }))
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    subscriber({
+      type: 'ACTION',
+      payload: { name: 'increment', selected: 0, args: [], rest: '[]' },
+    })
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] Unsupported action format',
+    )
+  })
+
+  it('has the list ready when connecting', () => {
+    let listed: unknown
+    extensionConnector.connect.mockImplementationOnce((options) => {
+      listed = JSON.parse(JSON.stringify(options.actionCreators))
+      return { subscribe: vi.fn(), init: vi.fn() } as any
+    })
+    createStore(
+      devtools(() => ({ count: 0, increment: (by: number) => by }), {
+        enabled: true,
+        actionCreators: { increment: true },
+      }),
+    )
+
+    expect(listed).toEqual([{ name: 'increment', args: ['by'] }])
+  })
+
+  it('picks by specificity and takes functions from the option', () => {
+    const decrement = (by: number) => by
+    const log = (message: string) => message
+    createStore(
+      devtools(
+        () => ({
+          increment: () => {},
+          reset: () => {},
+          decrement: () => {},
+          nested: { a: { b: () => {} } },
+        }),
+        {
+          enabled: true,
+          actionCreators: { '**': true, reset: false, decrement, log },
+        },
+      ),
+    )
+
+    const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+    expect(actionCreators).toEqual([
+      { name: 'increment', func: expect.any(Function), args: [] },
+      { name: 'decrement', func: decrement, args: ['by'] },
+      { name: 'nested.a.b', func: expect.any(Function), args: [] },
+      { name: 'log', func: log, args: ['message'] },
+    ])
+  })
+
+  it.each<[source: string, args: string[]]>([
+    ['() => {}', []],
+    ['(a, b) => a', ['a', 'b']],
+    ['a => a', ['a']],
+    ['async a => a', ['a']],
+    ['async (a, b) => a', ['a', 'b']],
+    ['function (a, b) { return a }', ['a', 'b']],
+    ['function named(a, b) { return a }', ['a', 'b']],
+    ['async function* named(a) {}', ['a']],
+    ['method(a, b) { return a }', ['a', 'b']],
+    ['(a = 1, b = [1, 2], c = fn(1, 2)) => a', ['a', 'b', 'c']],
+    ['(a = (x) => x, b) => a', ['a', 'b']],
+    ['(a = x => x, b) => a', ['a', 'b']],
+    ['({ a, b }, [c, d]) => a', ['{ a, b }', '[c, d]']],
+    ['({ a = 1, b } = {}, c) => a', ['{ a = 1, b }', 'c']],
+    ['(a, ...rest) => a', ['a']],
+    ['(a /* first */, // second\n b) => a', ['a', 'b']],
+    ["(a /* it's */, // it's\n b) => a", ['a', 'b']],
+    ['(url = "https://example.test", count = 1) => url', ['url', 'count']],
+    ["(url = 'https://example.test', count = 1) => url", ['url', 'count']],
+    ['(url = `https://example.test`, count = 1) => url', ['url', 'count']],
+    ['(a = "x, y", b = ")", c = "\\"//", d) => a', ['a', 'b', 'c', 'd']],
+    ['({ a = "//" } = {}, b) => a', ['{ a = "//" }', 'b']],
+    ['(\n  a,\n  b,\n) => a', ['a', 'b']],
+    ['function () { [native code] }', []],
+  ])('lists the arguments of %s', (source, args) => {
+    const func = () => {}
+    func.toString = () => source
+    createStore(
+      devtools(() => ({ func }), {
+        enabled: true,
+        actionCreators: { func: true },
+      }),
+    )
+
+    const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+    expect(actionCreators[0].args).toEqual(args)
+  })
+
+  describe('with arguments from the dropdown', () => {
+    const setup = (options: object = {}) => {
+      const received = vi.fn()
+      createStore(
+        devtools(
+          () => ({
+            action: (...args: unknown[]) => received(...args),
+          }),
+          { enabled: true, actionCreators: { action: true }, ...options },
+        ),
+      )
+      const [subscriber] = getNamedConnectionSubscribers(undefined)
+      const dispatch = (payload: object) =>
+        subscriber({
+          type: 'ACTION',
+          payload: { name: 'action', selected: 0, ...payload },
+        })
+      return { received, dispatch }
+    }
+
+    it('parses them as JSON', () => {
+      const { received, dispatch } = setup()
+
+      dispatch({
+        args: ['5', '"foo"', '{ "by": 5 }', '[1, 2]', 'true', 'null'],
+        rest: '[7, 8]',
+      })
+
+      expect(received).toHaveBeenLastCalledWith(
+        5,
+        'foo',
+        { by: 5 },
+        [1, 2],
+        true,
+        null,
+        7,
+        8,
+      )
+    })
+
+    it('passes undefined for the ones left empty', () => {
+      const { received, dispatch } = setup()
+
+      // `undefined` in an array becomes `null` when the extension relays it
+      dispatch({ args: [null, '5', undefined, '6'], rest: '[]' })
+
+      expect(received).toHaveBeenLastCalledWith(undefined, 5, undefined, 6)
+    })
+
+    it('uses the reviver of the serialize option', () => {
+      const { received, dispatch } = setup({
+        serialize: {
+          reviver: (_key: string, value: unknown) =>
+            typeof value === 'number' ? value * 2 : value,
+        },
+      })
+
+      dispatch({ args: ['{ "by": 5 }'], rest: '[1]' })
+
+      expect(received).toHaveBeenLastCalledWith({ by: 10 }, 2)
+    })
+
+    it('does not evaluate them', () => {
+      const { received, dispatch } = setup()
+
+      expect(() => {
+        dispatch({ args: ['(globalThis.wasEvaluated = true)'], rest: '[]' })
+      }).not.toThrow()
+
+      expect((globalThis as any).wasEvaluated).toBeUndefined()
+      expect(received).not.toHaveBeenCalled()
+      expect(console.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Could not parse the arguments'),
+        expect.any(SyntaxError),
+      )
+    })
+
+    it('logs an error if rest is not an array', () => {
+      const { received, dispatch } = setup()
+
+      expect(() => {
+        dispatch({ args: [], rest: '5' })
+      }).not.toThrow()
+
+      expect(received).not.toHaveBeenCalled()
+      expect(console.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Could not parse the arguments'),
+        expect.any(Error),
+      )
+    })
+  })
+
+  it('logs an error for an unknown action from the dropdown', () => {
+    createStore(
+      devtools(() => ({ increment: () => {} }), {
+        enabled: true,
+        actionCreators: { increment: true },
+      }),
+    )
+
+    const [subscriber] = getNamedConnectionSubscribers(undefined)
+    expect(() => {
+      subscriber({
+        type: 'ACTION',
+        payload: { name: 'decrement', selected: 5, args: [], rest: '[]' },
+      })
+    }).not.toThrow()
+
+    expect(console.error).toHaveBeenLastCalledWith(
+      '[zustand devtools middleware] Action type "decrement" not found in actionCreators',
+    )
+  })
+
+  it('only calls the function selected in the dropdown on a shared connection', () => {
+    const name = 'actionCreatorsSharedConnection'
+    const incrementA = vi.fn()
+    const incrementB = vi.fn()
+    const apiA = createStore(
+      devtools(() => ({ incrementA: () => incrementA() }), {
+        enabled: true,
+        name,
+        store: 'a',
+        actionCreators: { incrementA: true },
+      }),
+    )
+    const apiB = createStore(
+      devtools(() => ({ incrementB: () => incrementB() }), {
+        enabled: true,
+        name,
+        store: 'b',
+        actionCreators: { incrementB: true },
+      }),
+    )
+
+    namedConnections.get(name)!.subscribers.forEach((subscriber) => {
+      subscriber({
+        type: 'ACTION',
+        payload: { name: 'incrementA', selected: 0, args: [], rest: '[]' },
+      })
+    })
+
+    expect(incrementA).toHaveBeenCalledTimes(1)
+    expect(incrementB).not.toHaveBeenCalled()
+    expect(console.error).not.toHaveBeenCalled()
+
+    apiA.devtools.cleanup()
+    apiB.devtools.cleanup()
+  })
+
+  it('only lists the first store on a shared connection, the others take custom actions', () => {
+    const name = 'actionCreatorsFirstStoreOnly'
+    const incrementB = vi.fn()
+    const apiA = createStore(
+      devtools(() => ({ incrementA: () => {} }), {
+        enabled: true,
+        name,
+        store: 'a',
+        actionCreators: { incrementA: true },
+      }),
+    )
+    const apiB = createStore(
+      devtools(() => ({ incrementB: (by: number) => incrementB(by) }), {
+        enabled: true,
+        name,
+        store: 'b',
+        actionCreators: { incrementB: true },
+      }),
+    )
+
+    expect(extensionConnector.connect).toHaveBeenCalledTimes(1)
+    const [{ actionCreators }] = extensionConnector.connect.mock.lastCall!
+    expect(actionCreators.map(({ name }: { name: string }) => name)).toEqual([
+      'incrementA',
+    ])
+
+    namedConnections.get(name)!.subscribers.forEach((subscriber) => {
+      subscriber({
+        type: 'ACTION',
+        payload: JSON.stringify({ type: 'incrementB', args: [5] }),
+      })
+    })
+
+    expect(incrementB).toHaveBeenCalledWith(5)
+    expect(console.error).not.toHaveBeenCalled()
+
+    apiA.devtools.cleanup()
+    apiB.devtools.cleanup()
   })
 })
