@@ -620,29 +620,36 @@ const getStateFunctions = (
   return functions
 }
 
+// A string or a comment as one token, any other character as its own
+const sourceTokenRe =
+  /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\/\*[\s\S]*?\*\/|\/\/.*|[\s\S]/g
+
 // Parameter names of a function, for the inputs of the action dropdown and for
-// custom actions passing `args` by name. Only its source has them.
+// custom actions passing `args` by name. Only its source has them. Strings stay
+// whole, as a `//`, `,` or `)` in a default value is not syntax.
 const getParamNames = (func: ActionCreatorObject['func']): string[] => {
-  const source = func.toString().replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
-  const arrowParam = /^(?:async\s+)?([^\s(=]+)\s*=>/.exec(source)?.[1]
+  const tokens = (func.toString().match(sourceTokenRe) ?? []).filter(
+    (token) => !/^\/[/*]/.test(token),
+  )
+  const arrowParam = /^(?:async\s+)?([^\s(=]+)\s*=>/.exec(tokens.join(''))?.[1]
   if (arrowParam) return [arrowParam]
 
   const params = ['']
   let depth = 0
   let inDefaultValue = false
-  for (const char of source.slice(source.indexOf('(') + 1)) {
+  for (const token of tokens.slice(tokens.indexOf('(') + 1)) {
     if (depth === 0) {
-      if (char === ')') break
-      if (char === ',') {
+      if (token === ')') break
+      if (token === ',') {
         params.push('')
         inDefaultValue = false
         continue
       }
-      if (char === '=') inDefaultValue = true
+      if (token === '=') inDefaultValue = true
     }
-    if ('([{'.includes(char)) depth++
-    if (')]}'.includes(char)) depth--
-    if (!inDefaultValue) params[params.length - 1] += char
+    if ('([{'.includes(token)) depth++
+    if (')]}'.includes(token)) depth--
+    if (!inDefaultValue) params[params.length - 1] += token
   }
   return (
     params

@@ -3307,6 +3307,12 @@ describe('actionCreators', () => {
     ['({ a = 1, b } = {}, c) => a', ['{ a = 1, b }', 'c']],
     ['(a, ...rest) => a', ['a']],
     ['(a /* first */, // second\n b) => a', ['a', 'b']],
+    ["(a /* it's */, // it's\n b) => a", ['a', 'b']],
+    ['(url = "https://example.test", count = 1) => url', ['url', 'count']],
+    ["(url = 'https://example.test', count = 1) => url", ['url', 'count']],
+    ['(url = `https://example.test`, count = 1) => url', ['url', 'count']],
+    ['(a = "x, y", b = ")", c = "\\"//", d) => a', ['a', 'b', 'c', 'd']],
+    ['({ a = "//" } = {}, b) => a', ['{ a = "//" }', 'b']],
     ['(\n  a,\n  b,\n) => a', ['a', 'b']],
     ['function () { [native code] }', []],
   ])('lists the arguments of %s', (source, args) => {
