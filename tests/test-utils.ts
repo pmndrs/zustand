@@ -35,11 +35,3 @@ const isReplacedMap = (value: any): value is ReplacedMap => {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
-
-export function createPromiseLike<T>(promise: Promise<T>): PromiseLike<T> {
-  return {
-    then(onFulfilled, onRejected) {
-      return createPromiseLike(promise.then(onFulfilled, onRejected))
-    },
-  }
-}
