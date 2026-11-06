@@ -196,7 +196,7 @@ to handle breaking changes in order to persist previously stored data.
 
 ### `migrate`
 
-> Type: `(persistedState: Object, version: number) => Object | Promise<Object>`
+> Type: `(persistedState: Object, version: number) => Object | PromiseLike<Object>`
 
 > Default: `(persistedState) => persistedState`
 
@@ -204,7 +204,14 @@ You can use this option to handle versions migration.
 The migrate function takes the persisted state
 and the version number as arguments.
 It must return a state that is compliant
-to the latest version (the version in the code).
+to the latest version (the version in the code), either directly or through a
+`PromiseLike`. A promise-like result must provide a chainable
+`then(onFulfilled, onRejected)` method and support omitted handlers; it does not
+need `catch` or `finally` methods.
+
+A migration result with a callable `then` property is treated as a thenable,
+even if it is a plain state object. Avoid returning a synchronous state object
+with an action named `then`; use a different action name instead.
 
 For instance, if you want to rename a field, you can use the following:
 
@@ -393,6 +400,40 @@ This can be done by calling the `rehydrate` method.
 await useBoundStore.persist.rehydrate()
 ```
 
+The result is a native `Promise`, supporting `await`, `.then()`, `.catch()`, and
+`.finally()`. Synchronous storage and migration can still restore the state and
+notify hydration listeners before `rehydrate()` returns. Callbacks attached to
+the returned Promise always run asynchronously.
+
+Migration writes also adopt promise-like `setItem` results, even when reading
+and migration are synchronous. Hydration completion callbacks and `hasHydrated()`
+may therefore update after the write settles rather than immediately. Use
+`await store.persist.rehydrate()` before relying on hydration completion.
+
+Write failures are passed to the callback returned by `onRehydrateStorage`,
+and `hasHydrated()` remains `false`. Awaiting `rehydrate()` does not itself throw
+these storage errors unless the callback throws.
+
+When combining Zustand versions, `setItem` may return the result of an older
+store's `rehydrate()`. If that result is a rejected internal synchronous
+Thenable, the outer hydration can stay pending, even when `getItem` and
+`migrate` are synchronous. The older Thenable reports rejection through
+`.catch()` and ignores the rejection handler passed to `.then()`.
+
+To handle this case, wrap the older store's result in a native Promise.
+
+```ts
+setItem: () =>
+  new Promise<void>((resolve, reject) => {
+    const result = legacyStore.persist.rehydrate()
+    if (result) {
+      result.then(resolve).catch(reject)
+    } else {
+      resolve()
+    }
+  })
+```
+
 ### `hasHydrated`
 
 > Type: `() => boolean`
@@ -448,6 +489,15 @@ unsub()
 This helper function enables you to create a [`storage`](#storage) object which is useful when you want to use a custom storage engine.
 
 `getStorage` is a function that returns the storage engine with the properties `getItem`, `setItem`, and `removeItem`.
+
+`getItem` can return a string or `null` directly, or a `PromiseLike` resolving to
+either value. Custom `PersistStorage` implementations can likewise return their
+storage value directly or through a `PromiseLike`.
+
+When calling the returned storage's `getItem` directly, use `await` to handle
+both synchronous and promise-like results. Unlike `persist.rehydrate()`, this
+helper does not convert every promise-like result to a native Promise, so
+`.catch()` and `.finally()` are not guaranteed on asynchronous results.
 
 `options` is an optional object that can be used to customize the serialization and deserialization of the data. `options.reviver` is a function that is passed to `JSON.parse` to deserialize the data. `options.replacer` is a function that is passed to `JSON.stringify` to serialize the data.
 
