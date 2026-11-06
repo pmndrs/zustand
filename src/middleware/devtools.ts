@@ -320,11 +320,10 @@ const devtoolsImpl: DevtoolsImpl =
 
     const actionCreatorObjects =
       actionCreators && getActionCreatorObjects(initialState, actionCreators)
-    const connectOptions = { ...options, actionCreators: actionCreatorObjects }
     const connectionInformation = extractConnectionInformation(
       store,
       extensionConnector,
-      connectOptions,
+      { ...options, actionCreators: actionCreatorObjects } as typeof options,
     )
     connection = connectionInformation.connection
 
