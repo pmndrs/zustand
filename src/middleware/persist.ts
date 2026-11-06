@@ -315,7 +315,6 @@ const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
         finishHydrationListeners.forEach((cb) => cb(stateFromStorage as S))
       })
       .then(
-        // Fulfilled Thenables from older Zustand versions expect a callback.
         () => undefined,
         (e: unknown) => {
           // Abort if a newer hydration has started
