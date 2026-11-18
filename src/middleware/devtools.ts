@@ -455,6 +455,20 @@ const devtoolsImpl: DevtoolsImpl =
               setStateFromDevtools(action.state as PartialState)
               return
             }
+            if (
+              !('state' in action) ||
+              action.state === undefined ||
+              action.state === null
+            ) {
+              console.warn(
+                `
+                [zustand devtools middleware] Calling __setState without a state property.
+                This may not be what you intended, you should explicitly set the state you want to set.
+                Example: { "type": "__setState", "state": { "foo": "bar" } }
+                `.replace(/\n\s+/g, '\n'),
+              )
+              return
+            }
             if (Object.keys(action.state as S).length !== 1) {
               console.error(
                 `

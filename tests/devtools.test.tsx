@@ -2661,6 +2661,47 @@ describe('when create devtools was called multiple times with `name` and `store`
           console.error = originalConsoleError
         })
 
+        it('does not throw when __setState has no state with `store` option', async () => {
+          const name1 = 'name-missing-state'
+          const store1 = 'missingStateStore'
+          const options1 = {
+            name: name1,
+            store: store1,
+            testStore: store1,
+          }
+          const initialState1 = { count: 0 }
+          const api1 = createStore(
+            devtools(() => initialState1, { enabled: true, ...options1 }),
+          )
+          const originalConsoleWarn = console.warn
+          console.warn = vi.fn()
+
+          const [connectionSubscriber] = getNamedConnectionSubscribers(
+            getKeyFromOptions(options1),
+          )
+          expect(() =>
+            connectionSubscriber({
+              type: 'ACTION',
+              payload: '{ "type": "__setState" }',
+            }),
+          ).not.toThrow()
+          expect(() =>
+            connectionSubscriber({
+              type: 'ACTION',
+              payload: '{ "type": "__setState", "state": null }',
+            }),
+          ).not.toThrow()
+
+          expect(console.warn).toHaveBeenCalledWith(
+            expect.stringContaining(
+              '[zustand devtools middleware] Calling __setState without a state property.',
+            ),
+          )
+          expect(api1.getState()).toStrictEqual({ ...initialState1 })
+
+          console.warn = originalConsoleWarn
+        })
+
         it('does nothing even if there is `api.dispatch`, connections isolated from each other', async () => {
           const { devtools: newDevtools } = await import('zustand/middleware')
 
