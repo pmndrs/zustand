@@ -167,7 +167,7 @@ type PersonStoreActions = {
   setPerson: (
     nextPerson:
       | PersonStoreState['person']
-      | ((person: PersonStoreState['person']) => PersonStoreState['person']),
+      | ((person: PersonStoreState['person']) => void),
   ) => void
 }
 
@@ -182,10 +182,11 @@ const personStore = createStore<PersonStore>()(
     },
     setPerson: (nextPerson) =>
       set((state) => {
-        state.person =
-          typeof nextPerson === 'function'
-            ? nextPerson(state.person)
-            : nextPerson
+        if (typeof nextPerson === 'function') {
+          nextPerson(state.person)
+        } else {
+          state.person = nextPerson
+        }
       }),
   })),
 )
