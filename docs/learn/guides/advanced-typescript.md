@@ -391,7 +391,8 @@ console.log(useBearStore.foo.toUpperCase())
 The recommended way to use `create` is using the curried workaround like so: `create<T>()(...)`. This is because it enables you to infer the store type. But if for some reason you do not want to use the workaround, you can pass the type parameters like the following. Note that in some cases, this acts as an assertion instead of annotation, so we don't recommend it.
 
 ```ts
-import { create } from "zustand"
+import { create } from 'zustand'
+import { devtools, persist } from 'zustand/middleware'
 
 interface BearState {
   bears: number
@@ -400,14 +401,18 @@ interface BearState {
 
 const useBearStore = create<
   BearState,
-  [
-    ['zustand/persist', BearState],
-    ['zustand/devtools', never]
-  ]
->(devtools(persist((set) => ({
-  bears: 0,
-  increase: (by) => set((state) => ({ bears: state.bears + by })),
-}), { name: 'bearStore' }))
+  [['zustand/devtools', never], ['zustand/persist', BearState]]
+>(
+  devtools(
+    persist(
+      (set) => ({
+        bears: 0,
+        increase: (by) => set((state) => ({ bears: state.bears + by })),
+      }),
+      { name: 'bearStore' },
+    ),
+  ),
+)
 ```
 
 ### Slices pattern
